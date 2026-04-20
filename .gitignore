@@ -1,0 +1,23 @@
+# Ignore build outputs and local profiler caches
+build/
+*.obj
+*.o
+*.pdb
+*.exe
+*.dll
+*.so
+*.dylib
+*.ptx
+*.cubin
+*.nvvp
+*.nsys-rep
+*.qdrep
+*.sqlite
+*.ncu-rep
+*.ncu-rep.gz
+*.log
+
+# Keep release evidence and reports tracked
+!releases/
+!benchmarks/reports/
+!profiles/

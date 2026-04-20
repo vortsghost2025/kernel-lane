@@ -1,0 +1,16 @@
+{
+  "lane": "kernel-lane",
+  "primary_gpu": "NVIDIA GeForce RTX 5060",
+  "cuda": {
+    "required": true,
+    "min_version": "12.0"
+  },
+  "default_build": {
+    "configuration": "Release",
+    "flags": ["-O3", "--use_fast_math"]
+  },
+  "baseline_policy": {
+    "regression_threshold_pct": 2.0,
+    "require_explanation_on_regression": true
+  }
+}
