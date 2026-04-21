@@ -2,7 +2,7 @@
   "name": "baseline",
   "created_at_utc": "2026-04-21T00:45:17Z",
   "gpu": "NVIDIA GeForce RTX 5060",
-  "command": "build\Release\benchmark.exe ",
+  "command": "build\\Release\\benchmark.exe ",
   "notes": "Automated benchmark run",
   "metrics": {
     "latency_ms": 126.33,
