@@ -29,7 +29,9 @@ if ($NsysReportPath -and (Test-Path $NsysReportPath)) {
   Write-Host "[WARN] No nsys report provided. Release will note this as a blocker."
 }
 
-$releaseRoot = Join-Path $PSScriptRoot "..\releases\$Version"
+# Normalize version to always use 'v' prefix for directory names
+$versionDir = if ($Version -match '^v') { $Version } else { "v$Version" }
+$releaseRoot = Join-Path $PSScriptRoot "..\releases\$versionDir"
 New-Item -ItemType Directory -Force -Path $releaseRoot | Out-Null
 
 $artifactDest = Join-Path $releaseRoot (Split-Path $ArtifactPath -Leaf)
@@ -48,7 +50,7 @@ if (-not $nsysMissing) {
 $metrics = Get-Content -Raw -Path $benchDest | ConvertFrom-Json
 
 $manifest = [ordered]@{
-  version = $Version
+    version = $versionDir
   created_at_utc = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
   artifact = (Split-Path $artifactDest -Leaf)
   benchmark_report = (Split-Path $benchDest -Leaf)
@@ -85,10 +87,10 @@ $convergenceArtifact = [ordered]@{
   type = "kernel_convergence"
   claim = $convergenceClaim
   evidence = $convergenceEvidence
-  status = if ($nsysMissing) { "partial" } else { "proven" }
-  next_blocker = if ($nsysMissing) { "nsys report missing - Nsight Systems daemon RPC timeout prevents collection" } else { $null }
-  version = $Version
-  created_at_utc = $manifest.created_at_utc
+    status = if ($nsysMissing) { "partial" } else { "proven" }
+    next_blocker = if ($nsysMissing) { "nsys report missing - optional on Windows headless per RELEASE_CONTRACT.md platform policy; required on Linux" } else { $null }
+    version = $versionDir
+    created_at_utc = $manifest.created_at_utc
 }
 
 $convergencePath = Join-Path $releaseRoot 'convergence.json'
@@ -104,22 +106,22 @@ $broadcast = [ordered]@{
   claim = $convergenceClaim
   evidence = $convergenceEvidence
   status = $convergenceArtifact.status
-  manifest_path = "releases/$Version/manifest.json"
-  convergence_path = "releases/$Version/convergence.json"
+    manifest_path = "releases/$versionDir/manifest.json"
+    convergence_path = "releases/$versionDir/convergence.json"
   created_at_utc = $manifest.created_at_utc
 }
 
-$broadcastPath = Join-Path $outboxDir "kernel_release_$Version.json"
+$broadcastPath = Join-Path $outboxDir "kernel_release_$versionDir.json"
 $broadcast | ConvertTo-Json -Depth 8 | Set-Content -Path $broadcastPath -Encoding UTF8
 
 # --- Update Index ---
 $indexPath = Join-Path $PSScriptRoot '..\releases\index.json'
 $index = Get-Content -Raw -Path $indexPath | ConvertFrom-Json
 if (-not $index.versions) { $index | Add-Member -NotePropertyName versions -NotePropertyValue @() -Force }
-$index.versions = @($index.versions | Where-Object { $_.version -ne $Version }) + @([ordered]@{
-  version = $Version
-  manifest = "releases/$Version/manifest.json"
-  convergence = "releases/$Version/convergence.json"
+$index.versions = @($index.versions | Where-Object { $_.version -ne $versionDir }) + @([ordered]@{
+    version = $versionDir
+    manifest = "releases/$versionDir/manifest.json"
+    convergence = "releases/$versionDir/convergence.json"
   created_at_utc = $manifest.created_at_utc
 })
 $index | ConvertTo-Json -Depth 8 | Set-Content -Path $indexPath -Encoding UTF8
