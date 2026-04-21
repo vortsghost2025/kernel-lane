@@ -60,14 +60,36 @@ $benchRaw = Get-Content -Raw -Path $benchDest
 $benchFixed = $benchRaw -replace '(?<!\\)\\(?!["\\/bfnrtu])', '\\'
 $metrics = $benchFixed | ConvertFrom-Json
 
+# Validate metrics are present and non-null — fail closed on missing data
+if ($null -eq $metrics -or $null -eq $metrics.metrics) {
+  throw "METRICS_MISSING: benchmark report contains no metrics object — cannot promote without quantitative evidence"
+}
+$metricsObj = $metrics.metrics
+$metricFields = @('speedup_vs_baseline', 'latency_ms', 'throughput')
+$presentMetrics = @()
+foreach ($field in $metricFields) {
+  $val = $metricsObj.PSObject.Properties.Match($field) | Select-Object -First 1
+  if ($null -ne $val -and $null -ne $val.Value) {
+    $presentMetrics += $field
+  }
+}
+if ($presentMetrics.Count -eq 0) {
+  throw "METRICS_ALL_NULL: speedup_vs_baseline, latency_ms, and throughput are all null — cannot promote without at least one valid metric"
+}
+
 $manifest = [ordered]@{
-    version = $versionDir
+  version = $versionDir
   created_at_utc = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
   artifact = (Split-Path $artifactDest -Leaf)
+  artifact_sha256 = (Get-FileHash -Path $artifactDest -Algorithm SHA256).Hash.ToLower()
   benchmark_report = (Split-Path $benchDest -Leaf)
+  benchmark_sha256 = (Get-FileHash -Path $benchDest -Algorithm SHA256).Hash.ToLower()
   nsys_report = if ($nsysMissing) { $null } else { (Split-Path $nsysDest -Leaf) }
+  nsys_sha256 = if ($nsysMissing) { $null } else { (Get-FileHash -Path $nsysDest -Algorithm SHA256).Hash.ToLower() }
   ncu_report = (Split-Path $ncuDest -Leaf)
-  metrics = $metrics.metrics
+  ncu_sha256 = (Get-FileHash -Path $ncuDest -Algorithm SHA256).Hash.ToLower()
+  metrics = $metricsObj
+  metrics_validated = $presentMetrics
   notes = $Notes
 }
 
@@ -78,16 +100,14 @@ $manifest | ConvertTo-Json -Depth 8 | Set-Content -Path $manifestPath -Encoding 
 $convergenceClaim = if ($Claim) { $Claim } else { "Version $Version promoted with benchmark evidence" }
 
 $convergenceEvidence = @()
-if ($metrics.metrics) {
-  if ($metrics.metrics.speedup_vs_baseline -ne $null) {
-    $convergenceEvidence += "benchmark: speedup $($metrics.metrics.speedup_vs_baseline)x vs baseline"
-  }
-  if ($metrics.metrics.latency_ms -ne $null) {
-    $convergenceEvidence += "benchmark: latency $($metrics.metrics.latency_ms) ms"
-  }
-  if ($metrics.metrics.throughput -ne $null) {
-    $convergenceEvidence += "benchmark: throughput $($metrics.metrics.throughput)"
-  }
+if ($metricsObj.speedup_vs_baseline -ne $null) {
+  $convergenceEvidence += "benchmark: speedup $($metricsObj.speedup_vs_baseline)x vs baseline"
+}
+if ($metricsObj.latency_ms -ne $null) {
+  $convergenceEvidence += "benchmark: latency $($metricsObj.latency_ms) ms"
+}
+if ($metricsObj.throughput -ne $null) {
+  $convergenceEvidence += "benchmark: throughput $($metricsObj.throughput)"
 }
 $convergenceEvidence += "ncu: $(Split-Path $ncuDest -Leaf)"
 if (-not $nsysMissing) {
@@ -139,6 +159,16 @@ $broadcast = [ordered]@{
 
 $broadcastPath = Join-Path $outboxDir "kernel_release_$versionDir.json"
 $broadcast | ConvertTo-Json -Depth 8 | Set-Content -Path $broadcastPath -Encoding UTF8
+
+# Enforce signed outbox emission (fail closed)
+$signScript = Join-Path $PSScriptRoot 'sign-outbox-message.js'
+if (!(Test-Path $signScript)) {
+  throw "Signing helper missing: $signScript"
+}
+& node $signScript --message $broadcastPath --lane kernel
+if ($LASTEXITCODE -ne 0) {
+  throw "Outbox signing failed for $broadcastPath"
+}
 
 # --- Update Index ---
 $indexPath = Join-Path $PSScriptRoot '..\releases\index.json'
