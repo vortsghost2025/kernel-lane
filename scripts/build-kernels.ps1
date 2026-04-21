@@ -13,12 +13,27 @@ if (-not $cuFiles) {
   exit 0
 }
 
+$execCount = 0
+$ptxCount = 0
 foreach ($f in $cuFiles) {
-  $out = Join-Path $buildDir ("{0}.ptx" -f $f.BaseName)
-  $cmd = "nvcc -ptx `"$($f.FullName)`" -o `"$out`" -O3 --use_fast_math"
-  Write-Host "[BUILD] $cmd"
-  cmd /c $cmd
-  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+  $containsMain = Select-String -Pattern 'int main\s*\(' -Path $f.FullName -Quiet
+  if ($containsMain) {
+    $out = Join-Path $buildDir ("{0}.exe" -f $f.BaseName)
+    $cmd = "nvcc -o `"$out`" `"$($f.FullName)`" -O3 --use_fast_math"
+    Write-Host "[BUILD] $cmd"
+    cmd /c $cmd
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    $execCount++
+  }
+  else {
+    $out = Join-Path $buildDir ("{0}.ptx" -f $f.BaseName)
+    $cmd = "nvcc -ptx -o `"$out`" `"$($f.FullName)`" -O3 --use_fast_math"
+    Write-Host "[BUILD] $cmd"
+    cmd /c $cmd
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    $ptxCount++
+  }
 }
 
 Write-Host "[PASS] Build complete: $buildDir"
+Write-Host "[SUMMARY] ${execCount} executables and ${ptxCount} PTX files produced."

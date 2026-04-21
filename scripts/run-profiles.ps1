@@ -2,7 +2,8 @@ param(
   [Parameter(Mandatory=$true)]
   [string]$ExecutablePath,
   [string]$Args = '',
-  [string]$Name = 'profile'
+  [string]$Name = 'profile',
+  [string]$Configuration = 'Release'
 )
 
 function Resolve-ToolCommand {
@@ -15,8 +16,9 @@ function Resolve-ToolCommand {
     return $ToolName
   }
 
+  $candidates = @()
   if ($ToolName -eq 'nsys') {
-    $candidates = @(
+    $candidates += @(
       'C:\Program Files\NVIDIA Corporation\Nsight Systems 2026.2.1\target-windows-x64\nsys.exe',
       'C:\Program Files\NVIDIA Corporation\Nsight Systems 2025.6.3\target-windows-x64\nsys.exe',
       'C:\Program Files\NVIDIA Corporation\Nsight Systems 2026.1.0\host-windows-x64\nsys.exe',
@@ -24,23 +26,36 @@ function Resolve-ToolCommand {
       'C:\Program Files\NVIDIA Corporation\Nsight Systems 2025.5.1\host-windows-x64\nsys.exe',
       'C:\Program Files\NVIDIA Corporation\Nsight Compute 2026.1.0\host\target-windows-x64\nsys.exe'
     )
-    foreach ($path in $candidates) {
-      if (Test-Path $path) {
-        return $path
-      }
+  } elseif ($ToolName -eq 'ncu') {
+    $candidates += @(
+      'C:\Program Files\NVIDIA Corporation\Nsight Compute 2026.1.0\ncu.exe',
+      'C:\Program Files\NVIDIA Corporation\Nsight Compute 2025.6.1\ncu.exe',
+      'C:\Program Files\NVIDIA Corporation\Nsight Compute 2025.5.1\ncu.exe'
+    )
+  }
+
+  foreach ($path in $candidates) {
+    if (Test-Path $path) {
+      return $path
     }
   }
 
   return $null
 }
 
+# Resolve the Executable Path
+if (!(Test-Path $ExecutablePath)) {
+  $buildPath = Join-Path $PSScriptRoot "..\build\$Configuration"
+  $resolvedPath = Join-Path -Path $buildPath -ChildPath $ExecutablePath
+  if (!(Test-Path $resolvedPath)) {
+    throw "Executable not found: $ExecutablePath"
+  }
+  $ExecutablePath = $resolvedPath
+}
+
 $nsysDir = Join-Path $PSScriptRoot '..\profiles\nsys'
 $ncuDir = Join-Path $PSScriptRoot '..\profiles\ncu'
 New-Item -ItemType Directory -Force -Path $nsysDir, $ncuDir | Out-Null
-
-if (!(Test-Path $ExecutablePath)) {
-  throw "Executable not found: $ExecutablePath"
-}
 
 $nsysExe = Resolve-ToolCommand -ToolName 'nsys'
 if (-not $nsysExe) {
@@ -49,7 +64,7 @@ if (-not $nsysExe) {
 
 $ncuExe = Resolve-ToolCommand -ToolName 'ncu'
 if (-not $ncuExe) {
-  throw 'ncu executable not found in PATH.'
+  throw 'ncu executable not found in PATH or fallback locations.'
 }
 
 $nsysOut = Join-Path $nsysDir $Name
@@ -65,5 +80,28 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 Write-Host "[NCU] $ncuCmd"
 cmd /c $ncuCmd
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+# Write JSON metadata files
+$metaTimestamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+
+$nsysMeta = [ordered]@{
+  name           = $Name
+  executable     = $ExecutablePath
+  args           = $Args
+  created_at_utc = $metaTimestamp
+  tool           = 'nsys'
+  output_files   = @($nsysOut)
+}
+$nsysMeta | ConvertTo-Json -Depth 4 | Set-Content -Path (Join-Path $nsysDir "${Name}_meta.json") -Encoding UTF8
+
+$ncuMeta = [ordered]@{
+  name           = $Name
+  executable     = $ExecutablePath
+  args           = $Args
+  created_at_utc = $metaTimestamp
+  tool           = 'ncu'
+  output_files   = @($ncuOut)
+}
+$ncuMeta | ConvertTo-Json -Depth 4 | Set-Content -Path (Join-Path $ncuDir "${Name}_meta.json") -Encoding UTF8
 
 Write-Host "[PASS] Profiling outputs at $nsysDir and $ncuDir"

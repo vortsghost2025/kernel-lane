@@ -55,15 +55,44 @@ Mode mismatch — orchestrator was in plan mode but executed tasks as if in code
 ## Repo State (Verified)
 | Component | Path | Status |
 |---|---|---|
-| Scripts | `scripts/*.ps1` | Complete (5 scripts) |
+| Scripts | `scripts/*.ps1` | Complete (6 scripts: build, benchmark, profile, promote, reject, env-check) |
 | Config | `config/targets.json` | Complete (RTX 5060, CUDA 12.0+, -O3, 2% regression threshold) |
 | Lane docs | `docs/` | 4 files (charter, release contract, promotion checklist, adoption notice) |
 | Integration rules | `integration/PROMOTION_CONSUME_RULES.md` | Complete |
-| Kernel source | `kernels/src/` | Empty (no .cu files) |
+| Kernel source | `kernels/src/` | 5 .cu files intaked from snac-v2/kimi-shared |
 | Kernel tests | `kernels/tests/` | Empty |
 | Baselines | `baselines/` | Empty (README only) |
 | Benchmark reports | `benchmarks/reports/` | Empty |
 | Profile reports | `profiles/nsys/`, `profiles/ncu/` | Empty |
 | Releases | `releases/index.json` | `{ "versions": [] }` |
-| Git remote | — | None configured |
+| Git remote | `origin` → `github.com/vortsghost2025/kernel-lane.git` | Configured, pushed |
 | Adoption proposal | `docs/LANE4_INTERFACE_ADOPTION_*.md` | Phase: PROPOSAL |
+| Cross-lane inbox | `lanes/kernel/inbox/`, `lanes/kernel-lane/inbox/` | Active (Library integration reqs received) |
+| Cross-lane outbox | `lanes/kernel/outbox/` | Active |
+
+## Session 2 Changes (2026-04-20T23:30Z)
+
+### Pipeline Fix: build-kernels.ps1
+- **Before**: Compiled all .cu files to .ptx only (`nvcc -ptx`), which cannot produce runnable executables
+- **After**: Detects `int main(` via `Select-String`; kernels with main() compile to .exe, kernels without compile to .ptx
+- **Impact**: 4 kernels (arb_kernel_graph, arb_kernel_tensor, benchmark, matrix_benchmark) → .exe; 1 kernel (inference_kernel) → .ptx
+
+### Pipeline Fix: run-benchmarks.ps1
+- **Before**: Accepted generic `-BenchmarkCommand` string; did not capture or parse output
+- **After**: Accepts `-ExecutablePath`, `-Configuration`, `-Args`; resolves path from build/; captures stdout; parses latency_ms and throughput via regex
+- **Impact**: Benchmark reports now contain real metric values instead of nulls
+
+### Pipeline Fix: run-profiles.ps1
+- **Before**: No Configuration parameter; no path resolution from build/; ncu had no fallback candidate paths; no metadata output
+- **After**: Adds `-Configuration` param; resolves executables from build/; adds ncu fallback paths (3 versions); writes JSON metadata files per profile run
+- **Impact**: Profiling can discover executables and tools without manual path specification
+
+### Bug Fix: reject-release.ps1
+- **Before**: Lines 27 and 48 had invalid PowerShell syntax: `if ($x) { $x } { $null }` (missing `else`)
+- **After**: Corrected to `if ($x) { $x } else { $null }`
+- **Impact**: Rejection artifact generation would have failed at runtime
+
+### Convergence Contract Updated
+- Evidence section: added build-kernels.ps1, run-benchmarks.ps1, run-profiles.ps1 entries with fix dates
+- Status section: added kernel main() classification, pipeline fix status, Library lane inbox
+- Next Blocker: updated to reflect fixed scripts and correct command syntax

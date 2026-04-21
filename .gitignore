@@ -16,6 +16,8 @@ build/
 *.ncu-rep
 *.ncu-rep.gz
 *.log
+*.bak
+nul
 
 # Keep release evidence and reports tracked
 !releases/
