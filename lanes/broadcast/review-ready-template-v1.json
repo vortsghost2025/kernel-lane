@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "lane": "library",
+  "repo": "self-organizing-library",
+  "branch": "main",
+  "commit_sha": "d34db33",
+  "generated_at": "2026-04-21T00:00:00Z",
+  "claim": "Concurrency policy wired and overlap blocked at runtime.",
+  "status": "proven",
+  "blocker_id": null,
+  "risk_level": "medium",
+  "changed_files": [
+    "scripts/inbox-watcher.js",
+    "scripts/concurrency-policy.js"
+  ],
+  "diff_scope": {
+    "base_sha": "abc1234",
+    "head_sha": "d34db33",
+    "files_changed": 2
+  },
+  "evidence": {
+    "commands": [
+      "node scripts/inbox-watcher.js --poll",
+      "node scripts/inbox-watcher.js --poll"
+    ],
+    "artifacts": [
+      "logs/watcher-runtime.log",
+      ".runtime/locks/watcher-library.lock"
+    ],
+    "tests": {
+      "passed": 4,
+      "failed": 0,
+      "flaky": 0
+    }
+  },
+  "policy": {
+    "one_blocker_respected": true,
+    "verified_by": ["library", "codex"],
+    "no_bypass_claimed": true
+  },
+  "review_request": {
+    "focus": ["concurrency", "scheduler-overlap"],
+    "questions": [
+      "Is stale-lock recovery fail-closed if acquired_at is malformed?"
+    ]
+  }
+}

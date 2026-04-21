@@ -1,0 +1,9 @@
+{
+  "name": "baseline",
+  "executable": "S:\\kernel-lane\\build\\Release\\profile_target.exe",
+  "nsys_version": "NVIDIA Nsight Systems version 2026.2.1.210-262137639646v0",
+  "created_at_utc": "2026-04-21T12:46:14Z",
+  "tool": "nsys",
+  "args": "profile -t cuda --sample=none --cpuctxsw=none -x true --force-overwrite=true --stats=true -o S:\\kernel-lane\\scripts\\..\\profiles\\nsys\\baseline S:\\kernel-lane\\build\\Release\\profile_target.exe",
+  "exit_code": 0
+}

@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review-ready-schema-v1",
+  "title": "Lane Review-Ready Payload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "lane",
+    "repo",
+    "branch",
+    "commit_sha",
+    "generated_at",
+    "claim",
+    "status",
+    "risk_level",
+    "changed_files",
+    "diff_scope",
+    "evidence",
+    "policy",
+    "review_request"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "lane": {
+      "type": "string",
+      "enum": ["archivist", "library", "swarmmind", "kernel"]
+    },
+    "repo": { "type": "string", "minLength": 1 },
+    "branch": { "type": "string", "minLength": 1 },
+    "commit_sha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{7,40}$"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "claim": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 300
+    },
+    "status": {
+      "type": "string",
+      "enum": ["proven", "conflicted", "blocked", "unproven"]
+    },
+    "blocker_id": {
+      "type": ["string", "null"],
+      "maxLength": 120
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"]
+    },
+    "changed_files": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "diff_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_sha", "head_sha", "files_changed"],
+      "properties": {
+        "base_sha": { "type": "string", "pattern": "^[a-f0-9]{7,40}$" },
+        "head_sha": { "type": "string", "pattern": "^[a-f0-9]{7,40}$" },
+        "files_changed": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commands", "artifacts", "tests"],
+      "properties": {
+        "commands": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "tests": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["passed", "failed", "flaky"],
+          "properties": {
+            "passed": { "type": "integer", "minimum": 0 },
+            "failed": { "type": "integer", "minimum": 0 },
+            "flaky": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "one_blocker_respected",
+        "verified_by",
+        "no_bypass_claimed"
+      ],
+      "properties": {
+        "one_blocker_respected": { "type": "boolean" },
+        "verified_by": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "no_bypass_claimed": { "type": "boolean" }
+      }
+    },
+    "review_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["focus", "questions"],
+      "properties": {
+        "focus": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "string",
+            "enum": [
+              "concurrency",
+              "identity-chain",
+              "routing",
+              "verification",
+              "kernel-promotion",
+              "recovery-overrides",
+              "fallback-remnants",
+              "scheduler-overlap"
+            ]
+          }
+        },
+        "questions": {
+          "type": "array",
+          "maxItems": 3,
+          "items": { "type": "string", "minLength": 3, "maxLength": 240 }
+        }
+      }
+    }
+  }
+}
