@@ -1,14 +1,14 @@
 ﻿{
     "type":  "kernel_release_broadcast",
     "version":  "v0.1.0",
-    "claim":  "Baseline release: RTX 5060 FMA kernel benchmark + ncu profile",
+    "claim":  "Baseline release: RTX 5060 FMA kernel benchmark + full 42-pass ncu profile",
     "evidence":  [
                      "benchmark: latency 126.33 ms",
                      "benchmark: throughput 8105480.5",
-                     "ncu: baseline.ncu-rep"
+                     "ncu: full-profile-2026-04-21.ncu-rep"
                  ],
     "status":  "partial",
     "manifest_path":  "releases/v0.1.0/manifest.json",
     "convergence_path":  "releases/v0.1.0/convergence.json",
-    "created_at_utc":  "2026-04-21T03:27:48Z"
+    "created_at_utc":  "2026-04-21T04:52:00Z"
 }
