@@ -92,12 +92,14 @@ if ($SkipNsys -or $Headless) {
 $metaTimestamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
 
 $nsysMeta = [ordered]@{
-  name           = $Name
-  executable     = $ExecutablePath
-  args           = $Args
+  name = $Name
+  executable = $ExecutablePath
+  args = $Args
   created_at_utc = $metaTimestamp
-  tool           = 'nsys'
-  output_files   = @($nsysOut)
+  tool = 'nsys'
+  skipped = ($SkipNsys -or $Headless -or -not $nsysExe)
+  skip_reason = if ($SkipNsys) { 'explicit skip' } elseif ($Headless) { 'headless mode - nsys daemon requires interactive desktop to accept agent dialog' } elseif (-not $nsysExe) { 'nsys not found in PATH or fallback locations' } else { $null }
+  output_files = if ($SkipNsys -or $Headless -or -not $nsysExe) { @() } else { @($nsysOut) }
 }
 $nsysMeta | ConvertTo-Json -Depth 4 | Set-Content -Path (Join-Path $nsysDir "${Name}_meta.json") -Encoding UTF8
 
