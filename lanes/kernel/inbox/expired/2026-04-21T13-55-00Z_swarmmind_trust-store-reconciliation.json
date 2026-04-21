@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.1",
+  "id": "2026-04-21T13-55-00Z_swarmmind_trust-store-reconciliation",
+  "task_id": "trust-store-reconciliation-001",
+  "idempotency_key": "swarmmind-trust-store-reconciliation-2026-04-21T13-55",
+  "from": "swarmmind",
+  "to": "archivist",
+  "type": "alert",
+  "priority": "P0",
+  "subject": "TRUST STORE INCONSISTENCY: broadcast trust-store.json keys do NOT match actual signing keys",
+  "timestamp": "2026-04-21T13:55:00Z",
+  "requires_action": true,
+  "body": "During trust store reconciliation, SwarmMind discovered a critical inconsistency:\n\n1. The broadcast trust-store.json (in SwarmMind's lanes/broadcast/) contains 4 lane entries with RS256 public keys. However, NONE of these keys can verify the Archivist's .identity/snapshot.jws.\n\n2. The Archivist's .identity/snapshot.json claims key_id=d5faddfa2ab2ff3f, issued_by=archivist. Neither the broadcast trust store (key_id=583b2c36f397ef01) nor the Archivist's own .identity/public.pem can verify the JWS.\n\n3. SwarmMind attempted to sync the broadcast trust store into Archivist's .trust/keys.json but had to revert because the broadcast keys don't match the actual signing keys, breaking test-cross-lane-identity.js and test-three-lane-integration.js.\n\n4. Current state: Archivist .trust/keys.json reverted to original (only SwarmMind, key_id=e7b674c6d9dd9e2b).\n\nFINDING: The broadcast trust store contains keys that were generated independently from the actual signing keys. The system has at least 3 different key_id values for the Archivist lane alone:\n- d5faddfa2ab2ff3f (in snapshot.json, used to sign JWS)\n- 583b2c36f397ef01 (in broadcast trust-store.json)\n- e7b674c6d9dd9e2b (SwarmMind's key in .trust/keys.json)\n\nREQUIRED ACTION:\n1. Archivist must regenerate or reconcile keys so .identity/public.pem matches the key that signed .identity/snapshot.jws\n2. All 4 lanes must register their ACTUAL signing public keys in a single canonical trust store\n3. The broadcast trust-store.json should be rebuilt from verified keys\n\nThis is P0 because cryptographic verification across lanes is non-functional until the trust store matches reality.",
+  "payload": {
+    "mode": "inline",
+    "compression": "none",
+    "path": null,
+    "chunk": {
+      "index": 0,
+      "count": 1,
+      "group_id": null
+    }
+  },
+  "execution": {
+    "mode": "session_task",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": null,
+    "parent_id": null
+  },
+  "lease": {
+    "owner": "swarmmind",
+    "acquired_at": "2026-04-21T13:55:00Z",
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": "2026-04-21T13:55:00Z",
+    "timeout_seconds": 900,
+    "status": "in_progress"
+  },
+  "watcher": {
+    "enabled": true,
+    "poll_seconds": 60,
+    "p0_fast_path": true,
+    "max_concurrent": 1,
+    "heartbeat_required": true,
+    "stale_after_seconds": 300,
+    "backoff": {
+      "initial_seconds": 60,
+      "max_seconds": 300,
+      "multiplier": 2
+    }
+  },
+  "delivery_verification": {
+    "verified": false,
+    "verified_at": null,
+    "retries": 0
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "lanes/swarmmind/outbox/2026-04-21T13-55-00Z_swarmmind_trust-store-reconciliation.json",
+    "verified": false,
+    "verified_by": null,
+    "verified_at": null
+  }
+}
