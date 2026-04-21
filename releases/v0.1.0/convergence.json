@@ -1,0 +1,13 @@
+﻿{
+    "type":  "kernel_convergence",
+    "claim":  "Baseline release: RTX 5060 FMA kernel benchmark + ncu profile",
+    "evidence":  [
+                     "benchmark: latency 126.33 ms",
+                     "benchmark: throughput 8105480.5",
+                     "ncu: baseline.ncu-rep"
+                 ],
+    "status":  "partial",
+    "next_blocker":  "nsys report missing - Nsight Systems daemon RPC timeout prevents collection",
+    "version":  "v0.1.0",
+    "created_at_utc":  "2026-04-21T03:27:48Z"
+}

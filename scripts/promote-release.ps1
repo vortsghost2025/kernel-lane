@@ -86,7 +86,7 @@ $convergenceArtifact = [ordered]@{
   claim = $convergenceClaim
   evidence = $convergenceEvidence
   status = if ($nsysMissing) { "partial" } else { "proven" }
-  next_blocker = if ($nsysMissing) { "nsys report missing — Nsight Systems daemon RPC timeout prevents collection" } else { $null }
+  next_blocker = if ($nsysMissing) { "nsys report missing - Nsight Systems daemon RPC timeout prevents collection" } else { $null }
   version = $Version
   created_at_utc = $manifest.created_at_utc
 }
@@ -115,7 +115,7 @@ $broadcast | ConvertTo-Json -Depth 8 | Set-Content -Path $broadcastPath -Encodin
 # --- Update Index ---
 $indexPath = Join-Path $PSScriptRoot '..\releases\index.json'
 $index = Get-Content -Raw -Path $indexPath | ConvertFrom-Json
-if (-not $index.versions) { $index | Add-Member -NotePropertyName versions -NotePropertyValue @() }
+if (-not $index.versions) { $index | Add-Member -NotePropertyName versions -NotePropertyValue @() -Force }
 $index.versions = @($index.versions | Where-Object { $_.version -ne $Version }) + @([ordered]@{
   version = $Version
   manifest = "releases/$Version/manifest.json"
@@ -129,5 +129,5 @@ Write-Host "[MANIFEST] $manifestPath"
 Write-Host "[CONVERGENCE] $convergencePath"
 Write-Host "[BROADCAST] $broadcastPath"
 if ($nsysMissing) {
-  Write-Host "[WARN] nsys report is MISSING — convergence status is 'partial', not 'proven'"
+  Write-Host "[WARN] nsys report is MISSING - convergence status is 'partial', not 'proven'"
 }
