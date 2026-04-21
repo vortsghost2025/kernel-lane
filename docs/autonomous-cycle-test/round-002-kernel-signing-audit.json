@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.2",
+  "audit_type": "outbox-signing-compliance",
+  "round": 2,
+  "lane": "kernel",
+  "timestamp": "2026-04-21T20:16:16Z",
+  "summary": {
+    "total_messages": 51,
+    "signed": 5,
+    "unsigned": 46,
+    "compliance_rate": "9.8%",
+    "status": "NON-COMPLIANT"
+  },
+  "by_lane": {
+    "kernel": {
+      "total": 7,
+      "signed": 1,
+      "unsigned": 6,
+      "signed_key_ids": ["74bc4b8df188b771"],
+      "note": "2 release JSON files have BOM encoding errors preventing parse. Only delegation-proposal is signed."
+    },
+    "archivist": {
+      "total": 4,
+      "signed": 0,
+      "unsigned": 4,
+      "signed_key_ids": [],
+      "note": "All messages predate signing infrastructure. No v1.2 messages in outbox."
+    },
+    "library": {
+      "total": 21,
+      "signed": 1,
+      "unsigned": 20,
+      "signed_key_ids": ["a3136a93627b7b46"],
+      "note": "act-round-001 is signed. 3 non-schema files (gate-result, protocol-ack, test-001) are not inbox messages."
+    },
+    "swarmmind": {
+      "total": 19,
+      "signed": 3,
+      "unsigned": 16,
+      "signed_key_ids": ["b5d6bf66c0ad53a7", "ad645452e2e44871", "72bd1d099a7490ab"],
+      "note": "3 different key_ids observed — key rotation in progress. Unsigned messages include key-reconciliation alerts which should have been signed."
+    }
+  },
+  "risk_assessment": {
+    "level": "HIGH",
+    "reason": "90.2% of outbound messages lack cryptographic signatures. Under enforce mode, these messages would be expired by recipient watchers. Historical messages predate signing infrastructure but all NEW messages must be signed.",
+    "required_action": "All lanes must sign all outbound messages via sign-outbox-message.js or create-signed-message.js before delivery."
+  },
+  "convergence_gate": {
+    "claim": "9.8% signing compliance across 4-lane outboxes — insufficient for enforce-mode operation",
+    "evidence": "docs/autonomous-cycle-test/round-002-kernel-signing-audit.json",
+    "verified_by": "kernel",
+    "contradictions": [],
+    "status": "proven"
+  }
+}

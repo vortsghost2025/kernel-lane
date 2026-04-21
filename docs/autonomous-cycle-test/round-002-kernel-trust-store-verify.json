@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.2",
+  "audit_type": "trust-store-keyid-cross-verification",
+  "round": 2,
+  "lane": "kernel",
+  "timestamp": "2026-04-21T20:16:16Z",
+  "summary": {
+    "lanes_checked": 4,
+    "lanes_match": 3,
+    "lanes_mismatch": 1,
+    "status": "PARTIAL-COMPLIANCE"
+  },
+  "verification_results": {
+    "archivist": {
+      "trust_store_key_id": "583b2c36f397ef01",
+      "pem_fingerprint": "583b2c36f397ef01",
+      "match": true,
+      "identity_dir_exists": true,
+      "identity_dir_files": ["private.pem", "public.pem", "keys.json", "snapshot.jws", "snapshot.json"],
+      "note": "Key reconciliation completed in prior session. snapshot.jws re-signed with correct keyId."
+    },
+    "library": {
+      "trust_store_key_id": "a3136a93627b7b46",
+      "pem_fingerprint": "a3136a93627b7b46",
+      "match": true,
+      "identity_dir_exists": true,
+      "identity_dir_files": ["private.pem", "public.pem", "keys.json", "snapshot.jws", "snapshot.json", "identity.json", "current.json"],
+      "note": "Stable identity. No key rotation detected."
+    },
+    "kernel": {
+      "trust_store_key_id": "74bc4b8df188b771",
+      "pem_fingerprint": "74bc4b8df188b771",
+      "match": true,
+      "identity_dir_exists": true,
+      "identity_dir_files": ["private.pem", "public.pem"],
+      "note": "Stable identity. Signed delegation proposal verified with this key."
+    },
+    "swarmmind": {
+      "trust_store_key_id_in_kernel_trust_store": "72bd1d099a7490ab",
+      "trust_store_key_id_in_swarmmind_trust_store": "72bd1d099a7490ab",
+      "latest_outbox_key_id": "72bd1d099a7490ab",
+      "previous_key_ids_observed": ["b5d6bf66c0ad53a7", "ad645452e2e44871", "0ea6e056ade40876"],
+      "pem_fingerprint": "N/A — .identity/ directory missing (deleted by external process)",
+      "match": "UNKNOWN — cannot verify without .identity/",
+      "identity_dir_exists": false,
+      "note": "CRITICAL: SwarmMind .identity/ directory has been deleted AGAIN. Key self-healing will regenerate on next watcher startup, but key_id will differ from trust store entry. Trust store entries across all 4 lanes show 72bd1d099a7490ab (latest rotation) but new key will have a new key_id. This is the THIRD key rotation event."
+    }
+  },
+  "cross_lane_consistency": {
+    "check": "All 4 trust-store.json files contain same 4 entries with same key_ids?",
+    "archivist_key_id": "583b2c36f397ef01",
+    "library_key_id": "a3136a93627b7b46",
+    "kernel_key_id": "74bc4b8df188b771",
+    "swarmmind_key_id": "72bd1d099a7490ab",
+    "consistent_across_all_4_stores": true,
+    "note": "All trust stores are synchronized. The SwarmMind key_id in trust stores (72bd1d099a7490ab) matches the most recent outbound signed message. However .identity/ is missing so next self-heal will generate a NEW key, breaking this consistency."
+  },
+  "risk_assessment": {
+    "level": "CRITICAL",
+    "reason": "SwarmMind .identity/ keeps getting deleted by external process (likely git clean or agent workspace reset). Each deletion triggers key regeneration, creating a new key_id that diverges from all 4 trust stores. Root cause: external process deleting .identity/. Self-healing treats symptom, not cause.",
+    "required_action": "1. Add .identity/ to .gitignore in SwarmMind repo. 2. Protect .identity/ from deletion in agent workspace. 3. Consider adding key_id continuity check to self-healing (detect if key_id changed and alert other lanes)."
+  },
+  "convergence_gate": {
+    "claim": "3 of 4 lanes have verified key_id ↔ PEM consistency. SwarmMind is in key rotation loop due to external .identity/ deletion.",
+    "evidence": "docs/autonomous-cycle-test/round-002-kernel-trust-store-verify.json",
+    "verified_by": "kernel",
+    "contradictions": ["swarmmind .identity/ missing — cannot verify PEM fingerprint against trust store"],
+    "status": "conflicted"
+  }
+}
