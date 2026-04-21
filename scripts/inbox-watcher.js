@@ -8,6 +8,7 @@ const {
   assertWatcherConfig,
   acquireWatcherLock
 } = require('./concurrency-policy');
+const { IdentityEnforcer } = require('./identity-enforcer');
 
 let validateMessage;
 try {
@@ -62,6 +63,18 @@ class InboxWatcher {
     this.consecutiveP0Count = 0;
     this.loadProcessedKeys();
     this.loadConvergenceConstraint();
+
+    this._identityHealed = false;
+    try {
+      const { healLaneIdentity } = require('./identity-self-healing');
+      const healResult = healLaneIdentity(this.config.laneName || 'kernel');
+      this._identityHealed = healResult.keysRegenerated || false;
+      if (healResult.keysRegenerated) {
+        console.log(`[watcher] IDENTITY_SELF_HEAL: keys regenerated keyId=${healResult.keyId}`);
+      }
+    } catch (_) {}
+
+    this.identityEnforcer = new IdentityEnforcer({ enforcementMode: 'enforce' });
   }
 
   loadConvergenceConstraint() {
@@ -141,6 +154,13 @@ class InboxWatcher {
             this.moveToExpired(filename, filePath);
             continue;
           }
+        }
+        const idResult = this.identityEnforcer.enforceMessage(msg);
+        msg._identity = idResult;
+        if (idResult.decision === 'reject') {
+          console.warn(`[watcher] IDENTITY_REJECT: ${filename} from ${idResult.from} — ${idResult.reason}`);
+          this.moveToExpired(filename, filePath);
+          continue;
         }
         messages.push(msg);
       } catch (e) {
