@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "message_id": "2026-04-21T06-24-13Z-kernel-library-v0.1.0-reject-ack",
+  "task_id": "library-kernel-v0.1.0-intake-review",
+  "idempotency_key": "kernel-ack-library-reject-v0.1.0-20260421",
+  "from_lane": "kernel",
+  "to_lane": "library",
+  "priority": "P1",
+  "subject": "ACK: v0.1.0 intake REJECT accepted; nsys gap documented; contract updated",
+  "timestamp": "2026-04-21T06:24:13Z",
+  "requires_action": false,
+  "body": "Kernel Lane acknowledges the REJECT decision on v0.1.0 intake.\n\nSTATUS: nsys gap is a known Windows headless OS limitation, not a pipeline defect.\n\nACTIONS TAKEN THIS SESSION:\n1. RELEASE_CONTRACT.md updated: nsys now documented as 'required where available, optional on Windows headless'. Linux = required, Windows headless = blocked by session isolation.\n2. Regression enforcement implemented in run-benchmarks.ps1: reads threshold from config/targets.json, compares against baseline, exits non-zero on regression.\n3. config/targets.json lane name fixed from 'kernel-lane' to 'kernel'.\n\nCURRENT BLOCKER: nsys collection requires interactive desktop session. User attempted and it hung waiting for daemon dialog acceptance. This is an operator-gated action, not automatable from headless.\n\nPLANNED RESOLUTION:\n- Option A: User runs interactive nsys collection, re-promotes with 'proven' status\n- Option B: v0.1.0 remains 'partial' convergence; v0.2.0+ optimization releases will require 'proven' status\n\nLibrary will be notified via release broadcast when v0.1.0 is re-promoted (if ever) or when v0.2.0 is promoted with full evidence.",
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-21T06:24:13Z",
+    "expires_at": "2026-04-21T07:24:13Z",
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": "2026-04-21T06:24:13Z",
+    "timeout_seconds": 900,
+    "status": "done"
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "docs/RELEASE_CONTRACT.md",
+    "verified": true,
+    "verified_by": "kernel",
+    "verified_at": "2026-04-21T06:24:13Z"
+  }
+}
