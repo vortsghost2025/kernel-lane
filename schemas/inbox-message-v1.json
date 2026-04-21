@@ -1,0 +1,233 @@
+{
+  "$id": "https://example.com/schemas/inbox-message-v1.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Inbox Message Schema v1.2",
+  "description": "Cross-lane inbox message format. v1.2 adds: signature/key_id REQUIRED (fail-closed identity), type enum expanded with 'ack'. v1.1 added: payload.compression, execution.parent_id, watcher block, canonical_paths, delivery_verification.",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+    "default": "1.2",
+    "enum": ["1.0", "1.1", "1.2"]
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "from": {
+      "type": "string",
+      "default": "library"
+    },
+  "to": {
+    "type": "string",
+    "enum": ["archivist", "library", "swarmmind", "kernel"]
+  },
+  "type": {
+    "type": "string",
+    "enum": ["task", "response", "heartbeat", "escalation", "handoff", "ack"]
+  },
+    "task_kind": {
+      "type": "string",
+      "enum": ["proposal", "review", "amendment", "ratification"]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["P0", "P1", "P2", "P3"]
+    },
+    "subject": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "requires_action": {
+      "type": "boolean"
+    },
+    "payload": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["inline", "path", "chunked"]
+        },
+        "compression": {
+          "type": "string",
+          "enum": ["none", "gzip"],
+          "default": "none",
+          "description": "v1.1: Compression for large payloads. gzip recommended for body > 2000 chars."
+        },
+        "path": {
+          "type": "string"
+        },
+        "chunk": {
+          "type": "object",
+          "properties": {
+            "index": {"type": "integer"},
+            "count": {"type": "integer"},
+            "group_id": {"type": "string"}
+          },
+          "required": ["index", "count"]
+        }
+      },
+      "required": ["mode"]
+    },
+    "execution": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["manual", "session_task", "watcher"]
+        },
+        "engine": {
+          "type": "string",
+          "enum": ["kilo", "opencode", "other"]
+        },
+        "actor": {
+          "type": "string",
+          "enum": ["lane", "subagent", "watcher"],
+          "description": "v1.1: 'watcher' added for watcher-initiated processing provenance."
+        },
+        "session_id": {"type": "string"},
+        "parent_id": {
+          "type": "string",
+          "default": null,
+          "description": "v1.1: Links to parent task for fan-out/fan-in patterns. Null if this is a root task."
+        }
+      },
+      "required": ["mode", "engine", "actor"]
+    },
+    "lease": {
+      "type": "object",
+      "properties": {
+        "owner": {"type": "string"},
+        "acquired_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "renew_count": {
+          "type": "integer",
+          "default": 0
+        },
+        "max_renewals": {
+          "type": "integer",
+          "default": 3
+        }
+      }
+    },
+    "retry": {
+      "type": "object",
+      "properties": {
+        "attempt": {"type": "integer", "default": 1},
+        "max_attempts": {"type": "integer", "default": 3},
+        "last_error": {"type": "string"},
+        "last_attempt_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "default": true
+        },
+        "evidence_path": {"type": "string"},
+        "verified": {"type": "boolean", "default": false},
+        "verified_by": {"type": "string"},
+        "verified_at": {"type": "string",
+          "format": "date-time"}
+      }
+    },
+    "heartbeat": {
+      "type": "object",
+      "properties": {
+        "interval_seconds": {"type": "integer", "default": 300},
+        "last_heartbeat_at": {"type": "string",
+          "format": "date-time"},
+        "timeout_seconds": {"type": "integer", "default": 900},
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "done", "failed", "escalated", "timed_out"]
+        }
+      }
+    },
+    "watcher": {
+      "type": "object",
+      "description": "v1.1: Watcher policy block for inbox consumer configuration.",
+      "properties": {
+        "enabled": {"type": "boolean", "default": false},
+        "poll_seconds": {"type": "integer", "default": 60},
+        "p0_fast_path": {"type": "boolean", "default": true},
+        "max_concurrent": {"type": "integer", "default": 1},
+        "heartbeat_required": {"type": "boolean", "default": true},
+        "stale_after_seconds": {"type": "integer", "default": 300},
+        "backoff": {
+          "type": "object",
+          "properties": {
+            "initial_seconds": {"type": "integer", "default": 60},
+            "max_seconds": {"type": "integer", "default": 300},
+            "multiplier": {"type": "integer", "default": 2}
+          }
+        }
+      }
+    },
+    "canonical_paths": {
+      "type": "object",
+      "description": "v1.1: Canonical delivery paths. Senders MUST write to the target lane's canonical path, NOT their own local mirror.",
+      "properties": {
+        "archivist": {"type": "string", "default": "S:/Archivist-Agent/lanes/archivist/inbox/"},
+        "library": {"type": "string", "default": "S:/self-organizing-library/lanes/library/inbox/"},
+        "swarmmind": {"type": "string", "default": "S:/SwarmMind Self-Optimizing Multi-Agent AI System/lanes/swarmmind/inbox/"},
+        "kernel": {"type": "string", "default": "S:/kernel-lane/lanes/kernel/inbox/"}
+      }
+    },
+    "delivery_verification": {
+      "type": "object",
+      "description": "v1.1: Post-write delivery verification. Sender SHOULD verify file exists at canonical path after writing.",
+      "properties": {
+        "verified": {"type": "boolean", "default": false},
+        "verified_at": {"type": "string", "format": "date-time"},
+        "retries": {"type": "integer", "default": 0}
+      }
+    },
+    "signature": {
+      "type": "string",
+      "description": "v1.2: JWS compact signature (RS256). All outbound messages MUST be signed.",
+      "minLength": 1,
+      "pattern": "^eyJ[A-Za-z0-9_-]+\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$"
+    },
+    "signature_alg": {
+      "type": "string",
+      "description": "v1.2: Signature algorithm. Must be RS256.",
+      "enum": ["RS256"],
+      "default": "RS256"
+    },
+    "key_id": {
+      "type": "string",
+      "description": "v1.2: Key identifier (first 16 hex chars of SHA-256 of public key). MUST match trust store.",
+      "minLength": 16,
+      "maxLength": 16,
+      "pattern": "^[a-f0-9]{16}$"
+    }
+  },
+  "required": [
+    "schema_version", "task_id", "idempotency_key", "from", "to",
+    "type", "task_kind", "priority", "subject", "body",
+    "timestamp", "requires_action", "payload", "execution",
+    "lease", "retry", "evidence", "heartbeat",
+    "signature", "key_id"
+  ]
+}
