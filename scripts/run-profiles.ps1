@@ -1,9 +1,11 @@
 param(
-  [Parameter(Mandatory=$true)]
-  [string]$ExecutablePath,
-  [string]$Args = '',
-  [string]$Name = 'profile',
-  [string]$Configuration = 'Release'
+[Parameter(Mandatory=$true)]
+[string]$ExecutablePath,
+[string]$Args = '',
+[string]$Name = 'profile',
+[string]$Configuration = 'Release',
+[switch]$SkipNsys,
+[switch]$Headless
 )
 
 function Resolve-ToolCommand {
@@ -58,28 +60,33 @@ $ncuDir = Join-Path $PSScriptRoot '..\profiles\ncu'
 New-Item -ItemType Directory -Force -Path $nsysDir, $ncuDir | Out-Null
 
 $nsysExe = Resolve-ToolCommand -ToolName 'nsys'
-if (-not $nsysExe) {
-  throw 'nsys executable not found in PATH or default install locations.'
-}
-
 $ncuExe = Resolve-ToolCommand -ToolName 'ncu'
+
 if (-not $ncuExe) {
   throw 'ncu executable not found in PATH or fallback locations.'
 }
 
-$nsysOut = Join-Path $nsysDir $Name
 $ncuOut = Join-Path $ncuDir $Name
-
-$nsysCmd = "`"$nsysExe`" profile -o `"$nsysOut`" `"$ExecutablePath`" $Args"
 $ncuCmd = "`"$ncuExe`" --set full --export `"$ncuOut`" `"$ExecutablePath`" $Args"
-
-Write-Host "[NSYS] $nsysCmd"
-cmd /c $nsysCmd
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host "[NCU] $ncuCmd"
 cmd /c $ncuCmd
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+if ($SkipNsys -or $Headless) {
+  Write-Host "[NSYS] Skipped ($($SkipNsys ? 'explicit skip' : 'headless mode'))"
+} elseif (-not $nsysExe) {
+  Write-Host "[NSYS] WARNING: nsys not found, skipping system-level trace"
+} else {
+  $nsysOut = Join-Path $nsysDir $Name
+  $nsysCmd = "`"$nsysExe`" profile -o `"$nsysOut`" `"$ExecutablePath`" $Args"
+  Write-Host "[NSYS] $nsysCmd (requires interactive daemon — may timeout if headless)"
+  cmd /c $nsysCmd
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "[NSYS] WARNING: nsys failed (exit $LASTEXITCODE). Daemon may not be running."
+    Write-Host "[NSYS] Run scripts/setup-nsys-daemon.ps1 from a desktop session to fix."
+  }
+}
 
 # Write JSON metadata files
 $metaTimestamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
