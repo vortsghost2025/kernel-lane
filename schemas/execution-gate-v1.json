@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExecutionGate",
+  "description": "Hard execution gate derived from active-blocker.json. Prevents parallel work by constraining allowed actions. Checked BEFORE any task dispatch, file write, or git commit.",
+  "type": "object",
+  "required": ["id", "owner", "locked_at", "status", "allowed_actions", "forbidden"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique blocker identifier"
+    },
+    "owner": {
+      "type": "string",
+      "enum": ["archivist", "library", "swarmmind", "kernel", "user"],
+      "description": "Lane that owns this blocker — only this lane may work on it"
+    },
+    "locked_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the blocker was locked"
+    },
+    "unlocked_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "When the blocker was resolved (null while active)"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "resolved", "superseded"],
+      "description": "Blocker lifecycle state"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of what this blocker controls"
+    },
+    "allowed_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Whitelist of action categories permitted while blocker is active. Any action NOT in this list is FORBIDDEN.",
+      "examples": [
+        "read_file",
+        "search_codebase",
+        "run_tests",
+        "git_commit_related",
+        "write_to_owner_lane"
+      ]
+    },
+    "forbidden": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["pattern", "reason"],
+        "properties": {
+          "pattern": {
+            "type": "string",
+            "description": "Glob or regex pattern matching forbidden file paths or actions"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why this is forbidden under current blocker"
+          }
+        }
+      },
+      "description": "Explicit forbidden patterns — any match means the action is rejected"
+    },
+    "verification": {
+      "type": "object",
+      "description": "How to verify the blocker is resolved",
+      "required": ["method", "command"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["test_pass", "command_exit_0", "file_absent", "manual_review"],
+          "description": "How resolution is verified"
+        },
+        "command": {
+          "type": "string",
+          "description": "Command to run for verification"
+        },
+        "expected": {
+          "type": "string",
+          "description": "Expected output or condition for resolution"
+        }
+      }
+    }
+  },
+  "_enforcement": {
+    "description": "This schema is enforced by scripts/execution-gate.js BEFORE any agent action",
+    "protocol": [
+      "1. Agent reads lanes/broadcast/active-blocker.json at session start",
+      "2. If blocker exists and status=active, agent loads execution-gate-v1.json",
+      "3. Before ANY write/commit/dispatch, agent validates action against allowed_actions + forbidden",
+      "4. If action is forbidden: STOP. Log violation. Do NOT proceed.",
+      "5. Only owner lane may modify files related to the blocker",
+      "6. Resolution requires verification.method to pass",
+      "7. On resolution: set status=resolved, unlocked_at=now, remove blocker within 60s"
+    ],
+    "violation_handling": {
+      "description": "When an agent violates the gate",
+      "actions": [
+        "Log violation to lanes/broadcast/gate-violations.jsonl",
+        "Alert coordinator (archivist inbox, P0)",
+        "Quarantine offending lane's write capability until review"
+      ]
+    }
+  }
+}
