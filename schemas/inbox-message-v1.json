@@ -27,7 +27,7 @@
   },
   "type": {
     "type": "string",
-    "enum": ["task", "response", "heartbeat", "escalation", "handoff", "ack"]
+    "enum": ["task", "response", "heartbeat", "escalation", "handoff", "ack", "alert"]
   },
     "task_kind": {
       "type": "string",
