@@ -24,5 +24,15 @@ nul
 !benchmarks/reports/
 !profiles/
 
+# Cryptographic material — never commit signatures or keys
+*.jws
+*.pem
+.identity/
+.runtime/
+
+# Signed message sidecars (JWS signatures stored separately)
+lanes/**/signature-*.jws
+
+# Local operational files
 lanes/*/outbox/unsigned/
 logs/quarantine-tracker.json
