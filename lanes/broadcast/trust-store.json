@@ -1,0 +1,42 @@
+{
+  "archivist": {
+    "lane_id": "archivist",
+    "algorithm": "RS256",
+    "key_id": "583b2c36f397ef01",
+    "registered_at": "2026-04-21T12:57:06.833Z",
+    "expires_at": null,
+    "revoked_at": null,
+    "public_key_path": "archivist-public.pem",
+    "public_key_ref": "see .identity/public.pem on respective lane"
+  },
+  "library": {
+    "lane_id": "library",
+    "algorithm": "RS256",
+    "key_id": "a3136a93627b7b46",
+    "registered_at": "2026-04-21T12:28:18.842Z",
+    "expires_at": null,
+    "revoked_at": null,
+    "public_key_path": "library-public.pem",
+    "public_key_ref": "see .identity/public.pem on respective lane"
+  },
+  "swarmmind": {
+    "lane_id": "swarmmind",
+    "algorithm": "RS256",
+    "key_id": "5245d4773997dadb",
+    "registered_at": "2026-04-21T12:28:18.844Z",
+    "expires_at": null,
+    "revoked_at": null,
+    "public_key_path": "swarmmind-public.pem",
+    "public_key_ref": "see .identity/public.pem on respective lane"
+  },
+  "kernel": {
+    "lane_id": "kernel",
+    "algorithm": "RS256",
+    "key_id": "74bc4b8df188b771",
+    "registered_at": "2026-04-21T12:28:18.845Z",
+    "expires_at": null,
+    "revoked_at": null,
+    "public_key_path": "kernel-public.pem",
+    "public_key_ref": "see .identity/public.pem on respective lane"
+  }
+}
