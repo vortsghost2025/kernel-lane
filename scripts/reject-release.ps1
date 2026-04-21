@@ -53,6 +53,16 @@ $broadcast = [ordered]@{
 $broadcastPath = Join-Path $outboxDir "kernel_rejection_$Version.json"
 $broadcast | ConvertTo-Json -Depth 8 | Set-Content -Path $broadcastPath -Encoding UTF8
 
+# Enforce signed outbox emission (fail closed)
+$signScript = Join-Path $PSScriptRoot 'sign-outbox-message.js'
+if (!(Test-Path $signScript)) {
+  throw "Signing helper missing: $signScript"
+}
+& node $signScript --message $broadcastPath --lane kernel
+if ($LASTEXITCODE -ne 0) {
+  throw "Outbox signing failed for $broadcastPath"
+}
+
 Write-Host "[REJECTED] Version: $Version"
 Write-Host "[CLAIM] $Claim"
 Write-Host "[EVIDENCE] $($Evidence -join ', ')"

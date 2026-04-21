@@ -16,7 +16,7 @@ class IdentityEnforcer {
   constructor(options = {}) {
     this.trustStore = null;
     this.trustStorePath = options.trustStorePath || this._findTrustStore();
-    this.enforcementMode = options.enforcementMode || 'warn'; // 'enforce' | 'warn' | 'audit'
+    this.enforcementMode = options.enforcementMode || 'enforce'; // 'enforce' | 'warn' | 'audit'
     this.verificationLog = [];
     this._loadTrustStore();
   }
@@ -295,3 +295,4 @@ if (require.main === module) {
   console.log('  warn   — log + console warnings, no rejection');
   console.log('  enforce — reject unsigned/invalid messages');
 }
+

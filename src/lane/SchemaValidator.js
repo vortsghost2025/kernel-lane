@@ -4,17 +4,30 @@ const crypto = require('crypto');
 
 const SCHEMA_PATH = path.resolve(__dirname, '../../schemas/inbox-message-v1.json');
 
-const REQUIRED_FIELDS = [
+const REQUIRED_FIELDS_V12 = [
+  'schema_version', 'task_id', 'idempotency_key', 'from', 'to',
+  'type', 'task_kind', 'priority', 'subject', 'body',
+  'timestamp', 'requires_action', 'payload', 'execution',
+  'lease', 'retry', 'evidence', 'heartbeat',
+  'signature', 'key_id'
+];
+
+const REQUIRED_FIELDS_V11 = [
   'schema_version', 'task_id', 'idempotency_key', 'from', 'to',
   'type', 'task_kind', 'priority', 'subject', 'body',
   'timestamp', 'requires_action', 'payload', 'execution',
   'lease', 'retry', 'evidence', 'heartbeat'
 ];
 
+function getRequiredFields(schemaVersion) {
+  if (schemaVersion === '1.2') return REQUIRED_FIELDS_V12;
+  return REQUIRED_FIELDS_V11;
+}
+
 const ENUM_CONSTRAINTS = {
-  schema_version: ['1.0', '1.1'],
-  to: ['archivist', 'library', 'swarmmind', 'kernel-lane'],
-  type: ['task', 'response', 'heartbeat', 'escalation', 'handoff'],
+  schema_version: ['1.0', '1.1', '1.2'],
+  to: ['archivist', 'library', 'swarmmind', 'kernel'],
+  type: ['task', 'response', 'heartbeat', 'escalation', 'handoff', 'alert', 'ack'],
   task_kind: ['proposal', 'review', 'amendment', 'ratification'],
   priority: ['P0', 'P1', 'P2', 'P3'],
   'payload.mode': ['inline', 'path', 'chunked'],
@@ -70,10 +83,12 @@ function validate(message) {
     return { valid: false, errors: ['Message must be a non-null object'] };
   }
 
-  // Check required fields
-  for (const field of REQUIRED_FIELDS) {
+  // Check required fields (version-aware)
+  const schemaVersion = message.schema_version || '1.1';
+  const requiredFields = getRequiredFields(schemaVersion);
+  for (const field of requiredFields) {
     if (!(field in message)) {
-      errors.push(`Missing required field: ${field}`);
+      errors.push(`Missing required field (v${schemaVersion}): ${field}`);
     }
   }
 
@@ -154,7 +169,7 @@ function computeIdempotencyKey({ task_id, from, to, subject }) {
 function createMessage(template = {}) {
   const now = new Date().toISOString();
   const defaults = {
-    schema_version: '1.1',
+    schema_version: '1.2',
     task_id: template.task_id || `task-${Date.now()}`,
     idempotency_key: '',
     from: template.from || 'library',
@@ -235,16 +250,13 @@ function createMessage(template = {}) {
   },
   };
 
-  const message = { ...defaults, ...template };
+const message = { ...defaults, ...template };
 
-  // Bug 3 fix: ALWAYS force delivery_verification.verified = false on creation.
-  // Only deliverMessage() can set this to true after schema validation + disk write.
-  // Allow template to set retries but NEVER allow overriding verified=true.
-  message.delivery_verification = {
-    verified: false,
-    verified_at: null,
-    retries: template.delivery_verification?.retries || 0,
-  };
+  // v1.2 NOTE: createMessage does NOT auto-generate signature/key_id.
+  // Callers must either: (a) pass signature+key_id in template, or
+  // (b) run sign-outbox-message.js after creation. v1.2 messages
+  // without these fields will fail validate() by design — this
+  // enforces the identity-signing chain.
 
   // Recompute idempotency_key if not explicitly provided
   if (!template.idempotency_key) {
@@ -374,6 +386,8 @@ module.exports = {
   loadSchema,
   deliverMessage,
   getCanonicalPath,
-  REQUIRED_FIELDS,
+  REQUIRED_FIELDS_V11,
+  REQUIRED_FIELDS_V12,
+  getRequiredFields,
   ENUM_CONSTRAINTS,
 };
