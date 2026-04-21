@@ -9,6 +9,13 @@ const {
   acquireWatcherLock
 } = require('./concurrency-policy');
 
+let validateMessage;
+try {
+  validateMessage = require('../src/lane/SchemaValidator').validate;
+} catch (_) {
+  validateMessage = null;
+}
+
 const PRIORITY_ORDER = { P0: 0, P1: 1, P2: 2, P3: 3 };
 const PREEMPTION_CYCLE_LIMIT = 2;
 const P0_YIELD_EVERY_N = 5;
@@ -31,11 +38,11 @@ function isValidInboxMessage(filename) {
 }
 
 const DEFAULT_CONFIG = {
-  laneName: 'archivist',
-  inboxPath: path.join(__dirname, '..', 'lanes', 'archivist', 'inbox'),
-  processedPath: path.join(__dirname, '..', 'lanes', 'archivist', 'inbox', 'processed'),
-  outboxPath: path.join(__dirname, '..', 'lanes', 'archivist', 'outbox'),
-  expiredPath: path.join(__dirname, '..', 'lanes', 'archivist', 'inbox', 'expired'),
+  laneName: 'kernel',
+  inboxPath: path.join(__dirname, '..', 'lanes', 'kernel', 'inbox'),
+  processedPath: path.join(__dirname, '..', 'lanes', 'kernel', 'inbox', 'processed'),
+  outboxPath: path.join(__dirname, '..', 'lanes', 'kernel', 'outbox'),
+  expiredPath: path.join(__dirname, '..', 'lanes', 'kernel', 'inbox', 'expired'),
   canonicalPaths: {
     archivist: 'S:/Archivist-Agent/lanes/archivist/inbox/',
     library: 'S:/self-organizing-library/lanes/library/inbox/',
@@ -126,10 +133,19 @@ class InboxWatcher {
           this.moveToProcessed(filename, filePath);
           continue;
         }
+        // Bug 2 fix: validate incoming messages against schema
+        if (validateMessage) {
+          const result = validateMessage(msg);
+          if (!result.valid) {
+            console.warn(`[watcher] INVALID: ${filename} — ${result.errors.join('; ')}`);
+            this.moveToExpired(filename, filePath);
+            continue;
+          }
+        }
         messages.push(msg);
       } catch (e) {
         console.error(`[watcher] Cannot parse ${filename}:`, e.message);
-        this.moveToProcessed(filename, filePath);
+        this.moveToExpired(filename, filePath);
       }
     }
 
@@ -188,6 +204,24 @@ class InboxWatcher {
       this.processedKeys.add(filename);
     } catch (e) {
       console.error(`[watcher] Cannot move ${filename}:`, e.message);
+    }
+  }
+
+  moveToExpired(filename, sourcePath) {
+    const expiredDir = this.config.expiredPath;
+    if (!fs.existsSync(expiredDir)) {
+      fs.mkdirSync(expiredDir, { recursive: true });
+    }
+    const dest = path.join(expiredDir, filename);
+    try {
+      if (fs.existsSync(dest)) {
+        fs.unlinkSync(sourcePath);
+      } else {
+        fs.renameSync(sourcePath, dest);
+      }
+      console.log(`[watcher] MOVED TO EXPIRED: ${filename} (schema-invalid, not processed)`);
+    } catch (e) {
+      console.error(`[watcher] Cannot move to expired ${filename}:`, e.message);
     }
   }
 
