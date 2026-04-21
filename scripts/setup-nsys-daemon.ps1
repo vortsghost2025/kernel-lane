@@ -34,5 +34,5 @@ if ($LASTEXITCODE -eq 0) {
 
     Write-Host "Logon task registered. Daemon will auto-start on every login."
 } else {
-    Write-Host "Exit code: $LASTEXITCODE — may need to retry or accept EULA manually"
+    Write-Host "Exit code: $LASTEXITCODE - may need to retry or accept EULA manually"
 }
