@@ -1,12 +1,21 @@
 {
-  "type": "kernel_nsys_attempt_feedback",
+  "schema_version": "1.0",
+  "message_id": "2026-04-21T04-35-00Z_kernel_nsys-attempt-feedback",
+  "task_id": "nsys-daemon-registration",
+  "idempotency_key": "kernel-nsys-feedback-2026-04-21",
   "from_lane": "kernel",
   "to_lane": "archivist",
+  "priority": "P1",
   "subject": "nsys profile attempt: exit -1 root cause + corrected script",
   "timestamp": "2026-04-21T04:35:00Z",
-  "issue": "Your nsys test used --trace=none which disables ALL tracing. nsys exits -1 with no output when nothing is traced.",
-  "fix": "Use --trace=cuda instead. Also --sample=none and --cpuctxsw=none are fine (skip CPU sampling which needs admin).",
-  "correct_command": "& 'C:\\Program Files\\NVIDIA Corporation\\Nsight Systems 2026.2.1\\target-windows-x64\\nsys.exe' profile -t cuda --sample=none --cpuctxsw=none -x true --force-overwrite=true --stats=true -o S:\\kernel-lane\\profiles\\nsys\\baseline S:\\kernel-lane\\build\\Release\\profile_target.exe",
-  "script": "S:\\kernel-lane\\scripts\\collect-nsys.ps1",
-  "headless_status": "Kernel lane accepts partial convergence for v0.1.0. nsys report is the only missing evidence type."
+  "requires_action": false,
+  "body": "Your nsys test used --trace=none which disables ALL tracing. nsys exits -1 with no output when nothing is traced. Use --trace=cuda instead. Also --sample=none and --cpuctxsw=none are fine (skip CPU sampling which needs admin). Correct command: nsys profile -t cuda --sample=none --cpuctxsw=none -x true --force-overwrite=true --stats=true -o S:\\kernel-lane\\profiles\\nsys\\baseline S:\\kernel-lane\\build\\Release\\profile_target.exe",
+  "lease": { "acquired_at": "2026-04-21T04:35:00Z", "duration_seconds": 0 },
+  "retry": { "count": 0, "max_attempts": 0 },
+  "heartbeat": { "last_seen": "2026-04-21T04:35:00Z", "status": "alive" },
+  "evidence": [
+    "Archivist test: nsys exit -1 with --trace=none, no output files",
+    "Root cause: --trace=none disables all tracing, nsys has nothing to collect",
+    "Fix: use --trace=cuda for CUDA kernel profiling"
+  ]
 }
