@@ -3,7 +3,8 @@ param(
   [string]$ExecutablePath,
   [string]$Configuration = 'Release',
   [string]$Args = '',
-  [string]$Notes = 'Automated benchmark run'
+  [string]$Notes = 'Automated benchmark run',
+  [string]$BaselineReport = 'benchmarks/reports/baseline.json'
 )
 
 $reportDir = Join-Path $PSScriptRoot '..\benchmarks\reports'
@@ -54,6 +55,66 @@ if ($output -match '(\d+\.\d+)\s+ms') {
 }
 if ($output -match '(\d+\.\d+)\s+ops/sec') {
   $result.metrics.throughput = [float]$matches[1]
+}
+
+# Regression Checking Logic
+$configPath = Join-Path $PSScriptRoot '..\config\targets.json'
+$threshold = 2.0
+$requireExplanation = $false
+if (Test-Path $configPath) {
+    $cfg = Get-Content $configPath | ConvertFrom-Json
+    if ($cfg.baseline_policy.regression_threshold_pct) {
+        $threshold = [float]$cfg.baseline_policy.regression_threshold_pct
+    }
+    if ($cfg.baseline_policy.require_explanation_on_regression) {
+        $requireExplanation = [bool]$cfg.baseline_policy.require_explanation_on_regression
+    }
+}
+
+$baselineExists = Test-Path $BaselineReport
+if ($baselineExists) {
+    $baselineData = Get-Content $BaselineReport | ConvertFrom-Json
+    $previousLatency = $baselineData.metrics.latency_ms
+    $previousThroughput = $baselineData.metrics.throughput
+  $latencyRegressed = $false
+  $throughputRegressed = $false
+
+  # Check for latency regression
+  if ($result.metrics.latency_ms -gt ($previousLatency * (1 + $threshold / 100))) {
+    $latencyRegressed = $true
+  }
+
+  # Check for throughput regression
+  if ($result.metrics.throughput -lt ($previousThroughput * (1 - $threshold / 100))) {
+    $throughputRegressed = $true
+  }
+
+  # Prepare output for regression check
+  $regressionCheck = [ordered]@{
+    baseline_report = $BaselineReport
+    threshold_pct = $threshold
+    latency_change_pct = if ($latencyRegressed) { ((($result.metrics.latency_ms - $previousLatency) / $previousLatency) * 100) } else { 0 }
+    throughput_change_pct = if ($throughputRegressed) { ((($previousThroughput - $result.metrics.throughput) / $previousThroughput) * 100) } else { 0 }
+    passed = -not ($latencyRegressed -or $throughputRegressed)
+  }
+
+  # Update result with regression check
+  $result | Add-Member -MemberType NoteProperty -Name regression_check -Value $regressionCheck
+
+  if ($latencyRegressed -or $throughputRegressed) {
+    Write-Host "[REGRESSION] Metrics regressed beyond threshold."
+    exit 1
+  }
+}
+else {
+  Write-Host "[WARNING] No baseline report exists, skipping regression checks."
+  $result | Add-Member -MemberType NoteProperty -Name regression_check -Value @{
+    baseline_report = $BaselineReport
+    threshold_pct = 0
+    latency_change_pct = 0
+    throughput_change_pct = 0
+    passed = $true
+  }
 }
 
 # Write report to JSON
