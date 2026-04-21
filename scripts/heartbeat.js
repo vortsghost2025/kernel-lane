@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { loadPolicy, assertWatcherConfig } = require('./concurrency-policy');
 
 const DEFAULT_CONFIG = {
   laneName: 'kernel',
@@ -15,6 +16,13 @@ const DEFAULT_CONFIG = {
     kernel: 'S:/kernel-lane/lanes/kernel/inbox/'
   }
 };
+
+const REPO_ROOT = path.join(__dirname, '..');
+const POLICY = loadPolicy(REPO_ROOT);
+assertWatcherConfig({
+  laneName: DEFAULT_CONFIG.laneName,
+  heartbeatSeconds: DEFAULT_CONFIG.intervalSeconds
+}, POLICY);
 
 class Heartbeat {
   constructor(configOverrides) {

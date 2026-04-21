@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "concurrency-policy-v1",
+  "status": "ACTIVE",
+  "ratified_at": "2026-04-21T00:00:00Z",
+  "lanes": [
+    "archivist",
+    "library",
+    "swarmmind",
+    "kernel"
+  ],
+  "enforcement": {
+    "one_watcher_process_per_repo": true,
+    "max_concurrent_message_processing": 1,
+    "min_poll_interval_seconds": 60,
+    "min_heartbeat_interval_seconds": 60,
+    "reject_uuid_named_temp_files": true,
+    "require_lease_and_idempotency_for_actionable_messages": true
+  },
+  "locks": {
+    "watcher_lock_dir": ".runtime/locks",
+    "watcher_lock_file_pattern": "watcher-{lane}.lock",
+    "stale_after_seconds": 900
+  },
+  "budgets": {
+    "max_top_level_agents": 4,
+    "max_total_subagents": 8
+  },
+  "notes": [
+    "This policy is machine-enforced by inbox watcher startup guards.",
+    "If watcher lock is held and not stale, additional watcher instances must exit."
+  ]
+}
