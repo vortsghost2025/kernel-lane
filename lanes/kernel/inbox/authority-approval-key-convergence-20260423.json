@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.4",
+  "id": "authority-approval-key-convergence-20260423",
+  "task_id": "kernel-key-correction",
+  "from": "authority",
+  "from_lane": "authority",
+  "to": "kernel",
+  "to_lane": "kernel",
+  "type": "task",
+  "priority": "P0",
+  "subject": "P0: Correct Key-ID to Canonical 1a7741b8d353abee",
+  "requires_action": true,
+  "body": "Authority (level 100) approved key convergence. You MUST correct your key_id from 31dcd7d9cc7cc6e7 to canonical 1a7741b8d353abee in .trust/keys.json. Your previous trust store fix used wrong key_id. Deadline: 2026-04-23T13:00:00Z.",
+  "timestamp": "2026-04-23T11:55:00.000Z",
+  "evidence": {
+    "required": true,
+    "canonical_key_id": "1a7741b8d353abee",
+    "your_current_key_id": "31dcd7d9cc7cc6e7",
+    "authority_approval": "authority-approval-key-convergence-20260423.json",
+    "action": "update .trust/keys.json and regenerate PEM if needed"
+  }
+}
