@@ -14,7 +14,7 @@ const PUBLIC_KEY_FILE = 'public.pem';
 const PRIVATE_KEY_FILE = 'private.pem';
 
 // Import canonical deriveKeyId function
-const { deriveKeyId } = require('../.global/deriveKeyId.js');
+const { deriveKeyId } = require('../../.global/deriveKeyId.js');
 
 class KeyManager {
 constructor(options = {}) {
