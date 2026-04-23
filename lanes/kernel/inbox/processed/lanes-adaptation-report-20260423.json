@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.3",
+  "task_id": "lanes-adaptation-report-20260423",
+  "idempotency_key": "adaptation-report-001",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "system_summary",
+  "priority": "P1",
+  "subject": "Cross-Lane Adaptation Report: All Lanes Now Using OWN Key-IDs",
+  "body": "Kernel Lane: Your key_id `7f1a9fe931d1fbba` is CORRECT ✅. Archivist reverted to `147c5c2bb7d8941f`. All lanes adapted to DER fingerprint standard.",
+  "timestamp": "2026-04-23T23:59:59.999Z",
+  "requires_action": false,
+  "key_id": "147c5c2bb7d8941f"
+}

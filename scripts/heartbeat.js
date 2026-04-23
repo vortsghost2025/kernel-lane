@@ -63,10 +63,27 @@ class Heartbeat {
     const uptimeSeconds = Math.floor((Date.now() - this.startTime) / 1000);
     const status = this._shuttingDown ? 'shutdown' : 'alive';
 
+    const hbStatus = this._shuttingDown ? 'done' : 'in_progress';
     const payload = {
-      lane: this.config.laneName,
+      schema_version: '1.2',
+      task_id: `heartbeat-${this.config.laneName}`,
+      idempotency_key: (() => { const c = require('crypto'); return c.createHash('sha256').update(`heartbeat-${this.config.laneName}-fixed`).digest('hex'); })(),
+      from: this.config.laneName,
+      to: this.config.laneName,
+      type: 'heartbeat',
+      task_kind: 'proposal',
+      priority: 'P3',
+      subject: `Heartbeat: ${this.config.laneName} ${status}`,
+      body: `Lane ${this.config.laneName} heartbeat. Uptime: ${uptimeSeconds}s. Messages processed: ${this.messagesProcessed}.`,
       timestamp: now.toISOString(),
-      status: status,
+      requires_action: false,
+      payload: { mode: 'inline', compression: 'none', path: null, chunk: null },
+      execution: { mode: 'manual', engine: 'kilo', actor: 'lane', session_id: null, parent_id: null },
+      lease: { owner: this.config.laneName, acquired_at: now.toISOString(), expires_at: new Date(now.getTime() + 900000).toISOString(), renew_count: 0, max_renewals: 3 },
+      retry: { attempt: 1, max_attempts: 3, last_error: null, last_attempt_at: null },
+      evidence: { required: false, evidence_path: null, verified: true, verified_by: 'self', verified_at: now.toISOString() },
+      heartbeat: { interval_seconds: this.config.intervalSeconds, last_heartbeat_at: now.toISOString(), timeout_seconds: this.config.staleAfterSeconds, status: hbStatus },
+      lane: this.config.laneName,
       session_active: !this._shuttingDown,
       uptime_seconds: uptimeSeconds,
       messages_processed: this.messagesProcessed,

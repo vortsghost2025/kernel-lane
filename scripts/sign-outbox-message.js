@@ -5,6 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+const { deriveKeyId } = require(path.join(__dirname, '..', 'src', 'attestation', 'deriveKeyId.js'));
+
 const PASSFILE_CANDIDATES = [
   path.join(__dirname, '..', '.runtime', 'lane-passphrases.json'),
   'S:/Archivist-Agent/.runtime/lane-passphrases.json'
@@ -96,7 +98,7 @@ function loadKeyMaterial(identityDir, lane, passphrase) {
     throw new Error(`PRIVATE_KEY_DECRYPT_FAILED for lane ${lane}: ${err.message}`);
   }
 
-  const keyId = crypto.createHash('sha256').update(publicPem).digest('hex').slice(0, 16);
+  const keyId = deriveKeyId(publicPem);
   return { privateKey, keyId };
 }
 

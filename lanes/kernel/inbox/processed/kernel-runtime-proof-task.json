@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.3",
+  "task_id": "kernel-runtime-proof-11031",
+  "idempotency_key": "kernel-proof-001",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "priority": "P0",
+  "subject": "HARDEN Phase: Runtime Proof Required",
+  "body": "## HARDEN Phase Task (from Usage.txt)\n\n### Execute:\n1. Verify key_id derived from `.identity/public.pem`\n2. Check if it matches canonical `1a7741b8d353abee`\n3. Perform sign → verify roundtrip\n4. Check guarded-write enforcement\n5. Verify lease/gate active\n\n### Deliverable:\n`kernel-runtime-proof-report.json` to `lanes/kernel/outbox/`\n\n### Required Contents:\n1. key_id derived from current `.identity/public.pem`\n2. Whether it matches canonical key_id\n3. sign → verify roundtrip result\n4. guarded-write enforcement result\n5. lease/gate active result\n\n### Rules:\n- No trust-store mutations\n- No authority assumptions\n- Evidence required for each result\n- Reference: `S:/self-organizing-library/context-buffer/Usage.txt`\n\n### Gate to Exit HARDEN:\nALL must be true:\n- Kernel proof PASS\n- Library verification PASS (awaiting their report)\n- SwarmMind compliance PASS (awaiting their report)",
+  "timestamp": "2026-04-23T23:59:59.999Z",
+  "requires_action": true,
+  "priority_action": true,
+  "key_id": "147c5c2bb7d8941f"
+}
