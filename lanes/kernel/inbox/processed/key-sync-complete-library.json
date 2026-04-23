@@ -55,5 +55,11 @@
     "last_heartbeat_at": "2026-04-23T20:44:57.839Z",
     "timeout_seconds": 900,
     "status": "done"
-  }
+  },
+  "status": "completed",
+  "terminal_decision": "Obviated by convergence phases (HARDEN/STRESS/PUSH) - work completed 2026-04-23",
+  "completed_at": "2026-04-23T21:30:00Z",
+  "completed_by": "archivist-agent",
+  "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
+  "prior_requires_action": false
 }
