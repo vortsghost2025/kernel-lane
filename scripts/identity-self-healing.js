@@ -11,14 +11,14 @@ const KEY_SIZE = 2048;
 const PASSFILE_SEARCH = [
   'S:/Archivist-Agent/.runtime/lane-passphrases.json',
   'S:/self-organizing-library/.runtime/lane-passphrases.json',
-  'S:/SwarmMind Self-Optimizing Multi-Agent AI System/.runtime/lane-passphrases.json',
+  'S:/SwarmMind/.runtime/lane-passphrases.json',
   'S:/kernel-lane/.runtime/lane-passphrases.json',
 ];
 
 const LANE_IDENTITY_DIRS = {
   archivist: 'S:/Archivist-Agent/.identity',
   library: 'S:/self-organizing-library/.identity',
-  swarmmind: 'S:/SwarmMind Self-Optimizing Multi-Agent AI System/.identity',
+  swarmmind: 'S:/SwarmMind/.identity',
   kernel: 'S:/kernel-lane/.identity',
 };
 
@@ -103,7 +103,7 @@ class IdentitySelfHealing {
       fs.writeFileSync(path.join(this.identityDir, 'public.pem'), publicKey);
       fs.writeFileSync(path.join(this.identityDir, 'private.pem'), privateKey);
 
-      const keyId = crypto.createHash('sha256').update(publicKey).digest('hex').substring(0, 16);
+      const keyId = deriveKeyId(publicKey);
 
       const meta = {
         lane_id: this.laneId,

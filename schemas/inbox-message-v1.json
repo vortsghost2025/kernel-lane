@@ -190,7 +190,7 @@
       "properties": {
         "archivist": {"type": "string", "default": "S:/Archivist-Agent/lanes/archivist/inbox/"},
         "library": {"type": "string", "default": "S:/self-organizing-library/lanes/library/inbox/"},
-        "swarmmind": {"type": "string", "default": "S:/SwarmMind Self-Optimizing Multi-Agent AI System/lanes/swarmmind/inbox/"},
+        "swarmmind": {"type": "string", "default": "S:/SwarmMind/lanes/swarmmind/inbox/"},
         "kernel": {"type": "string", "default": "S:/kernel-lane/lanes/kernel/inbox/"}
       }
     },

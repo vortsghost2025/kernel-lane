@@ -50,7 +50,7 @@ All cross-lane communication MUST use the `lanes/` structure.
 |-----------|-----------------------------------|---------------------------------------------------|
 | Archivist | `lanes/archivist/inbox/` | `S:/Archivist-Agent/lanes/archivist/inbox/` |
 | Library | `lanes/library/inbox/` | `S:/self-organizing-library/lanes/library/inbox/` |
-| SwarmMind | `lanes/swarmmind/inbox/` | `S:/SwarmMind Self-Optimizing Multi-Agent AI System/lanes/swarmmind/inbox/` |
+| SwarmMind | `lanes/swarmmind/inbox/` | `S:/SwarmMind/lanes/swarmmind/inbox/` |
 | Kernel | `lanes/kernel/inbox/` | `S:/kernel-lane/lanes/kernel/inbox/` |
 
 **CRITICAL: Senders MUST write to the target lane's CANONICAL path (absolute), NOT their own local mirror copy.**
