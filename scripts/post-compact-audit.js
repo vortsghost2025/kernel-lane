@@ -75,7 +75,46 @@ class PostCompactAudit {
     } catch (_) { return []; }
   }
 
-  _getLaneHeartbeats() {
+    _getFileIntegrityChecks() {
+        const integrityFiles = [
+            { name: 'private_pem', suffix: '.identity/private.pem', binary: true },
+            { name: 'public_pem', suffix: '.identity/public.pem', binary: false },
+            { name: 'snapshot_json', suffix: '.identity/snapshot.json', binary: false },
+        ];
+        const trustStorePath = this.trustStorePath;
+        const results = {};
+        for (const [laneId, config] of Object.entries(LANES)) {
+            const laneFiles = {};
+            for (const spec of integrityFiles) {
+                const fPath = path.join(config.root, spec.suffix);
+                if (!fs.existsSync(fPath)) {
+                    laneFiles[spec.name] = { path: fPath, exists: false, hash: null };
+                    continue;
+                }
+                try {
+                    const content = spec.binary
+                        ? fs.readFileSync(fPath)
+                        : fs.readFileSync(fPath, 'utf8');
+                    laneFiles[spec.name] = {
+                        path: fPath,
+                        exists: true,
+                        hash: crypto.createHash('sha256').update(content).digest('hex')
+                    };
+                } catch (_) {
+                    laneFiles[spec.name] = { path: fPath, exists: true, hash: null, error: 'read_failed' };
+                }
+            }
+            laneFiles.trust_store = {
+                path: trustStorePath,
+                exists: fs.existsSync(trustStorePath),
+                hash: this._hashFile(trustStorePath)
+            };
+            results[laneId] = laneFiles;
+        }
+        return results;
+    }
+
+    _getLaneHeartbeats() {
     const results = {};
     for (const [laneId, config] of Object.entries(LANES)) {
       const hbPath = path.join(config.inbox, `heartbeat-${laneId}.json`);
@@ -110,14 +149,15 @@ class PostCompactAudit {
       handoff_hash: this._hashFile(this.handoffPath),
       lane_states: this._getLaneHeartbeats(),
       inbox_counts: {},
-      known_risks: [
-        'identity_soft_keys',
-        'determinism_not_guaranteed',
-        'kernel_partial_convergence',
-        'contract_alignment_ambiguous',
-        'subagent_code_destruction_surface'
-      ]
-    };
+        known_risks: [
+                'identity_soft_keys',
+                'determinism_not_guaranteed',
+                'kernel_partial_convergence',
+                'contract_alignment_ambiguous',
+                'subagent_code_destruction_surface'
+            ],
+            file_integrity: this._getFileIntegrityChecks()
+        };
 
     for (const [laneId, config] of Object.entries(LANES)) {
       snapshot.inbox_counts[laneId] = this._countInboxMessages(config.inbox);
@@ -144,9 +184,10 @@ class PostCompactAudit {
       bootstrap_hash: this._hashFile(this.bootstrapPath),
       handoff_hash: this._hashFile(this.handoffPath),
       lane_states: this._getLaneHeartbeats(),
-      inbox_counts: {},
-      known_risks: []
-    };
+        inbox_counts: {},
+            known_risks: [],
+            file_integrity: this._getFileIntegrityChecks()
+        };
 
     for (const [laneId, config] of Object.entries(LANES)) {
       snapshot.inbox_counts[laneId] = this._countInboxMessages(config.inbox);
@@ -260,11 +301,31 @@ class PostCompactAudit {
     const postRisks = new Set(post.known_risks || []);
     diff.missing_risks = [...preRisks].filter(r => !postRisks.has(r));
     if (diff.missing_risks.length > 0) {
-      diff.risk_set_preserved = false;
-      diff.unexpected_changes.push(`risks_lost: ${diff.missing_risks.join(', ')}`);
-    }
+        diff.risk_set_preserved = false;
+            diff.unexpected_changes.push(`risks_lost: ${diff.missing_risks.join(', ')}`);
+        }
 
-    return diff;
+        if (pre.file_integrity && post.file_integrity) {
+            diff.file_integrity_violations = [];
+            for (const [lane, files] of Object.entries(pre.file_integrity)) {
+                for (const [fileKey, fileInfo] of Object.entries(files)) {
+                    const postInfo = post.file_integrity[lane]?.[fileKey];
+                    if (!postInfo) continue;
+                    if (fileInfo.exists && postInfo.exists && fileInfo.hash && postInfo.hash && fileInfo.hash !== postInfo.hash) {
+                        diff.file_integrity_violations.push({ lane, file: fileKey, pre_hash: fileInfo.hash, post_hash: postInfo.hash });
+                        if (fileKey === 'private_pem' || fileKey === 'snapshot_json' || fileKey === 'trust_store') {
+                            diff.unexpected_changes.push(`file_integrity_${lane}_${fileKey}_changed`);
+                        }
+                    }
+                    if (fileInfo.exists && !postInfo.exists) {
+                        diff.file_integrity_violations.push({ lane, file: fileKey, pre_hash: fileInfo.hash, post_hash: null, deleted: true });
+                        diff.unexpected_changes.push(`file_integrity_${lane}_${fileKey}_deleted`);
+                    }
+                }
+            }
+        }
+
+        return diff;
   }
 
   determineStatus(diff) {
@@ -272,11 +333,12 @@ class PostCompactAudit {
       return 'aligned';
     }
 
-    const criticalChanges = diff.unexpected_changes.filter(c =>
-      c.includes('trust_store') ||
-      c.includes('bootstrap_modified') ||
-      c.includes('governance_doc_modified') ||
-      c.includes('constraints_changed')
+        const criticalChanges = diff.unexpected_changes.filter(c =>
+            c.includes('trust_store') ||
+            c.includes('bootstrap_modified') ||
+            c.includes('governance_doc_modified') ||
+            c.includes('constraints_changed') ||
+            c.includes('file_integrity')
     );
 
     if (criticalChanges.length > 0) {
@@ -306,18 +368,20 @@ class PostCompactAudit {
         governance_hash: pre.governance_hash,
         bootstrap_hash: pre.bootstrap_hash,
         handoff_hash: pre.handoff_hash,
-        known_risks: pre.known_risks
-      },
-      post_compact: {
-        active_blocker: post.active_blocker,
-        trust_store_key_ids: post.trust_store_key_ids,
-        constraint_names: post.constraint_names,
-        lane_states: post.lane_states,
-        inbox_counts: post.inbox_counts,
-        governance_hash: post.governance_hash,
-        bootstrap_hash: post.bootstrap_hash,
-        handoff_hash: post.handoff_hash,
-        known_risks: post.known_risks
+            known_risks: pre.known_risks,
+            file_integrity: pre.file_integrity
+        },
+        post_compact: {
+            active_blocker: post.active_blocker,
+            trust_store_key_ids: post.trust_store_key_ids,
+            constraint_names: post.constraint_names,
+            lane_states: post.lane_states,
+            inbox_counts: post.inbox_counts,
+            governance_hash: post.governance_hash,
+            bootstrap_hash: post.bootstrap_hash,
+            handoff_hash: post.handoff_hash,
+            known_risks: post.known_risks,
+            file_integrity: post.file_integrity
       },
       diff,
       status,
@@ -331,8 +395,9 @@ class PostCompactAudit {
           'bootstrap_doc',
           'handoff_doc',
           'inbox_message_counts',
-          'lane_heartbeats',
-          'known_risk_set'
+                'lane_heartbeats',
+                'known_risk_set',
+                'file_integrity'
         ],
         contradictions_found: diff.unexpected_changes.length,
         self_declared_alignment: false
@@ -475,8 +540,14 @@ class PostCompactAudit {
     console.log(`Constraints intact: ${audit.diff.constraints_intact}`);
     console.log(`Governance intact: ${audit.diff.governance_intact}`);
     console.log(`Bootstrap intact: ${audit.diff.bootstrap_intact}`);
-    console.log(`Risk set preserved: ${audit.diff.risk_set_preserved}`);
-    console.log(`Self-declared alignment: ${audit.proof.self_declared_alignment}`);
+        console.log(`Risk set preserved: ${audit.diff.risk_set_preserved}`);
+        console.log(`File integrity violations: ${audit.diff.file_integrity_violations?.length || 0}`);
+        if (audit.diff.file_integrity_violations?.length > 0) {
+            for (const v of audit.diff.file_integrity_violations) {
+                console.log(` - ${v.lane}/${v.file}: ${v.deleted ? 'DELETED' : 'HASH_CHANGED'}`);
+            }
+        }
+        console.log(`Self-declared alignment: ${audit.proof.self_declared_alignment}`);
 
     console.log('\n=== Multi-Source Truth Reload ===');
     const truth = this.multiSourceTruthReload();

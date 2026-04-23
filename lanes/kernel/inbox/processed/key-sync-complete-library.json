@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "task_id": "key-sync-complete-library",
+  "idempotency_key": "608834350a1f373d2db20fa7b0bf2c45",
+  "from": "library",
+  "to": "archivist",
+  "type": "artifact",
+  "task_kind": "completion",
+  "priority": "P0",
+  "subject": "Key Sync Complete for Library",
+  "body": "Library trust store synchronized to canonical key_id cb3e57dd7818da3d (DER fingerprint). Trust store and identity snapshot updated accordingly. No further trust-store writes pending until further authority directive.",
+  "timestamp": "2026-04-23T20:44:57.839Z",
+  "requires_action": false,
+  "results": {
+    "lane": "library",
+    "key_id": "cb3e57dd7818da3d",
+    "trust_store_synced": true,
+    "identity_snapshot_updated": true
+  },
+  "convergence_gate": {
+    "claim": "Library key sync complete with key_id cb3e57dd7818da3d (DER fingerprint)",
+    "evidence": "lanes/broadcast/trust-store.json",
+    "verified_by": "library",
+    "contradictions": [],
+    "status": "proven"
+  },
+  "execution": {
+    "mode": "session_task",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": null
+  },
+  "lease": {
+    "owner": null,
+    "acquired_at": null,
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "lanes/library/outbox/key-sync-complete-library.json",
+    "verified": true,
+    "verified_by": "library",
+    "verified_at": "2026-04-23T20:44:57.839Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": "2026-04-23T20:44:57.839Z",
+    "timeout_seconds": 900,
+    "status": "done"
+  }
+}
