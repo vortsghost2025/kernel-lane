@@ -13,6 +13,9 @@ const KEY_SIZE = 2048;
 const PUBLIC_KEY_FILE = 'public.pem';
 const PRIVATE_KEY_FILE = 'private.pem';
 
+// Import canonical deriveKeyId function
+const { deriveKeyId } = require('../.global/deriveKeyId.js');
+
 class KeyManager {
 constructor(options = {}) {
 this.identityDir = options.identityDir || path.join(process.cwd(), '.identity');
@@ -62,9 +65,7 @@ return { publicKeyPath, privateKeyPath, keyId };
 }
 
 _generateKeyId(publicKey) {
-    const keyObj = crypto.createPublicKey(publicKey);
-    const der = keyObj.export({ type: 'spki', format: 'der' });
-    return crypto.createHash('sha256').update(der).digest('hex').substring(0, 16);
+    return deriveKeyId(publicKey);
 }
 
 loadPublicKey() {
