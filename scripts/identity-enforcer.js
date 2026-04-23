@@ -8,7 +8,7 @@ const crypto = require('crypto');
 const TRUST_STORE_SEARCH_PATHS = [
   'S:/Archivist-Agent/lanes/broadcast/trust-store.json',
   'S:/self-organizing-library/lanes/broadcast/trust-store.json',
-  'S:/SwarmMind Self-Optimizing Multi-Agent AI System/lanes/broadcast/trust-store.json',
+  'S:/SwarmMind/lanes/broadcast/trust-store.json',
   'S:/kernel-lane/lanes/broadcast/trust-store.json',
 ];
 

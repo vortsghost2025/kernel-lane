@@ -7,7 +7,7 @@ const path = require('path');
 const LANE_DIRS = {
   archivist: 'S:/Archivist-Agent',
   library: 'S:/self-organizing-library',
-  swarmmind: 'S:/SwarmMind Self-Optimizing Multi-Agent AI System',
+  swarmmind: 'S:/SwarmMind',
   kernel: 'S:/kernel-lane',
 };
 

@@ -49,7 +49,7 @@ function base64UrlEncode(input) {
 const LANE_IDENTITY_DIRS = {
   archivist: 'S:/Archivist-Agent/.identity',
   library: 'S:/self-organizing-library/.identity',
-  swarmmind: 'S:/SwarmMind Self-Optimizing Multi-Agent AI System/.identity',
+  swarmmind: 'S:/SwarmMind/.identity',
   kernel: 'S:/kernel-lane/.identity',
 };
 

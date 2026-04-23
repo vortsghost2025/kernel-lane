@@ -8,7 +8,7 @@ const crypto = require('crypto');
 const LANES = {
   archivist: { root: 'S:/Archivist-Agent', inbox: 'S:/Archivist-Agent/lanes/archivist/inbox' },
   library: { root: 'S:/self-organizing-library', inbox: 'S:/self-organizing-library/lanes/library/inbox' },
-  swarmmind: { root: 'S:/SwarmMind Self-Optimizing Multi-Agent AI System', inbox: 'S:/SwarmMind Self-Optimizing Multi-Agent AI System/lanes/swarmmind/inbox' },
+  swarmmind: { root: 'S:/SwarmMind', inbox: 'S:/SwarmMind/lanes/swarmmind/inbox' },
   kernel: { root: 'S:/kernel-lane', inbox: 'S:/kernel-lane/lanes/kernel/inbox' }
 };
 
