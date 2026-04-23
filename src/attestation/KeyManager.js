@@ -62,7 +62,9 @@ return { publicKeyPath, privateKeyPath, keyId };
 }
 
 _generateKeyId(publicKey) {
-return crypto.createHash('sha256').update(publicKey).digest('hex').substring(0, 16);
+    const keyObj = crypto.createPublicKey(publicKey);
+    const der = keyObj.export({ type: 'spki', format: 'der' });
+    return crypto.createHash('sha256').update(der).digest('hex').substring(0, 16);
 }
 
 loadPublicKey() {
