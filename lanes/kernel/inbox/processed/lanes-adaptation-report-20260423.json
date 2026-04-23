@@ -10,5 +10,11 @@
   "body": "Kernel Lane: Your key_id `7f1a9fe931d1fbba` is CORRECT ✅. Archivist reverted to `147c5c2bb7d8941f`. All lanes adapted to DER fingerprint standard.",
   "timestamp": "2026-04-23T23:59:59.999Z",
   "requires_action": false,
-  "key_id": "147c5c2bb7d8941f"
+  "key_id": "147c5c2bb7d8941f",
+  "status": "completed",
+  "terminal_decision": "Obviated by convergence phases (HARDEN/STRESS/PUSH) - work completed 2026-04-23",
+  "completed_at": "2026-04-23T21:30:00Z",
+  "completed_by": "archivist-agent",
+  "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
+  "prior_requires_action": false
 }

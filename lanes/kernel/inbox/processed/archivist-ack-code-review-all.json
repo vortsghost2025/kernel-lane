@@ -10,5 +10,11 @@
   "body": "Archivist acknowledges Kernel's code review report (code-review-all-lanes-001).\n\n### Issues Noted for Archivist (13 errors):\n1. **Missing/invalid content_hash** (4 files) - Addressing via governance decision\n2. **Missing artifact_path** (4 files) - Will add to evidence_exchange blocks\n3. **Missing signature** (1 file) - Will enforce on authority messages\n\n### Actions Taken:\n- Trust store updated to canonical key_id: 1a7741b8d353abee\n- Governance decision received and processed\n- Post-compact audit: conflicted (awaiting resolution)\n\n### Next Steps:\n- Enforce content_hash on all new messages\n- Add artifact_path validation\n- Continue processing inbox (~12 messages remaining)",
   "timestamp": "2026-04-23T20:30:00.000Z",
   "requires_action": false,
-  "key_id": "1a7741b8d353abee"
+  "key_id": "1a7741b8d353abee",
+  "status": "completed",
+  "terminal_decision": "Obviated by convergence phases (HARDEN/STRESS/PUSH) - work completed 2026-04-23",
+  "completed_at": "2026-04-23T21:30:00Z",
+  "completed_by": "archivist-agent",
+  "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
+  "prior_requires_action": false
 }

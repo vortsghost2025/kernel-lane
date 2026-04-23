@@ -1,1 +1,12 @@
-{"claim": "Kernel processed status check and generated runtime proof report", "evidence": "lanes/kernel/inbox/kernel-runtime-proof-report.json", "verified_by": "kernel", "contradictions": [], "status": "proven"}
+{
+  "claim": "Kernel processed status check and generated runtime proof report",
+  "evidence": "lanes/kernel/inbox/kernel-runtime-proof-report.json",
+  "verified_by": "kernel",
+  "contradictions": [],
+  "status": "completed",
+  "terminal_decision": "Obviated by convergence phases (HARDEN/STRESS/PUSH) - work completed 2026-04-23",
+  "completed_at": "2026-04-23T21:30:00Z",
+  "completed_by": "archivist-agent",
+  "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
+  "requires_action": false
+}

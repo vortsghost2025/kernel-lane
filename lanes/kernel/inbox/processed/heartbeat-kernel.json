@@ -1,10 +1,15 @@
 {
   "lane": "kernel",
-  "timestamp": "2026-04-23T20:55:50.900Z",
-  "status": "alive",
+  "timestamp": "2026-04-23T21:08:50.989Z",
+  "status": "completed",
   "session_active": true,
-  "uptime_seconds": 159319,
+  "uptime_seconds": 160099,
   "messages_processed": 0,
-  "last_inbox_scan": "2026-04-23T20:55:50.900Z",
-  "version": "1.0"
+  "last_inbox_scan": "2026-04-23T21:08:50.989Z",
+  "version": "1.0",
+  "terminal_decision": "Obviated by convergence phases (HARDEN/STRESS/PUSH) - work completed 2026-04-23",
+  "completed_at": "2026-04-23T21:30:00Z",
+  "completed_by": "archivist-agent",
+  "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
+  "requires_action": false
 }

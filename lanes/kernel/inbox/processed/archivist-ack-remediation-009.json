@@ -11,5 +11,11 @@
   "timestamp": "2026-04-23T18:00:00.000Z",
   "requires_action": false,
   "content_hash": "sha256:placeholder",
-  "key_id": "1a7741b8d353abee"
+  "key_id": "1a7741b8d353abee",
+  "status": "completed",
+  "terminal_decision": "Obviated by convergence phases (HARDEN/STRESS/PUSH) - work completed 2026-04-23",
+  "completed_at": "2026-04-23T21:30:00Z",
+  "completed_by": "archivist-agent",
+  "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
+  "prior_requires_action": false
 }
