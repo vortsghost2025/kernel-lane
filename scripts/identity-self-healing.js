@@ -4,6 +4,8 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { getAllBroadcastTrustStorePaths, getLaneRoots, computeKeyIdFromPem } = require('./canonical-trust-resolver');
+const { deriveKeyId } = require('../src/attestation/deriveKeyId');
 
 const KEY_SIZE = 2048;
 const PASSFILE_SEARCH = [
@@ -152,18 +154,10 @@ class IdentitySelfHealing {
   }
 
   _updateTrustStores(publicKey, keyId) {
-    const trustStoreDirs = [
-      'S:/Archivist-Agent/lanes/broadcast',
-      'S:/self-organizing-library/lanes/broadcast',
-      'S:/kernel-lane/lanes/broadcast',
-    ];
-    if (this.identityDir.includes('SwarmMind')) {
-      trustStoreDirs.push('S:/SwarmMind Self-Optimizing Multi-Agent AI System/lanes/broadcast');
-    }
+    const trustStorePaths = getAllBroadcastTrustStorePaths();
 
     let updated = 0;
-    for (const dir of trustStoreDirs) {
-      const tsPath = path.join(dir, 'trust-store.json');
+    for (const [laneName, tsPath] of Object.entries(trustStorePaths)) {
       try {
         if (!fs.existsSync(tsPath)) continue;
         const ts = JSON.parse(fs.readFileSync(tsPath, 'utf8'));
