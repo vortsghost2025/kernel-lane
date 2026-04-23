@@ -54,7 +54,7 @@ class IdentitySelfHealing {
     if (result.keysPresent) {
       try {
         const pub = fs.readFileSync(pubPath, 'utf8');
-        result.keyId = crypto.createHash('sha256').update(pub).digest('hex').substring(0, 16);
+        result.keyId = deriveKeyId(pub);
         this._log('INFO', `keys present: ${this.laneId} keyId=${result.keyId}`);
       } catch (e) {
         result.error = `KEY_READ_FAILED: ${e.message}`;
