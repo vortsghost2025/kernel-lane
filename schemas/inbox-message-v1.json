@@ -1,22 +1,23 @@
 {
   "$id": "https://example.com/schemas/inbox-message-v1.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Inbox Message Schema v1.2",
-  "description": "Cross-lane inbox message format. v1.2 adds: signature/key_id REQUIRED (fail-closed identity), type enum expanded with 'ack'. v1.1 added: payload.compression, execution.parent_id, watcher block, canonical_paths, delivery_verification.",
+  "title": "Inbox Message Schema v1.3",
+  "description": "Cross-lane inbox message format. v1.3: idempotency_key relaxed to any non-empty string, task_kind optional for alert/ack/heartbeat. v1.2: signature/key_id REQUIRED, ack+alert in type enum. v1.1: payload.compression, execution.parent_id, watcher block, canonical_paths, delivery_verification.",
   "type": "object",
   "properties": {
-    "schema_version": {
-      "type": "string",
-    "default": "1.2",
-    "enum": ["1.0", "1.1", "1.2"]
-    },
+  "schema_version": {
+    "type": "string",
+    "default": "1.3",
+    "enum": ["1.0", "1.1", "1.2", "1.3"]
+  },
     "task_id": {
       "type": "string"
     },
-    "idempotency_key": {
-      "type": "string",
-      "pattern": "^[a-f0-9]{64}$"
-    },
+  "idempotency_key": {
+    "type": "string",
+    "minLength": 1,
+    "description": "v1.3: Relaxed from hex64 to any non-empty string. Lanes generate descriptive keys."
+  },
     "from": {
       "type": "string",
       "default": "library"
@@ -29,10 +30,11 @@
     "type": "string",
     "enum": ["task", "response", "heartbeat", "escalation", "handoff", "ack", "alert"]
   },
-    "task_kind": {
-      "type": "string",
-      "enum": ["proposal", "review", "amendment", "ratification"]
-    },
+  "task_kind": {
+    "type": "string",
+    "enum": ["proposal", "review", "amendment", "ratification", "ack", "alert", "notification", "heartbeat"],
+    "description": "v1.3: Optional for alert/ack/heartbeat types. Required for task/response/escalation/handoff."
+  },
     "priority": {
       "type": "string",
       "enum": ["P0", "P1", "P2", "P3"]
@@ -151,6 +153,19 @@
           "format": "date-time"}
       }
     },
+    "evidence_exchange": {
+      "type": "object",
+      "description": "v1.3: Convergence evidence exchange block. Required when evidence.required is true for response/ack types.",
+      "properties": {
+        "artifact_path": {"type": "string"},
+        "artifact_type": {
+          "type": "string",
+          "enum": ["benchmark", "profile", "release", "log"]
+        },
+        "delivered_at": {"type": "string", "format": "date-time"}
+      },
+      "required": ["artifact_path", "artifact_type", "delivered_at"]
+    },
     "heartbeat": {
       "type": "object",
       "properties": {
@@ -225,9 +240,15 @@
   },
   "required": [
     "schema_version", "task_id", "idempotency_key", "from", "to",
-    "type", "task_kind", "priority", "subject", "body",
+    "type", "priority", "subject", "body",
     "timestamp", "requires_action", "payload", "execution",
     "lease", "retry", "evidence", "heartbeat",
     "signature", "key_id"
+  ],
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "enum": ["task", "response", "escalation", "handoff"] } } },
+      "then": { "required": ["task_kind"] }
+    }
   ]
 }

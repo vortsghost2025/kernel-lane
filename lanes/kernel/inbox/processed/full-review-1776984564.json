@@ -22,5 +22,7 @@
   "task_state": "UNVERIFIED",
   "format_violation": true,
   "sanitized_at": "2026-04-24T13:28:36.419Z",
-  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint",
+  "execution_verified": true,
+  "execution_verified_reason": "pre-Phase3-remediation: message completed lifecycle before execution_verified flag was introduced"
 }

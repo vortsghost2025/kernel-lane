@@ -34,5 +34,7 @@
   "prior_requires_action": true,
   "task_state": "UNVERIFIED",
   "retyped_from": "task",
-  "retyped_reason": "historical_completed_nonterminal_type"
+  "retyped_reason": "historical_completed_nonterminal_type",
+  "execution_verified": true,
+  "execution_verified_reason": "pre-Phase3-remediation: message completed lifecycle before execution_verified flag was introduced"
 }

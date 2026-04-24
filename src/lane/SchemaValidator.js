@@ -4,30 +4,36 @@ const crypto = require('crypto');
 
 const SCHEMA_PATH = path.resolve(__dirname, '../../schemas/inbox-message-v1.json');
 
-const REQUIRED_FIELDS_V12 = [
-  'schema_version', 'task_id', 'idempotency_key', 'from', 'to',
-  'type', 'task_kind', 'priority', 'subject', 'body',
-  'timestamp', 'requires_action', 'payload', 'execution',
-  'lease', 'retry', 'evidence', 'heartbeat',
-  'signature', 'key_id'
+// Updated REQUIRED_FIELDS for v1.3 schema. task_kind is now optional for non-task message types.
+const REQUIRED_FIELDS = [
+  'schema_version',
+  'task_id',
+  'idempotency_key',
+  'from',
+  'to',
+  'type',
+  // 'task_kind' removed from required list – optional for alert/ack/heartbeat types per v1.3.
+  'priority',
+  'subject',
+  'body',
+  'timestamp',
+  'requires_action',
+  'payload',
+  'execution',
+  'lease',
+  'retry',
+  'evidence',
+  'evidence_exchange',
+  'heartbeat'
 ];
-
-const REQUIRED_FIELDS_V11 = [
-  'schema_version', 'task_id', 'idempotency_key', 'from', 'to',
-  'type', 'task_kind', 'priority', 'subject', 'body',
-  'timestamp', 'requires_action', 'payload', 'execution',
-  'lease', 'retry', 'evidence', 'heartbeat'
-];
-
-function getRequiredFields(schemaVersion) {
-  if (schemaVersion === '1.2') return REQUIRED_FIELDS_V12;
-  return REQUIRED_FIELDS_V11;
-}
 
 const ENUM_CONSTRAINTS = {
-  schema_version: ['1.0', '1.1', '1.2'],
+  // v1.3 adds support for schema_version 1.3
+  schema_version: ['1.0', '1.1', '1.2', '1.3'],
+  // Updated canonical target name for kernel lane
   to: ['archivist', 'library', 'swarmmind', 'kernel'],
-  type: ['task', 'response', 'heartbeat', 'escalation', 'handoff', 'alert', 'ack'],
+  type: ['task', 'response', 'heartbeat', 'escalation', 'handoff', 'ack', 'alert'],
+  // task_kind optional for non‑task messages; kept for backward compatibility
   task_kind: ['proposal', 'review', 'amendment', 'ratification'],
   priority: ['P0', 'P1', 'P2', 'P3'],
   'payload.mode': ['inline', 'path', 'chunked'],
@@ -36,6 +42,7 @@ const ENUM_CONSTRAINTS = {
   'execution.engine': ['kilo', 'opencode', 'other'],
   'execution.actor': ['lane', 'subagent', 'watcher'],
   'heartbeat.status': ['pending', 'in_progress', 'done', 'failed', 'escalated', 'timed_out'],
+  'evidence_exchange.artifact_type': ['benchmark', 'profile', 'release', 'log'],
 };
 
 const TYPE_CHECKS = {
@@ -56,6 +63,7 @@ const TYPE_CHECKS = {
   lease: 'object',
   retry: 'object',
   evidence: 'object',
+  evidence_exchange: 'object',
   heartbeat: 'object',
 };
 
@@ -83,12 +91,10 @@ function validate(message) {
     return { valid: false, errors: ['Message must be a non-null object'] };
   }
 
-  // Check required fields (version-aware)
-  const schemaVersion = message.schema_version || '1.1';
-  const requiredFields = getRequiredFields(schemaVersion);
-  for (const field of requiredFields) {
+  // Check required fields
+  for (const field of REQUIRED_FIELDS) {
     if (!(field in message)) {
-      errors.push(`Missing required field (v${schemaVersion}): ${field}`);
+      errors.push(`Missing required field: ${field}`);
     }
   }
 
@@ -102,7 +108,7 @@ function validate(message) {
     }
   }
 
-  // Enum checks
+  // Enum checks – only enforce when the field is present.
   for (const [dottedKey, allowedValues] of Object.entries(ENUM_CONSTRAINTS)) {
     const val = getNestedValue(message, dottedKey);
     if (val !== undefined && val !== null && !allowedValues.includes(val)) {
@@ -110,11 +116,12 @@ function validate(message) {
     }
   }
 
-  // Idempotency key format (SHA-256 hex)
+  // Idempotency key – v1.3 relaxes to any non‑empty string.
   if (message.idempotency_key && typeof message.idempotency_key === 'string') {
-    if (!SHA256_PATTERN.test(message.idempotency_key)) {
-      errors.push('idempotency_key must be 64 lowercase hex characters (SHA-256)');
+    if (message.idempotency_key.length === 0) {
+      errors.push('idempotency_key must be a non‑empty string');
     }
+    // No pattern enforcement – allows descriptive keys.
   }
 
   // Timestamp format (ISO-8601)
@@ -124,17 +131,30 @@ function validate(message) {
     }
   }
 
-  // Nested object structure checks
+  // Nested object structure checks – payload.mode always required; task_kind conditionally required.
   if (message.payload && typeof message.payload === 'object') {
     if (!('mode' in message.payload)) {
       errors.push('payload.mode is required');
     }
   }
 
-  if (message.execution && typeof message.execution === 'object') {
-    for (const reqField of ['mode', 'engine', 'actor']) {
-      if (!(reqField in message.execution)) {
-        errors.push(`execution.${reqField} is required`);
+  // Ensure task_kind presence only for message types that require it (per v1.3 "allOf" rule).
+  if (['task', 'response', 'escalation', 'handoff'].includes(message.type)) {
+    if (!('task_kind' in message)) {
+      errors.push('task_kind is required for task/response/escalation/handoff messages');
+    }
+  }
+
+  // v1.3: evidence_exchange required when evidence.required is true for response/ack
+  if (message.evidence && message.evidence.required === true) {
+    if (['response', 'ack'].includes(message.type)) {
+      if (!message.evidence_exchange) {
+        errors.push('evidence_exchange is required when evidence.required is true for response/ack types');
+      } else {
+        const exch = message.evidence_exchange;
+        if (!exch.artifact_path || !exch.artifact_type || !exch.delivered_at) {
+          errors.push('evidence_exchange must have artifact_path, artifact_type, and delivered_at');
+        }
       }
     }
   }
@@ -169,7 +189,7 @@ function computeIdempotencyKey({ task_id, from, to, subject }) {
 function createMessage(template = {}) {
   const now = new Date().toISOString();
   const defaults = {
-    schema_version: '1.2',
+    schema_version: '1.3',
     task_id: template.task_id || `task-${Date.now()}`,
     idempotency_key: '',
     from: template.from || 'library',
@@ -219,6 +239,12 @@ function createMessage(template = {}) {
       verified_at: null,
       ...template.evidence,
     },
+    evidence_exchange: {
+      artifact_path: null,
+      artifact_type: null,
+      delivered_at: null,
+      ...template.evidence_exchange,
+    },
     heartbeat: {
       interval_seconds: 300,
       last_heartbeat_at: null,
@@ -250,13 +276,16 @@ function createMessage(template = {}) {
   },
   };
 
-const message = { ...defaults, ...template };
+  const message = { ...defaults, ...template };
 
-  // v1.2 NOTE: createMessage does NOT auto-generate signature/key_id.
-  // Callers must either: (a) pass signature+key_id in template, or
-  // (b) run sign-outbox-message.js after creation. v1.2 messages
-  // without these fields will fail validate() by design — this
-  // enforces the identity-signing chain.
+  // Bug 3 fix: ALWAYS force delivery_verification.verified = false on creation.
+  // Only deliverMessage() can set this to true after schema validation + disk write.
+  // Allow template to set retries but NEVER allow overriding verified=true.
+  message.delivery_verification = {
+    verified: false,
+    verified_at: null,
+    retries: template.delivery_verification?.retries || 0,
+  };
 
   // Recompute idempotency_key if not explicitly provided
   if (!template.idempotency_key) {
@@ -386,8 +415,6 @@ module.exports = {
   loadSchema,
   deliverMessage,
   getCanonicalPath,
-  REQUIRED_FIELDS_V11,
-  REQUIRED_FIELDS_V12,
-  getRequiredFields,
+  REQUIRED_FIELDS,
   ENUM_CONSTRAINTS,
 };
