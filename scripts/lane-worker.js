@@ -16,6 +16,7 @@ const COMPLETION_PROOF_FIELDS = [
 
 const SKIP_FILENAMES = new Set(['heartbeat.json', 'watcher.log', 'watcher.pid', 'readme.md']);
 const HEARTBEAT_PATTERN = /^heartbeat-.+\.json$/i;
+const NON_ASCII_PATTERN = /[^\x00-\x7F]/;
 
 const LANE_HINTS = [
   { hint: 'archivist-agent', lane: 'archivist' },
@@ -132,6 +133,18 @@ function shouldAutoStart(msg) {
   if (msg.auto_execute === true || msg.auto_start === true) return true;
   if (msg.execution && msg.execution.mode === 'watcher') return true;
   return false;
+}
+
+function isEnglishOnly(msg) {
+  if (!msg || typeof msg !== 'object') return true;
+  const textFields = ['subject', 'body', 'type', 'from', 'to'];
+  for (const field of textFields) {
+    const val = msg[field];
+    if (typeof val === 'string' && NON_ASCII_PATTERN.test(val)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function completionGateApprove(msg) {
@@ -284,6 +297,9 @@ class LaneWorker {
     if (!signatureResult.valid) {
       return { queue: 'blocked', reason: 'SIGNATURE_INVALID', detail: signatureResult.reason || 'Signature validation failed' };
     }
+    if (!isEnglishOnly(msg)) {
+      return { queue: 'blocked', reason: 'FORMAT_VIOLATION_NON_ENGLISH', detail: 'Message contains non-ASCII content. Re-request in English per governance constraint.' };
+    }
 
     const gate = completionGateApprove(msg);
     if (isActionable(msg) && !hasCompletionProof(msg)) {
@@ -312,8 +328,13 @@ class LaneWorker {
         detail: decision.detail || null,
         schema_valid: !!schemaResult.valid,
         signature_valid: !!signatureResult.valid,
+        english_only: isEnglishOnly(msg),
       },
     };
+    if (decision.reason === 'FORMAT_VIOLATION_NON_ENGLISH') {
+      enriched.format_violation = true;
+      enriched.format_violation_reason = 'Non-ASCII content detected. Re-request in English per governance constraint.';
+    }
     fs.writeFileSync(targetPath, JSON.stringify(enriched, null, 2), 'utf8');
   }
 
@@ -345,6 +366,7 @@ class LaneWorker {
       detail: decision.detail || null,
       schema_valid: !!schemaResult.valid,
       signature_valid: !!signatureResult.valid,
+      english_only: isEnglishOnly(msg),
       actionable: isActionable(msg),
       has_completion_proof: hasCompletionProof(msg),
       dry_run: this.dryRun,
