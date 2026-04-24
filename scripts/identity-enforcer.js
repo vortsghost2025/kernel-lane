@@ -6,11 +6,18 @@ const path = require('path');
 const crypto = require('crypto');
 
 const TRUST_STORE_SEARCH_PATHS = [
+  'S:/SwarmMind/lanes/broadcast/trust-store.json',
   'S:/Archivist-Agent/lanes/broadcast/trust-store.json',
   'S:/self-organizing-library/lanes/broadcast/trust-store.json',
-  'S:/SwarmMind/lanes/broadcast/trust-store.json',
   'S:/kernel-lane/lanes/broadcast/trust-store.json',
 ];
+
+const TRUST_STORE_PRECOMMIT_CHECKS = [
+  'signature_validates_against_key_id',
+  'key_id_matches_trust_store_entry',
+  'lane_id_invariant'
+];
+const CONVERGED_STATUSES = new Set(['proven', 'approved', 'ratified', 'accept', 'accepted']);
 
 class IdentityEnforcer {
   constructor(options = {}) {
@@ -233,19 +240,22 @@ class IdentityEnforcer {
   }
 
   static signMessage(msg, privateKey, keyId) {
-    const { stableStringify } = require(path.join(
-      fs.existsSync('S:/self-organizing-library/src/attestation/stableStringify.js')
-        ? 'S:/self-organizing-library/src/attestation'
-        : 'S:/kernel-lane/src/attestation',
-      'stableStringify.js'
-    ));
+const { stableStringify } = require(path.join(
+  fs.existsSync('S:/SwarmMind/src/attestation/stableStringify.js')
+  ? 'S:/SwarmMind/src/attestation'
+  : fs.existsSync('S:/self-organizing-library/src/attestation/stableStringify.js')
+  ? 'S:/self-organizing-library/src/attestation'
+  : 'S:/kernel-lane/src/attestation',
+  'stableStringify.js'
+));
 
     const header = { alg: 'RS256', typ: 'JWT', kid: keyId };
     const headerB64 = Buffer.from(JSON.stringify(header)).toString('base64')
       .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
-    const signablePayload = {
-      id: msg.id,
+  const signablePayload = {
+  id: msg.id || msg.task_id || 'unknown',
+      lane: msg.from || msg.from_lane || msg.lane,
       from: msg.from || msg.from_lane,
       to: msg.to || msg.to_lane,
       timestamp: msg.timestamp,
@@ -269,6 +279,106 @@ class IdentityEnforcer {
       signature_alg: 'RS256',
       key_id: keyId
     };
+  }
+
+  static _extractConvergedApprovals(payload) {
+    if (!payload || typeof payload !== 'object') return [];
+
+    const normalized = [];
+    if (Array.isArray(payload.approvals)) {
+      for (const item of payload.approvals) {
+        if (!item || typeof item !== 'object') continue;
+        normalized.push({
+          lane: item.lane || item.lane_id || item.from || item.from_lane || null,
+          status: item.status || item.decision || null,
+          signature: item.signature || item.jws || null
+        });
+      }
+    }
+
+    if (payload.lane_results && typeof payload.lane_results === 'object') {
+      for (const [lane, result] of Object.entries(payload.lane_results)) {
+        if (!result || typeof result !== 'object') continue;
+        normalized.push({
+          lane,
+          status: result.status || result.decision || null,
+          signature: result.signature || result.jws || null
+        });
+      }
+    }
+
+    if (payload.convergence && typeof payload.convergence === 'object') {
+      const conv = payload.convergence;
+      if (Array.isArray(conv.approvals)) {
+        for (const item of conv.approvals) {
+          if (!item || typeof item !== 'object') continue;
+          normalized.push({
+            lane: item.lane || item.lane_id || item.from || item.from_lane || null,
+            status: item.status || item.decision || null,
+            signature: item.signature || item.jws || null
+          });
+        }
+      }
+      if (conv.lane_results && typeof conv.lane_results === 'object') {
+        for (const [lane, result] of Object.entries(conv.lane_results)) {
+          if (!result || typeof result !== 'object') continue;
+          normalized.push({
+            lane,
+            status: result.status || result.decision || null,
+            signature: result.signature || result.jws || null
+          });
+        }
+      }
+    }
+
+    const accepted = [];
+    const seen = new Set();
+    for (const entry of normalized) {
+      const lane = typeof entry.lane === 'string' ? entry.lane.trim().toLowerCase() : '';
+      const status = typeof entry.status === 'string' ? entry.status.trim().toLowerCase() : '';
+      const signature = typeof entry.signature === 'string' ? entry.signature.trim() : '';
+      if (!lane || !CONVERGED_STATUSES.has(status) || signature.length < 20) continue;
+      if (seen.has(lane)) continue;
+      seen.add(lane);
+      accepted.push({ lane, status, signature });
+    }
+    return accepted;
+  }
+
+  static assertTrustStoreWriteAuthorized(options = {}) {
+    const approvalPath = options.approvalPath || process.env.TRUST_STORE_CONVERGENCE_PATH || null;
+    const approvalJson = options.approvalJson || process.env.TRUST_STORE_CONVERGENCE_JSON || null;
+
+    if (!approvalPath && !approvalJson) {
+      throw new Error('TRUST_STORE_WRITE_BLOCKED: missing convergence approval (set TRUST_STORE_CONVERGENCE_PATH or TRUST_STORE_CONVERGENCE_JSON)');
+    }
+
+    let payload;
+    if (approvalJson) {
+      payload = JSON.parse(approvalJson);
+    } else {
+      if (!fs.existsSync(approvalPath)) {
+        throw new Error(`TRUST_STORE_WRITE_BLOCKED: convergence approval file not found (${approvalPath})`);
+      }
+      payload = JSON.parse(fs.readFileSync(approvalPath, 'utf8'));
+    }
+
+    const approvals = IdentityEnforcer._extractConvergedApprovals(payload);
+    if (approvals.length < 3) {
+      const lanes = approvals.map(a => a.lane).join(', ') || 'none';
+      throw new Error(`TRUST_STORE_WRITE_BLOCKED: requires 3-lane convergence with signatures, got ${approvals.length} (${lanes})`);
+    }
+    return { ok: true, approvals };
+  }
+
+  static writeTrustStoreStrict(trustStorePath, trustStore, options = {}) {
+    IdentityEnforcer.assertTrustStoreWriteAuthorized(options);
+    const serialized = { ...trustStore };
+    if (!Array.isArray(serialized.preCommitChecks)) {
+      serialized.preCommitChecks = [...TRUST_STORE_PRECOMMIT_CHECKS];
+    }
+    fs.writeFileSync(trustStorePath, JSON.stringify(serialized, null, 2), 'utf8');
+    return { path: trustStorePath, ok: true };
   }
 }
 

@@ -1,237 +1,259 @@
 #!/usr/bin/env node
-
-/**
- * execution-gate.js — Hard execution gate enforcement
- *
- * Reads active-blocker.json and validates proposed actions against
- * the execution-gate-v1.json schema. Returns exit code 0 if allowed,
- * exit code 1 if forbidden.
- *
- * Usage:
- *   node execution-gate.js --action <action> --target <filepath> [--lane <lane>]
- *   node execution-gate.js --status   (prints current blocker state)
- *   node execution-gate.js --verify   (runs blocker resolution verification)
- *
- * This is the ONE place where parallel work becomes impossible.
- * Not discipline. Not review. Structure.
- */
+'use strict';
 
 const fs = require('fs');
 const path = require('path');
 
-const BROADCAST_DIR = path.resolve(__dirname, '..', 'lanes', 'broadcast');
-const BLOCKER_PATH = path.join(BROADCAST_DIR, 'active-blocker.json');
-const VIOLATIONS_PATH = path.join(BROADCAST_DIR, 'gate-violations.jsonl');
-const GATE_SCHEMA_PATH = path.resolve(__dirname, '..', 'schemas', 'execution-gate-v1.json');
+const { ArtifactResolver } = require('./artifact-resolver');
 
-function readBlocker() {
-  if (!fs.existsSync(BLOCKER_PATH)) return null;
-  try {
-    return JSON.parse(fs.readFileSync(BLOCKER_PATH, 'utf8'));
-  } catch (e) {
-    return { _error: `Cannot parse blocker: ${e.message}` };
-  }
-}
+const DEFAULT_ALLOWED_ROOTS = [
+  'S:/Archivist-Agent',
+  'S:/kernel-lane',
+  'S:/self-organizing-library',
+  'S:/SwarmMind',
+];
 
-function logViolation(lane, action, target, reason) {
-  const entry = {
-    timestamp: new Date().toISOString(),
-    lane: lane || 'unknown',
-    action,
-    target: target || '',
-    reason,
-    blocker_id: readBlocker()?.id || 'none'
-  };
-  const line = JSON.stringify(entry) + '\n';
-  try {
-    fs.appendFileSync(VIOLATIONS_PATH, line, 'utf8');
-  } catch (e) {
-    // Can't log violation — that's itself a problem, but don't crash
-    console.error('[GATE] Cannot write violation log:', e.message);
-  }
-}
+const COMPLETION_WINDOW_MS = 5 * 60 * 1000;
 
-function matchForbidden(target, forbiddenList) {
-  if (!forbiddenList || !Array.isArray(forbiddenList)) return null;
-  for (const rule of forbiddenList) {
-    const pattern = rule.pattern;
-    try {
-      // Support glob-style patterns with **
-      const regexStr = pattern
-        .replace(/\*\*/g, '§§')   // preserve **
-        .replace(/\*/g, '[^/]*')   // * matches within segment
-        .replace(/§§/g, '.*')      // ** matches across segments
-        .replace(/\?/g, '[^/]');
-      const regex = new RegExp('^' + regexStr + '$', 'i');
-      if (regex.test(target)) return rule;
-    } catch (e) {
-      // Invalid pattern — skip
-    }
-  }
-  return null;
-}
-
-function isAllowed(action, target, lane) {
-  const blocker = readBlocker();
-
-  // No blocker = all actions allowed
-  if (!blocker || blocker.status !== 'active') {
-    return { allowed: true, reason: 'no_active_blocker' };
+class ExecutionGate {
+  constructor(options = {}) {
+    const rawRoots = options.allowedRoots || DEFAULT_ALLOWED_ROOTS;
+    this.resolver = options.resolver || new ArtifactResolver({
+      allowedRoots: rawRoots,
+      dryRun: options.dryRun !== undefined ? !!options.dryRun : true,
+      configPath: options.configPath,
+    });
+    this.lane = options.lane || 'archivist';
+    this.dryRun = options.dryRun !== undefined ? !!options.dryRun : true;
+    this.completionLogPath = options.completionLogPath || null;
   }
 
-  // Wrong owner lane trying to work on blocker
-  if (lane && blocker.owner && lane !== blocker.owner) {
-    // Non-owner can still read, but cannot write/commit
-    const readOnlyActions = ['read_file', 'search_codebase', 'run_tests', 'grep', 'glob', 'git_log', 'git_diff', 'git_status'];
-    if (readOnlyActions.includes(action)) {
-      return { allowed: true, reason: 'read_action_permitted_for_non_owner' };
-    }
-    // Non-owner write — still subject to forbidden patterns
-    if (target && blocker.forbidden) {
-      const match = matchForbidden(target, blocker.forbidden);
-      if (match) {
-        return {
-          allowed: false,
-          reason: `target matches forbidden pattern: ${match.pattern} — ${match.reason}`,
-          blocker_id: blocker.id
-        };
-      }
-    }
-    // Non-owner write = forbidden unless explicitly allowed
-    if (blocker.allowed_actions && blocker.allowed_actions.includes(action)) {
-      return { allowed: true, reason: 'explicitly_allowed' };
-    }
-    return {
-      allowed: false,
-      reason: `lane '${lane}' is not the blocker owner '${blocker.owner}' — only read actions permitted`,
-      blocker_id: blocker.id
-    };
-  }
-
-  // Read actions are ALWAYS allowed — forbidden patterns only block writes
-  const readActions = ['read_file', 'search_codebase', 'run_tests', 'grep', 'glob', 'git_log', 'git_diff', 'git_status'];
-  if (readActions.includes(action)) {
-    return { allowed: true, reason: 'read_action_always_permitted', blocker_id: blocker.id };
-  }
-
-  // Check explicit forbidden patterns (only for write actions)
-  if (target && blocker.forbidden) {
-    const match = matchForbidden(target, blocker.forbidden);
-    if (match) {
+  verify(msg) {
+    if (!msg || typeof msg !== 'object') {
       return {
-        allowed: false,
-        reason: `target matches forbidden pattern: ${match.pattern} — ${match.reason}`,
-        blocker_id: blocker.id
+        execution_verified: false,
+        would_verify: false,
+        verification_type: 'INVALID_MESSAGE',
+        reason: 'Message is null or not an object',
+        verifier_lane: this.lane,
+        verified_at: null,
       };
     }
-  }
 
-  // Check allowed_actions whitelist
-  if (blocker.allowed_actions && blocker.allowed_actions.length > 0) {
-    if (blocker.allowed_actions.includes(action)) {
-      return { allowed: true, reason: 'action_in_whitelist', blocker_id: blocker.id };
+    const classification = this.resolver.classifyProof(msg);
+
+    if (classification.type === 'NONE') {
+      return {
+        execution_verified: false,
+        would_verify: false,
+        verification_type: 'NO_PROOF',
+        reason: 'No completion proof field present — cannot verify execution',
+        verifier_lane: this.lane,
+        verified_at: null,
+      };
     }
-    // Action not in whitelist = forbidden
+
+    // Non-path proofs (message IDs, task IDs) — accept if referenced message exists
+    if (classification.path === null) {
+      const refVerified = this._verifyReference(msg, classification);
+      return {
+        execution_verified: refVerified.verified,
+        would_verify: !!refVerified.wouldVerify,
+        verification_type: classification.type,
+        reason: refVerified.reason,
+        verifier_lane: this.lane,
+        verified_at: refVerified.verified ? new Date().toISOString() : null,
+      };
+    }
+
+    // Path-based proofs — resolve artifact on filesystem
+    const resolution = this.resolver.resolveMessage(msg);
+    if (!resolution.resolved) {
+      return {
+        execution_verified: false,
+        would_verify: false,
+        verification_type: resolution.type,
+        reason: `Artifact unresolvable: ${resolution.reason}`,
+        artifact_path: resolution.path,
+        verifier_lane: this.lane,
+        verified_at: null,
+      };
+    }
+
+    if (this.dryRun && resolution.reason === 'DRY_RUN_SKIP_FS_CHECK') {
+      return {
+        execution_verified: false,
+        would_verify: true,
+        verification_type: resolution.type,
+        reason: resolution.reason,
+        artifact_path: resolution.path,
+        verifier_lane: this.lane,
+        verified_at: null,
+      };
+    }
+
     return {
-      allowed: false,
-      reason: `action '${action}' not in allowed_actions whitelist: [${blocker.allowed_actions.join(', ')}]`,
-      blocker_id: blocker.id
+      execution_verified: true,
+      would_verify: true,
+      verification_type: resolution.type,
+      reason: resolution.reason,
+      artifact_path: resolution.path,
+      verifier_lane: this.lane,
+      verified_at: new Date().toISOString(),
     };
   }
 
-  // No whitelist defined = allow (backwards compatible with old blocker format)
-  return { allowed: true, reason: 'no_whitelist_defined', blocker_id: blocker.id };
-}
+  _verifyReference(msg, classification) {
+    if (classification.type === 'LEGACY_MESSAGE_ID') {
+      const msgId = msg.completion_message_id;
+      if (!msgId) return { verified: false, wouldVerify: false, reason: 'completion_message_id is empty' };
 
-function verify(blocker) {
-  if (!blocker || !blocker.verification) {
-    return { verified: false, reason: 'no_verification_method_defined' };
-  }
-
-  const { method, command, expected } = blocker.verification;
-
-  switch (method) {
-    case 'test_pass':
-    case 'command_exit_0': {
-      if (!command) return { verified: false, reason: 'no_command_defined' };
-      try {
-        const { execSync } = require('child_process');
-        const result = execSync(command, { encoding: 'utf8', timeout: 30000 });
-        if (expected && !result.includes(expected)) {
-          return { verified: false, reason: `output does not contain '${expected}'`, output: result.slice(0, 200) };
-        }
-        return { verified: true, output: result.slice(0, 200) };
-      } catch (e) {
-        return { verified: false, reason: `command failed: ${e.message}` };
+      const found = this._findReferencedMessage(msgId, msg);
+      if (found) {
+        return { verified: true, wouldVerify: true, reason: 'Referenced message exists on disk' };
       }
+      if (this.dryRun) {
+        return { verified: false, wouldVerify: true, reason: 'DRY_RUN_SKIP_REF_CHECK' };
+      }
+      return { verified: false, wouldVerify: false, reason: `Referenced message not found: ${msgId}` };
     }
-    case 'file_absent': {
-      if (!command) return { verified: false, reason: 'no_file_path_defined' };
-      const exists = fs.existsSync(command);
-      return { verified: !exists, reason: exists ? 'file still exists' : 'file absent as expected' };
+
+    if (classification.type === 'LEGACY_TASK_ID') {
+      const taskId = msg.resolved_by_task_id;
+      if (!taskId) return { verified: false, wouldVerify: false, reason: 'resolved_by_task_id is empty' };
+
+      const found = this._findReferencedTask(taskId, msg);
+      if (found) {
+        return { verified: true, wouldVerify: true, reason: 'Referenced task exists on disk' };
+      }
+      if (this.dryRun) {
+        return { verified: false, wouldVerify: true, reason: 'DRY_RUN_SKIP_REF_CHECK' };
+      }
+      return { verified: false, wouldVerify: false, reason: `Referenced task not found: ${taskId}` };
     }
-    case 'manual_review':
-      return { verified: false, reason: 'requires_manual_review — cannot auto-verify' };
-    default:
-      return { verified: false, reason: `unknown verification method: ${method}` };
+
+    // LEGACY_REFERENCE from completion-proof classifyProof
+    return { verified: false, wouldVerify: false, reason: 'NON_PATH_PROOF_UNVERIFIED' };
+  }
+
+  _findReferencedMessage(msgId, sourceMsg) {
+    const searchDirs = this._getSearchDirs(sourceMsg);
+    const normalizedId = String(msgId).toLowerCase();
+
+    for (const dir of searchDirs) {
+      if (!fs.existsSync(dir)) continue;
+      try {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const ent of entries) {
+          if (!ent.isFile() || !ent.name.endsWith('.json')) continue;
+          if (ent.name.toLowerCase().includes(normalizedId) || normalizedId.includes(ent.name.toLowerCase().replace('.json', ''))) {
+            return path.join(dir, ent.name);
+          }
+        }
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  _findReferencedTask(taskId, sourceMsg) {
+    return this._findReferencedMessage(taskId, sourceMsg);
+  }
+
+  _getSearchDirs(sourceMsg) {
+    const fromLane = sourceMsg.from || 'archivist';
+    const laneRootMap = {
+      archivist: 'S:/Archivist-Agent',
+      kernel: 'S:/kernel-lane',
+      library: 'S:/self-organizing-library',
+      swarmmind: 'S:/SwarmMind',
+    };
+    const root = laneRootMap[fromLane] || laneRootMap.archivist;
+    return [
+      path.join(root, 'lanes', fromLane, 'inbox', 'processed'),
+      path.join(root, 'lanes', fromLane, 'outbox'),
+      path.join(root, 'lanes', fromLane, 'inbox'),
+    ];
+  }
+
+  stamp(msg) {
+    const result = this.verify(msg);
+    return {
+      ...msg,
+      execution_verified: result.execution_verified,
+      would_verify: result.would_verify === true,
+      execution_verification: {
+        type: result.verification_type,
+        reason: result.reason,
+        would_verify: result.would_verify === true,
+        verifier_lane: result.verifier_lane,
+        verified_at: result.verified_at,
+        artifact_path: result.artifact_path || null,
+      },
+    };
+  }
+
+  checkLiveness(processedDir) {
+    const now = Date.now();
+    const cutoff = now - COMPLETION_WINDOW_MS;
+    let count = 0;
+
+    if (!fs.existsSync(processedDir)) {
+      return {
+        tasks_completed_last_5min: 0,
+        alert: true,
+        alert_reason: 'PROCESSED_DIR_MISSING',
+        checked_at: new Date().toISOString(),
+      };
+    }
+
+    try {
+      const entries = fs.readdirSync(processedDir, { withFileTypes: true });
+      for (const ent of entries) {
+        if (!ent.isFile() || !ent.name.endsWith('.json')) continue;
+        const fullPath = path.join(processedDir, ent.name);
+        try {
+          const stat = fs.statSync(fullPath);
+          if (stat.mtimeMs >= cutoff) {
+            count++;
+          }
+        } catch (_) {}
+      }
+    } catch (_) {}
+
+    const alert = count === 0;
+    return {
+      tasks_completed_last_5min: count,
+      alert,
+      alert_reason: alert ? 'ZERO_COMPLETIONS_WHILE_SYSTEM_ACTIVE' : null,
+      checked_at: new Date().toISOString(),
+    };
+  }
+
+  checkLivenessAcrossLanes() {
+    const laneDirs = {
+      archivist: 'S:/Archivist-Agent/lanes/archivist/inbox/processed',
+      kernel: 'S:/kernel-lane/lanes/kernel/inbox/processed',
+      library: 'S:/self-organizing-library/lanes/library/inbox/processed',
+      swarmmind: 'S:/SwarmMind/lanes/swarmmind/inbox/processed',
+    };
+
+    const results = {};
+    let totalCompletions = 0;
+
+    for (const [lane, dir] of Object.entries(laneDirs)) {
+      const liveness = this.checkLiveness(dir);
+      results[lane] = liveness;
+      totalCompletions += liveness.tasks_completed_last_5min;
+    }
+
+    return {
+      total_completed_last_5min: totalCompletions,
+      per_lane: results,
+      system_alert: totalCompletions === 0,
+      alert_reason: totalCompletions === 0 ? 'ALL_LANES_ZERO_COMPLETIONS' : null,
+      checked_at: new Date().toISOString(),
+    };
   }
 }
 
-// CLI entry point
-const args = process.argv.slice(2);
-
-if (args.includes('--status')) {
-  const blocker = readBlocker();
-  if (!blocker) {
-    console.log(JSON.stringify({ status: 'no_blocker', allowed: 'all' }, null, 2));
-    process.exit(0);
-  }
-  console.log(JSON.stringify({
-    status: blocker.status,
-    id: blocker.id,
-    owner: blocker.owner,
-    locked_at: blocker.locked_at,
-    allowed_actions: blocker.allowed_actions || '(none defined — backwards compatible)',
-    forbidden_count: blocker.forbidden?.length || 0,
-    verification: blocker.verification?.method || 'none'
-  }, null, 2));
-  process.exit(0);
-}
-
-if (args.includes('--verify')) {
-  const blocker = readBlocker();
-  if (!blocker || blocker.status !== 'active') {
-    console.log(JSON.stringify({ status: 'no_active_blocker', verified: true }));
-    process.exit(0);
-  }
-  const result = verify(blocker);
-  console.log(JSON.stringify(result, null, 2));
-  process.exit(result.verified ? 0 : 1);
-}
-
-// Main gate check
-const actionIdx = args.indexOf('--action');
-const targetIdx = args.indexOf('--target');
-const laneIdx = args.indexOf('--lane');
-
-if (actionIdx === -1) {
-  console.error('Usage: node execution-gate.js --action <action> --target <path> [--lane <lane>]');
-  console.error('       node execution-gate.js --status');
-  console.error('       node execution-gate.js --verify');
-  process.exit(2);
-}
-
-const action = args[actionIdx + 1];
-const target = targetIdx !== -1 ? args[targetIdx + 1] : '';
-const lane = laneIdx !== -1 ? args[laneIdx + 1] : '';
-
-const result = isAllowed(action, target, lane);
-
-if (result.allowed) {
-  console.log(JSON.stringify({ gate: 'OPEN', ...result }));
-  process.exit(0);
-} else {
-  console.log(JSON.stringify({ gate: 'CLOSED', ...result }));
-  logViolation(lane, action, target, result.reason);
-  process.exit(1);
-}
+module.exports = { ExecutionGate, COMPLETION_WINDOW_MS };

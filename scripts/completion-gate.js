@@ -4,98 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const TERMINAL_TYPES = new Set([
-  'ack',
-  'acknowledgment',
-  'heartbeat',
-  'notification',
-  'response',
-]);
-
-const COMPLETION_PROOF_FIELDS = [
-  'completion_artifact_path',
-  'completion_message_id',
-  'resolved_by_task_id',
-  'terminal_decision',
-];
-
-function hasCompletionProof(msg) {
-  if (typeof msg !== 'object' || msg === null) return false;
-  return COMPLETION_PROOF_FIELDS.some(field => {
-    const val = msg[field];
-    return val !== undefined && val !== null && val !== '' && val !== false;
-  });
-}
-
-function hasFollowupObligation(msg) {
-  if (typeof msg !== 'object' || msg === null) return false;
-  return !!(msg.depends_on || msg.creates_followup || msg.links_to_contradiction);
-}
-
-function isActionable(msg) {
-  if (typeof msg !== 'object' || msg === null) return false;
-  return msg.requires_action === true;
-}
-
-function isTerminalInformational(msg) {
-  if (typeof msg !== 'object' || msg === null) return false;
-  if (msg.requires_action !== false) return false;
-  const type = String(msg.type || '').toLowerCase().trim();
-  if (!TERMINAL_TYPES.has(type)) return false;
-  if (hasFollowupObligation(msg)) return false;
-  return true;
-}
-
-function evaluate(msg) {
-  if (typeof msg !== 'object' || msg === null) {
-    return { pass: false, reason: 'INVALID_MESSAGE', detail: 'Message is null or not an object' };
-  }
-
-  if (isActionable(msg)) {
-    if (hasCompletionProof(msg)) {
-      return { pass: true, reason: 'ACTIONABLE_WITH_PROOF', detail: null };
-    }
-    return {
-      pass: false,
-      reason: 'ACTIONABLE_MISSING_PROOF',
-      detail: 'Actionable message (type=' + msg.type + ', priority=' + msg.priority + ') requires one of: ' + COMPLETION_PROOF_FIELDS.join(', '),
-    };
-  }
-
-  if (isTerminalInformational(msg)) {
-    return { pass: true, reason: 'TERMINAL_INFORMATIONAL', detail: null };
-  }
-
-  if (msg.requires_action === false && !TERMINAL_TYPES.has(String(msg.type || '').toLowerCase().trim())) {
-    return {
-      pass: false,
-      reason: 'NON_TERMINAL_TYPE',
-      detail: 'type="' + msg.type + '" is not a terminal type. Terminal types: ' + [...TERMINAL_TYPES].join(', '),
-    };
-  }
-
-  if (msg.requires_action === false && hasFollowupObligation(msg)) {
-    return {
-      pass: false,
-      reason: 'HAS_FOLLOWUP_OBLIGATION',
-      detail: 'Message has followup obligation (depends_on=' + !!msg.depends_on + ', creates_followup=' + !!msg.creates_followup + ', links_to_contradiction=' + !!msg.links_to_contradiction + ')',
-    };
-  }
-
-  if (msg.requires_action === undefined || msg.requires_action === null) {
-    return {
-      pass: false,
-      reason: 'AMBIGUOUS_REQUIRES_ACTION',
-      detail: 'requires_action is ' + msg.requires_action + ' -- must be explicitly true or false',
-    };
-  }
-
-  return {
-    pass: false,
-    reason: 'UNKNOWN_FAILURE',
-    detail: 'Message does not meet any gate criteria (requires_action=' + msg.requires_action + ', type=' + msg.type + ')',
-  };
-}
+const cp = require('./completion-proof');
 
 const LANES = {
   archivist: {
@@ -174,7 +83,7 @@ function gateLane(laneName, cfg, apply) {
     const msg = safeReadJson(src);
     if (!msg) continue;
 
-    const verdict = evaluate(msg);
+    const verdict = cp.evaluate(msg);
 
     if (verdict.pass) {
       result.allowed += 1;
@@ -256,3 +165,5 @@ function gateLane(laneName, cfg, apply) {
     process.exit(20);
   }
 })();
+
+module.exports = { gateLane, evaluate: cp.evaluate };
