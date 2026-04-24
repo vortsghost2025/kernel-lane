@@ -9,7 +9,7 @@
   "priority": "P3",
   "subject": "Heartbeat: kernel alive",
   "body": "Lane kernel heartbeat. Uptime: 0s. Messages processed: 0.",
-  "timestamp": "2026-04-24T13:42:01.195Z",
+  "timestamp": "2026-04-24T14:27:01.737Z",
   "requires_action": false,
   "payload": {
     "mode": "inline",
@@ -26,8 +26,8 @@
   },
   "lease": {
     "owner": "kernel",
-    "acquired_at": "2026-04-24T13:42:01.195Z",
-    "expires_at": "2026-04-24T13:57:01.195Z",
+    "acquired_at": "2026-04-24T14:27:01.737Z",
+    "expires_at": "2026-04-24T14:42:01.737Z",
     "renew_count": 0,
     "max_renewals": 3
   },
@@ -42,11 +42,11 @@
     "evidence_path": null,
     "verified": true,
     "verified_by": "self",
-    "verified_at": "2026-04-24T13:42:01.195Z"
+    "verified_at": "2026-04-24T14:27:01.737Z"
   },
   "heartbeat": {
     "interval_seconds": 60,
-    "last_heartbeat_at": "2026-04-24T13:42:01.195Z",
+    "last_heartbeat_at": "2026-04-24T14:27:01.737Z",
     "timeout_seconds": 900,
     "status": "in_progress"
   },
@@ -54,7 +54,7 @@
   "session_active": true,
   "uptime_seconds": 0,
   "messages_processed": 0,
-  "last_inbox_scan": "2026-04-24T13:42:01.195Z",
+  "last_inbox_scan": "2026-04-24T14:27:01.737Z",
   "version": "1.0",
   "system_state": "degraded",
   "active_contradictions": [
