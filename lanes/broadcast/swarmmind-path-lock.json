@@ -1,0 +1,51 @@
+{
+  "id": "swarmmind-path-lock-2026-04-24T14-10-00Z",
+  "declared_by": "authority",
+  "declared_at": "2026-04-24T14:10:00Z",
+  "priority": "P0",
+  "type": "policy",
+  "canonical_root": "S:/SwarmMind",
+  "deprecated_path": "S:/SwarmMind Self-Optimizing Multi-Agent AI System",
+  "git_remote": "https://github.com/vortsghost2025/SwarmMind-Self-Optimizing-Multi-Agent-AI-System.git",
+  "rules": [
+    {
+      "id": "RULE-1",
+      "text": "No agent may read from deprecated path",
+      "enforcement": "hard",
+      "scope": "all_lanes"
+    },
+    {
+      "id": "RULE-2",
+      "text": "No onboarding may reference deprecated path",
+      "enforcement": "hard",
+      "scope": "all_lanes"
+    },
+    {
+      "id": "RULE-3",
+      "text": "Deprecated path is read-only until deletion",
+      "enforcement": "hard",
+      "scope": "all_lanes"
+    },
+    {
+      "id": "RULE-4",
+      "text": "All scripts/tests must resolve relative to S:/SwarmMind",
+      "enforcement": "hard",
+      "scope": "all_lanes"
+    }
+  ],
+  "deletion_prerequisites": [
+    "All uncommitted work in S:/SwarmMind committed and pushed",
+    "No active agent session reading from deprecated path",
+    "Authority explicit deletion approval"
+  ],
+  "deletion_status": "completed",
+  "deletion_approved_by": "authority",
+  "deletion_executed_at": "2026-04-24T14:12:00Z",
+  "deletion_verified": true,
+  "evidence": {
+    "canonical_root": "S:/SwarmMind",
+    "canonical_git_commits": 7,
+    "deprecated_path_exists": false,
+    "deprecated_path_verified_gone": true
+  }
+}
