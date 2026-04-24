@@ -1,0 +1,39 @@
+[
+  {
+    "id": "swarmmind_no_heartbeat",
+    "priority": "P0",
+    "description": "RESOLVING: Scheduled task created (every 5 min), heartbeat updating successfully. Monitoring stability.",
+    "detected_at": "2026-04-23T21:45:00.000Z",
+    "source": "convergence-monitor-report-20260423.json",
+    "status": "resolving",
+    "resolution": null,
+    "last_heartbeat": "2026-04-23T22:09:19.646Z",
+    "scheduled_task": "SwarmMindHeartbeat (every 5 min, created 22:02Z)",
+    "consecutive_updates": 4,
+    "stability_check_needed_until": "2026-04-23T22:35:00.000Z",
+    "next_update_expected": "2026-04-23T22:14:19.000Z"
+  },
+  {
+    "id": "message_loss",
+    "priority": "P1",
+    "description": "RESOLVED: 42 actionable messages processed from action-required/ to processed/ (41 completed + 1 informational)",
+    "detected_at": "2026-04-23T21:30:00.000Z",
+    "source": "post-compact-audit.js + recover-action-required-from-processed.js + manual processing",
+    "status": "resolved",
+    "resolution": "All actionable messages in action-required/ processed and moved to processed/. 0 remaining.",
+    "verified_at": "2026-04-23T22:01:53.241Z",
+    "resolved_at": "2026-04-23T22:10:00.000Z",
+    "action-required_final_count": 0
+  },
+  {
+    "id": "priority_P0_contradiction",
+    "priority": "P0",
+    "description": "RESOLVING: System now reports 'degraded' (not 'aligned'). Contradiction being addressed.",
+    "detected_at": "2026-04-23T17:49:00.000Z",
+    "source": "SYSTEM.txt",
+    "status": "resolving",
+    "resolution": null,
+    "system_state_now": "degraded",
+    "corrected_at": "2026-04-23T21:45:00.000Z"
+  }
+]

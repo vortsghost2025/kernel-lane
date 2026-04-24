@@ -1,17 +1,18 @@
 [
   {
     "lane": "archivist",
-    "total": 159,
-    "verified": 159,
+    "total": 161,
+    "verified": 161,
     "mismatches": [],
     "missingEvidence": []
   },
   {
     "lane": "library",
     "total": 68,
-    "verified": 62,
+    "verified": 61,
     "mismatches": [],
     "missingEvidence": [
+      "convergence-complete.json",
       "library-act-round-009-response-20260422212300.json",
       "library-contradiction-key-id-mapping-20260423.json",
       "library-cross-lane-review-response-20260422212500.json",

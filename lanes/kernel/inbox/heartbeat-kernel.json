@@ -1,10 +1,64 @@
 {
+  "schema_version": "1.2",
+  "task_id": "heartbeat-kernel",
+  "idempotency_key": "81bf15a14e0ad9501fd97c25e2f7c090502676072663c83a025ae956e01fb655",
+  "from": "kernel",
+  "to": "kernel",
+  "type": "heartbeat",
+  "task_kind": "proposal",
+  "priority": "P3",
+  "subject": "Heartbeat: kernel alive",
+  "body": "Lane kernel heartbeat. Uptime: 7681s. Messages processed: 0.",
+  "timestamp": "2026-04-24T00:23:44.659Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none",
+    "path": null,
+    "chunk": null
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": null,
+    "parent_id": null
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-24T00:23:44.659Z",
+    "expires_at": "2026-04-24T00:38:44.659Z",
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": false,
+    "evidence_path": null,
+    "verified": true,
+    "verified_by": "self",
+    "verified_at": "2026-04-24T00:23:44.659Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 60,
+    "last_heartbeat_at": "2026-04-24T00:23:44.659Z",
+    "timeout_seconds": 900,
+    "status": "in_progress"
+  },
   "lane": "kernel",
-  "timestamp": "2026-04-23T21:02:50.948Z",
-  "status": "alive",
   "session_active": true,
-  "uptime_seconds": 159739,
+  "uptime_seconds": 7681,
   "messages_processed": 0,
-  "last_inbox_scan": "2026-04-23T21:02:50.948Z",
-  "version": "1.0"
+  "last_inbox_scan": "2026-04-24T00:23:44.659Z",
+  "version": "1.0",
+  "system_state": "unknown",
+  "active_contradictions": [],
+  "processed_ok": true,
+  "compaction_enabled": false,
+  "compaction_suspend_reason": null
 }

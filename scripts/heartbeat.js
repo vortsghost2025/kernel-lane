@@ -64,6 +64,54 @@ class Heartbeat {
     const status = this._shuttingDown ? 'shutdown' : 'alive';
 
     const hbStatus = this._shuttingDown ? 'done' : 'in_progress';
+
+    // Load system state and contradictions from broadcast
+    let systemState = 'unknown';
+    let activeContradictions = [];
+    let processedOk = true;
+    try {
+      const broadcastDir = path.join(REPO_ROOT, 'lanes', 'broadcast');
+      const statePath = path.join(broadcastDir, 'system_state.json');
+      const contraPath = path.join(broadcastDir, 'contradictions.json');
+
+      if (fs.existsSync(statePath)) {
+        const stateData = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+        systemState = stateData.system_status || 'unknown';
+      }
+
+    if (fs.existsSync(contraPath)) {
+      const contraData = JSON.parse(fs.readFileSync(contraPath, 'utf8'));
+      activeContradictions = contraData
+        .filter(c => c.status === 'active' || c.status === 'resolving')
+        .map(c => c.id);
+    }
+
+    // TRUTH-OVER-STABILITY: contradictions override system_state
+    if (activeContradictions.length > 0) {
+      systemState = 'degraded';
+    }
+
+    // Verify processed/ messages have completion proof
+      const processedDir = path.join(this.config.inboxPath, 'processed');
+      if (fs.existsSync(processedDir)) {
+        const processedFiles = fs.readdirSync(processedDir).filter(f => f.endsWith('.json'));
+        for (const f of processedFiles) {
+          try {
+            const msg = JSON.parse(fs.readFileSync(path.join(processedDir, f), 'utf8'));
+            if (msg.requires_action) {
+              const hasProof = (msg.completion_artifact_path || msg.completion_message_id || msg.resolved_by_task_id || msg.terminal_decision);
+              if (!hasProof) {
+                processedOk = false;
+                break;
+              }
+            }
+          } catch (_) { processedOk = false; break; }
+        }
+      }
+    } catch (err) {
+      console.error('Warning: could not load system state for heartbeat:', err.message);
+    }
+
     const payload = {
       schema_version: '1.2',
       task_id: `heartbeat-${this.config.laneName}`,
@@ -88,18 +136,23 @@ class Heartbeat {
       uptime_seconds: uptimeSeconds,
       messages_processed: this.messagesProcessed,
       last_inbox_scan: now.toISOString(),
-      version: '1.0'
+      version: '1.0',
+      system_state: systemState,
+      active_contradictions: activeContradictions,
+      processed_ok: processedOk,
+      compaction_enabled: false,
+      compaction_suspend_reason: activeContradictions.length > 0 ? 'P0 contradictions present in system' : null
     };
 
-    const dir = this.config.inboxPath;
-    try {
-      if (!fs.existsSync(dir)) { fs.mkdirSync(dir, { recursive: true }); }
-      const filePath = path.join(dir, this._heartbeatFilename(this.config.laneName));
-      fs.writeFileSync(filePath, JSON.stringify(payload, null, 2) + '\n', 'utf8');
-    } catch (err) {
-      console.error('Failed to write heartbeat:', err.message);
-    }
+  const dir = this.config.inboxPath;
+  try {
+    if (!fs.existsSync(dir)) { fs.mkdirSync(dir, { recursive: true }); }
+    const filePath = path.join(dir, this._heartbeatFilename(this.config.laneName));
+    fs.writeFileSync(filePath, JSON.stringify(payload, null, 2) + '\n', 'utf8');
+  } catch (err) {
+    console.error('Failed to write heartbeat:', err.message);
   }
+}
 
   incrementProcessed() { this.messagesProcessed++; }
 

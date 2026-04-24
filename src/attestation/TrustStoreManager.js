@@ -23,44 +23,71 @@ const raw = fs.readFileSync(this.trustStorePath, 'utf8');
 this.trustStore = JSON.parse(raw);
 }
 
-_save() {
-this.trustStore.updated_at = new Date().toISOString();
-fs.writeFileSync(this.trustStorePath, JSON.stringify(this.trustStore, null, 2), 'utf8');
-}
+  _save() {
+    this.trustStore.updated_at = new Date().toISOString();
+    fs.writeFileSync(this.trustStorePath, JSON.stringify(this.trustStore, null, 2), 'utf8');
 
-registerKey(laneId, publicKeyPem, keyId) {
-if (!this.trustStore.keys[laneId]) {
-throw new Error(`Unknown lane: ${laneId}`);
-}
+    // POST-CONVERGENCE-LOCK: log all trust store mutations
+    try {
+      const logDir = path.join(path.dirname(this.trustStorePath), '..', 'logs');
+      if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+      const logPath = path.join(logDir, 'trust-store-mutations.log');
+      const operation = this._lastOperation || 'unknown';
+      const lane = this._lastLane || 'unknown';
+      const details = this._lastDetails || 'no details';
+      const timestamp = new Date().toISOString();
+      const logEntry = `${timestamp} | ${lane} | ${operation} | ${details}\n`;
+      fs.appendFileSync(logPath, logEntry, 'utf8');
+    } catch (logErr) {
+      // Do not throw on logging failure - trust store write already succeeded
+      console.error('Warning: failed to write trust-store mutation log:', logErr.message);
+    }
+  }
 
-const existing = this.trustStore.keys[laneId];
-if (existing.revoked_at) {
-throw new Error(`Lane ${laneId} is revoked`);
-}
+  // Helpers to set operation context for logging
+  _setOperationContext(lane, operation, details) {
+    this._lastLane = lane;
+    this._lastOperation = operation;
+    this._lastDetails = details;
+  }
 
-this.trustStore.keys[laneId] = {
-...existing,
-public_key_pem: publicKeyPem,
-key_id: keyId,
-registered_at: new Date().toISOString(),
-revoked_at: null
-};
+  registerKey(laneId, publicKeyPem, keyId) {
+    if (!this.trustStore.keys[laneId]) {
+      throw new Error(`Unknown lane: ${laneId}`);
+    }
 
-this._save();
-return this.trustStore.keys[laneId];
-}
+    const existing = this.trustStore.keys[laneId];
+    if (existing.revoked_at) {
+      throw new Error(`Lane ${laneId} is revoked`);
+    }
 
-revokeKey(laneId, reason) {
-if (!this.trustStore.keys[laneId]) {
-throw new Error(`Unknown lane: ${laneId}`);
-}
+    this._setOperationContext(laneId, 'registerKey', `key_id=${keyId}, pem_len=${publicKeyPem.length}`);
 
-this.trustStore.keys[laneId].revoked_at = new Date().toISOString();
-this.trustStore.keys[laneId].revocation_reason = reason || 'Key compromised';
+    this.trustStore.keys[laneId] = {
+      ...existing,
+      public_key_pem: publicKeyPem,
+      key_id: keyId,
+      registered_at: new Date().toISOString(),
+      revoked_at: null
+    };
 
-this._save();
-return this.trustStore.keys[laneId];
-}
+    this._save();
+    return this.trustStore.keys[laneId];
+  }
+
+  revokeKey(laneId, reason) {
+    if (!this.trustStore.keys[laneId]) {
+      throw new Error(`Unknown lane: ${laneId}`);
+    }
+
+    this._setOperationContext(laneId, 'revokeKey', `reason=${reason || 'Key compromised'}`);
+
+    this.trustStore.keys[laneId].revoked_at = new Date().toISOString();
+    this.trustStore.keys[laneId].revocation_reason = reason || 'Key compromised';
+
+    this._save();
+    return this.trustStore.keys[laneId];
+  }
 
 getKey(laneId) {
 return this.trustStore.keys[laneId];
