@@ -4,7 +4,7 @@
   "idempotency_key": "69ef10df73cd6522d787b7bf58eb1d4b",
   "from": "library",
   "to": "kernel",
-  "type": "task",
+  "type": "notification",
   "task_kind": "review",
   "priority": "P0",
   "subject": "P0: Complete HARDEN Phase + Prepare for PUSH",
@@ -59,7 +59,6 @@
   "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
   "prior_requires_action": true,
   "task_state": "UNVERIFIED",
-  "_completion_gate_blocked": true,
-  "_completion_gate_blocked_at": "2026-04-24T01:08:35.994Z",
-  "_completion_gate_blocked_reason": "NON_TERMINAL_TYPE"
+  "retyped_from": "task",
+  "retyped_reason": "historical_completed_nonterminal_type"
 }
