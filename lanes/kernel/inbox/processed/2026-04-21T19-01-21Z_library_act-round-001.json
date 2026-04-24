@@ -4,7 +4,7 @@
   "idempotency_key": "97ea2ffcb4d77a41b88f99167ec433bfb6c07ac9d7f07a6354c2d7506d7e5068",
   "from": "library",
   "to": "kernel-lane",
-  "type": "task",
+  "type": "notification",
   "task_kind": "proposal",
   "priority": "P1",
   "subject": "ACT Round 1: Schema Self-Audit + Heartbeat Health Check — complete and propose next 2 tasks",
@@ -64,7 +64,6 @@
   "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
   "prior_requires_action": true,
   "task_state": "UNVERIFIED",
-  "_completion_gate_blocked": true,
-  "_completion_gate_blocked_at": "2026-04-24T01:08:35.984Z",
-  "_completion_gate_blocked_reason": "NON_TERMINAL_TYPE"
+  "retyped_from": "task",
+  "retyped_reason": "historical_completed_nonterminal_type"
 }

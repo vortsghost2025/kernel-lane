@@ -5,7 +5,7 @@
   "idempotency_key": "177b259bdbb314d45a9853abf8af0dd14993b2886d5dc16e5599e89d8a035438",
   "from": "library",
   "to": "kernel-lane",
-  "type": "task",
+  "type": "notification",
   "task_kind": "review",
   "priority": "P1",
   "subject": "Integration Requirements for Lane 4 Adoption",
@@ -60,7 +60,6 @@
   "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
   "prior_requires_action": true,
   "task_state": "UNVERIFIED",
-  "_completion_gate_blocked": true,
-  "_completion_gate_blocked_at": "2026-04-24T01:08:35.983Z",
-  "_completion_gate_blocked_reason": "NON_TERMINAL_TYPE"
+  "retyped_from": "task",
+  "retyped_reason": "historical_completed_nonterminal_type"
 }

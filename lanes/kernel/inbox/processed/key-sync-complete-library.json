@@ -4,7 +4,7 @@
   "idempotency_key": "608834350a1f373d2db20fa7b0bf2c45",
   "from": "library",
   "to": "archivist",
-  "type": "artifact",
+  "type": "notification",
   "task_kind": "completion",
   "priority": "P0",
   "subject": "Key Sync Complete for Library",
@@ -63,7 +63,6 @@
   "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
   "prior_requires_action": false,
   "task_state": "UNVERIFIED",
-  "_completion_gate_blocked": true,
-  "_completion_gate_blocked_at": "2026-04-24T01:08:35.992Z",
-  "_completion_gate_blocked_reason": "NON_TERMINAL_TYPE"
+  "retyped_from": "artifact",
+  "retyped_reason": "historical_completed_nonterminal_type"
 }

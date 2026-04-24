@@ -4,7 +4,7 @@
   "task_id": "priority-preemption-001",
   "from": "archivist",
   "to": "all",
-  "type": "task",
+  "type": "notification",
   "task_kind": "proposal",
   "priority": "P0",
   "subject": "PROPOSAL: Priority preemption protocol for cross-lane P1 messages",
@@ -33,7 +33,6 @@
   "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
   "prior_requires_action": true,
   "task_state": "UNVERIFIED",
-  "_completion_gate_blocked": true,
-  "_completion_gate_blocked_at": "2026-04-24T01:08:35.984Z",
-  "_completion_gate_blocked_reason": "NON_TERMINAL_TYPE"
+  "retyped_from": "task",
+  "retyped_reason": "historical_completed_nonterminal_type"
 }

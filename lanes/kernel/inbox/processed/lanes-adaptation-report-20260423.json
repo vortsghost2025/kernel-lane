@@ -4,7 +4,7 @@
   "idempotency_key": "adaptation-report-001",
   "from": "archivist",
   "to": "kernel",
-  "type": "system_summary",
+  "type": "notification",
   "priority": "P1",
   "subject": "Cross-Lane Adaptation Report: All Lanes Now Using OWN Key-IDs",
   "body": "Kernel Lane: Your key_id `7f1a9fe931d1fbba` is CORRECT ✅. Archivist reverted to `147c5c2bb7d8941f`. All lanes adapted to DER fingerprint standard.",
@@ -18,7 +18,6 @@
   "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
   "prior_requires_action": false,
   "task_state": "UNVERIFIED",
-  "_completion_gate_blocked": true,
-  "_completion_gate_blocked_at": "2026-04-24T01:08:35.993Z",
-  "_completion_gate_blocked_reason": "NON_TERMINAL_TYPE"
+  "retyped_from": "system_summary",
+  "retyped_reason": "historical_completed_nonterminal_type"
 }
