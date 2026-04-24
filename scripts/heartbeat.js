@@ -58,6 +58,30 @@ class Heartbeat {
     return `heartbeat-${laneName}.json`;
   }
 
+  _writeSystemState(systemState, activeContradictions, processedOk) {
+    const broadcastDir = path.join(REPO_ROOT, 'lanes', 'broadcast');
+    const statePath = path.join(broadcastDir, 'system_state.json');
+    const payload = {
+      system_status: systemState,
+      timestamp: new Date().toISOString(),
+      active_contradictions: activeContradictions,
+      total_contradictions: activeContradictions.length,
+      compaction_enabled: activeContradictions.length === 0,
+      compaction_suspend_reason: activeContradictions.length > 0 ? 'Active contradictions present' : null,
+      processed_ok: processedOk,
+      derived_from: 'contradictions.json',
+      written_by: 'heartbeat.js'
+    };
+    try {
+      if (!fs.existsSync(broadcastDir)) {
+        fs.mkdirSync(broadcastDir, { recursive: true });
+      }
+      fs.writeFileSync(statePath, JSON.stringify(payload, null, 2) + '\n', 'utf8');
+    } catch (err) {
+      console.error('Failed to write system_state.json:', err.message);
+    }
+  }
+
   writeHeartbeat() {
     const now = new Date();
     const uptimeSeconds = Math.floor((Date.now() - this.startTime) / 1000);
@@ -65,19 +89,13 @@ class Heartbeat {
 
     const hbStatus = this._shuttingDown ? 'done' : 'in_progress';
 
-    // Load system state and contradictions from broadcast
-    let systemState = 'unknown';
-    let activeContradictions = [];
-    let processedOk = true;
-    try {
-      const broadcastDir = path.join(REPO_ROOT, 'lanes', 'broadcast');
-      const statePath = path.join(broadcastDir, 'system_state.json');
-      const contraPath = path.join(broadcastDir, 'contradictions.json');
-
-      if (fs.existsSync(statePath)) {
-        const stateData = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-        systemState = stateData.system_status || 'unknown';
-      }
+  // Load contradictions (truth-over-stability) — derive system_state, do NOT read system_state.json
+  let systemState = 'consistent';
+  let activeContradictions = [];
+  let processedOk = true;
+  try {
+    const broadcastDir = path.join(REPO_ROOT, 'lanes', 'broadcast');
+    const contraPath = path.join(broadcastDir, 'contradictions.json');
 
     if (fs.existsSync(contraPath)) {
       const contraData = JSON.parse(fs.readFileSync(contraPath, 'utf8'));
@@ -90,6 +108,7 @@ class Heartbeat {
     if (activeContradictions.length > 0) {
       systemState = 'degraded';
     }
+    this._writeSystemState(systemState, activeContradictions, processedOk);
 
     // Verify processed/ messages have completion proof
       const processedDir = path.join(this.config.inboxPath, 'processed');

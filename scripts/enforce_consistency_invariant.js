@@ -24,8 +24,7 @@ const activeContradictions = contradictions.filter(c => c.status === 'active');
 if ((state.status === 'consistent' || state.status === 'aligned') && activeContradictions.length > 0) {
   console.error('[invariant] CONSISTENCY VIOLATION – active contradictions present while system reports', state.status);
   console.error('Active contradictions:', activeContradictions.map(c => c.id));
-  state.status = 'inconsistent';
-  fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2));
+  console.error('[invariant] INVARIANT: Only heartbeat.js may write system_state.json. No auto-fix applied.');
   process.exit(1);
 }
 

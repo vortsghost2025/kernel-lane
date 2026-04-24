@@ -1,10 +1,14 @@
 {
-  "timestamp": "2026-04-23T23:13:45Z",
-  "task_state": "UNVERIFIED",
-  "note": "Completion unverified until recovery and proof are confirmed across all lanes.",
-  "verification": {
-    "recovery_script_parity": "enforced",
-    "processed_actionable_count": 36,
-    "verified": false
-  }
+  "system_status": "degraded",
+  "timestamp": "2026-04-24T13:02:01.824Z",
+  "active_contradictions": [
+    "swarmmind_no_heartbeat",
+    "priority_P0_contradiction"
+  ],
+  "total_contradictions": 2,
+  "compaction_enabled": false,
+  "compaction_suspend_reason": "Active contradictions present",
+  "processed_ok": true,
+  "derived_from": "contradictions.json",
+  "written_by": "heartbeat.js"
 }
