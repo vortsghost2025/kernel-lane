@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.1",
+  "report_id": "identity-enforcement-test-20260423",
+  "generated_at": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
+  "lane": "kernel",
+  "test_summary": "Identity enforcement pipeline test: sign/verify roundtrip successful, unsigned messages correctly rejected in enforce mode.",
+  "test_results": {
+    "sign_message": "PASS",
+    "verify_against_trust_store": "PASS",
+    "reject_unsigned": "PASS",
+    "reject_invalid_signature": "PASS"
+  },
+  "evidence": {
+    "signer_used": "Signer.signInboxMessage",
+    "verifier_used": "Verifier.verifyAgainstTrustStore",
+    "trust_store_source": "lanes/broadcast/trust-store.json"
+  },
+  "requires_action": false,
+  "payload": {"mode":"inline","compression":"none","path":null,"chunk":{"index":0,"count":1,"group_id":null}}
+}

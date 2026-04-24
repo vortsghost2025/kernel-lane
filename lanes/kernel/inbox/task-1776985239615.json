@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.3",
+  "task_id": "task-1776985239615",
+  "idempotency_key": "404befd7d02d986c6f9b2bd0924032a24075b8ec897068987640012e40ed03dc",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "review",
+  "priority": "P0",
+  "subject": "Required remediation tasks (full-lane-review-1776985238653)",
+  "body": "# Cross-Lane Review Dispatch (full-lane-review-1776985238653)\n\nProven findings:\n- sync-gate status: FAIL\n- sync-gate issues: 1\n- post-compact status: drifted (contradictions=0)\n- git drift (kernel): total=98, modified=5, deleted=57, untracked=36\n\nRequired tasks:\n1. Recover 8 action-required messages from processed/ using recover-action-required-from-processed.js --lane kernel --apply, then triage action-required/ with completion evidence.\n2. Publish canonical trust-store snapshot across all lanes and verify all 4 key_id derivations are valid (4/4) in each lane copy.\n3. Review and reconcile mass deleted inbox reply artifacts (D entries in git status) to ensure no completion evidence was lost.\n4. Commit and ship watcher fail-closed guard changes; verify action-required messages never auto-move to processed.\n\nResponse contract: send signed completion response with exact evidence paths and command outputs.",
+  "timestamp": "2026-04-23T23:00:39.615Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none",
+    "path": null,
+    "chunk": {
+      "index": 0,
+      "count": 1,
+      "group_id": null
+    }
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": null,
+    "parent_id": null
+  },
+  "lease": {
+    "owner": null,
+    "acquired_at": null,
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": false,
+    "evidence_path": null,
+    "verified": false,
+    "verified_by": null,
+    "verified_at": null
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": null,
+    "delivered_at": null
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": null,
+    "timeout_seconds": 900,
+    "status": "pending"
+  },
+  "watcher": {
+    "enabled": false,
+    "poll_seconds": 60,
+    "p0_fast_path": true,
+    "max_concurrent": 1,
+    "heartbeat_required": true,
+    "stale_after_seconds": 300,
+    "backoff": {
+      "initial_seconds": 60,
+      "max_seconds": 300,
+      "multiplier": 2
+    }
+  },
+  "delivery_verification": {
+    "verified": true,
+    "verified_at": "2026-04-23T23:00:39.617Z",
+    "retries": 0
+  },
+  "review_id": "full-lane-review-1776985238653",
+  "generated_by": "full-lane-review-and-dispatch.js",
+  "content_hash": "sha256:b2b433f5a2c6dc5a20afc5e03c0a87c3b6124548a132ffbb9ee87e22e8b38716",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjE0N2M1YzJiYjdkODk0MWYifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6YjJiNDMzZjVhMmM2ZGM1YTIwYWZjNWUwM2MwYTg3YzNiNjEyNDU0OGExMzJmZmJiOWVlODdlMjJlOGIzODcxNiIsImV4cCI6MTc3NzA3MTYzOSwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3Njk4NTIzOSwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAwIiwidGFza19pZCI6InRhc2stMTc3Njk4NTIzOTYxNSIsInRvIjoia2VybmVsIn0.dGwz0H7GjttjXdHeVcCsiAyxTqfAE19o13__eCNx9aRgTV9wJCZTNcO5rWNuJ9k2nrtxT92I7l8yb_4oCfkDI6yxZFyvOGyWh6T6a7I8XL0iURIGz-AWHqOh8Snhdo54UpI28oKqS44XyaMuihs6TgYFznXjehWjMcszM5ia-QGDKJZveY_JBy__l2SF2Rcl-QGaCeyfIHQr0QsSsxb07vroLpzZYiKP5Q_Nw2xajT3qeBQZ325Z_nd6kB9qtDCXkIAlyClHnbI21y5vehzGqdpLb9LopoJQTYTq6HaHR1ikqvyw90MQYtRGFMKS0TOqrWbPT40C1vJAoy5MkMxVtg",
+  "signature_alg": "RS256",
+  "key_id": "147c5c2bb7d8941f"
+}
