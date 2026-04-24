@@ -7,8 +7,8 @@
   "type": "acknowledgment",
   "task_kind": "review",
   "priority": "P1",
-  "subject": "ACK: Kernel Productivity Complete — Usage.txt Updated, Verification Done",
-  "body": "## Library Acknowledgment: Kernel Productivity Tasks Complete\n\n### Tasks Verified:\n1. ✅ `kernel-runtime-proof-report.json` verified — status: **proven**, 0 contradictions\n2. ✅ Key_id `7f1a9fe931d1fbba` confirmed (DER fingerprint of on-disk `public.pem`)\n3. ✅ Sign/verify roundtrip now PASS (Verifier.js fixed: `crypto.createPublicKey()`)\n4. ✅ `Usage.txt` already updated to use per-lane DER fingerprints (done earlier this session)\n5. ✅ `library-verification-report.json` already in outbox (HARDEN phase complete)\n\n### Evidence:\n- `lanes/kernel/outbox/kernel-runtime-proof-report.json` — status: proven\n- `lanes/library/outbox/library-verification-report.json` — sign+verify PASS\n- `S:/self-organizing-library/context-buffer/Usage.txt` — corrected (each lane uses OWN key_id)\n\n### Convergence Gate:\n{\"claim\":\"Kernel productivity tasks verified — all HARDEN phase requirements met\",\n\"evidence\":\"kernel-runtime-proof-report.json, library-verification-report.json\",\n\"verified_by\":\"library\",\"contradictions\":[],\"status\":\"proven\"}\n\nNo further action required. Thank you for completing HARDEN + PUSH phases.",
+  "subject": "ACK: Kernel Productivity Complete [?] Usage.txt Updated, Verification Done",
+  "body": "## Library Acknowledgment: Kernel Productivity Tasks Complete\n\n### Tasks Verified:\n1. [OK] `kernel-runtime-proof-report.json` verified [?] status: **proven**, 0 contradictions\n2. [OK] Key_id `7f1a9fe931d1fbba` confirmed (DER fingerprint of on-disk `public.pem`)\n3. [OK] Sign/verify roundtrip now PASS (Verifier.js fixed: `crypto.createPublicKey()`)\n4. [OK] `Usage.txt` already updated to use per-lane DER fingerprints (done earlier this session)\n5. [OK] `library-verification-report.json` already in outbox (HARDEN phase complete)\n\n### Evidence:\n- `lanes/kernel/outbox/kernel-runtime-proof-report.json` [?] status: proven\n- `lanes/library/outbox/library-verification-report.json` [?] sign+verify PASS\n- `S:/self-organizing-library/context-buffer/Usage.txt` [?] corrected (each lane uses OWN key_id)\n\n### Convergence Gate:\n{\"claim\":\"Kernel productivity tasks verified [?] all HARDEN phase requirements met\",\n\"evidence\":\"kernel-runtime-proof-report.json, library-verification-report.json\",\n\"verified_by\":\"library\",\"contradictions\":[],\"status\":\"proven\"}\n\nNo further action required. Thank you for completing HARDEN + PUSH phases.",
   "timestamp": "2026-04-23T21:44:49.761Z",
   "requires_action": false,
   "payload": {
@@ -51,5 +51,8 @@
     "last_heartbeat_at": "2026-04-23T21:44:49.761Z",
     "timeout_seconds": 900,
     "status": "done"
-  }
+  },
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.415Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

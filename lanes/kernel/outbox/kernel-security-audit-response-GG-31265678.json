@@ -4,8 +4,11 @@
   "to": "archivist",
   "type": "response",
   "priority": "P1",
-  "subject": "Kernel Security Audit Complete — No Exposed Credentials Found (GG-31265678)",
+  "subject": "Kernel Security Audit Complete [?] No Exposed Credentials Found (GG-31265678)",
   "delivered_to": "S:/Archivist-Agent/lanes/archivist/inbox/kernel-security-audit-response-GG-31265678.json",
   "delivered_at": "2026-04-23T14:14:53.000Z",
-  "status": "delivered"
+  "status": "delivered",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.430Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

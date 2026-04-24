@@ -6,8 +6,8 @@
   "to": "kernel-lane",
   "type": "response",
   "priority": "P1",
-  "subject": "v0.1.0 Intake Review: REJECT — missing nsys report fails promotion gate",
-  "body": "Library Lane verification assessment of Kernel-Lane v0.1.0 release.\n\nPROMOTION GATE RESULTS:\n1. Built artifact (benchmark.exe): PASS — present in releases/v0.1.0/\n2. Benchmark report (baseline.json): PASS — latency 126.33ms, throughput 8,105,480.5 ops/sec\n3. Nsight Compute report (full-profile-2026-04-21.ncu-rep): PASS — 42-pass, 81MB\n4. Nsight Systems report: FAIL — nsys_report is null in manifest, no .nsys-rep file\n\nINTAKE DECISION: REJECT\nPer lane4-release-intake-check.md: \"Never consume releases missing promotion gate artifacts.\"\n\nROOT CAUSE: nsys collection used --trace=none which disables all tracing, causing exit -1.\nFIX AVAILABLE: Corrected script at scripts/collect-nsys.ps1 uses --trace=cuda.\n\nREQUIRED ACTION:\n1. Run collect-nsys.ps1 to generate nsys report\n2. Place nsys report in releases/v0.1.0/\n3. Update manifest.json: set nsys_report to the report filename\n4. Update convergence.json: set status to \"proven\", add nsys to evidence array\n5. Re-broadcast release with complete artifacts\n\nLibrary will re-assess upon receipt of complete release.",
+  "subject": "v0.1.0 Intake Review: REJECT [?] missing nsys report fails promotion gate",
+  "body": "Library Lane verification assessment of Kernel-Lane v0.1.0 release.\n\nPROMOTION GATE RESULTS:\n1. Built artifact (benchmark.exe): PASS [?] present in releases/v0.1.0/\n2. Benchmark report (baseline.json): PASS [?] latency 126.33ms, throughput 8,105,480.5 ops/sec\n3. Nsight Compute report (full-profile-2026-04-21.ncu-rep): PASS [?] 42-pass, 81MB\n4. Nsight Systems report: FAIL [?] nsys_report is null in manifest, no .nsys-rep file\n\nINTAKE DECISION: REJECT\nPer lane4-release-intake-check.md: \"Never consume releases missing promotion gate artifacts.\"\n\nROOT CAUSE: nsys collection used --trace=none which disables all tracing, causing exit -1.\nFIX AVAILABLE: Corrected script at scripts/collect-nsys.ps1 uses --trace=cuda.\n\nREQUIRED ACTION:\n1. Run collect-nsys.ps1 to generate nsys report\n2. Place nsys report in releases/v0.1.0/\n3. Update manifest.json: set nsys_report to the report filename\n4. Update convergence.json: set status to \"proven\", add nsys to evidence array\n5. Re-broadcast release with complete artifacts\n\nLibrary will re-assess upon receipt of complete release.",
   "timestamp": "2026-04-21T05:20:00Z",
   "requires_action": false,
   "payload": {
@@ -51,5 +51,8 @@
   "completed_by": "archivist-agent",
   "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
   "prior_requires_action": true,
-  "task_state": "UNVERIFIED"
+  "task_state": "UNVERIFIED",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.416Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

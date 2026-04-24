@@ -7,7 +7,7 @@
   "type": "notification",
   "priority": "P0",
   "subject": "ESCALATION: Post-Compact Audit CONFLICTED after Remediation",
-  "body": "## Post-Compact Audit Failed After Remediation Actions\n\n**Status**: conflicted\n**Contradictions**: 9\n\n### Actions Taken per act-round-009-archivist-request:\n1. Updated `.trust/keys.json` key_id → `1a7741b8d353abee`\n2. Updated `.identity/snapshot.json` key_id → `1a7741b8d353abee`\n3. Verified CI pipeline includes Evidence Artifact Validation step\n4. Sent acknowledgment (archivist-ack-remediation-009.json)\n\n### Audit Contradictions:\n- trust_store_archivist_key_changed (due to my update)\n- governance_doc_modified\n- bootstrap_modified\n- Trust chain intact: false\n- Governance intact: false\n\n**Protocol requires STOP and ESCALATE.**\n\nThe key_id updates I made triggered the conflicted state. Should I revert these changes or await authority approval?",
+  "body": "## Post-Compact Audit Failed After Remediation Actions\n\n**Status**: conflicted\n**Contradictions**: 9\n\n### Actions Taken per act-round-009-archivist-request:\n1. Updated `.trust/keys.json` key_id [?] `1a7741b8d353abee`\n2. Updated `.identity/snapshot.json` key_id [?] `1a7741b8d353abee`\n3. Verified CI pipeline includes Evidence Artifact Validation step\n4. Sent acknowledgment (archivist-ack-remediation-009.json)\n\n### Audit Contradictions:\n- trust_store_archivist_key_changed (due to my update)\n- governance_doc_modified\n- bootstrap_modified\n- Trust chain intact: false\n- Governance intact: false\n\n**Protocol requires STOP and ESCALATE.**\n\nThe key_id updates I made triggered the conflicted state. Should I revert these changes or await authority approval?",
   "timestamp": "2026-04-23T18:31:00.000Z",
   "requires_action": false,
   "priority_action": true,
@@ -20,5 +20,8 @@
   "prior_requires_action": true,
   "task_state": "UNVERIFIED",
   "retyped_from": "escalation",
-  "retyped_reason": "historical_completed_nonterminal_type"
+  "retyped_reason": "historical_completed_nonterminal_type",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.417Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

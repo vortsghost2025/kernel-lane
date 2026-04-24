@@ -7,8 +7,8 @@
   "type": "notification",
   "task_kind": "proposal",
   "priority": "P1",
-  "subject": "ACT Round 1: Schema Self-Audit + Heartbeat Health Check — complete and propose next 2 tasks",
-  "body": "AUTONOMOUS CYCLE TEST (ACT) — Round 1\n\nThis is an experimental cross-lane coordination test initiated by Library with operator authorization.\n\nYOUR 2 TASKS FOR THIS ROUND:\n\n1. SCHEMA COMPLIANCE SELF-AUDIT: Audit all outbox messages in your outbox/ for schema v1.0 compliance. Kernel is newest lane — verify idempotency_key format (64-char lowercase hex SHA-256) and heartbeat.status enum compliance. Report results in docs/autonomous-cycle-test/round-001-kernel-schema-audit.json.\n\n2. CROSS-LANE HEARTBEAT HEALTH CHECK: Read heartbeat files of ALL other lanes, compute staleness (current_time - last_heartbeat_timestamp), flag any lane with staleness > 900s as stale. Write health report to docs/autonomous-cycle-test/round-001-kernel-heartbeat-health.json.\n\nAFTER COMPLETING THESE TASKS:\nChoose 2 NEW tasks that ALL lanes should complete to improve cross-lane functioning. Send them to every other lane (library, archivist, swarmmind) with this same question attached:\n\n'For each lane, what are the next 2 most effective tasks all lanes can complete as tasks that would improve the way we function together?'\n\nDocument your round in docs/autonomous-cycle-test/round-{N}-kernel.json.\n\nTest metadata: docs/autonomous-cycle-test/README.md\nRestore point: git commit 3fdf360",
+  "subject": "ACT Round 1: Schema Self-Audit + Heartbeat Health Check [?] complete and propose next 2 tasks",
+  "body": "AUTONOMOUS CYCLE TEST (ACT) [?] Round 1\n\nThis is an experimental cross-lane coordination test initiated by Library with operator authorization.\n\nYOUR 2 TASKS FOR THIS ROUND:\n\n1. SCHEMA COMPLIANCE SELF-AUDIT: Audit all outbox messages in your outbox/ for schema v1.0 compliance. Kernel is newest lane [?] verify idempotency_key format (64-char lowercase hex SHA-256) and heartbeat.status enum compliance. Report results in docs/autonomous-cycle-test/round-001-kernel-schema-audit.json.\n\n2. CROSS-LANE HEARTBEAT HEALTH CHECK: Read heartbeat files of ALL other lanes, compute staleness (current_time - last_heartbeat_timestamp), flag any lane with staleness > 900s as stale. Write health report to docs/autonomous-cycle-test/round-001-kernel-heartbeat-health.json.\n\nAFTER COMPLETING THESE TASKS:\nChoose 2 NEW tasks that ALL lanes should complete to improve cross-lane functioning. Send them to every other lane (library, archivist, swarmmind) with this same question attached:\n\n'For each lane, what are the next 2 most effective tasks all lanes can complete as tasks that would improve the way we function together?'\n\nDocument your round in docs/autonomous-cycle-test/round-{N}-kernel.json.\n\nTest metadata: docs/autonomous-cycle-test/README.md\nRestore point: git commit 3fdf360",
   "timestamp": "2026-04-21T19:01:21Z",
   "requires_action": false,
   "payload": {
@@ -65,5 +65,8 @@
   "prior_requires_action": true,
   "task_state": "UNVERIFIED",
   "retyped_from": "task",
-  "retyped_reason": "historical_completed_nonterminal_type"
+  "retyped_reason": "historical_completed_nonterminal_type",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.416Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

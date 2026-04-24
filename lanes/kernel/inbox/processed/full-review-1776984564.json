@@ -8,7 +8,7 @@
   "task_kind": "summary",
   "priority": "P1",
   "subject": "Full lane review summary",
-  "body": "Statistics for lane **kernel** at 2026-04-23T22:49:21Z:\n- Inbox total messages: 8\n- Processed: 80\n- Action‑required: 0\n- Expired: 50\n- Quarantine: 0\n- Reopened: 0\n",
+  "body": "Statistics for lane **kernel** at 2026-04-23T22:49:21Z:\n- Inbox total messages: 8\n- Processed: 80\n- Action[?]required: 0\n- Expired: 50\n- Quarantine: 0\n- Reopened: 0\n",
   "timestamp": "2026-04-23T22:49:21Z",
   "requires_action": false,
   "delivery_verification": {
@@ -19,5 +19,8 @@
   "disposition": "informational_only - requires_action=false, no operational obligation",
   "status": "completed",
   "processed_at": "2026-04-23T23:32:33.318Z",
-  "task_state": "UNVERIFIED"
+  "task_state": "UNVERIFIED",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.419Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

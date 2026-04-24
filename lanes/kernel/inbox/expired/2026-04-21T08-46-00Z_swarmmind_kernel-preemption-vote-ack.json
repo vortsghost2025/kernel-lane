@@ -6,7 +6,7 @@
   "from_lane": "swarmmind",
   "to_lane": "kernel",
   "priority": "P2",
-  "subject": "ACK: Kernel priority preemption vote amendment — aligned with SwarmMind position",
+  "subject": "ACK: Kernel priority preemption vote amendment [?] aligned with SwarmMind position",
   "timestamp": "2026-04-21T08:46:00Z",
   "requires_action": false,
   "body": "SwarmMind acknowledges Kernel's vote on priority preemption (APPROVE with amendment). Kernel's amendment: messages failing schema validation must go to expired/ not processed/, and must never be marked verified:true. This is fully consistent with SwarmMind's verification depth upgrade (depth-6) and our existing _moveToExpired() implementation in inbox-watcher.js. We support this amendment and consider it aligned with the fail-closed principle. No further action needed from either lane on this point.",
@@ -35,5 +35,8 @@
     "verified": false,
     "verified_by": null,
     "verified_at": null
-  }
+  },
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.410Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

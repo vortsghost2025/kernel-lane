@@ -9,13 +9,7 @@ const {
   acquireWatcherLock
 } = require('./concurrency-policy');
 const { IdentityEnforcer } = require('./identity-enforcer');
-
-let validateMessage;
-try {
-  validateMessage = require('../src/lane/SchemaValidator').validate;
-} catch (_) {
-  validateMessage = null;
-}
+const { moveFileWithLease } = require('./lease-write');
 
 const PRIORITY_ORDER = { P0: 0, P1: 1, P2: 2, P3: 3 };
 const PREEMPTION_CYCLE_LIMIT = 2;
@@ -40,13 +34,16 @@ const UUID_PATTERN = /^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}\.json$/i;
 
 function hasCompletionProof(msg) {
   if (!msg) return false;
+  // Check for completion proof fields
   for (const field of COMPLETION_PROOF_FIELDS) {
     if (msg[field]) return true;
   }
+  // Check convergence_gate status
   if (msg.convergence_gate && msg.convergence_gate.status) {
     const status = String(msg.convergence_gate.status).toLowerCase();
     if (['proven', 'approved', 'ratified', 'accepted'].includes(status)) return true;
   }
+  // Check disposition field
   if (msg.disposition && VALID_DISPOSITIONS.has(String(msg.disposition).toLowerCase())) return true;
   return false;
 }
@@ -69,13 +66,25 @@ function isActionRequiredMessage(msg) {
   );
 }
 
+function isEnglishOnly(msg) {
+  const textFields = ['subject', 'body', 'type', 'from', 'to'];
+  for (const field of textFields) {
+    const val = msg && msg[field];
+    if (typeof val === 'string' && /[^\x00-\x7F]/.test(val)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 const DEFAULT_CONFIG = {
-  laneName: 'kernel',
-  inboxPath: path.join(__dirname, '..', 'lanes', 'kernel', 'inbox'),
-  processedPath: path.join(__dirname, '..', 'lanes', 'kernel', 'inbox', 'processed'),
-  outboxPath: path.join(__dirname, '..', 'lanes', 'kernel', 'outbox'),
-  expiredPath: path.join(__dirname, '..', 'lanes', 'kernel', 'inbox', 'expired'),
-  actionRequiredPath: path.join(__dirname, '..', 'lanes', 'kernel', 'inbox', 'action-required'),
+  laneName: 'archivist',
+  inboxPath: path.join(__dirname, '..', 'lanes', 'archivist', 'inbox'),
+  processedPath: path.join(__dirname, '..', 'lanes', 'archivist', 'inbox', 'processed'),
+  outboxPath: path.join(__dirname, '..', 'lanes', 'archivist', 'outbox'),
+  expiredPath: path.join(__dirname, '..', 'lanes', 'archivist', 'inbox', 'expired'),
+  quarantinePath: path.join(__dirname, '..', 'lanes', 'archivist', 'inbox', 'quarantine'),
+  actionRequiredPath: path.join(__dirname, '..', 'lanes', 'archivist', 'inbox', 'action-required'),
   canonicalPaths: {
     archivist: 'S:/Archivist-Agent/lanes/archivist/inbox/',
     library: 'S:/self-organizing-library/lanes/library/inbox/',
@@ -93,13 +102,15 @@ class InboxWatcher {
     this.consecutiveEmptyScans = 0;
     this.maxBackoffSeconds = 300;
     this.consecutiveP0Count = 0;
+    this.quarantineTracker = this._loadQuarantineTracker();
     this.loadProcessedKeys();
     this.loadConvergenceConstraint();
 
+    // Identity self-healing: detect and regenerate missing keys on startup
     this._identityHealed = false;
     try {
       const { healLaneIdentity } = require('./identity-self-healing');
-      const healResult = healLaneIdentity(this.config.laneName || 'kernel');
+      const healResult = healLaneIdentity(this.config.laneName || 'archivist');
       this._identityHealed = healResult.keysRegenerated || false;
       if (healResult.keysRegenerated) {
         console.log(`[watcher] IDENTITY_SELF_HEAL: keys regenerated keyId=${healResult.keyId}`);
@@ -107,6 +118,16 @@ class InboxWatcher {
     } catch (_) {}
 
     this.identityEnforcer = new IdentityEnforcer({ enforcementMode: 'enforce' });
+    this.assertNoRawRenameSync();
+  }
+
+  assertNoRawRenameSync() {
+    // Fail closed if this watcher ever regresses to raw rename operations.
+    const source = fs.readFileSync(__filename, 'utf8');
+    const forbidden = 'rename' + 'Sync(';
+    if (source.includes(forbidden)) {
+      throw new Error('WATCHER_INVARIANT_VIOLATION: raw renameSync operation detected in inbox-watcher.js');
+    }
   }
 
   loadConvergenceConstraint() {
@@ -120,7 +141,7 @@ class InboxWatcher {
 
   ensureDirs() {
     for (const dir of [this.config.inboxPath, this.config.processedPath,
-      this.config.outboxPath, this.config.expiredPath, this.config.actionRequiredPath]) {
+      this.config.outboxPath, this.config.expiredPath, this.config.quarantinePath, this.config.actionRequiredPath]) {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
@@ -138,6 +159,40 @@ class InboxWatcher {
     } catch (_) {}
   }
 
+  _loadQuarantineTracker() {
+    const trackerPath = path.join(this.repoRoot, 'logs', 'quarantine-tracker.json');
+    try {
+      if (fs.existsSync(trackerPath)) {
+        return JSON.parse(fs.readFileSync(trackerPath, 'utf8'));
+      }
+    } catch (_) {}
+    return {};
+  }
+
+  _saveQuarantineTracker() {
+    const trackerPath = path.join(this.repoRoot, 'logs', 'quarantine-tracker.json');
+    try {
+      const logDir = path.dirname(trackerPath);
+      if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+      fs.writeFileSync(trackerPath, JSON.stringify(this.quarantineTracker, null, 2), 'utf8');
+    } catch (_) {}
+  }
+
+  _trackQuarantine(filename, reason) {
+    const key = filename.replace(/\.json$/, '');
+    if (!this.quarantineTracker[key]) {
+      this.quarantineTracker[key] = { count: 0, reasons: [], first_at: null, last_at: null };
+    }
+    this.quarantineTracker[key].count++;
+    this.quarantineTracker[key].reasons.push(reason);
+    this.quarantineTracker[key].last_at = new Date().toISOString();
+    if (!this.quarantineTracker[key].first_at) {
+      this.quarantineTracker[key].first_at = this.quarantineTracker[key].last_at;
+    }
+    this._saveQuarantineTracker();
+    return this.quarantineTracker[key].count;
+  }
+
   checkIdempotencyKey(msg) {
     if (!msg.idempotency_key && !msg.id) {
       console.log('[watcher] REJECT: message has no idempotency_key or id — cannot guarantee once-only processing');
@@ -151,7 +206,7 @@ class InboxWatcher {
     return true;
   }
 
-  scan() {
+  async scan() {
     this.ensureDirs();
 
     let files;
@@ -170,34 +225,30 @@ class InboxWatcher {
 
       const filePath = path.join(this.config.inboxPath, filename);
       try {
-        const raw = fs.readFileSync(filePath, 'utf8');
-        const msg = JSON.parse(raw);
-        msg._sourceFile = filename;
-        msg._sourcePath = filePath;
-        if (!this.checkIdempotencyKey(msg)) {
-          this.moveToProcessed(filename, filePath);
-          continue;
-        }
-        // Bug 2 fix: validate incoming messages against schema
-        if (validateMessage) {
-          const result = validateMessage(msg);
-          if (!result.valid) {
-            console.warn(`[watcher] INVALID: ${filename} — ${result.errors.join('; ')}`);
-            this.moveToExpired(filename, filePath);
-            continue;
-          }
-        }
-        const idResult = this.identityEnforcer.enforceMessage(msg);
-        msg._identity = idResult;
-        if (idResult.decision === 'reject') {
-          console.warn(`[watcher] IDENTITY_REJECT: ${filename} from ${idResult.from} — ${idResult.reason}`);
-          this.moveToExpired(filename, filePath);
+          const raw = fs.readFileSync(filePath, 'utf8');
+          const msg = JSON.parse(raw);
+          msg._sourceFile = filename;
+          msg._sourcePath = filePath;
+          const idResult = this.identityEnforcer.enforceMessage(msg);
+          msg._identity = idResult;
+      if (idResult.decision === 'reject') {
+        console.log(`[watcher] IDENTITY_REJECT: ${filename} from ${idResult.from} — ${idResult.reason}`);
+        await this.moveToExpired(filename, filePath);
+        continue;
+      }
+      if (!isEnglishOnly(msg)) {
+        console.log(`[watcher] FORMAT_VIOLATION: ${filename} — non-ASCII content detected, marking format_violation=true`);
+        msg.format_violation = true;
+        msg.format_violation_reason = 'Non-ASCII content detected in message fields per English-only constraint';
+      }
+          if (!this.checkIdempotencyKey(msg)) {
+          await this.moveToProcessed(filename, filePath);
           continue;
         }
         messages.push(msg);
       } catch (e) {
-        console.error(`[watcher] Cannot parse ${filename}:`, e.message);
-        this.moveToExpired(filename, filePath);
+      console.error(`[watcher] Cannot parse ${filename}:`, e.message);
+      await this.moveToExpired(filename, filePath);
       }
     }
 
@@ -245,13 +296,13 @@ class InboxWatcher {
     return false;
   }
 
-  moveToProcessed(filename, sourcePath) {
+  async moveToProcessed(filename, sourcePath) {
     const dest = path.join(this.config.processedPath, filename);
     try {
       if (fs.existsSync(dest)) {
-        fs.unlinkSync(sourcePath);
+        if (fs.existsSync(sourcePath)) fs.unlinkSync(sourcePath);
       } else {
-        fs.renameSync(sourcePath, dest);
+        await moveFileWithLease(sourcePath, dest, this.config.laneName, 30000);
       }
       this.processedKeys.add(filename);
     } catch (e) {
@@ -259,43 +310,85 @@ class InboxWatcher {
     }
   }
 
-  moveToExpired(filename, sourcePath) {
-    const expiredDir = this.config.expiredPath;
-    if (!fs.existsSync(expiredDir)) {
-      fs.mkdirSync(expiredDir, { recursive: true });
-    }
-    const dest = path.join(expiredDir, filename);
+  async moveToExpired(filename, sourcePath) {
+    const dest = path.join(this.config.expiredPath, filename);
+    const attemptCount = this._trackQuarantine(filename, 'expired');
+    const MAX_QUARANTINE_ATTEMPTS = 3;
+
     try {
-      if (fs.existsSync(dest)) {
-        fs.unlinkSync(sourcePath);
-      } else {
-        fs.renameSync(sourcePath, dest);
+      if (!fs.existsSync(this.config.expiredPath)) {
+        fs.mkdirSync(this.config.expiredPath, { recursive: true });
       }
-      console.log(`[watcher] MOVED TO EXPIRED: ${filename} (schema-invalid, not processed)`);
+      if (!fs.existsSync(this.config.quarantinePath)) {
+        fs.mkdirSync(this.config.quarantinePath, { recursive: true });
+      }
+
+      if (attemptCount > MAX_QUARANTINE_ATTEMPTS) {
+        const qDest = path.join(this.config.quarantinePath, filename);
+        if (fs.existsSync(sourcePath)) {
+          if (fs.existsSync(qDest)) {
+            fs.unlinkSync(sourcePath);
+          } else {
+            await moveFileWithLease(sourcePath, qDest, this.config.laneName, 30000);
+          }
+        }
+        this._logQuarantine(filename, 'RETRY_LIMIT', attemptCount);
+        this.processedKeys.add(filename);
+        console.log(`[watcher] QUARANTINE: ${filename} — exceeded ${MAX_QUARANTINE_ATTEMPTS} attempts, moved to quarantine/`);
+        return;
+      }
+
+      if (fs.existsSync(dest)) {
+        if (fs.existsSync(sourcePath)) fs.unlinkSync(sourcePath);
+      } else {
+        await moveFileWithLease(sourcePath, dest, this.config.laneName, 30000);
+      }
+      this.processedKeys.add(filename);
+      console.log(`[watcher] EXPIRED: ${filename} — attempt ${attemptCount}/${MAX_QUARANTINE_ATTEMPTS}`);
     } catch (e) {
-      console.error(`[watcher] Cannot move to expired ${filename}:`, e.message);
+      console.error(`[watcher] Cannot expire ${filename}:`, e.message);
     }
   }
 
-  moveToActionRequired(filename, sourcePath) {
-    const actionDir = this.config.actionRequiredPath;
-    if (!fs.existsSync(actionDir)) {
-      fs.mkdirSync(actionDir, { recursive: true });
-    }
-    const dest = path.join(actionDir, filename);
+  async moveToActionRequired(filename, sourcePath) {
+    const dest = path.join(this.config.actionRequiredPath, filename);
     try {
+      if (!fs.existsSync(this.config.actionRequiredPath)) {
+        fs.mkdirSync(this.config.actionRequiredPath, { recursive: true });
+      }
       if (fs.existsSync(dest)) {
-        fs.unlinkSync(sourcePath);
+        if (fs.existsSync(sourcePath)) fs.unlinkSync(sourcePath);
       } else {
-        fs.renameSync(sourcePath, dest);
+        await moveFileWithLease(sourcePath, dest, this.config.laneName, 30000);
       }
       console.log(`[watcher] ACTION-REQUIRED HOLD: ${filename} moved to action-required/`);
     } catch (e) {
-      console.error(`[watcher] Cannot move to action-required ${filename}:`, e.message);
+      console.error(`[watcher] Cannot move ${filename} to action-required/:`, e.message);
     }
   }
 
-  processMessage(msg) {
+  _logQuarantine(filename, reason, attemptCount) {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      lane: this.config.laneName,
+      file: filename,
+      reason: reason,
+      attempt_count: attemptCount,
+      action: 'quarantine',
+      requires_review: true
+    };
+    const logPath = path.join(this.repoRoot, 'logs', 'quarantine.log');
+    try {
+      const logDir = path.dirname(logPath);
+      if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+      const line = JSON.stringify(logEntry) + '\n';
+      fs.appendFileSync(logPath, line, 'utf8');
+    } catch (e) {
+      console.error(`[watcher] Cannot log quarantine:`, e.message);
+    }
+  }
+
+  async processMessage(msg) {
     const filename = msg._sourceFile;
     const sourcePath = msg._sourcePath;
     const priority = msg.priority || 'P3';
@@ -315,16 +408,16 @@ class InboxWatcher {
       // P0: Check for completion proof before blocking
       if (hasCompletionProof(msg)) {
         console.log(`[watcher] ACTION REQUIRED but COMPLETION_PROOF FOUND: ${msg.id || filename} — allowing processed/`);
-        this.moveToProcessed(filename, sourcePath);
+        await this.moveToProcessed(filename, sourcePath);
         this.processedKeys.add(idempotencyKey);
       } else {
         console.log(`[watcher] ACTION REQUIRED (no proof): ${msg.id || filename}`);
-        this.moveToActionRequired(filename, sourcePath);
+        await this.moveToActionRequired(filename, sourcePath);
       }
       return;
     }
 
-    this.moveToProcessed(filename, sourcePath);
+    await this.moveToProcessed(filename, sourcePath);
     this.processedKeys.add(idempotencyKey);
 
     const p = PRIORITY_ORDER[priority] ?? 3;
@@ -379,7 +472,7 @@ class InboxWatcher {
     return results;
   }
 
-  run() {
+  async run() {
     const releaseLock = acquireWatcherLock({
       repoRoot: this.repoRoot,
       laneName: this.config.laneName,
@@ -388,7 +481,7 @@ class InboxWatcher {
 
     console.log(`[watcher] ${this.config.laneName} inbox scan starting`);
     try {
-      let messages = this.scan();
+      let messages = await this.scan();
       console.log(`[watcher] Found ${messages.length} messages`);
 
       if (messages.length === 0) {
@@ -412,7 +505,7 @@ class InboxWatcher {
 
       for (const msg of messages) {
         try {
-          this.processMessage(msg);
+          await this.processMessage(msg);
         } catch (e) {
           console.error(`[watcher] Error processing ${msg._sourceFile}:`, e.message);
         }
@@ -428,6 +521,7 @@ class InboxWatcher {
 module.exports = { InboxWatcher, DEFAULT_CONFIG, PRIORITY_ORDER };
 
 if (require.main === module) {
+  (async () => {
   const args = process.argv.slice(2);
   const watcher = new InboxWatcher();
 
@@ -435,7 +529,7 @@ if (require.main === module) {
     const health = watcher.checkLaneHealth();
     console.log(JSON.stringify(health, null, 2));
   } else if (args.includes('--scan')) {
-    const messages = watcher.scan();
+    const messages = await watcher.scan();
     console.log(JSON.stringify(messages.map(m => ({
       id: m.id, from: m.from, priority: m.priority, type: m.type
     })), null, 2));
@@ -478,7 +572,7 @@ if (require.main === module) {
       fs.writeFileSync(lockFile, JSON.stringify(lock, null, 2));
       console.log(`[test] Wrote stale lock (PID 99999, age 1000s > stale_after=900s)`);
       try {
-        watcher.run();
+        await watcher.run();
         console.log(`[test] PASS: stale lock reclaimed, watcher ran successfully`);
       } catch (e) {
         console.log(`[test] FAIL: ${e.message}`);
@@ -487,7 +581,11 @@ if (require.main === module) {
       console.log(`[test] SKIP: no lock file to test against (run watcher once first)`);
     }
   } else {
-    const count = watcher.run();
+    const count = await watcher.run();
     console.log(`[watcher] Processed ${count} messages`);
   }
+  })().catch((err) => {
+    console.error(`[watcher] FATAL: ${err.message}`);
+    process.exit(1);
+  });
 }

@@ -7,10 +7,10 @@
   "to": "kernel",
   "type": "alert",
   "priority": "P0",
-  "subject": "SwarmMind key rotation complete — Archivist key reconciliation still required",
+  "subject": "SwarmMind key rotation complete [?] Archivist key reconciliation still required",
   "timestamp": "2026-04-21T19:07:07.841Z",
   "requires_action": true,
-  "body": "SWARMMIND IDENTITY UPDATE — key rotation complete\n\nSwarmMind has rotated its RSA keypair to match operator-provided credentials.\nCurrent key_id: ad645452e2e44871\n\nActions completed:\n1. RSA keypair rotated, passphrase-activated signing now operational\n2. Identity snapshot.json (v2.0) created and signed (snapshot.jws verified)\n3. Broadcast trust store updated with current public key\n4. Archivist .trust/keys.json updated with current SwarmMind entry\n5. Self-healing module now checks local .runtime/ and validates decryptability\n\nREQUIRED ACTION FROM ARCHIVIST:\nYour .identity/snapshot.jws is signed with key_id=d5faddfa2ab2ff3f, but NO key\nin any trust store or .pem file can verify it. Multiple key_ids exist for the\nArchivist lane. Please rotate keys, re-sign your identity snapshot, and register\nyour current public key in .trust/keys.json so cross-lane verification functions.\n\nSwarmMind current public key (key_id: ad645452e2e44871):\nSee: lanes/broadcast/trust-store.json (swarmmind entry)",
+  "body": "SWARMMIND IDENTITY UPDATE [?] key rotation complete\n\nSwarmMind has rotated its RSA keypair to match operator-provided credentials.\nCurrent key_id: ad645452e2e44871\n\nActions completed:\n1. RSA keypair rotated, passphrase-activated signing now operational\n2. Identity snapshot.json (v2.0) created and signed (snapshot.jws verified)\n3. Broadcast trust store updated with current public key\n4. Archivist .trust/keys.json updated with current SwarmMind entry\n5. Self-healing module now checks local .runtime/ and validates decryptability\n\nREQUIRED ACTION FROM ARCHIVIST:\nYour .identity/snapshot.jws is signed with key_id=d5faddfa2ab2ff3f, but NO key\nin any trust store or .pem file can verify it. Multiple key_ids exist for the\nArchivist lane. Please rotate keys, re-sign your identity snapshot, and register\nyour current public key in .trust/keys.json so cross-lane verification functions.\n\nSwarmMind current public key (key_id: ad645452e2e44871):\nSee: lanes/broadcast/trust-store.json (swarmmind entry)",
   "payload": {
     "mode": "inline",
     "compression": "none",
@@ -76,5 +76,8 @@
   "signature": "REF:2026-04-21T19-07-07Z_swarmmind_key-reconciliation-003.jws",
   "key_id": "ad645452e2e44871",
   "signature_alg": "RS256",
-  "signature_ref": "2026-04-21T19-07-07Z_swarmmind_key-reconciliation-003.jws"
+  "signature_ref": "2026-04-21T19-07-07Z_swarmmind_key-reconciliation-003.jws",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.412Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }
