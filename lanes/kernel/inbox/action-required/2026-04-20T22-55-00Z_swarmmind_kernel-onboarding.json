@@ -42,5 +42,8 @@
   "completed_by": "archivist-agent",
   "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
   "prior_requires_action": true,
-  "task_state": "UNVERIFIED"
+  "task_state": "UNVERIFIED",
+  "_completion_gate_blocked": true,
+  "_completion_gate_blocked_at": "2026-04-24T01:08:35.983Z",
+  "_completion_gate_blocked_reason": "NON_TERMINAL_TYPE"
 }
