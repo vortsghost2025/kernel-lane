@@ -54,14 +54,8 @@ function enforceInvariant(laneId, root) {
   } else if (contraCount > 0 && !allowedStatus.includes(state.system_status)) {
     console.error(`[${laneId}] ❌ INVARIANT VIOLATION - ${contraCount} active contraditions but system_status='${state.system_status}'`);
     
-    // Fix: update status to "degraded"
-    state.system_status = 'degraded';
-    state.status_changed_at = new Date().toISOString();
-    state.status_change_reason = `Hard invariant enforced: ${contraCount} active contradiction(s) found`;
-    
-    fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
-    console.log(`[${laneId}] ✅ Status updated to: ${state.system_status}`);
-    process.exit(1);
+  console.error(`[${laneId}] INVARIANT: Only heartbeat.js may write system_state.json. No auto-fix applied. Heartbeat will correct on next cycle.`);
+  process.exit(1);
   }
   
   // 4. Check for P0 contradictions - system must not be "aligned"
@@ -75,10 +69,7 @@ function enforceInvariant(laneId, root) {
   // 5. Check compaction status
   if (state.compaction_enabled === true) {
     console.error(`[${laneId}] ❌ INVARIANT VIOLATION - compaction enabled while contraditions exist`);
-    state.compaction_enabled = false;
-    state.compaction_suspend_reason = 'P0 contraditions present - invariant enforced';
-    fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
-    console.error(`[${laneId}] ✅ Compaction disabled`);
+    console.error(`[${laneId}] INVARIANT: Only heartbeat.js may write system_state.json. No auto-fix applied. Heartbeat will correct on next cycle.`);
     process.exit(1);
   }
   
