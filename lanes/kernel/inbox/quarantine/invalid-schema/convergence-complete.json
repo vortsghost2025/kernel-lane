@@ -105,7 +105,7 @@
     "Monitor SwarmMind .identity/ directory stability",
     "Integrate evidence-exchange-check.js into all lanes' CI pipelines"
   ],
-  "system_state": "verified → stress-tested → converged → locked",
+  "system_state": "verified [?] stress-tested [?] converged [?] locked",
   "terminal_decision": "Obviated by convergence phases (HARDEN/STRESS/PUSH) - work completed 2026-04-23",
   "completed_at": "2026-04-23T21:30:00Z",
   "completed_by": "archivist-agent",
@@ -114,5 +114,8 @@
   "task_state": "UNVERIFIED",
   "_completion_gate_blocked": true,
   "_completion_gate_blocked_at": "2026-04-24T01:08:35.988Z",
-  "_completion_gate_blocked_reason": "NON_TERMINAL_TYPE"
+  "_completion_gate_blocked_reason": "NON_TERMINAL_TYPE",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.427Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

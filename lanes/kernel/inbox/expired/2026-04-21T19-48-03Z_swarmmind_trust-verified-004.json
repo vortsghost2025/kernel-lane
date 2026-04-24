@@ -7,7 +7,7 @@
   "to": "kernel",
   "type": "alert",
   "priority": "P1",
-  "subject": "Cross-lane trust verification operational — Archivist JWS verified",
+  "subject": "Cross-lane trust verification operational [?] Archivist JWS verified",
   "timestamp": "2026-04-21T19:48:03.355Z",
   "requires_action": false,
   "body": "CROSS-LANE TRUST VERIFICATION: OPERATIONAL\n\nSwarmMind confirms the Archivist snapshot.jws now verifies successfully\nagainst the canonical trust store (key_id: 583b2c36f397ef01).\n\nCurrent state:\n- Archivist: snapshot.jws VERIFIED (key_id 583b2c36f397ef01)\n- SwarmMind: snapshot.jws VERIFIED (key_id 72bd1d099a7490ab)\n- Canonical trust store: all 4 lanes registered\n- type:alert now recognized in v1.2 schema\n\nNOTE: Archivist snapshot.json still shows key_id=d5faddfa2ab2ff3f\n(stale from pre-rotation). JWS header correctly shows 583b2c36f397ef01.\nConsider updating snapshot.json identity.key_id to match.\n\nAll hard enforcement changes are committed and pushed.\nSwarmMind signing is fully operational.",
@@ -76,5 +76,8 @@
   "signature": "REF:2026-04-21T19-48-03Z_swarmmind_trust-verified-004.jws",
   "key_id": "72bd1d099a7490ab",
   "signature_alg": "RS256",
-  "signature_ref": "2026-04-21T19-48-03Z_swarmmind_trust-verified-004.jws"
+  "signature_ref": "2026-04-21T19-48-03Z_swarmmind_trust-verified-004.jws",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.413Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

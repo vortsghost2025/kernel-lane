@@ -3,7 +3,7 @@
   "report_id": "productivity-report-20260423",
   "generated_at": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
   "lane": "kernel",
-  "summary": "Kernel executed CI checks, full benchmark sweep, generated ncu and nsys profile artifacts, and verified cross‑lane synchronization. All tasks completed with no errors, improving confidence in build stability and performance.",
+  "summary": "Kernel executed CI checks, full benchmark sweep, generated ncu and nsys profile artifacts, and verified cross[?]lane synchronization. All tasks completed with no errors, improving confidence in build stability and performance.",
   "artifacts": [
     "kernel-runtime-proof-report.json",
     "key-sync-complete-kernel.json",
@@ -31,5 +31,17 @@
     "Archivist to perform final convergence ratification"
   ],
   "requires_action": false,
-  "payload": {"mode":"inline","compression":"none","path":null,"chunk":{"index":0,"count":1,"group_id":null}}
+  "payload": {
+    "mode": "inline",
+    "compression": "none",
+    "path": null,
+    "chunk": {
+      "index": 0,
+      "count": 1,
+      "group_id": null
+    }
+  },
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.432Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

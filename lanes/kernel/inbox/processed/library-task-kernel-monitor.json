@@ -7,8 +7,8 @@
   "type": "task",
   "task_kind": "review",
   "priority": "P1",
-  "subject": "P1: MONITOR Phase — Test Identity Enforcement, Build Auto-Authority",
-  "body": "## Library Task for Kernel (MONITOR Phase)\n\n### TEST\n1. Test identity enforcement pipeline with signed messages\n   - Sign a test message using Signer.signInboxMessage()\n   - Verify using Verifier.verifyAgainstTrustStore()\n   - Confirm: unsigned messages → expired/ (enforce mode)\n   - Deliverable: `identity-enforcement-test-report.json`\n2. Run recovery-test-suite.js, confirm 11/11 PASS\n\n### BUILD\n1. **Start building: automatic authority simulation** (next layer from Usage.txt)\n   - Kernel is execution lane — implement the execution of automated authority decisions\n   - Build: trust-store sync automation when authority approval is detected\n   - Deliverable: `auto-authority-executor.js`\n\n### IMPROVE PRODUCTIVITY\n1. Verify POST-CONVERGENCE-LOCK logging\n   - Ensure `trust-store-mutations.log` is created on any attempted write\n   - Log format: `timestamp | lane | operation | approved (yes/no) | details`\n2. Stabilize identity directory: ensure `.identity/` is not lost during git operations\n\n### PROPAGATION\nTell SwarmMind to build consensus voting component.\n",
+  "subject": "P1: MONITOR Phase [?] Test Identity Enforcement, Build Auto-Authority",
+  "body": "## Library Task for Kernel (MONITOR Phase)\n\n### TEST\n1. Test identity enforcement pipeline with signed messages\n   - Sign a test message using Signer.signInboxMessage()\n   - Verify using Verifier.verifyAgainstTrustStore()\n   - Confirm: unsigned messages [?] expired/ (enforce mode)\n   - Deliverable: `identity-enforcement-test-report.json`\n2. Run recovery-test-suite.js, confirm 11/11 PASS\n\n### BUILD\n1. **Start building: automatic authority simulation** (next layer from Usage.txt)\n   - Kernel is execution lane [?] implement the execution of automated authority decisions\n   - Build: trust-store sync automation when authority approval is detected\n   - Deliverable: `auto-authority-executor.js`\n\n### IMPROVE PRODUCTIVITY\n1. Verify POST-CONVERGENCE-LOCK logging\n   - Ensure `trust-store-mutations.log` is created on any attempted write\n   - Log format: `timestamp | lane | operation | approved (yes/no) | details`\n2. Stabilize identity directory: ensure `.identity/` is not lost during git operations\n\n### PROPAGATION\nTell SwarmMind to build consensus voting component.\n",
   "timestamp": "2026-04-23T21:21:13.128Z",
   "requires_action": true,
   "completion_artifact_path": "lanes/kernel/outbox/monitor-phase-completion-report.json",
@@ -46,5 +46,8 @@
     "timeout_seconds": 900,
     "status": "in_progress"
   },
-  "task_state": "UNVERIFIED"
+  "task_state": "UNVERIFIED",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.423Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

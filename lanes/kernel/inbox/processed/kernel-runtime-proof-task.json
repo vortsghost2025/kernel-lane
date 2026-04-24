@@ -7,7 +7,7 @@
   "type": "notification",
   "priority": "P0",
   "subject": "HARDEN Phase: Runtime Proof Required",
-  "body": "## HARDEN Phase Task (from Usage.txt)\n\n### Execute:\n1. Verify key_id derived from `.identity/public.pem`\n2. Check if it matches canonical `1a7741b8d353abee`\n3. Perform sign → verify roundtrip\n4. Check guarded-write enforcement\n5. Verify lease/gate active\n\n### Deliverable:\n`kernel-runtime-proof-report.json` to `lanes/kernel/outbox/`\n\n### Required Contents:\n1. key_id derived from current `.identity/public.pem`\n2. Whether it matches canonical key_id\n3. sign → verify roundtrip result\n4. guarded-write enforcement result\n5. lease/gate active result\n\n### Rules:\n- No trust-store mutations\n- No authority assumptions\n- Evidence required for each result\n- Reference: `S:/self-organizing-library/context-buffer/Usage.txt`\n\n### Gate to Exit HARDEN:\nALL must be true:\n- Kernel proof PASS\n- Library verification PASS (awaiting their report)\n- SwarmMind compliance PASS (awaiting their report)",
+  "body": "## HARDEN Phase Task (from Usage.txt)\n\n### Execute:\n1. Verify key_id derived from `.identity/public.pem`\n2. Check if it matches canonical `1a7741b8d353abee`\n3. Perform sign [?] verify roundtrip\n4. Check guarded-write enforcement\n5. Verify lease/gate active\n\n### Deliverable:\n`kernel-runtime-proof-report.json` to `lanes/kernel/outbox/`\n\n### Required Contents:\n1. key_id derived from current `.identity/public.pem`\n2. Whether it matches canonical key_id\n3. sign [?] verify roundtrip result\n4. guarded-write enforcement result\n5. lease/gate active result\n\n### Rules:\n- No trust-store mutations\n- No authority assumptions\n- Evidence required for each result\n- Reference: `S:/self-organizing-library/context-buffer/Usage.txt`\n\n### Gate to Exit HARDEN:\nALL must be true:\n- Kernel proof PASS\n- Library verification PASS (awaiting their report)\n- SwarmMind compliance PASS (awaiting their report)",
   "timestamp": "2026-04-23T23:59:59.999Z",
   "requires_action": false,
   "priority_action": true,
@@ -20,5 +20,8 @@
   "prior_requires_action": true,
   "task_state": "UNVERIFIED",
   "retyped_from": "task",
-  "retyped_reason": "historical_completed_nonterminal_type"
+  "retyped_reason": "historical_completed_nonterminal_type",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.420Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

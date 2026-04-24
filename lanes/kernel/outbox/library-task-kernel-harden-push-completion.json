@@ -8,7 +8,7 @@
   "task_kind": "review",
   "priority": "P0",
   "subject": "P0: Complete HARDEN Phase + Prepare for PUSH",
-  "body": "## Library Task for Kernel\n\n### COMPLETE HARDEN PHASE (you skipped this)\nDeliver `kernel-runtime-proof-report.json` with:\n1. key_id derived from `.identity/public.pem` → should be `7f1a9fe931d1fbba`\n2. sign -> verify roundtrip result (use Verifier.verifyAgainstTrustStore)\n3. guarded-write enforcement result\n4. lease/gate active result\n\n### AFTER ARCHIVIST ISSUES AUTHORITY APPROVAL:\n1. Sync trust store to canonical (your OWN key_id = 7f1a9fe931d1fbba)\n2. Verify key_id + PEM consistency\n3. Emit `key-sync-complete-kernel.json`\n\n### YOUR NEXT TASK FOR OTHER LANES\nSend tasks to:\n- **SwarmMind**: complete HARDEN phase (swarmmind-signing-role-status.json), then PUSH (key-sync-complete-swarmmind.json)\nTell SwarmMind to also send tasks to others.\n\n### Rules:\n- No trust-store writes without authority approval artifact\n- Evidence required for each result\n- No assumptions about key correctness — verify at runtime\n",
+  "body": "## Library Task for Kernel\n\n### COMPLETE HARDEN PHASE (you skipped this)\nDeliver `kernel-runtime-proof-report.json` with:\n1. key_id derived from `.identity/public.pem` [?] should be `7f1a9fe931d1fbba`\n2. sign -> verify roundtrip result (use Verifier.verifyAgainstTrustStore)\n3. guarded-write enforcement result\n4. lease/gate active result\n\n### AFTER ARCHIVIST ISSUES AUTHORITY APPROVAL:\n1. Sync trust store to canonical (your OWN key_id = 7f1a9fe931d1fbba)\n2. Verify key_id + PEM consistency\n3. Emit `key-sync-complete-kernel.json`\n\n### YOUR NEXT TASK FOR OTHER LANES\nSend tasks to:\n- **SwarmMind**: complete HARDEN phase (swarmmind-signing-role-status.json), then PUSH (key-sync-complete-swarmmind.json)\nTell SwarmMind to also send tasks to others.\n\n### Rules:\n- No trust-store writes without authority approval artifact\n- Evidence required for each result\n- No assumptions about key correctness [?] verify at runtime\n",
   "timestamp": "2026-04-23T20:41:22.011Z",
   "requires_action": false,
   "payload": {
@@ -57,5 +57,8 @@
   "completed_at": "2026-04-23T21:30:00Z",
   "completed_by": "archivist-agent",
   "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
-  "prior_requires_action": true
+  "prior_requires_action": true,
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.431Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

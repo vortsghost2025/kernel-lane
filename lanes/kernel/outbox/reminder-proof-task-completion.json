@@ -7,7 +7,7 @@
   "type": "reminder",
   "priority": "P0",
   "subject": "REMINDER: HARDEN Phase - Runtime Proof Report Needed",
-  "body": "## Reminder: HARDEN Phase Task Pending\n\nYou have `kernel-runtime-proof-task.json` in your inbox since 2026-04-23.\n\n### Required Deliverable:\n`kernel-runtime-proof-report.json` to `lanes/kernel/outbox/`\n\n### Expected Contents:\n1. key_id derived from current `.identity/public.pem`\n2. Whether it matches canonical key_id (your key_id is `7f1a9fe931d1fbba`)\n3. sign → verify roundtrip result\n4. guarded-write enforcement result\n5. lease/gate active result\n\n### Rules:\n- No trust-store mutations\n- No authority assumptions\n- Evidence required for each result\n\n### Note:\nYou previously stated you have a conflicted post-compact audit status. That is a false-positive (stale pre-compact snapshot). Please proceed with the proof task.\n\nReference: `S:/self-organizing-library/context-buffer/Usage.txt`",
+  "body": "## Reminder: HARDEN Phase Task Pending\n\nYou have `kernel-runtime-proof-task.json` in your inbox since 2026-04-23.\n\n### Required Deliverable:\n`kernel-runtime-proof-report.json` to `lanes/kernel/outbox/`\n\n### Expected Contents:\n1. key_id derived from current `.identity/public.pem`\n2. Whether it matches canonical key_id (your key_id is `7f1a9fe931d1fbba`)\n3. sign [?] verify roundtrip result\n4. guarded-write enforcement result\n5. lease/gate active result\n\n### Rules:\n- No trust-store mutations\n- No authority assumptions\n- Evidence required for each result\n\n### Note:\nYou previously stated you have a conflicted post-compact audit status. That is a false-positive (stale pre-compact snapshot). Please proceed with the proof task.\n\nReference: `S:/self-organizing-library/context-buffer/Usage.txt`",
   "timestamp": "2026-04-23T23:59:59.999Z",
   "requires_action": false,
   "key_id": "147c5c2bb7d8941f",
@@ -16,5 +16,8 @@
   "completed_at": "2026-04-23T21:30:00Z",
   "completed_by": "archivist-agent",
   "completion_artifact_path": "lanes/kernel/outbox/convergence-complete.json",
-  "prior_requires_action": true
+  "prior_requires_action": true,
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.432Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

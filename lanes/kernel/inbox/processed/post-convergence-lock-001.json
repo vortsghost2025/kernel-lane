@@ -5,8 +5,8 @@
   "to": "kernel",
   "type": "notification",
   "priority": "P0",
-  "subject": "POST-CONVERGENCE LOCK — No Trust-Store Writes Without Authority",
-  "body": "## POST-CONVERGENCE LOCK ACTIVE\n\n### Lock Rules (Effective Immediately)\n1. **No trust-store writes unless authority approval artifact is present**\n   - Check for `authority-approval-key-convergence-20260423.json` in your inbox\n   - If not present, ALL trust-store writes BLOCKED\n\n2. **All attempted trust mutations must be logged**\n   - Log to `trust-store-mutations.log`\n   - Format: `timestamp | lane | operation | approved (yes/no) | details`\n\n3. **Any mutation without approval = blocked**\n   - Mutation without authority = BLOCK + ALERT to archivist\n\n### Your Status\n- ✅ `key-sync-complete-kernel.json` received\n- ✅ Authority approval: `authority-approval-key-convergence-20260423.json` in your inbox\n- 🔒 LOCK ACTIVE - your trust store is now locked\n\n### Allowed Operations\n- ✅ Read trust store\n- ✅ Verify signatures\n- ✅ Process messages\n- 🔒 Write trust store: ONLY WITH AUTHORITY APPROVAL\n\n### Compliance\nYour key_id `7f1a9fe931d1fbba` is LOCKED. No changes without new authority message.",
+  "subject": "POST-CONVERGENCE LOCK [?] No Trust-Store Writes Without Authority",
+  "body": "## POST-CONVERGENCE LOCK ACTIVE\n\n### Lock Rules (Effective Immediately)\n1. **No trust-store writes unless authority approval artifact is present**\n   - Check for `authority-approval-key-convergence-20260423.json` in your inbox\n   - If not present, ALL trust-store writes BLOCKED\n\n2. **All attempted trust mutations must be logged**\n   - Log to `trust-store-mutations.log`\n   - Format: `timestamp | lane | operation | approved (yes/no) | details`\n\n3. **Any mutation without approval = blocked**\n   - Mutation without authority = BLOCK + ALERT to archivist\n\n### Your Status\n- [OK] `key-sync-complete-kernel.json` received\n- [OK] Authority approval: `authority-approval-key-convergence-20260423.json` in your inbox\n- [LOCK] LOCK ACTIVE - your trust store is now locked\n\n### Allowed Operations\n- [OK] Read trust store\n- [OK] Verify signatures\n- [OK] Process messages\n- [LOCK] Write trust store: ONLY WITH AUTHORITY APPROVAL\n\n### Compliance\nYour key_id `7f1a9fe931d1fbba` is LOCKED. No changes without new authority message.",
   "timestamp": "2026-04-23T20:50:00.000Z",
   "requires_action": false,
   "priority_action": true,
@@ -19,5 +19,8 @@
   "prior_requires_action": true,
   "task_state": "UNVERIFIED",
   "retyped_from": "lock",
-  "retyped_reason": "historical_completed_nonterminal_type"
+  "retyped_reason": "historical_completed_nonterminal_type",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.424Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

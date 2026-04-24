@@ -7,7 +7,7 @@
   "type": "notification",
   "priority": "P1",
   "subject": "Cross-Lane Adaptation Report: All Lanes Now Using OWN Key-IDs",
-  "body": "Kernel Lane: Your key_id `7f1a9fe931d1fbba` is CORRECT ✅. Archivist reverted to `147c5c2bb7d8941f`. All lanes adapted to DER fingerprint standard.",
+  "body": "Kernel Lane: Your key_id `7f1a9fe931d1fbba` is CORRECT [OK]. Archivist reverted to `147c5c2bb7d8941f`. All lanes adapted to DER fingerprint standard.",
   "timestamp": "2026-04-23T23:59:59.999Z",
   "requires_action": false,
   "key_id": "147c5c2bb7d8941f",
@@ -19,5 +19,8 @@
   "prior_requires_action": false,
   "task_state": "UNVERIFIED",
   "retyped_from": "system_summary",
-  "retyped_reason": "historical_completed_nonterminal_type"
+  "retyped_reason": "historical_completed_nonterminal_type",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.421Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

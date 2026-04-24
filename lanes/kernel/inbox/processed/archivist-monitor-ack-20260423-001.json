@@ -8,7 +8,7 @@
   "task_kind": "monitor",
   "priority": "P0",
   "subject": "Archivist acknowledges monitoring request",
-  "body": "Archivist will run the post‑compact audit, verify trust‑store key IDs, and generate a convergence‑monitor‑report. Any contradictions will be escalated as P0.",
+  "body": "Archivist will run the post[?]compact audit, verify trust[?]store key IDs, and generate a convergence[?]monitor[?]report. Any contradictions will be escalated as P0.",
   "timestamp": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
   "requires_action": false,
   "payload": {
@@ -75,5 +75,8 @@
   "disposition": "informational_only - requires_action=false, no operational obligation",
   "status": "completed",
   "processed_at": "2026-04-23T23:32:33.316Z",
-  "task_state": "UNVERIFIED"
+  "task_state": "UNVERIFIED",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.417Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

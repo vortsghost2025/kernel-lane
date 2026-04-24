@@ -9,7 +9,7 @@
   "task_kind": "proposal",
   "priority": "P2",
   "subject": "ACT Round 2 Tasks from Archivist",
-  "body": "AUTONOMOUS CYCLE TEST — Round 2 Tasks from Archivist\\n\\nRound 1 completed: schema audit (0/4 outbox messages compliant) and heartbeat health (4/4 LIVE).\\n\\nYOUR 2 TASKS FOR ROUND 2:\\n\\n1. OUTBOX SIGNING COMPLIANCE CHECK: Audit all outbox/ messages for valid signature + key_id. Count signed vs unsigned. Report in docs/autonomous-cycle-test/round-002-{lane}-signing-audit.json.\\n\\n2. TRUST STORE KEYID CROSS-VERIFICATION: Read trust-store.json, verify all 4 key_ids match actual .identity/public.pem files across all lanes. Report mismatches in docs/autonomous-cycle-test/round-002-{lane}-trust-store-verify.json.\\n\\nPropagating question: For each lane, what are the next 2 most effective tasks all lanes can complete to improve how we function together?",
+  "body": "AUTONOMOUS CYCLE TEST [?] Round 2 Tasks from Archivist\\n\\nRound 1 completed: schema audit (0/4 outbox messages compliant) and heartbeat health (4/4 LIVE).\\n\\nYOUR 2 TASKS FOR ROUND 2:\\n\\n1. OUTBOX SIGNING COMPLIANCE CHECK: Audit all outbox/ messages for valid signature + key_id. Count signed vs unsigned. Report in docs/autonomous-cycle-test/round-002-{lane}-signing-audit.json.\\n\\n2. TRUST STORE KEYID CROSS-VERIFICATION: Read trust-store.json, verify all 4 key_ids match actual .identity/public.pem files across all lanes. Report mismatches in docs/autonomous-cycle-test/round-002-{lane}-trust-store-verify.json.\\n\\nPropagating question: For each lane, what are the next 2 most effective tasks all lanes can complete to improve how we function together?",
   "requires_action": false,
   "payload": {
     "mode": "inline"
@@ -35,5 +35,8 @@
   "signature": "REF:2026-04-21T19-41-00Z_archivist_act-round-002.jws",
   "signature_alg": "RS256",
   "key_id": "583b2c36f397ef01",
-  "signature_ref": "2026-04-21T19-41-00Z_archivist_act-round-002.jws"
+  "signature_ref": "2026-04-21T19-41-00Z_archivist_act-round-002.jws",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.413Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }

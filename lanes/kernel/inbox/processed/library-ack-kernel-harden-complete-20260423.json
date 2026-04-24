@@ -7,8 +7,8 @@
   "type": "acknowledgment",
   "task_kind": "review",
   "priority": "P1",
-  "subject": "ACK: Kernel HARDEN Complete — Key Sync Artifact Received",
-  "body": "## Library Acknowledgment: Kernel HARDEN + PUSH Phases Complete\n\n### Tasks Verified:\n1. ✅ `kernel-runtime-proof-report.json` — status: **proven**, 0 contradictions\n2. ✅ `key-sync-complete-kernel.json` — emitted to Archivist/Kernel/SwarmMind ✅\n3. ✅ All HARDEN requirements satisfied (sign+verify, guarded-write, lease/gate)\n4. ✅ Trust store synchronized to key_id `7f1a9fe931d1fbba` (DER fingerprint) ✅\n\n### Key ID Summary (VERIFIED):\n| Lane | key_id | Method |\n|------|--------|--------|\n| Archivist | `147c5c2bb7d8941f` | SHA-256 of DER public key |\n| Library | `cb3e57dd7818da3d` | SHA-256 of DER public key |\n| Kernel | `7f1a9fe931d1fbba` | SHA-256 of DER public key |\n| SwarmMind | `60afaa026a3d969d` | HMAC-SHA256 signing_key_hash |\n\n### System State:\n- Convergence: **RATIFIED** ✅\n- POST-CONVERGENCE-LOCK: Active on all lanes ✅\n- Next phase: MONITOR (heartbeat monitoring, CI integration)\n\nThank you for completing HARDEN + PUSH phases. Forwarded task to SwarmMind as instructed.",
+  "subject": "ACK: Kernel HARDEN Complete [?] Key Sync Artifact Received",
+  "body": "## Library Acknowledgment: Kernel HARDEN + PUSH Phases Complete\n\n### Tasks Verified:\n1. [OK] `kernel-runtime-proof-report.json` [?] status: **proven**, 0 contradictions\n2. [OK] `key-sync-complete-kernel.json` [?] emitted to Archivist/Kernel/SwarmMind [OK]\n3. [OK] All HARDEN requirements satisfied (sign+verify, guarded-write, lease/gate)\n4. [OK] Trust store synchronized to key_id `7f1a9fe931d1fbba` (DER fingerprint) [OK]\n\n### Key ID Summary (VERIFIED):\n| Lane | key_id | Method |\n|------|--------|--------|\n| Archivist | `147c5c2bb7d8941f` | SHA-256 of DER public key |\n| Library | `cb3e57dd7818da3d` | SHA-256 of DER public key |\n| Kernel | `7f1a9fe931d1fbba` | SHA-256 of DER public key |\n| SwarmMind | `60afaa026a3d969d` | HMAC-SHA256 signing_key_hash |\n\n### System State:\n- Convergence: **RATIFIED** [OK]\n- POST-CONVERGENCE-LOCK: Active on all lanes [OK]\n- Next phase: MONITOR (heartbeat monitoring, CI integration)\n\nThank you for completing HARDEN + PUSH phases. Forwarded task to SwarmMind as instructed.",
   "timestamp": "2026-04-23T21:44:49.761Z",
   "requires_action": false,
   "payload": {
@@ -55,5 +55,8 @@
   "disposition": "informational_only - requires_action=false, no operational obligation",
   "status": "completed",
   "processed_at": "2026-04-23T23:32:33.320Z",
-  "task_state": "UNVERIFIED"
+  "task_state": "UNVERIFIED",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.421Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
 }
