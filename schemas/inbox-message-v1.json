@@ -36,18 +36,20 @@
         "kernel"
       ]
     },
-    "type": {
-      "type": "string",
-      "enum": [
-        "task",
-        "response",
-        "heartbeat",
-        "escalation",
-        "handoff",
-        "ack",
-        "alert"
-      ]
-    },
+  "type": {
+    "type": "string",
+    "enum": [
+      "task",
+      "response",
+      "heartbeat",
+      "escalation",
+      "handoff",
+      "ack",
+      "alert",
+      "notification",
+      "status"
+    ]
+  },
     "task_kind": {
       "type": "string",
       "enum": [
@@ -438,7 +440,9 @@
               "task",
               "response",
               "escalation",
-              "handoff"
+              "handoff",
+              "notification",
+              "status"
             ]
           }
         }

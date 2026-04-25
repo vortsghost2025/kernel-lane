@@ -32,7 +32,7 @@ const ENUM_CONSTRAINTS = {
   schema_version: ['1.0', '1.1', '1.2', '1.3'],
   // Updated canonical target name for kernel lane
   to: ['archivist', 'library', 'swarmmind', 'kernel'],
-  type: ['task', 'response', 'heartbeat', 'escalation', 'handoff', 'ack', 'alert'],
+  type: ['task', 'response', 'heartbeat', 'escalation', 'handoff', 'ack', 'alert', 'notification', 'status'],
   // NFM-019 fix: extend task_kind to cover task lifecycle + alert + notification + heartbeat
   // Governance process: proposal, review, amendment, ratification
   // Task lifecycle: ack, done, status, report, handoff
@@ -142,7 +142,7 @@ function validate(message) {
   }
 
   // Ensure task_kind presence only for message types that require it (per v1.3 "allOf" rule).
-  if (['task', 'response', 'escalation', 'handoff'].includes(message.type)) {
+  if (['task', 'response', 'escalation', 'handoff', 'notification', 'status'].includes(message.type)) {
     if (!('task_kind' in message)) {
       errors.push('task_kind is required for task/response/escalation/handoff messages');
     }
