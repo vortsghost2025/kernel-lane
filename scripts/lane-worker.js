@@ -11,6 +11,33 @@ const { ExecutionGate } = require('./execution-gate');
 const ACTIONABLE_TYPES = new Set(['task', 'escalation', 'request']);
 const NON_ASCII_PATTERN = /[^\x00-\x7F]/;
 
+// NFM-019 fix: Unicode-to-ASCII normalization map for common typographic characters
+// Policy: lane messages must be ASCII-only. Agents naturally produce Unicode punctuation
+// (em-dashes, smart quotes, ellipsis). This map normalizes them BEFORE the ASCII check,
+// so legitimate content is not quarantined for typographic conventions.
+const UNICODE_NORMALIZE_MAP = {
+  '\u2014': '--',   // em-dash
+  '\u2013': '-',    // en-dash
+  '\u2018': "'",    // left single quote
+  '\u2019': "'",    // right single quote
+  '\u201C': '"',    // left double quote
+  '\u201D': '"',    // right double quote
+  '\u2026': '...',  // ellipsis
+  '\u00A0': ' ',    // non-breaking space
+  '\u2022': '*',    // bullet
+  '\u2010': '-',    // hyphen
+  '\u2011': '-',    // non-breaking hyphen
+  '\u2012': '-',    // figure dash
+  '\u2015': '--',   // horizontal bar
+  '\u2212': '-',    // minus sign
+};
+
+const UNICODE_NORMALIZE_RE = new RegExp('[' + Object.keys(UNICODE_NORMALIZE_MAP).join('') + ']', 'g');
+
+function normalizeToAscii(str) {
+  return str.replace(UNICODE_NORMALIZE_RE, ch => UNICODE_NORMALIZE_MAP[ch] || '?');
+}
+
 const SKIP_FILENAMES = new Set(['heartbeat.json', 'watcher.log', 'watcher.pid', 'readme.md']);
 const HEARTBEAT_PATTERN = /^heartbeat-.+\.json$/i;
 
@@ -102,12 +129,28 @@ function isEnglishOnly(msg) {
   if (!msg || typeof msg !== 'object') return true;
   const textFields = ['subject', 'body', 'type', 'from', 'to'];
   for (const field of textFields) {
-    const val = msg[field];
-    if (typeof val === 'string' && NON_ASCII_PATTERN.test(val)) {
-      return false;
+    let val = msg[field];
+    if (typeof val === 'string') {
+      // NFM-019 fix: normalize common Unicode punctuation to ASCII before check
+      val = normalizeToAscii(val);
+      if (NON_ASCII_PATTERN.test(val)) {
+        return false;
+      }
     }
   }
   return true;
+}
+
+// Apply Unicode normalization to message text fields in-place before routing
+function normalizeMessage(msg) {
+  if (!msg || typeof msg !== 'object') return msg;
+  const textFields = ['subject', 'body'];
+  for (const field of textFields) {
+    if (typeof msg[field] === 'string') {
+      msg[field] = normalizeToAscii(msg[field]);
+    }
+  }
+  return msg;
 }
 
 function completionGateApprove(msg) {
@@ -241,6 +284,8 @@ class LaneWorker {
   }
 
   decideRoute(msg, schemaResult, signatureResult) {
+    // NFM-019 fix: normalize Unicode punctuation to ASCII before any checks
+    normalizeMessage(msg);
     if (!schemaResult.valid) {
       return { queue: 'quarantine', reason: 'SCHEMA_INVALID', detail: schemaResult.errors.join('; ') };
     }
