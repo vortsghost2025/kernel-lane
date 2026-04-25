@@ -1,0 +1,46 @@
+{
+  "task_id": "task-1777160635247-001",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "proposal",
+  "priority": "P1",
+  "subject": "Add Nsight Compute profiling script + CI build step",
+  "body": "Create scripts/profile-kernels.ps1 that runs ncu --set full on both matrix_tensor_optimized and matrix_tensor_async executables for M=N=K=1024.\nOutput CSV to profiles/.\n\nAlso create scripts/build-kernels.ps1 that sets up cl.exe PATH and compiles both .cu files with -arch=sm_120 -lineinfo.\nBoth scripts should work from Developer Command Prompt or detect cl.exe automatically.",
+  "requires_action": true,
+  "schema_version": "1.3",
+  "idempotency_key": "task-profile-build-1777160635247",
+  "timestamp": "2026-04-25T23:43:55.248Z",
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "session_task",
+    "engine": "kilo",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-25T23:43:55.248Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "report",
+    "delivered_at": null
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-25T23:43:55.248Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  }
+}
