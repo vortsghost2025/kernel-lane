@@ -107,3 +107,14 @@ By isolating it as Lane 4, you get:
 - faster iteration on CUDA tuning
 - safer integration into the main lattice
 - deterministic convergence through evidence-backed releases
+
+## Head-less profiling
+
+Run the combined Nsight Systems + Nsight Compute headless capture:
+
+```powershell
+.\scripts\run-headless-profiling.ps1 -DurationSec 60
+```
+
+Artifacts are written to `profiles/headless/`. Use `.\scripts\check-profiling-regression.ps1` to compare against the baseline.
+

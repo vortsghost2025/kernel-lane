@@ -1,0 +1,6 @@
+"Kernel Name","Kernel Duration (ns)","Grid Size","Block Size","Registers","Shared Memory"
+"vector_add",1000,256,256,32,0
+"matrix_mul",50000,16,16,64,8192
+"conv2d",120000,32,32,96,16384
+"reduction",35000,64,64,48,4096
+"fft",250000,8,8,128,32768

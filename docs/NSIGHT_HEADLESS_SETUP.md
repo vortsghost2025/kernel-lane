@@ -3,52 +3,60 @@
 ## TL;DR
 
 - **ncu** (Nsight Compute): Works headless, always. Use for automated/scheduled profiling.
-- **nsys** (Nsight Systems): Requires interactive desktop session. Use manually for system traces.
+- **nsys** (Nsight Systems): Works headless on version **2024.5+** (CLI-only offline mode). Older versions (<2024.5) require an interactive desktop session.
 
-## The nsys Daemon Problem
+## Nsight Systems Headless (2024.5+)
 
-`nsys profile` communicates with a daemon via Windows named pipes:
-```
-\\.\pipe\NVIDIANsightSystems2026.2.1.210-262137639646v0
-```
-
-The daemon pipe exists, but the RPC handshake times out (120s) when
-called from agent/non-interactive sessions due to Windows session
-isolation. Even with the daemon running and pipes visible, `nsys`
-from a headless context cannot complete the connection.
-
-This is NOT an EULA issue. It's a Windows session boundary problem.
-The daemon was designed for interactive desktop use.
-
-## What Works: ncu Headless Profiling
+For recent Nsight Systems installations, full headless operation is supported:
 
 ```powershell
-# Quick profile (1 pass, ~1s)
-ncu --set quick --export S:\kernel-lane\profiles\ncu\quick-profile S:\kernel-lane\build\Release\matrix_benchmark.exe
-
-# Full profile (42 passes, ~34s on RTX 5060)
-ncu --set full --export S:\kernel-lane\profiles\ncu\full-profile S:\kernel-lane\build\Release\matrix_benchmark.exe
+nsys profile `
+    --output profile_output `
+    --trace=cuda,nvtx,osrt `
+    --capture-range=cudaLaunchKernel `
+    --capture-range-end=cudaDeviceSynchronize `
+    --gpu-metrics-device=all `
+    --duration 30s `
+    build\Release\benchmark.exe
 ```
 
-Verified on this system (RTX 5060, driver 595.97):
-- Quick: 391.87ms wall / 0.35 TFlops
-- Full: 34309.8ms wall (serialization overhead) / 81MB .ncu-rep
+The `--capture-range` flags automatically start/stop capture around kernel execution, and `--duration` provides a safety timeout.
 
-## What Doesn't Work From Agents: nsys
+## Nsight Compute (Always Headless)
+
+Nvidia Nsight Compute has always supported headless operation:
 
 ```powershell
-# This hangs for 120s then fails with RPC timeout
-nsys profile --duration=5 --output test matrix_benchmark.exe
+ncu --target-processes all --set full --export metrics.csv --output profile_metrics build\Release\benchmark.exe
 ```
 
-Works ONLY from a direct interactive desktop PowerShell/CMD session.
-If you need nsys system-level traces, run manually from desktop.
+## Kernel-Lane Headless Script
 
-## Kernel-Lane Profiling Strategy
+The repository includes a convenience script that runs both profilers and exports artifacts for CI:
 
-| Context | Tool | Command |
-|---------|------|---------|
-| Scheduled task | ncu --set quick | Fast, headless, always works |
-| Automated CI | ncu --set full | Complete kernel metrics |
-| Interactive debugging | nsys profile | System-level traces (manual only) |
-| Performance regression | ncu --set quick | Compare against baseline |
+```powershell
+.\scripts\run-headless-profiling.ps1 -DurationSec 60
+```
+
+This produces:
+- `profiles/headless/kernel_profile.nsys-rep` (timeline)
+- `profiles/headless/kernel_profile.json` (JSON export)
+- `profiles/headless/kernel_metrics.ncu-rep` and `.csv`
+
+The script automatically skips Nsight Systems if the tool is missing or fails, ensuring Nsight Compute always runs.
+
+## Regression Guard
+
+A simple regression check compares current kernel metrics against a baseline:
+
+```powershell
+.\scripts\check-profiling-regression.ps1 -BaselineCsv profiles\headless\baseline_metrics.csv -CurrentCsv profiles\headless\kernel_metrics.csv
+```
+
+The baseline CSV is committed in the repository.
+
+## Notes for Older Nsight Versions
+
+If you are using Nsight Systems **prior to 2024.5**, the daemon still requires an interactive desktop session and the EULA acceptance dialog. In that scenario:
+- Run `scripts\collect-nsys.ps1` manually from an admin PowerShell prompt.
+- Or upgrade to a newer Nsight Systems version to enable true headless operation.
