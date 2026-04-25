@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.3",
+  "task_id": "task-1777139176934-bcace2dc",
+  "idempotency_key": "da4390204eef9ded748d3c276b9da3f54160cb44b9a5040cce6e6ebdc8ccc624",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "proposal",
+  "priority": "P0",
+  "subject": "Enable Tensor Core WMMA for 16x16 GEMM tiles",
+  "body": "Nsight Copilot analysis: theoretical lower bound for matrix_mul on RTX 5060 is ~27us with Tensor Cores vs current 50us baseline (CUDA cores only). RTX 5060 supports 4x4x4 FP32 WMMA operations. Implementation: 1) #include <mma.h>, 2) Use wmma::fragment, wmma::load_matrix_sync, wmma::mma_sync, wmma::store_matrix_sync for 16x16x16 tiles, 3) Ensure input matrices are in column-major or row-major as required by WMMA API, 4) Profile with ncu --metrics tensor__core_utilization. Target: reduce from 50us toward 27us. Even 35us would be a 30% improvement.",
+  "timestamp": "2026-04-25T17:46:16.934Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-25T17:46:16.934Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/outbox/response-task-1777139176934-bcace2dc.json",
+    "artifact_type": "response",
+    "delivered_at": "2026-04-25T17:46:16.934Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-25T17:46:16.934Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 3600
+  },
+  "content_hash": "sha256:b6840f38bd8b38d032693adfd54b83e9d7b27a3a30737fb91481f09b87a0b29e",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVlNzBiNzgxMDViYzYxODkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6YjY4NDBmMzhiZDhiMzhkMDMyNjkzYWRmZDU0YjgzZTlkN2IyN2EzYTMwNzM3ZmI5MTQ4MWYwOWI4N2EwYjI5ZSIsImV4cCI6MTc3NzIyNTU3NiwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzEzOTE3NiwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAwIiwidGFza19pZCI6InRhc2stMTc3NzEzOTE3NjkzNC1iY2FjZTJkYyIsInRvIjoia2VybmVsIn0.CSM6hd3Y45beRz7WXCv3jX6O9NnxnbLwzyiEX5-faR2LTRe2VBI-RryEaLDZ-0vWGd4l01sfEo0aQpx-X-F18LCzqZaIpaAYrQTYPjhQIMwNvioiWj9U5L3R0NuDwSo7M4Q9V3lFuKD97LNVU-rOI_cDkj6xf4BIrc_1HQuPcWNusBctXi7XxtaPKvzmH8vmek__B87QBra4NEo19iXS5DSoLQyHZ-YRhPrX3OESud4QM33JJOLBU9lECSyonkeykjPG4PMhZBnSbjERFIlVufPkIK8li6ygol_-14fQrSKAcsi0qI54vVSubYWNx4gA3oe-MJjCXbnesHA12cL0lA",
+  "signature_alg": "RS256",
+  "key_id": "ee70b78105bc6189",
+  "execution_verified": true,
+  "would_verify": true,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T20:00:19.844Z",
+    "dry_run": false,
+    "route": "processed",
+    "reason": "ACTIONABLE_WITH_PROOF",
+    "detail": null,
+    "schema_valid": true,
+    "signature_valid": true,
+    "english_only": true,
+    "execution_verified": true,
+    "would_verify": true
+  }
+}

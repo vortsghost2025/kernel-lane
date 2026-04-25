@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.3",
+  "task_id": "task-1777139085267-330c6d92",
+  "idempotency_key": "7bcd7128b9b9623703e6629a97a4e1261ecf4c863bd09c4edd2437e005de897c",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "proposal",
+  "priority": "P1",
+  "subject": "Replace shared-memory reduction with __shfl_sync warp shuffle",
+  "body": "Nsight Copilot analysis: use __shfl_sync for intra-warp reduction instead of shared-memory tree reduction. Benefits: 1) 5-10 cycles vs 30-40 cycles, 2) No bank conflicts, 3) No __syncthreads needed for warp-level ops. Implementation: for each warp, #pragma unroll for (offset = warpSize/2; offset > 0; offset >>= 1) { acc += __shfl_sync(0xffffffff, acc, threadIdx.x + offset); } Then write warp results to shared for final block-wide reduction (only 8 warps). Profile with ncu to verify reduced shared-memory traffic.",
+  "timestamp": "2026-04-25T17:44:45.267Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-25T17:44:45.267Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/outbox/response-task-1777139085267-330c6d92.json",
+    "artifact_type": "response",
+    "delivered_at": "2026-04-25T17:44:45.267Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-25T17:44:45.267Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 3600
+  },
+  "content_hash": "sha256:1c85e23989bbdd18f84ccfca91612279e6d8de72814ba2693698bd2061512777",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVlNzBiNzgxMDViYzYxODkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MWM4NWUyMzk4OWJiZGQxOGY4NGNjZmNhOTE2MTIyNzllNmQ4ZGU3MjgxNGJhMjY5MzY5OGJkMjA2MTUxMjc3NyIsImV4cCI6MTc3NzIyNTQ4NSwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzEzOTA4NSwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6InRhc2stMTc3NzEzOTA4NTI2Ny0zMzBjNmQ5MiIsInRvIjoia2VybmVsIn0.XZbG5ujhOhjaG88GtNAAEl70OJ1NHzOnj5wTYFJJLUBqBs8lpcksFmwtKXf7y2Gj_VxsnkNtPtdycL3TyL4JDnP92v-25OcnDjDWtB0w2jomiEgYASHzQ6PNKSSoPUvZZ7LjRSjhT2Mux8EcQekyLwC-Bofs5Jw_o-uMkTDCyOC5q6DxYqySHcQ8_4mfxYoCycWAnVJothslPJJuegul0Lv3NxXe1q7tqAYFAOVLMSzOfing7FKeweelnzft9LosGUurNj54NxfVeip57eAD94z-kcWS1kz8QP3YwFNioDVOxUHANE2WG3tk4aTCA-aQdVntgUpib-zEtUR2ylboEg",
+  "signature_alg": "RS256",
+  "key_id": "ee70b78105bc6189",
+  "execution_verified": true,
+  "would_verify": true,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T20:00:19.843Z",
+    "dry_run": false,
+    "route": "processed",
+    "reason": "ACTIONABLE_WITH_PROOF",
+    "detail": null,
+    "schema_valid": true,
+    "signature_valid": true,
+    "english_only": true,
+    "execution_verified": true,
+    "would_verify": true
+  }
+}

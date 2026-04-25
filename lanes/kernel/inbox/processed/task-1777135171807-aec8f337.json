@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.3",
+  "task_id": "task-1777135171807-aec8f337",
+  "idempotency_key": "020bff7606c3af4eaa552e2438c82d317eaede9e7a1eced99edaff2a9b7e533c",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "proposal",
+  "priority": "P1",
+  "subject": "Optimize matrix_mul: coalesced memory access + shared memory tiling",
+  "body": "Current baseline: 50000ns. Target: <30000ns. Apply: 1) coalesced global memory reads using padded shared memory, 2) 16x16 tiling with __syncthreads(), 3) verify with ncu before/after. Push optimized kernel to src/kernels/matrix_mul_optimized.cu. Return signed response with speedup metrics.",
+  "timestamp": "2026-04-25T16:39:31.807Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-25T16:39:31.807Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/outbox/response-task-1777135171807-aec8f337.json",
+    "artifact_type": "response",
+    "delivered_at": "2026-04-25T16:39:31.807Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-25T16:39:31.807Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 3600
+  },
+  "content_hash": "sha256:0e95cb48a7a2c604c432b4a1cc536fa2772c6c6e6aec9ecf7e0935d330025ba7",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVlNzBiNzgxMDViYzYxODkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MGU5NWNiNDhhN2EyYzYwNGM0MzJiNGExY2M1MzZmYTI3NzJjNmM2ZTZhZWM5ZWNmN2UwOTM1ZDMzMDAyNWJhNyIsImV4cCI6MTc3NzIyMTU3MSwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzEzNTE3MSwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6InRhc2stMTc3NzEzNTE3MTgwNy1hZWM4ZjMzNyIsInRvIjoia2VybmVsIn0.m8Ud88Ms2subYHH1yItBVwsfNp1jWobj9uvlyTMpZBjomC8Wt_ibDw5PZJFLnHrJ9S0QrKFVPy_zjV8Urf2j6h9ksLjvwOvxctRD4KTWjfLH6pCtI-6uOwbMxDOVbYk2LlL2ueqnAtStQ3baNSeFY08Q5pvdI796-C4JsmnWI1yD--s_SWGs0iKtpKD1qGHkhmKG4XivCcqpCHdOv_RBnEj6ago0BEalVGxLp27r8tvkl8ZvRxNNSw1T4IIsdMczqiKcIZTbW3QaaN2zr8FPCiodbnI0c4p5Fhouckh8LhPbLxBnZg-efG9Wy02TkVsN1Vm50RGd1EgMIx9N_UO8OA",
+  "signature_alg": "RS256",
+  "key_id": "ee70b78105bc6189",
+  "execution_verified": true,
+  "would_verify": true,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T20:00:19.841Z",
+    "dry_run": false,
+    "route": "processed",
+    "reason": "ACTIONABLE_WITH_PROOF",
+    "detail": null,
+    "schema_valid": true,
+    "signature_valid": true,
+    "english_only": true,
+    "execution_verified": true,
+    "would_verify": true
+  }
+}
