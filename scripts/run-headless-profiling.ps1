@@ -58,7 +58,7 @@ if ($nsysAvailable) {
         '--capture-range=cudaLaunchKernel',
         '--capture-range-end=cudaDeviceSynchronize',
         '--gpu-metrics-device=all',
-        "--duration=${DurationSec}s",
+        '--duration', $DurationSec.ToString(),
         '-o', $nsysOutputBase,
         $Executable
     )
@@ -89,8 +89,7 @@ $ncuOutputBase = Join-Path $OutputDir "kernel_metrics"
 $ncuArgs = @(
     '--target-processes','all',
     '--set','full',
-    '--csv',
-    '--force-overwrite',
+    '--export',"$ncuOutputBase.csv",
     '-o', $ncuOutputBase,
     $Executable
 )
