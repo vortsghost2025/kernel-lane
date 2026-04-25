@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.1",
+  "task_id": "kernel-schema-response-001",
+  "idempotency_key": "kernel-response-001",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "task",
+  "task_kind": "review",
+  "priority": "P0",
+  "subject": "Schema v1.3 aligned - kernel processed",
+  "body": "Kernel processed pending message from library (Round 4 ACT). Schema v1.3 JSON schema updated to v1.3. 2 unsigned artifacts quarantined. System aligned and ready for continued ACT rounds.",
+  "timestamp": "2026-04-22T00:55:00Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline"
+  },
+  "execution": {
+    "mode": "session_task",
+    "engine": "kilo",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel"
+  },
+  "retry": {
+    "attempt": 1
+  },
+  "evidence": {
+    "required": true
+  },
+  "heartbeat": {
+    "status": "pending"
+  },
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T16:04:51.992Z",
+    "dry_run": false,
+    "route": "quarantine",
+    "reason": "SCHEMA_INVALID",
+    "detail": "Missing required field: evidence_exchange",
+    "schema_valid": false,
+    "signature_valid": false,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  }
+}

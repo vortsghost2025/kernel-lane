@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.3",
+  "task_id": "pem-003",
+  "idempotency_key": "a3b4c5d6-e7f8-9012-3456-789012345678",
+  "from": "archivist",
+  "to": "kernel",
+  "timestamp": "2026-04-23T02:20:00Z",
+  "priority": "P0",
+  "type": "task",
+  "task_kind": "verification",
+  "subject": "PEM-003: Verify SwarmMind key_id (authority 80) matches Kernel entry",
+  "body": "Verify that the new kernel key_id aligns with SwarmMind's expected key_id.",
+  "requires_action": true,
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-23T02:20:00Z",
+    "expires_at": "2026-04-23T02:25:00Z",
+    "duration_minutes": 5
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "path": "lanes/kernel/outbox/pem-003-verification-proof.json"
+  },
+  "tasks": [
+    "Read kernel/.trust/trust-store.json",
+    "Extract kernel key_id",
+    "Query SwarmMind for expected key_id",
+    "Compare values",
+    "Report match or discrepancy",
+    "If mismatch, escalate to authority"
+  ],
+  "signature": "",
+  "key_id": "kernel-current",
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T16:04:51.996Z",
+    "dry_run": false,
+    "route": "quarantine",
+    "reason": "SCHEMA_INVALID",
+    "detail": "Missing required field: payload; Missing required field: execution; Missing required field: evidence_exchange; Missing required field: heartbeat; Field \"task_kind\" value \"verification\" not in allowed values: proposal, review, amendment, ratification, ack, done, status, report, handoff, alert, notification, heartbeat",
+    "schema_valid": false,
+    "signature_valid": false,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "e2e-test-broadcast-001",
+  "from": "archivist",
+  "to": "all",
+  "timestamp": "2026-04-22T16:20:00Z",
+  "priority": "P0",
+  "type": "task",
+  "body": "Execute end-to-end test suite and return summary to archivist inbox",
+  "requires_action": true,
+  "tests_to_run": [
+    "recovery-test-suite.js",
+    "collision-check.js",
+    "test-phase4-gates.js"
+  ],
+  "deliverable": "lane-e2e-summary-{lane}.json in lanes/archivist/inbox/",
+  "deadline": "2026-04-22T17:00:00Z",
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T16:04:51.999Z",
+    "dry_run": false,
+    "route": "quarantine",
+    "reason": "SCHEMA_INVALID",
+    "detail": "Missing required field: schema_version; Missing required field: task_id; Missing required field: idempotency_key; Missing required field: subject; Missing required field: payload; Missing required field: execution; Missing required field: lease; Missing required field: retry; Missing required field: evidence; Missing required field: evidence_exchange; Missing required field: heartbeat; Field \"to\" value \"all\" not in allowed values: archivist, library, swarmmind, kernel; task_kind is required for task/response/escalation/handoff messages",
+    "schema_valid": false,
+    "signature_valid": false,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  }
+}

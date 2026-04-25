@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.1",
+  "task_id": "summary-recovery-1776979657-kernel",
+  "idempotency_key": "summary-recovery-1776979657-kernel",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "notification",
+  "task_kind": "summary",
+  "priority": "P1",
+  "subject": "Recovery Summary",
+  "body": "The recovery tool has moved 3 previously mis[?]processed messages back to their respective action[?]required folders. Details:\n- archivist: 2026-04-21T14-01-00Z_archivist_signed-test.json\n- library: 2026-04-21T02-55-00Z-archivist-test-001.json\n- swarmmind: 2026-04-20T22-05-00Z-library-context-upgrade-swarmmind.json\nAll other lanes remain unchanged.\n",
+  "timestamp": "2026-04-23T21:27:36Z",
+  "requires_action": false,
+  "delivery_verification": {
+    "verified": true,
+    "verified_at": null,
+    "retries": 0
+  },
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.401Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint",
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T16:04:52.001Z",
+    "dry_run": false,
+    "route": "quarantine",
+    "reason": "SCHEMA_INVALID",
+    "detail": "Missing required field: payload; Missing required field: execution; Missing required field: lease; Missing required field: retry; Missing required field: evidence; Missing required field: evidence_exchange; Missing required field: heartbeat; Field \"task_kind\" value \"summary\" not in allowed values: proposal, review, amendment, ratification, ack, done, status, report, handoff, alert, notification, heartbeat",
+    "schema_valid": false,
+    "signature_valid": false,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  }
+}
