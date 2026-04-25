@@ -255,12 +255,15 @@
         },
         "artifact_type": {
           "type": "string",
-          "enum": [
-            "benchmark",
-            "profile",
-            "release",
-            "log"
-          ]
+    "enum": [
+      "benchmark",
+      "profile",
+      "release",
+      "log",
+      "response",
+      "report",
+      "artifact"
+    ]
         },
         "delivered_at": {
           "type": "string",
