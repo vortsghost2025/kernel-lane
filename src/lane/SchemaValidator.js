@@ -45,7 +45,7 @@ const ENUM_CONSTRAINTS = {
   'execution.engine': ['kilo', 'opencode', 'other'],
   'execution.actor': ['lane', 'subagent', 'watcher'],
   'heartbeat.status': ['pending', 'in_progress', 'done', 'failed', 'escalated', 'timed_out'],
-  'evidence_exchange.artifact_type': ['benchmark', 'profile', 'release', 'log'],
+  'evidence_exchange.artifact_type': ['benchmark', 'profile', 'release', 'log', 'response', 'report', 'artifact'],
 };
 
 const TYPE_CHECKS = {
