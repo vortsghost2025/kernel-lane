@@ -5,39 +5,75 @@
   "description": "Cross-lane inbox message format. v1.3: idempotency_key relaxed to any non-empty string, task_kind optional for alert/ack/heartbeat. v1.2: signature/key_id REQUIRED, ack+alert in type enum. v1.1: payload.compression, execution.parent_id, watcher block, canonical_paths, delivery_verification.",
   "type": "object",
   "properties": {
-  "schema_version": {
-    "type": "string",
-    "default": "1.3",
-    "enum": ["1.0", "1.1", "1.2", "1.3"]
-  },
+    "schema_version": {
+      "type": "string",
+      "default": "1.3",
+      "enum": [
+        "1.0",
+        "1.1",
+        "1.2",
+        "1.3"
+      ]
+    },
     "task_id": {
       "type": "string"
     },
-  "idempotency_key": {
-    "type": "string",
-    "minLength": 1,
-    "description": "v1.3: Relaxed from hex64 to any non-empty string. Lanes generate descriptive keys."
-  },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "description": "v1.3: Relaxed from hex64 to any non-empty string. Lanes generate descriptive keys."
+    },
     "from": {
       "type": "string",
       "default": "library"
     },
-  "to": {
-    "type": "string",
-    "enum": ["archivist", "library", "swarmmind", "kernel"]
-  },
-  "type": {
-    "type": "string",
-    "enum": ["task", "response", "heartbeat", "escalation", "handoff", "ack", "alert"]
-  },
-  "task_kind": {
-    "type": "string",
-    "enum": ["proposal", "review", "amendment", "ratification", "ack", "alert", "notification", "heartbeat"],
-    "description": "v1.3: Optional for alert/ack/heartbeat types. Required for task/response/escalation/handoff."
-  },
+    "to": {
+      "type": "string",
+      "enum": [
+        "archivist",
+        "library",
+        "swarmmind",
+        "kernel"
+      ]
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "task",
+        "response",
+        "heartbeat",
+        "escalation",
+        "handoff",
+        "ack",
+        "alert"
+      ]
+    },
+    "task_kind": {
+      "type": "string",
+      "enum": [
+        "proposal",
+        "review",
+        "amendment",
+        "ratification",
+        "ack",
+        "done",
+        "status",
+        "report",
+        "handoff",
+        "alert",
+        "notification",
+        "heartbeat"
+      ],
+      "description": "v1.3: Optional for alert/ack/heartbeat types. Required for task/response/escalation/handoff."
+    },
     "priority": {
       "type": "string",
-      "enum": ["P0", "P1", "P2", "P3"]
+      "enum": [
+        "P0",
+        "P1",
+        "P2",
+        "P3"
+      ]
     },
     "subject": {
       "type": "string"
@@ -57,11 +93,18 @@
       "properties": {
         "mode": {
           "type": "string",
-          "enum": ["inline", "path", "chunked"]
+          "enum": [
+            "inline",
+            "path",
+            "chunked"
+          ]
         },
         "compression": {
           "type": "string",
-          "enum": ["none", "gzip"],
+          "enum": [
+            "none",
+            "gzip"
+          ],
           "default": "none",
           "description": "v1.1: Compression for large payloads. gzip recommended for body > 2000 chars."
         },
@@ -71,44 +114,75 @@
         "chunk": {
           "type": "object",
           "properties": {
-            "index": {"type": "integer"},
-            "count": {"type": "integer"},
-            "group_id": {"type": "string"}
+            "index": {
+              "type": "integer"
+            },
+            "count": {
+              "type": "integer"
+            },
+            "group_id": {
+              "type": "string"
+            }
           },
-          "required": ["index", "count"]
+          "required": [
+            "index",
+            "count"
+          ]
         }
       },
-      "required": ["mode"]
+      "required": [
+        "mode"
+      ]
     },
     "execution": {
       "type": "object",
       "properties": {
         "mode": {
           "type": "string",
-          "enum": ["manual", "session_task", "watcher"]
+          "enum": [
+            "manual",
+            "session_task",
+            "watcher"
+          ]
         },
         "engine": {
           "type": "string",
-          "enum": ["kilo", "opencode", "other"]
+          "enum": [
+            "kilo",
+            "opencode",
+            "other"
+          ]
         },
         "actor": {
           "type": "string",
-          "enum": ["lane", "subagent", "watcher"],
+          "enum": [
+            "lane",
+            "subagent",
+            "watcher"
+          ],
           "description": "v1.1: 'watcher' added for watcher-initiated processing provenance."
         },
-        "session_id": {"type": "string"},
+        "session_id": {
+          "type": "string"
+        },
         "parent_id": {
           "type": "string",
           "default": null,
           "description": "v1.1: Links to parent task for fan-out/fan-in patterns. Null if this is a root task."
         }
       },
-      "required": ["mode", "engine", "actor"]
+      "required": [
+        "mode",
+        "engine",
+        "actor"
+      ]
     },
     "lease": {
       "type": "object",
       "properties": {
-        "owner": {"type": "string"},
+        "owner": {
+          "type": "string"
+        },
         "acquired_at": {
           "type": "string",
           "format": "date-time"
@@ -130,9 +204,17 @@
     "retry": {
       "type": "object",
       "properties": {
-        "attempt": {"type": "integer", "default": 1},
-        "max_attempts": {"type": "integer", "default": 3},
-        "last_error": {"type": "string"},
+        "attempt": {
+          "type": "integer",
+          "default": 1
+        },
+        "max_attempts": {
+          "type": "integer",
+          "default": 3
+        },
+        "last_error": {
+          "type": "string"
+        },
         "last_attempt_at": {
           "type": "string",
           "format": "date-time"
@@ -146,36 +228,74 @@
           "type": "boolean",
           "default": true
         },
-        "evidence_path": {"type": "string"},
-        "verified": {"type": "boolean", "default": false},
-        "verified_by": {"type": "string"},
-        "verified_at": {"type": "string",
-          "format": "date-time"}
+        "evidence_path": {
+          "type": "string"
+        },
+        "verified": {
+          "type": "boolean",
+          "default": false
+        },
+        "verified_by": {
+          "type": "string"
+        },
+        "verified_at": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
     },
     "evidence_exchange": {
       "type": "object",
       "description": "v1.3: Convergence evidence exchange block. Required when evidence.required is true for response/ack types.",
       "properties": {
-        "artifact_path": {"type": "string"},
+        "artifact_path": {
+          "type": "string"
+        },
         "artifact_type": {
           "type": "string",
-          "enum": ["benchmark", "profile", "release", "log"]
+          "enum": [
+            "benchmark",
+            "profile",
+            "release",
+            "log"
+          ]
         },
-        "delivered_at": {"type": "string", "format": "date-time"}
+        "delivered_at": {
+          "type": "string",
+          "format": "date-time"
+        }
       },
-      "required": ["artifact_path", "artifact_type", "delivered_at"]
+      "required": [
+        "artifact_path",
+        "artifact_type",
+        "delivered_at"
+      ]
     },
     "heartbeat": {
       "type": "object",
       "properties": {
-        "interval_seconds": {"type": "integer", "default": 300},
-        "last_heartbeat_at": {"type": "string",
-          "format": "date-time"},
-        "timeout_seconds": {"type": "integer", "default": 900},
+        "interval_seconds": {
+          "type": "integer",
+          "default": 300
+        },
+        "last_heartbeat_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "default": 900
+        },
         "status": {
           "type": "string",
-          "enum": ["pending", "in_progress", "done", "failed", "escalated", "timed_out"]
+          "enum": [
+            "pending",
+            "in_progress",
+            "done",
+            "failed",
+            "escalated",
+            "timed_out"
+          ]
         }
       }
     },
@@ -183,18 +303,45 @@
       "type": "object",
       "description": "v1.1: Watcher policy block for inbox consumer configuration.",
       "properties": {
-        "enabled": {"type": "boolean", "default": false},
-        "poll_seconds": {"type": "integer", "default": 60},
-        "p0_fast_path": {"type": "boolean", "default": true},
-        "max_concurrent": {"type": "integer", "default": 1},
-        "heartbeat_required": {"type": "boolean", "default": true},
-        "stale_after_seconds": {"type": "integer", "default": 300},
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "poll_seconds": {
+          "type": "integer",
+          "default": 60
+        },
+        "p0_fast_path": {
+          "type": "boolean",
+          "default": true
+        },
+        "max_concurrent": {
+          "type": "integer",
+          "default": 1
+        },
+        "heartbeat_required": {
+          "type": "boolean",
+          "default": true
+        },
+        "stale_after_seconds": {
+          "type": "integer",
+          "default": 300
+        },
         "backoff": {
           "type": "object",
           "properties": {
-            "initial_seconds": {"type": "integer", "default": 60},
-            "max_seconds": {"type": "integer", "default": 300},
-            "multiplier": {"type": "integer", "default": 2}
+            "initial_seconds": {
+              "type": "integer",
+              "default": 60
+            },
+            "max_seconds": {
+              "type": "integer",
+              "default": 300
+            },
+            "multiplier": {
+              "type": "integer",
+              "default": 2
+            }
           }
         }
       }
@@ -203,19 +350,40 @@
       "type": "object",
       "description": "v1.1: Canonical delivery paths. Senders MUST write to the target lane's canonical path, NOT their own local mirror.",
       "properties": {
-        "archivist": {"type": "string", "default": "S:/Archivist-Agent/lanes/archivist/inbox/"},
-        "library": {"type": "string", "default": "S:/self-organizing-library/lanes/library/inbox/"},
-        "swarmmind": {"type": "string", "default": "S:/SwarmMind/lanes/swarmmind/inbox/"},
-        "kernel": {"type": "string", "default": "S:/kernel-lane/lanes/kernel/inbox/"}
+        "archivist": {
+          "type": "string",
+          "default": "S:/Archivist-Agent/lanes/archivist/inbox/"
+        },
+        "library": {
+          "type": "string",
+          "default": "S:/self-organizing-library/lanes/library/inbox/"
+        },
+        "swarmmind": {
+          "type": "string",
+          "default": "S:/SwarmMind/lanes/swarmmind/inbox/"
+        },
+        "kernel": {
+          "type": "string",
+          "default": "S:/kernel-lane/lanes/kernel/inbox/"
+        }
       }
     },
     "delivery_verification": {
       "type": "object",
       "description": "v1.1: Post-write delivery verification. Sender SHOULD verify file exists at canonical path after writing.",
       "properties": {
-        "verified": {"type": "boolean", "default": false},
-        "verified_at": {"type": "string", "format": "date-time"},
-        "retries": {"type": "integer", "default": 0}
+        "verified": {
+          "type": "boolean",
+          "default": false
+        },
+        "verified_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "retries": {
+          "type": "integer",
+          "default": 0
+        }
       }
     },
     "signature": {
@@ -227,7 +395,9 @@
     "signature_alg": {
       "type": "string",
       "description": "v1.2: Signature algorithm. Must be RS256.",
-      "enum": ["RS256"],
+      "enum": [
+        "RS256"
+      ],
       "default": "RS256"
     },
     "key_id": {
@@ -239,16 +409,45 @@
     }
   },
   "required": [
-    "schema_version", "task_id", "idempotency_key", "from", "to",
-    "type", "priority", "subject", "body",
-    "timestamp", "requires_action", "payload", "execution",
-    "lease", "retry", "evidence", "heartbeat",
-    "signature", "key_id"
+    "schema_version",
+    "task_id",
+    "idempotency_key",
+    "from",
+    "to",
+    "type",
+    "priority",
+    "subject",
+    "body",
+    "timestamp",
+    "requires_action",
+    "payload",
+    "execution",
+    "lease",
+    "retry",
+    "evidence",
+    "heartbeat",
+    "signature",
+    "key_id"
   ],
   "allOf": [
     {
-      "if": { "properties": { "type": { "enum": ["task", "response", "escalation", "handoff"] } } },
-      "then": { "required": ["task_kind"] }
+      "if": {
+        "properties": {
+          "type": {
+            "enum": [
+              "task",
+              "response",
+              "escalation",
+              "handoff"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "task_kind"
+        ]
+      }
     }
   ]
 }
