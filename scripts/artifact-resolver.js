@@ -66,14 +66,16 @@ class ArtifactResolver {
     if (path.isAbsolute(artifactPath)) return artifactPath;
     if (this.hasPathTraversal(artifactPath)) return null;
 
+    const candidates = [];
     for (const root of this.allowedRoots) {
       const candidate = path.join(root, artifactPath);
       const normalized = normalizePath(candidate);
       if (normalized.startsWith(root.toLowerCase())) {
-        return candidate;
+        if (fs.existsSync(candidate)) return candidate;
+        candidates.push(candidate);
       }
     }
-    return null;
+    return candidates.length > 0 ? candidates[0] : null;
   }
 
   resolveExists(artifactPath) {

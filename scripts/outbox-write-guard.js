@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { moveFileWithLease } = require('./lease-write');
 
 const LANE_DIRS = {
   archivist: 'S:/Archivist-Agent',
@@ -24,6 +25,17 @@ function validateOutboxMessage(msg) {
   }
   if (!msg.id) {
     errors.push('MISSING_ID');
+  }
+  const lease = msg.lease;
+  if (!lease || typeof lease !== 'object') {
+    errors.push('MISSING_LEASE');
+  } else {
+    if (!lease.owner || typeof lease.owner !== 'string') {
+      errors.push('MISSING_LEASE_OWNER');
+    }
+    if (!lease.acquired_at || Number.isNaN(Date.parse(lease.acquired_at))) {
+      errors.push('MISSING_LEASE_ACQUIRED_AT');
+    }
   }
   return { valid: errors.length === 0, errors };
 }
@@ -96,7 +108,7 @@ function guardWrite(msg, outboxPath, filename) {
   return true;
 }
 
-function remediateUnsigned(laneId) {
+async function remediateUnsigned(laneId) {
   const baseDir = LANE_DIRS[laneId];
   if (!baseDir) throw new Error(`Unknown lane: ${laneId}`);
 
@@ -117,13 +129,13 @@ function remediateUnsigned(laneId) {
       if (!check.valid) {
         if (!fs.existsSync(unsignedPath)) fs.mkdirSync(unsignedPath, { recursive: true });
         const dest = path.join(unsignedPath, file);
-        fs.renameSync(filePath, dest);
+        await moveFileWithLease(filePath, dest, laneId, 30000);
         moved.push({ file, errors: check.errors, id: msg.id || null });
       }
     } catch (err) {
       if (!fs.existsSync(unsignedPath)) fs.mkdirSync(unsignedPath, { recursive: true });
       const dest = path.join(unsignedPath, file);
-      try { fs.renameSync(filePath, dest); } catch (_) {}
+      try { await moveFileWithLease(filePath, dest, laneId, 30000); } catch (_) {}
       moved.push({ file, errors: ['PARSE_ERROR'], id: null });
     }
   }
@@ -134,6 +146,7 @@ function remediateUnsigned(laneId) {
 module.exports = { validateOutboxMessage, scanOutbox, scanAllLanes, guardWrite, remediateUnsigned };
 
 if (require.main === module) {
+  (async () => {
   const args = process.argv.slice(2);
   const command = args[0] || 'scan';
 
@@ -163,7 +176,7 @@ if (require.main === module) {
       console.error('Usage: node outbox-write-guard.js quarantine <lane>');
       process.exit(1);
     }
-    const result = remediateUnsigned(lane);
+    const result = await remediateUnsigned(lane);
     console.log(`Quarantined ${result.moved} unsigned messages from ${lane} outbox`);
     if (result.files.length > 0) {
       for (const f of result.files) {
@@ -189,4 +202,8 @@ if (require.main === module) {
     console.error('Commands: scan [lane], quarantine <lane>, guard <message.json>');
     process.exit(1);
   }
+  })().catch((err) => {
+    console.error(`FAIL: ${err.message}`);
+    process.exit(1);
+  });
 }
