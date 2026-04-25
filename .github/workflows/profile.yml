@@ -1,0 +1,38 @@
+name: CUDA Headless Profiling
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  profile:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install CUDA Toolkit
+        uses: NVIDIA/cuda-toolkit-action@v2
+        with:
+          cuda: '13.2'
+
+      - name: Install Nsight Systems & Compute
+        run: choco install -y nsight-systems nsight-compute
+        shell: pwsh
+
+      - name: Build
+        run: .\scripts\build-kernels.ps1 -Configuration Release
+        shell: pwsh
+
+      - name: Run headless profiling
+        run: .\scripts\run-headless-profiling.ps1 -DurationSec 60
+        shell: pwsh
+
+      - name: Upload profiling data
+        uses: actions/upload-artifact@v3
+        with:
+          name: profiling-data
+          path: profiles/headless/
+
+      - name: Check regression
+        run: .\scripts\check-profiling-regression.ps1
+        shell: pwsh
