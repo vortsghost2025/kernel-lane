@@ -310,13 +310,16 @@ class LaneWorker {
     if (!signatureResult.valid) {
       return { queue: 'blocked', reason: 'SIGNATURE_INVALID', detail: signatureResult.reason || 'Signature validation failed' };
     }
-    if (!isEnglishOnly(msg)) {
-      return { queue: 'quarantine', reason: 'FORMAT_VIOLATION_NON_ASCII', detail: 'Message contains non-ASCII content. Re-request in English per governance constraint.' };
-    }
+  if (!isEnglishOnly(msg)) {
+    return { queue: 'quarantine', reason: 'FORMAT_VIOLATION_NON_ASCII', detail: 'Message contains non-ASCII content. Re-request in English per governance constraint.' };
+  }
 
-    if (cp.hasUnresolvableEvidence(msg)) {
-      return { queue: 'blocked', reason: 'EVIDENCE_REQUIRED_NO_ARTIFACT', detail: 'evidence.required=true but no evidence_exchange.artifact_path provided' };
-    }
+  // NFM-022 fix: skip hasUnresolvableEvidence for actionable tasks
+  // A new task (requires_action=true) hasn't been executed yet, so
+  // evidence.required=true with no artifact is expected, not a violation.
+  if (!isActionable(msg) && cp.hasUnresolvableEvidence(msg)) {
+    return { queue: 'blocked', reason: 'EVIDENCE_REQUIRED_NO_ARTIFACT', detail: 'evidence.required=true but no evidence_exchange.artifact_path provided' };
+  }
 
     if (cp.hasFakeProof(msg)) {
       return { queue: 'blocked', reason: 'FAKE_COMPLETION_PROOF', detail: 'terminal_decision/disposition present without evidence_exchange or legacy artifact' };
