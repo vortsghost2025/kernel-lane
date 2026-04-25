@@ -271,13 +271,25 @@ class LaneWorker {
       return { queue: 'blocked', reason: gate.reason, detail: gate.detail };
     }
 
-    // Artifact resolution check: only for processed/ admission
-    if (gate.pass && isActionable(msg) && cp.hasCompletionProof(msg)) {
-      const executionResult = this.executionGate.verify(msg);
-      if (!executionResult.execution_verified) {
-        return {
-          queue: 'blocked',
-          reason: 'EXECUTION_NOT_VERIFIED',
+  // Artifact resolution check: only for processed/ admission
+  // Actionable messages with artifact_path should go to actionRequired, not blocked
+  // (the artifact won't exist until the lane completes the task)
+  if (gate.pass && isActionable(msg) && cp.hasCompletionProof(msg)) {
+    const executionResult = this.executionGate.verify(msg);
+    if (!executionResult.execution_verified) {
+      if (shouldAutoStart(msg)) {
+        return { queue: 'inProgress', reason: 'ACTIONABLE_ARTIFACT_PENDING', detail: gate.detail, execution_would_verify: executionResult.would_verify === true };
+      }
+      return { queue: 'actionRequired', reason: 'ACTIONABLE_ARTIFACT_PENDING', detail: gate.detail, execution_would_verify: executionResult.would_verify === true };
+    }
+  }
+  // Non-actionable messages claiming completion without verifiable artifact = blocked
+  if (gate.pass && !isActionable(msg) && cp.hasCompletionProof(msg)) {
+    const executionResult = this.executionGate.verify(msg);
+    if (!executionResult.execution_verified) {
+      return {
+        queue: 'blocked',
+        reason: 'EXECUTION_NOT_VERIFIED',
           detail: `Execution verification failed: type=${executionResult.verification_type} reason=${executionResult.reason} artifact_path=${executionResult.artifact_path || 'null'}`,
           execution_verified: false,
           execution_would_verify: executionResult.would_verify === true,
