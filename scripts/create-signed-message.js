@@ -5,7 +5,12 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const { deriveKeyId } = require(path.join(__dirname, '..', 'src', 'attestation', 'deriveKeyId.js'));
+const { deriveKeyId } = require(path.join(__dirname, '..', '.global', 'deriveKeyId.js'));
+
+// LEASE + ATOMIC WRITE: Require kernel primitives for cross-lane mutation safety
+const KERNEL_ROOT = 'S:/kernel-lane';
+const { atomicWriteWithLease } = require(path.join(KERNEL_ROOT, 'scripts', 'atomic-write-util'));
+const { guardWrite } = require(path.join(__dirname, 'outbox-write-guard'));
 
 const PASSFILE = 'S:/Archivist-Agent/.runtime/lane-passphrases.json';
 
@@ -57,16 +62,18 @@ function createSignedMessage(msg, laneId) {
   }
 
   const passphrase = findPassphrase(laneId);
-  if (!passphrase) throw new Error(`PASSPHRASE_MISSING for lane ${laneId}`);
-
   const publicPem = fs.readFileSync(pubPath, 'utf8');
   const privatePem = fs.readFileSync(privPath, 'utf8');
 
   let privateKey;
   try {
-    privateKey = crypto.createPrivateKey({ key: privatePem, format: 'pem', passphrase });
+    if (passphrase) {
+      privateKey = crypto.createPrivateKey({ key: privatePem, format: 'pem', passphrase });
+    } else {
+      privateKey = crypto.createPrivateKey({ key: privatePem, format: 'pem' });
+    }
   } catch (e) {
-    throw new Error(`PRIVATE_KEY_DECRYPT_FAILED for ${laneId}: ${e.message}`);
+    throw new Error(`PRIVATE_KEY_LOAD_FAILED for ${laneId}: ${e.message}`);
   }
 
   const keyId = deriveKeyId(publicPem);
@@ -104,20 +111,34 @@ function createSignedMessage(msg, laneId) {
   };
 }
 
-function writeSignedMessage(msg, laneId, outboxPath) {
+async function writeSignedMessage(msg, laneId, outboxPath) {
   const signed = createSignedMessage(msg, laneId);
   if (!fs.existsSync(outboxPath)) {
     fs.mkdirSync(outboxPath, { recursive: true });
   }
   const filename = `${msg.id || 'msg-' + Date.now()}.json`;
   const filePath = path.join(outboxPath, filename);
-  fs.writeFileSync(filePath, JSON.stringify(signed, null, 2) + '\n', 'utf8');
+  // Governance invariant: every outbound write must carry explicit lease metadata.
+  if (!signed.lease || typeof signed.lease !== 'object') {
+    const now = Date.now();
+    signed.lease = {
+      owner: laneId,
+      acquired_at: new Date(now).toISOString(),
+      expires_at: new Date(now + 30000).toISOString(),
+      renewal_count: 0,
+      max_renewals: 3
+    };
+  }
+  guardWrite(signed, outboxPath, filename);
+  // Atomic write with mandatory lease
+  await atomicWriteWithLease(filePath, signed, laneId, 30000);
   return { filePath, keyId: signed.key_id, filename };
 }
 
 module.exports = { createSignedMessage, writeSignedMessage, findPassphrase, stableStringify };
 
 if (require.main === module) {
+  (async () => {
   const args = process.argv.slice(2);
   if (args.length < 2) {
     console.error('Usage: node create-signed-message.js <message.json> <lane> [outbox-dir]');
@@ -133,7 +154,11 @@ if (require.main === module) {
   console.log(JSON.stringify(signed, null, 2));
 
   if (outboxDir) {
-    const result = writeSignedMessage(msg, lane, outboxDir);
+    const result = await writeSignedMessage(msg, lane, outboxDir);
     console.error(`[signed] Written: ${result.filePath} key_id=${result.keyId}`);
   }
+  })().catch((err) => {
+    console.error(`[signed] ERROR: ${err.message}`);
+    process.exit(1);
+  });
 }
