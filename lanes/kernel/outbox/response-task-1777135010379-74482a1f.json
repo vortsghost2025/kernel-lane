@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.3",
+  "task_id": "response-task-1777135010379-74482a1f",
+  "idempotency_key": "response-task-1777135010379-74482a1f",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "status",
+  "priority": "P2",
+  "subject": "Re: Profile vector_add kernel with Nsight Compute",
+  "body": "Kernel profiling metrics are available in kernel metrics artifacts and recorded for handoff. Occupancy and throughput details are captured in headless profiling CSV outputs.",
+  "timestamp": "2026-04-25T20:00:04.455Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-25T20:00:04.455Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "profiles/headless/kernel_metrics.csv",
+    "verified": true,
+    "verified_by": "self",
+    "verified_at": "2026-04-25T20:00:04.455Z"
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/outbox/response-task-1777135010379-74482a1f.json",
+    "artifact_type": "response",
+    "delivered_at": "2026-04-25T20:00:04.455Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-25T20:00:04.455Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 3600
+  },
+  "convergence_gate": {
+    "claim": "Kernel profiling metrics are available in kernel metrics artifacts and recorded for handoff",
+    "evidence": "profiles/headless/kernel_metrics.csv",
+    "verified_by": "self",
+    "contradictions": [],
+    "status": "proven"
+  },
+  "_original_task_id": "task-1777135010379-74482a1f",
+  "content_hash": "sha256:17918f50dcc0e5f9d5e804cba046d2df8c32c401e5b9936a60d25a1162af6b4e",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImI2NzdlYjg3ZjZiZTgzZjkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MTc5MThmNTBkY2MwZTVmOWQ1ZTgwNGNiYTA0NmQyZGY4YzMyYzQwMWU1Yjk5MzZhNjBkMjVhMTE2MmFmNmI0ZSIsImV4cCI6MTc3NzIzMzYwNCwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3NzE0NzIwNCwiaWQiOm51bGwsImxhbmUiOiJrZXJuZWwiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6InJlc3BvbnNlLXRhc2stMTc3NzEzNTAxMDM3OS03NDQ4MmExZiIsInRvIjoiYXJjaGl2aXN0In0.VpEni8Hzsg7F00x14RCUpDlicDDE2kSIsx96YqTzgc5F4HcaV-4LSIf7z6H5HO3rTYgl7rqDoxJRwbLIsRBYjdgKI_0tL9PvyD1tKy1bg1KgZ2ydM-B3NoOdaNTB6fcEYCNUU2oX8Pb3kWsZ20swVdnUSbks9j8dXh59Kjgngw79y_8ZNFoS3X7a0MkZr5-eSNsU5wL2m9IZMAQ0NOIdf8Ymnh-vN2fsCXKnORw_zDbSmORnXe-UlvWzZDdPcXRrwYjF1dvYTMHN2x7_s6KoBp9HLU9jDpCjkk4zWI6AFVx9oqK4FA17wPg9I1yCGTpKdChkHGydD1tDq05Pf9UaWQ",
+  "signature_alg": "RS256",
+  "key_id": "b677eb87f6be83f9"
+}

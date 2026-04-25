@@ -1,0 +1,1 @@
+cmd /c ""C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 && ""C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\bin\nvcc.exe" -arch=sm_89 -O3 -o ""S:/kernel-lane/kernels/src/matrix_tensor_optimized.exe" ""S:/kernel-lane/kernels/src/matrix_tensor_optimized.cu"""

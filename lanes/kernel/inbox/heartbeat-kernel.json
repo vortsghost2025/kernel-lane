@@ -9,7 +9,7 @@
   "priority": "P3",
   "subject": "Heartbeat: kernel alive",
   "body": "Lane kernel heartbeat. Uptime: 0s. Messages processed: 0.",
-  "timestamp": "2026-04-25T16:28:01.602Z",
+  "timestamp": "2026-04-25T20:01:01.797Z",
   "requires_action": false,
   "payload": {
     "mode": "inline",
@@ -26,8 +26,8 @@
   },
   "lease": {
     "owner": "kernel",
-    "acquired_at": "2026-04-25T16:28:01.602Z",
-    "expires_at": "2026-04-25T16:43:01.602Z",
+    "acquired_at": "2026-04-25T20:01:01.797Z",
+    "expires_at": "2026-04-25T20:16:01.797Z",
     "renew_count": 0,
     "max_renewals": 3
   },
@@ -42,11 +42,11 @@
     "evidence_path": null,
     "verified": true,
     "verified_by": "self",
-    "verified_at": "2026-04-25T16:28:01.602Z"
+    "verified_at": "2026-04-25T20:01:01.797Z"
   },
   "heartbeat": {
     "interval_seconds": 60,
-    "last_heartbeat_at": "2026-04-25T16:28:01.602Z",
+    "last_heartbeat_at": "2026-04-25T20:01:01.797Z",
     "timeout_seconds": 900,
     "status": "in_progress"
   },
@@ -54,11 +54,11 @@
   "session_active": true,
   "uptime_seconds": 0,
   "messages_processed": 0,
-  "last_inbox_scan": "2026-04-25T16:28:01.602Z",
+  "last_inbox_scan": "2026-04-25T20:01:01.797Z",
   "version": "1.0",
   "system_state": "consistent",
   "active_contradictions": [],
-  "processed_ok": true,
+  "processed_ok": false,
   "compaction_enabled": false,
   "compaction_suspend_reason": null
 }

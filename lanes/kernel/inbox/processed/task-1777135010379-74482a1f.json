@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.3",
+  "task_id": "task-1777135010379-74482a1f",
+  "idempotency_key": "1072bfe749b40c6642572e7d4f8619005e6998899e759cdaf050ac8cacc77e84",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "status",
+  "priority": "P2",
+  "subject": "Profile vector_add kernel with Nsight Compute",
+  "body": "Run ncu --set full on the vector_add kernel. Capture: 1) occupancy, 2) memory throughput, 3) warp execution efficiency. Write results to profiles/headless/vector_add_metrics.csv. Return signed response with key findings.",
+  "timestamp": "2026-04-25T16:36:50.380Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-25T16:36:50.380Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/outbox/response-task-1777135010379-74482a1f.json",
+    "artifact_type": "response",
+    "delivered_at": "2026-04-25T16:36:50.380Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-25T16:36:50.380Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 3600
+  },
+  "content_hash": "sha256:ae9ef6bf4edc91347cd467f0b7ca004a4c0b875fc0fa48f6e2a7a407882aa1cc",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVlNzBiNzgxMDViYzYxODkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6YWU5ZWY2YmY0ZWRjOTEzNDdjZDQ2N2YwYjdjYTAwNGE0YzBiODc1ZmMwZmE0OGY2ZTJhN2E0MDc4ODJhYTFjYyIsImV4cCI6MTc3NzIyMTQxMCwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzEzNTAxMCwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6InRhc2stMTc3NzEzNTAxMDM3OS03NDQ4MmExZiIsInRvIjoia2VybmVsIn0.jyGF_e3Z_ZeYuqgASmiaSn-2ObUMygbzQ0NKymLBYlmuSOp4CHo_qmf7__cuxFXTR_29sfEv3mknc_D_z7GmEx8swssnBnWCftkVC-MmlB7g_B7x1c4rV0UPpXrVLW-p-Xjn3y7-W9l5-UhsKyas3aqx4_ykijsOk8gfF2xo5HTWudrT7feMstZfU_6lJe7q_cy2HTB9bXAOZJTXHbI9V9PXHTOqKDjYmYMR8uMhw-Md4fUp8n8AI55w8yQetlakj_PBz3g1YvtsWIYKVRrGSwclIsTcj5p_LeYAps6huaB0mAu_0LFTB8G-DyGQ6fxuDrsl_EA2crKw-bw_O4NahQ",
+  "signature_alg": "RS256",
+  "key_id": "ee70b78105bc6189",
+  "execution_verified": true,
+  "would_verify": true,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T20:00:19.840Z",
+    "dry_run": false,
+    "route": "processed",
+    "reason": "ACTIONABLE_WITH_PROOF",
+    "detail": null,
+    "schema_valid": true,
+    "signature_valid": true,
+    "english_only": true,
+    "execution_verified": true,
+    "would_verify": true
+  }
+}
