@@ -269,17 +269,35 @@ class LaneWorker {
   }
 
   listInboxFiles() {
-    const entries = fs.readdirSync(this.config.queues.inbox, { withFileTypes: true });
     const files = [];
-    for (const ent of entries) {
-      if (!ent.isFile()) continue;
-      const name = ent.name;
-      const lower = name.toLowerCase();
-      if (!lower.endsWith('.json')) continue;
-      if (SKIP_FILENAMES.has(lower)) continue;
-      if (HEARTBEAT_PATTERN.test(lower)) continue;
-      files.push(path.join(this.config.queues.inbox, name));
+    const inboxDir = this.config.queues.inbox;
+
+    // Scan inbox root
+    if (fs.existsSync(inboxDir)) {
+      const entries = fs.readdirSync(inboxDir, { withFileTypes: true });
+      for (const ent of entries) {
+        if (!ent.isFile()) continue;
+        const lower = ent.name.toLowerCase();
+        if (!lower.endsWith('.json')) continue;
+        if (SKIP_FILENAMES.has(lower)) continue;
+        if (HEARTBEAT_PATTERN.test(lower)) continue;
+        files.push(path.join(inboxDir, ent.name));
+      }
     }
+
+    // Scan action-required subfolder (tasks awaiting agent execution)
+    const arDir = this.config.queues.actionRequired;
+    if (fs.existsSync(arDir)) {
+      const entries = fs.readdirSync(arDir, { withFileTypes: true });
+      for (const ent of entries) {
+        if (!ent.isFile()) continue;
+        const lower = ent.name.toLowerCase();
+        if (!lower.endsWith('.json')) continue;
+        if (SKIP_FILENAMES.has(lower)) continue;
+        files.push(path.join(arDir, ent.name));
+      }
+    }
+
     return files.slice(0, this.maxFiles);
   }
 
