@@ -26,7 +26,7 @@ $cur  = Get-Mean $CurrentCsv  "Kernel Duration (ns)"
 $diff = (($cur - $base) / $base) * 100
 
 if ([math]::Abs($diff) -gt $ThresholdPct) {
-    Write-Error "❌ Regression: $([math]::Round($diff,2))% exceeds threshold $ThresholdPct%"
+    Write-Error ("REGRESSION: {0}% exceeds threshold {1}%" -f [math]::Round($diff,2), $ThresholdPct)
     exit 1
 }
-Write-Host "✅ No regression (Δ = $([math]::Round($diff,2))%)"
+Write-Host ("No regression (delta = {0}%)" -f [math]::Round($diff,2))
