@@ -363,7 +363,7 @@ class LaneWorker {
       }
     }
 
-    return { queue: 'processed', reason: gate.reason, detail: gate.detail, execution_verified: true, execution_would_verify: true };
+    return { queue: 'processed', reason: gate.reason, detail: gate.detail, execution_verified: cp.hasCompletionProof(msg), execution_would_verify: cp.hasCompletionProof(msg) };
   }
 
   _writeWithMetadata(targetPath, msg, decision, schemaResult, signatureResult) {
@@ -565,3 +565,4 @@ module.exports = {
   hasFakeProof: cp.hasFakeProof,
   hasUnresolvableEvidence: cp.hasUnresolvableEvidence,
 };
+

@@ -12,7 +12,10 @@ const KERNEL_ROOT = 'S:/kernel-lane';
 const { atomicWriteWithLease } = require(path.join(KERNEL_ROOT, 'scripts', 'atomic-write-util'));
 const { guardWrite } = require(path.join(__dirname, 'outbox-write-guard'));
 
-const PASSFILE = 'S:/Archivist-Agent/.runtime/lane-passphrases.json';
+const PASSFILE_CANDIDATES = [
+  path.join(__dirname, '..', '.runtime', 'lane-passphrases.json'),
+  'S:/Archivist-Agent/.runtime/lane-passphrases.json'
+];
 
 const LANE_IDENTITY_DIRS = {
   archivist: 'S:/Archivist-Agent/.identity',
@@ -38,15 +41,16 @@ function findPassphrase(laneId) {
   if (process.env.LANE_KEY_PASSPHRASE) return process.env.LANE_KEY_PASSPHRASE;
   const envKey = `LANE_KEY_PASSPHRASE_${laneId.toUpperCase()}`;
   if (process.env[envKey]) return process.env[envKey];
-  try {
-    if (fs.existsSync(PASSFILE)) {
-      const parsed = JSON.parse(fs.readFileSync(PASSFILE, 'utf8'));
+    for (const passfile of PASSFILE_CANDIDATES) {
+    try {
+      if (!fs.existsSync(passfile)) continue;
+      const parsed = JSON.parse(fs.readFileSync(passfile, 'utf8'));
       if (parsed && parsed[laneId]) {
         const val = parsed[laneId];
         return typeof val === 'object' && val.passphrase ? val.passphrase : val;
       }
-    }
-  } catch (_) {}
+    } catch (_) {}
+  }
   return null;
 }
 
@@ -162,3 +166,6 @@ if (require.main === module) {
     process.exit(1);
   });
 }
+
+
+

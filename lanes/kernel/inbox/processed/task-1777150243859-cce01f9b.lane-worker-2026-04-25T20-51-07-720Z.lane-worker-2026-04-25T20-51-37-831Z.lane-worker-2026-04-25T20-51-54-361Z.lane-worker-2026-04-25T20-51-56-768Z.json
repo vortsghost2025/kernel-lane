@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.3",
+  "task_id": "task-1777150243859-cce01f9b",
+  "idempotency_key": "2e8d9d8952e48fb010c817ac46aba526f40c3b947c8a5206feaf080bec6dd012",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "ack",
+  "priority": "P3",
+  "subject": "Pipeline test: auto-execute",
+  "body": "This task tests the full automated pipeline: dispatch -> lane-worker -> task-executor -> relay-daemon -> response",
+  "timestamp": "2026-04-25T20:50:43.859Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-25T20:50:43.859Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/outbox/response-task-1777150243859-cce01f9b.json",
+    "artifact_type": "response",
+    "delivered_at": "2026-04-25T20:50:43.859Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-25T20:50:43.859Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 3600
+  },
+  "content_hash": "sha256:10a5aa4f4610c3ed1ddafd2ca45cd53ecec86010219cdabe8f1b09a10e1adbff",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVlNzBiNzgxMDViYzYxODkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MTBhNWFhNGY0NjEwYzNlZDFkZGFmZDJjYTQ1Y2Q1M2VjZWM4NjAxMDIxOWNkYWJlOGYxYjA5YTEwZTFhZGJmZiIsImV4cCI6MTc3NzIzNjY0MywiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzE1MDI0MywiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAzIiwidGFza19pZCI6InRhc2stMTc3NzE1MDI0Mzg1OS1jY2UwMWY5YiIsInRvIjoia2VybmVsIn0.YWWDzwlpkNMjuMcADld7D8wgAsQHhNBjj0GuP87Y-P3lkXsx_ilCcZw3vADJa80xomO0PDJqQrPKJWAN5a8RttEYSxh7qhnb4InI0Brr869TSMQUPlnzLrFZzd-MWdE3feOS72OaMZWl7gl4cpo8pa9OdtfvXNzn_cSKgkM22GYn1ilmuc9tY2yHhL2ptq-yhOG8tZ8y55f860ReVOPWqe83gNovBdycIwuMG5yECBQKNAQHnVDOvwAU7Na8oE4o5YoFdCXhLEIEd2MOH82TdWWZtinPIhXylHhPpqeg0yc1kTHBkUBCVoI68FR6un-N3JengBXHH9sKVT86JiDdNg",
+  "signature_alg": "RS256",
+  "key_id": "ee70b78105bc6189",
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T20:51:56.768Z",
+    "dry_run": false,
+    "route": "actionRequired",
+    "reason": "ACTIONABLE_ARTIFACT_PENDING",
+    "detail": null,
+    "schema_valid": true,
+    "signature_valid": true,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  }
+}

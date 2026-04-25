@@ -1,0 +1,36 @@
+{
+  "id": "e2e-summary-request-001",
+  "from": "archivist",
+  "to": "all",
+  "timestamp": "2026-04-22T16:25:00Z",
+  "priority": "P0",
+  "type": "task",
+  "body": "Deliver lane E2E summary to archivist inbox",
+  "requires_action": true,
+  "deliverable": "lane-e2e-summary-{lane}.json in lanes/archivist/inbox/",
+  "required_fields": [
+    "broadcast_received: yes/no",
+    "broadcast_processed: yes/no",
+    "validation_result",
+    "trust_source_used_at_runtime",
+    "warnings_or_anomalies",
+    "active_blockers",
+    "final_status: PASS|PASS-WARN|FAIL"
+  ],
+  "deadline": "2026-04-22T17:00:00Z",
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T16:04:51.998Z",
+    "dry_run": false,
+    "route": "quarantine",
+    "reason": "SCHEMA_INVALID",
+    "detail": "Missing required field: schema_version; Missing required field: task_id; Missing required field: idempotency_key; Missing required field: subject; Missing required field: payload; Missing required field: execution; Missing required field: lease; Missing required field: retry; Missing required field: evidence; Missing required field: evidence_exchange; Missing required field: heartbeat; Field \"to\" value \"all\" not in allowed values: archivist, library, swarmmind, kernel; task_kind is required for task/response/escalation/handoff messages",
+    "schema_valid": false,
+    "signature_valid": false,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  }
+}

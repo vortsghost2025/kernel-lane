@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.3",
+  "task_id": "pem-002",
+  "idempotency_key": "f2a3b4c5-d6e7-8901-2345-678901234567",
+  "from": "archivist",
+  "to": "kernel",
+  "timestamp": "2026-04-23T02:10:00Z",
+  "priority": "P0",
+  "type": "task",
+  "task_kind": "update",
+  "subject": "PEM-002: Compute SHA-256 fingerprint and update kernel/.trust/trust-store.json",
+  "body": "Compute fingerprint of new key and update kernel trust store.",
+  "requires_action": true,
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-23T02:10:00Z",
+    "expires_at": "2026-04-23T02:15:00Z",
+    "duration_minutes": 5
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "path": "lanes/kernel/outbox/pem-002-update-proof.json"
+  },
+  "tasks": [
+    "Compute SHA-256 fingerprint of public key",
+    "Read kernel/.trust/trust-store.json",
+    "Update key_id with new fingerprint",
+    "Update public_key_pem field",
+    "Update registered_at timestamp",
+    "Save file",
+    "Commit and push"
+  ],
+  "signature": "",
+  "key_id": "kernel-current",
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T16:04:51.995Z",
+    "dry_run": false,
+    "route": "quarantine",
+    "reason": "SCHEMA_INVALID",
+    "detail": "Missing required field: payload; Missing required field: execution; Missing required field: evidence_exchange; Missing required field: heartbeat; Field \"task_kind\" value \"update\" not in allowed values: proposal, review, amendment, ratification, ack, done, status, report, handoff, alert, notification, heartbeat",
+    "schema_valid": false,
+    "signature_valid": false,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  }
+}

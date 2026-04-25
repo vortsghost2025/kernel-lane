@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "full-test-reminder",
+  "idempotency_key": "full-test-reminder-kernel-2026-04-22T20-32-29-475Z",
+  "body": "Reminder: please run the full test suite and deliver lane-e2e-summary-kernel.json to the Archivist inbox.",
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T16:04:51.999Z",
+    "dry_run": false,
+    "route": "quarantine",
+    "reason": "SCHEMA_INVALID",
+    "detail": "Missing required field: from; Missing required field: to; Missing required field: type; Missing required field: priority; Missing required field: subject; Missing required field: timestamp; Missing required field: requires_action; Missing required field: payload; Missing required field: execution; Missing required field: lease; Missing required field: retry; Missing required field: evidence; Missing required field: evidence_exchange; Missing required field: heartbeat",
+    "schema_valid": false,
+    "signature_valid": false,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  }
+}

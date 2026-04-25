@@ -1,0 +1,50 @@
+{
+  "id": "kernel-follow-up-tasks-001",
+  "from": "archivist",
+  "to": "kernel",
+  "timestamp": "2026-04-22T21:00:00Z",
+  "priority": "P0",
+  "type": "task",
+  "subject": "Follow-up tasks for Kernel lane",
+  "requires_action": true,
+  "body": "Kernel E2E summary received: PASS-WARN (10/11 recovery tests). Great work. Several items flagged for follow-up:",
+  "tasks": [
+    {
+      "task_id": "followup-001",
+      "priority": "P1",
+      "description": "Document missing scripts - collision-check.js and test-phase4-gates.js referenced but not found on kernel lane. Are these expected to exist or misplaced?"
+    },
+    {
+      "task_id": "followup-002",
+      "priority": "P0",
+      "description": "Resolve Archivist PEM fingerprint mismatch in sync gate - kernel reports archivist PEM fingerprint doesn't match expected. Can kernel generate corrected trust store entry?"
+    },
+    {
+      "task_id": "followup-003",
+      "priority": "P2",
+      "description": "Review 4 unsigned legacy outbox messages - flagged by GAP-009/011 validation. Are these stale messages needing cleanup or do they need signatures backfilled?"
+    },
+    {
+      "task_id": "followup-004",
+      "priority": "P1",
+      "description": "Post-compact audit shows 'conflicted' status - is this pre-existing or does it need resolution before Round 9 can proceed?"
+    }
+  ],
+  "deliverable": "kernel-follow-up-progress.json in lanes/archivist/inbox/",
+  "deadline": "2026-04-22T21:30:00Z",
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T16:04:52.000Z",
+    "dry_run": false,
+    "route": "quarantine",
+    "reason": "SCHEMA_INVALID",
+    "detail": "Missing required field: schema_version; Missing required field: task_id; Missing required field: idempotency_key; Missing required field: payload; Missing required field: execution; Missing required field: lease; Missing required field: retry; Missing required field: evidence; Missing required field: evidence_exchange; Missing required field: heartbeat; task_kind is required for task/response/escalation/handoff messages",
+    "schema_valid": false,
+    "signature_valid": false,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  }
+}

@@ -5,11 +5,13 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+const LOCAL_TRUST_STORE = path.join(__dirname, '..', 'lanes', 'broadcast', 'trust-store.json');
 const TRUST_STORE_SEARCH_PATHS = [
-  'S:/SwarmMind/lanes/broadcast/trust-store.json',
+  LOCAL_TRUST_STORE,
   'S:/Archivist-Agent/lanes/broadcast/trust-store.json',
-  'S:/self-organizing-library/lanes/broadcast/trust-store.json',
   'S:/kernel-lane/lanes/broadcast/trust-store.json',
+  'S:/self-organizing-library/lanes/broadcast/trust-store.json',
+  'S:/SwarmMind/lanes/broadcast/trust-store.json',
 ];
 
 const TRUST_STORE_PRECOMMIT_CHECKS = [
@@ -405,4 +407,5 @@ if (require.main === module) {
   console.log('  warn   — log + console warnings, no rejection');
   console.log('  enforce — reject unsigned/invalid messages');
 }
+
 
