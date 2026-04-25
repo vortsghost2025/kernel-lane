@@ -1,13 +1,10 @@
 {
-  "system_status": "degraded",
-  "timestamp": "2026-04-25T12:26:02.349Z",
-  "active_contradictions": [
-    "swarmmind_no_heartbeat",
-    "priority_P0_contradiction"
-  ],
-  "total_contradictions": 2,
-  "compaction_enabled": false,
-  "compaction_suspend_reason": "Active contradictions present",
+  "system_status": "consistent",
+  "timestamp": "2026-04-25T13:48:01.397Z",
+  "active_contradictions": [],
+  "total_contradictions": 0,
+  "compaction_enabled": true,
+  "compaction_suspend_reason": null,
   "processed_ok": true,
   "derived_from": "contradictions.json",
   "written_by": "heartbeat.js"
