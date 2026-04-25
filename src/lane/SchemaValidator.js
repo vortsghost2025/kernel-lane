@@ -33,8 +33,11 @@ const ENUM_CONSTRAINTS = {
   // Updated canonical target name for kernel lane
   to: ['archivist', 'library', 'swarmmind', 'kernel'],
   type: ['task', 'response', 'heartbeat', 'escalation', 'handoff', 'ack', 'alert'],
-  // task_kind optional for non‑task messages; kept for backward compatibility
-  task_kind: ['proposal', 'review', 'amendment', 'ratification'],
+  // NFM-019 fix: extend task_kind to cover task lifecycle + alert + notification + heartbeat
+  // Governance process: proposal, review, amendment, ratification
+  // Task lifecycle: ack, done, status, report, handoff
+  // System: alert, notification, heartbeat
+  task_kind: ['proposal', 'review', 'amendment', 'ratification', 'ack', 'done', 'status', 'report', 'handoff', 'alert', 'notification', 'heartbeat'],
   priority: ['P0', 'P1', 'P2', 'P3'],
   'payload.mode': ['inline', 'path', 'chunked'],
   'payload.compression': ['none', 'gzip'],
