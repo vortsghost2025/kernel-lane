@@ -50,10 +50,10 @@ __global__ void wmma_gemm_async(const T* __restrict__ A,
     {
         const T* srcA = A + tile_m * K;           // start of row tile
         const T* srcB = B + tile_n;              // start of column tile
-        cuda::memcpy_async(sA[buf], srcA,
-                           WMMA_M * (WMMA_K + PAD) * sizeof(T), pipe);
-        cuda::memcpy_async(sB[buf], srcB,
-                           WMMA_K * (WMMA_N + PAD) * sizeof(T), pipe);
+    cuda::memcpy_async((T*)(shmem + buf * 2 * WMMA_M * (WMMA_K + PAD)),
+                       srcA, WMMA_M * (WMMA_K + PAD) * sizeof(T), pipe);
+    cuda::memcpy_async((T*)(shmem + buf * 2 * WMMA_M * (WMMA_K + PAD) + WMMA_M * (WMMA_K + PAD)),
+                       srcB, WMMA_K * (WMMA_N + PAD) * sizeof(T), pipe);
         pipe.producer_commit();
     }
 
@@ -109,7 +109,7 @@ void run_async(const std::string& mode, int M, int N, int K) {
         cudaMalloc(&dA, static_cast<size_t>(M) * K * sizeof(__nv_fp8_e4m3));
         cudaMalloc(&dB, static_cast<size_t>(K) * N * sizeof(__nv_fp8_e4m3));
         // Note: For simplicity we reuse the same kernel template with T=__nv_fp8_e4m3 and PAD=PAD_FP8
-        wmma_gemm_async<__nv_fp8_e4m3,PAD_FP8><<<grid, block, 2 * WMMA_M * (WMMA_K + PAD_FP8) * sizeof(__nv_fp8_e4m3)>>>(
+        wmma_gemm_async<__nv_fp8_e4m3,PAD_FP8><<<grid, block, 4 * WMMA_M * (WMMA_K + PAD_FP8) * sizeof(__nv_fp8_e4m3)>>>(
             reinterpret_cast<const __nv_fp8_e4m3*>(dA),
             reinterpret_cast<const __nv_fp8_e4m3*>(dB),
             dC, M, N, K);
