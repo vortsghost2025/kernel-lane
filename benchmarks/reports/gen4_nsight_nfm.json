@@ -1,0 +1,8 @@
+{
+  "gate": "nsight_compute",
+  "command": "ncu --set full -k matrixMul_wmma_baseline -k matrixMul_wmma_4warp_padded -k matrixMul_wmma_4warp_async -o profiles/headless/gen4_metrics S:/kernel-lane/build/Release/matrix_tensor_optimized.exe",
+  "output": "Error: executable not found; cannot profile. Compile gate must succeed first.",
+  "timestamp": "2026-04-25T19:40:20.000Z",
+  "success": false,
+  "details": "Nsight Compute profiling requires a successfully compiled executable. Install MSVC host compiler and re-run compile gate."
+}

@@ -1,0 +1,8 @@
+{
+  "gate": "compile",
+  "command": "nvcc -o \"S:/kernel-lane/build/Release/matrix_tensor_optimized.exe\" \"S:/kernel-lane/kernels/src/matrix_tensor_optimized.cu\" -O3 --use_fast_math",
+  "output": "nvcc fatal   : Cannot find compiler 'cl.exe' in PATH",
+  "timestamp": "2026-04-25T19:40:00.000Z",
+  "success": false,
+  "details": "Host compiler (cl.exe) missing from PATH; MSVC environment import succeeded but cl not available. Install Visual Studio C++ build tools or configure PATH before retry."
+}

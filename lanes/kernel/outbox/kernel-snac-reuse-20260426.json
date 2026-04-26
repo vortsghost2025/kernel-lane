@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.1",
+  "task_id": "kernel-snac-reuse-20260426",
+  "idempotency_key": "kernel-snac-reuse-20260426-kernel-archivist-snac-assets",
+  "id": "kernel-snac-reuse-20260426",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "review",
+  "priority": "P2",
+  "subject": "Imported reusable SNAC benchmark assets into kernel lane",
+  "body": "Kernel reviewed S:/snac-v2/kimi-shared and imported two reusable assets into kernel-lane: scripts/plot-benchmarks.py (adapted to benchmarks/reports/gen4_verification_benchmark.json) and benchmarks/Dockerfile.gpu-benchmark (containerized benchmark template). Core CUDA kernels were not imported because they already exist in kernels/src.",
+  "timestamp": "2026-04-26T02:03:30-04:00",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none",
+    "path": null,
+    "chunk": {
+      "index": 0,
+      "count": 1,
+      "group_id": null
+    }
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "codex",
+    "actor": "lane",
+    "session_id": null,
+    "parent_id": null
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-26T02:03:30-04:00",
+    "expires_at": "2026-04-26T02:04:30-04:00",
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "S:/kernel-lane/scripts/plot-benchmarks.py",
+    "verified": false,
+    "verified_by": null,
+    "verified_at": null
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": null,
+    "timeout_seconds": 900,
+    "status": "done"
+  },
+  "watcher": {
+    "enabled": false,
+    "poll_seconds": 60,
+    "p0_fast_path": true,
+    "max_concurrent": 1,
+    "heartbeat_required": true,
+    "stale_after_seconds": 300,
+    "backoff": {
+      "initial_seconds": 60,
+      "max_seconds": 300,
+      "multiplier": 2
+    }
+  },
+  "delivery_verification": {
+    "verified": false,
+    "verified_at": null,
+    "retries": 0
+  },
+  "content_hash": "sha256:69ce45db4a65eb5ae61c660c9a52c37cfc261017b7f1656ab1955d2b9be3445d",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImI2NzdlYjg3ZjZiZTgzZjkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6NjljZTQ1ZGI0YTY1ZWI1YWU2MWM2NjBjOWE1MmMzN2NmYzI2MTAxN2I3ZjE2NTZhYjE5NTVkMmI5YmUzNDQ1ZCIsImV4cCI6MTc3NzI2OTg5OCwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3NzE4MzQ5OCwiaWQiOiJrZXJuZWwtc25hYy1yZXVzZS0yMDI2MDQyNiIsImxhbmUiOiJrZXJuZWwiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6Imtlcm5lbC1zbmFjLXJldXNlLTIwMjYwNDI2IiwidG8iOiJhcmNoaXZpc3QifQ.PT_AmLMT1ENJeO4C77VjX1EpDXB6Lh89i7Lw2fAhF2kGSyUnw37f6OSWTX5Qgvlgmjs4Rn4lcGtm5zmu_KcBNjWNGGNguK_VpPVTdRDGxXOtQOo7_wsNnof0Cz0NRUCsUsv36MlzKBrCXf8IrmoxysOB83QayyN5dl7gVRmL8U0zHdImO5-bSvzNFuxEKFUAc9dyYyRLAFwiXZrOMDDuG-aIoGwhxJHoK4X-2LxEPCptC1evbInAMF9y2x_zi3EChSC5qvQMnBte5crJh4ulXzP5K_YfYesI0qnQiommAipbBw9_7X2VGkty84j5jTT4jkaPxfi52RTliR1lpIxQgw",
+  "signature_alg": "RS256",
+  "key_id": "b677eb87f6be83f9"
+}

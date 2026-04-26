@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.3",
+  "task_id": "task-1777155525463-f8176664",
+  "idempotency_key": "fe5e929777c5ac83b7c4730e813818145e0853ff3e703727cb289a52987d8be1",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "proposal",
+  "priority": "P0",
+  "subject": "Nsight SM120 analysis: switch to 4-warp blocks + async double-buffer",
+  "body": "Nsight Copilot confirmed: (1) 16x17 padding works on Blackwell for half-precision bank conflicts, (2) RTX 5060 needs 4 warps per block (128 threads, dim3(32,4,1)) for 80%+ occupancy vs our current 1-warp blocks at 1.6% occupancy, (3) FP8 gives 2x TFLOPS (60 vs 30) if precision tolerable, (4) Full async double-buffer skeleton with cuda::memcpy_async and cp.async pipeline provided in NSIGHT_WMMA_ANALYSIS_SM120.md. Priority: implement 4-warp block layout first (biggest occupancy win), then add async double-buffering, then FP8 variant.",
+  "timestamp": "2026-04-25T22:18:45.464Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-25T22:18:45.464Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/outbox/response-task-1777155525463-f8176664.json",
+    "artifact_type": "response",
+    "delivered_at": "2026-04-25T22:18:45.464Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-25T22:18:45.464Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 3600
+  },
+  "content_hash": "sha256:b9274357a0ff11355827ced92a26f450bd52e3e72b37b55fc6fc088be6f88278",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVlNzBiNzgxMDViYzYxODkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6YjkyNzQzNTdhMGZmMTEzNTU4MjdjZWQ5MmEyNmY0NTBiZDUyZTNlNzJiMzdiNTVmYzZmYzA4OGJlNmY4ODI3OCIsImV4cCI6MTc3NzI0MTkyNSwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzE1NTUyNSwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAwIiwidGFza19pZCI6InRhc2stMTc3NzE1NTUyNTQ2My1mODE3NjY2NCIsInRvIjoia2VybmVsIn0.lGwOFLSpvslaojrsFkEzKm-SDwapwwTJU_rWXnsWKRGM6mZBosekcY3ZwswioUhi_zpj-XUp8TJQO2gTZ8Kxvn7JfyTVsP8AAqkoq3gdnyDQwYFvT0zb1immZ_21sQkvldHuylf-MQNDQYglBTmOe5lCvj8bbCkJKnwnHlfSKNWdhbFkGnNTKOQuB61LDqGHOsNSpzV6fkm_9r3r6kN3aTGzLXTjRHg0mmtY7rvFJVO9abVLhKFnJfjN4yT3RZkWHZy0d1qXWem2GZaBDntmPJ08COKXzKCqlfosCB2XYjkmRVB8L9jqt69GR2kOCH8G_qPkWJGe2eOL0oNe3BiUfQ",
+  "signature_alg": "RS256",
+  "key_id": "ee70b78105bc6189",
+  "execution_verified": true,
+  "would_verify": true,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-25T22:30:31.130Z",
+    "dry_run": false,
+    "route": "processed",
+    "reason": "ACTIONABLE_WITH_PROOF",
+    "detail": null,
+    "schema_valid": true,
+    "signature_valid": true,
+    "english_only": true,
+    "execution_verified": true,
+    "would_verify": true
+  },
+  "terminal_decision": "completed_legacy",
+  "terminal_decision_reason": "Processed before proof-first gate. Task completed via lane-worker E2E test cycle."
+}

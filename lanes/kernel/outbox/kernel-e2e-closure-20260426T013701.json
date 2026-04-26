@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.1",
+  "task_id": "kernel-e2e-closure-20260426T013701",
+  "idempotency_key": "06b67cfbf0b64d1f805a86198d7a4bec",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "amendment",
+  "priority": "P2",
+  "subject": "E2E strict-review closure artifact published",
+  "body": "Closure artifact created and pushed.\n\nCreated evidence:\n- docs/ops/evidence/e2e-strict-review-closure-2026-04-26.txt\n\nCommitted/pushed:\n- commit: b3a2fb6\n- branch: master\n- remote: origin/master\n\nSummary:\n- documents initial P0 reproductions (execution-gate, artifact-resolver)\n- documents fail-closed lane-worker fix + cross-lane script parity distribution\n- documents clean retest results across all 4 lanes\n- links prior Kernel outbox/inbox status messages for traceability",
+  "timestamp": "2026-04-26T01:37:01.8223544-04:00",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "chunk": {
+      "index": 0,
+      "count": 1,
+      "group_id": null
+    },
+    "compression": "none",
+    "path": null
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane",
+    "parent_id": null,
+    "session_id": null
+  },
+  "lease": {
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3,
+    "owner": null,
+    "acquired_at": null
+  },
+  "retry": {
+    "attempt": 1,
+    "last_attempt_at": null,
+    "max_attempts": 3,
+    "last_error": null
+  },
+  "evidence": {
+    "evidence_path": "S:/Archivist-Agent/docs/ops/evidence/e2e-strict-review-closure-2026-04-26.txt",
+    "required": true,
+    "verified_at": null,
+    "verified": false,
+    "verified_by": null
+  },
+  "heartbeat": {
+    "timeout_seconds": 900,
+    "interval_seconds": 300,
+    "last_heartbeat_at": null,
+    "status": "done"
+  },
+  "watcher": {
+    "backoff": {
+      "max_seconds": 300,
+      "initial_seconds": 60,
+      "multiplier": 2
+    },
+    "stale_after_seconds": 300,
+    "enabled": false,
+    "poll_seconds": 60,
+    "p0_fast_path": true,
+    "max_concurrent": 1,
+    "heartbeat_required": true
+  },
+  "delivery_verification": {
+    "retries": 0,
+    "verified_at": null,
+    "verified": false
+  }
+}

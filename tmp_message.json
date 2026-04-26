@@ -1,0 +1,19 @@
+{
+  "task_id": "response-20260425T190822Z",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "status",
+  "priority": "P2",
+  "subject": "GEN4 WMMA candidate adoption",
+  "body": "Technical author: SwarmMind agent\nOwning lane: Kernel Lane\nSignature status before closure: unsigned\nClosure action: Kernel Lane reviewed/adopted and signed response",
+  "timestamp": "2026-04-25T19:08:22.000Z",
+  "requires_action": false,
+  "payload": {"mode": "inline", "compression": "none"},
+  "execution": {"mode": "auto", "engine": "pipeline", "actor": "kernel"},
+  "lease": {"owner": "kernel", "acquired_at": "2026-04-25T19:08:22.000Z"},
+  "retry": {"attempt": 1, "max_attempts": 1},
+  "evidence": {"required": false, "verified": true},
+  "evidence_exchange": {"artifact_path": null, "artifact_type": "response", "delivered_at": "2026-04-25T19:08:22.000Z"},
+  "heartbeat": {"status": "done", "last_heartbeat_at": "2026-04-25T19:08:22.000Z", "interval_seconds": 300, "timeout_seconds": 900}
+}

@@ -1,46 +1,29 @@
 [
   {
     "lane": "archivist",
-    "total": 161,
-    "verified": 161,
+    "total": 5,
+    "verified": 5,
     "mismatches": [],
     "missingEvidence": []
   },
   {
     "lane": "library",
-    "total": 68,
-    "verified": 61,
+    "total": 2,
+    "verified": 2,
     "mismatches": [],
-    "missingEvidence": [
-      "convergence-complete.json",
-      "library-act-round-009-response-20260422212300.json",
-      "library-contradiction-key-id-mapping-20260423.json",
-      "library-cross-lane-review-response-20260422212500.json",
-      "round-7-audit-library-ack.json",
-      "round-7-remediation-001-proposal.json",
-      "round-7-severity-escalation.json"
-    ]
+    "missingEvidence": []
   },
   {
     "lane": "swarmmind",
-    "total": 20,
-    "verified": 16,
-    "mismatches": [
-      "cross-lane-code-review-001.json",
-      "swarmmind-round7-patches-completed-001.json",
-      "trust-store-convergence-p0-escalation-001.json"
-    ],
-    "missingEvidence": [
-      "cross-lane-code-review-001.json",
-      "swarmmind-identity-restore-complete_1776902049421.json",
-      "swarmmind-round7-patches-completed-001.json",
-      "trust-store-convergence-p0-escalation-001.json"
-    ]
+    "total": 8,
+    "verified": 8,
+    "mismatches": [],
+    "missingEvidence": []
   },
   {
     "lane": "kernel",
-    "total": 10,
-    "verified": 10,
+    "total": 18,
+    "verified": 18,
     "mismatches": [],
     "missingEvidence": []
   }

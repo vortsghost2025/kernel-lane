@@ -1,0 +1,5 @@
+kernel,mode,latency_ms,tflops,fp8_fallback_to_fp16
+matrix_tensor_async,fp16,239.6891,0.008959454760354143,False
+matrix_tensor_async,fp8,128.4838,0.016714042143834474,True
+matrix_tensor_optimized,wmma-padded,257.7421,0.008331908710296067,False
+matrix_benchmark,baseline,478.5609,0.004487377986793321,False

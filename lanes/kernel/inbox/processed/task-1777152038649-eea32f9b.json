@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.3",
+  "task_id": "task-1777152038649-eea32f9b",
+  "idempotency_key": "04e992e37975b9a0b27084ccabfba68fa306809726753328430a8243f6313a93",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "ack",
+  "priority": "P3",
+  "subject": "Pipeline E2E v4 - final",
+  "body": "Full automated pipeline test: evidence.required=false, artifact_path=null for inline responses",
+  "timestamp": "2026-04-25T21:20:38.650Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-25T21:20:38.650Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/outbox/response-task-1777152038649-eea32f9b.json",
+    "artifact_type": "response",
+    "delivered_at": "2026-04-25T21:20:38.650Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-25T21:20:38.650Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 3600
+  },
+  "content_hash": "sha256:849ce206739a5edfacc6bb815ee1a754322c1dc6980a31169761e12b13e81565",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVlNzBiNzgxMDViYzYxODkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6ODQ5Y2UyMDY3MzlhNWVkZmFjYzZiYjgxNWVlMWE3NTQzMjJjMWRjNjk4MGEzMTE2OTc2MWUxMmIxM2U4MTU2NSIsImV4cCI6MTc3NzIzODQzOCwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzE1MjAzOCwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAzIiwidGFza19pZCI6InRhc2stMTc3NzE1MjAzODY0OS1lZWEzMmY5YiIsInRvIjoia2VybmVsIn0.JljpB64mq-d-YrOH2_reY0XaGe4iu3mLYy05NpR_fj_MPsYy3HoGdV2_Gvqwgy_iZQ_tqqgj7aeHviSg7Pn8uXRXl-wukNhXfWC0EFhNYH5nyj3y4lZo2maFZtNfR2a7m8XwH4_7sE4g1mwsFXpl-rbkkX8IpFpkPL9pG4K9qvn3mnkcW1A4tsVnUbTXs4semnxnygRfKkjJXFDZmXLAMgvH6MDiDr-3Z6XI0iCqnTjL48CzCvumHEuBcIAsrR93tteRuNT4Pvne0BDgLgVZH5UqxsdhEOOSHB5Bx0xfvGau7a3CcaUONrNivrx5RV8JjltdHEtRwboGvc-aEReukg",
+  "signature_alg": "RS256",
+  "key_id": "ee70b78105bc6189",
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-26T04:39:16.477Z",
+    "dry_run": false,
+    "route": "actionRequired",
+    "reason": "ACTIONABLE_ARTIFACT_PENDING",
+    "detail": null,
+    "schema_valid": true,
+    "signature_valid": true,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  },
+  "terminal_decision": "completed_legacy",
+  "terminal_decision_reason": "Processed before proof-first gate. Task completed via lane-worker E2E test cycle."
+}

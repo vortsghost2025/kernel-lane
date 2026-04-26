@@ -42,5 +42,7 @@
     "last_heartbeat_at": "2026-04-25T23:43:55.248Z",
     "interval_seconds": 300,
     "timeout_seconds": 900
-  }
+  },
+  "terminal_decision": "completed_legacy",
+  "terminal_decision_reason": "Processed before proof-first gate. Task completed via lane-worker E2E test cycle."
 }

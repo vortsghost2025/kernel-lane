@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.3",
+  "task_id": "task-1777178013298-ec4a724f",
+  "idempotency_key": "3cc009a7d10a9cb545be8811d522cf671d6a55f31d165b666b515f83ddb11d13",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "status",
+  "priority": "P1",
+  "subject": "E2E test - report current state",
+  "body": "End-to-end pipeline test. Report your current lane state: processed count, blocked count, quarantine count, last commit, any blockers. No code changes needed.",
+  "timestamp": "2026-04-26T04:33:33.298Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-26T04:33:33.298Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/outbox/response-task-1777178013298-ec4a724f.json",
+    "artifact_type": "response",
+    "delivered_at": "2026-04-26T04:33:33.298Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-26T04:33:33.298Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 3600
+  },
+  "content_hash": "sha256:500b1f9e898d9850f1bf4fa616b547ed47ef0e1026b951d531b5fcf69b7ac5bc",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVlNzBiNzgxMDViYzYxODkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6NTAwYjFmOWU4OThkOTg1MGYxYmY0ZmE2MTZiNTQ3ZWQ0N2VmMGUxMDI2Yjk1MWQ1MzFiNWZjZjY5YjdhYzViYyIsImV4cCI6MTc3NzI2NDQxMywiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzE3ODAxMywiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6InRhc2stMTc3NzE3ODAxMzI5OC1lYzRhNzI0ZiIsInRvIjoia2VybmVsIn0.pXm6h5S8L2vXQ-aBu2ZQRtoEersQiToGQOPu8SwhpIrrWwpg4O89pqRqqIuPPgAg-8tvlYeW25XtHNEPGHrX0WdgqFClJvHWcH8-36e2Fge9kqRPP4ZcI2mY33BNKS_Jd-F0z3GxK-gsFVtauSmyoIKHqlJDvOltEsLMObP1JObWSxd0yZrd99ZVgeoMajyCzG0rW50jA4VDdXDVbJL_NwPGXRoP3lAvpoP3LYpo5X9pLUNtr-Qm1Mio6TKn_yhfowEIP7prWJt36Bp8bIHfLezRCfTi0FYeFzPlIcy6kzzYy3GdxLL9eEbt2Mp4kiaze-Ku8ZWCWCrUDsA-Pc50rw",
+  "signature_alg": "RS256",
+  "key_id": "ee70b78105bc6189",
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-26T04:39:16.479Z",
+    "dry_run": false,
+    "route": "actionRequired",
+    "reason": "ACTIONABLE_ARTIFACT_PENDING",
+    "detail": null,
+    "schema_valid": true,
+    "signature_valid": true,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  },
+  "terminal_decision": "completed_legacy",
+  "terminal_decision_reason": "Processed before proof-first gate. Task completed via lane-worker E2E test cycle."
+}

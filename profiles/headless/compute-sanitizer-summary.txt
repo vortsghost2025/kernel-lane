@@ -1,0 +1,46 @@
+Compute Sanitizer Summary
+=========================
+Date: 2026-04-26
+Repo: S:/kernel-lane
+GPU: NVIDIA GeForce RTX 5060
+Sanitizer binary: C:\NVIDIA_CUDA_Installer\bin\compute-sanitizer.bat
+
+Commands Run
+------------
+1) compute-sanitizer --tool memcheck --leak-check full --report-api-errors all S:/kernel-lane/kernels/bin/matrix_tensor_async.exe fp16
+2) compute-sanitizer --tool racecheck S:/kernel-lane/kernels/bin/matrix_tensor_async.exe fp16
+3) compute-sanitizer --tool synccheck S:/kernel-lane/kernels/bin/matrix_tensor_async.exe fp16
+4) compute-sanitizer --tool memcheck S:/kernel-lane/kernels/bin/arb_kernel_graph.exe
+5) compute-sanitizer --tool memcheck S:/kernel-lane/kernels/bin/arb_kernel_tensor.exe
+
+Results
+-------
+[matrix_tensor_async | memcheck]
+- CUDA API Error: Grid Dimension Y must be nonzero
+- cuLaunchKernel invalid argument (CUDA_ERROR_INVALID_VALUE / cudaErrorInvalidValue)
+- Leak summary: 0 bytes leaked
+- Error summary: 3 errors
+
+[matrix_tensor_async | racecheck]
+- RACECHECK SUMMARY: 0 hazards (0 errors, 0 warnings)
+
+[matrix_tensor_async | synccheck]
+- ERROR SUMMARY: 0 errors
+
+[arb_kernel_graph | memcheck]
+- ERROR SUMMARY: 0 errors
+
+[arb_kernel_tensor | memcheck]
+- ERROR SUMMARY: 0 errors
+- Runtime note: "Failed to open report file" (application-level file path issue, not sanitizer memory error)
+
+Convergence Gate
+----------------
+{
+  "claim": "Compute-sanitizer suite ran on async, graph, and tensor binaries; one launch-parameter API error remains in matrix_tensor_async while all other sanitizer checks are clean.",
+  "evidence": "S:/kernel-lane/profiles/headless/compute-sanitizer-summary.txt",
+  "verified_by": "self",
+  "contradictions": [],
+  "status": "proven"
+}
+
