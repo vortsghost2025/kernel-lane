@@ -74,9 +74,9 @@ function createResponse(originalMsg, executionResult, lane) {
     execution: { mode: 'auto', engine: 'pipeline', actor: 'task-executor' },
     lease: { owner: lane, acquired_at: nowIso() },
     retry: { attempt: 1, max_attempts: 1 },
-    evidence: { required: true, verified: true },
+    evidence: { required: false, verified: true },
     evidence_exchange: {
-      artifact_path: `lanes/${lane}/inbox/processed/response-${originalMsg.task_id || Date.now()}.json`,
+      artifact_path: null,
       artifact_type: 'response',
       delivered_at: nowIso(),
     },

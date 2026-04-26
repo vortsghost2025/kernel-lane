@@ -3,9 +3,7 @@ param(
   [string]$Configuration = 'Release'
 )
 
-# --- MSVC Environment Bootstrap ---
-# NVCC on Windows requires cl.exe (MSVC host compiler).
-# Import the Visual Studio build environment if cl.exe is not already in PATH.
+# Ensure MSVC host compiler is available (cl.exe)
 $vcvarsall = 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvarsall.bat'
 if (-not (Get-Command 'cl.exe' -ErrorAction SilentlyContinue)) {
   if (Test-Path $vcvarsall) {
@@ -17,53 +15,32 @@ if (-not (Get-Command 'cl.exe' -ErrorAction SilentlyContinue)) {
           [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')
         }
       }
-      Write-Host "[ENV] MSVC environment imported successfully"
+      Write-Host "[ENV] MSVC environment imported"
     } else {
-      Write-Host "[WARN] Failed to import MSVC environment via vcvarsall.bat"
+      Write-Host "[ERROR] Failed to import MSVC environment"
+      exit 1
     }
   } else {
-    Write-Host "[WARN] vcvarsall.bat not found at expected path. Build may fail if cl.exe is not in PATH."
+    Write-Host "[ERROR] cl.exe not found and vcvarsall.bat missing. Install Visual Studio C++ Build Tools."
+    exit 1
   }
-}
-
-# Verify cl.exe is now available
-if (-not (Get-Command 'cl.exe' -ErrorAction SilentlyContinue)) {
-  Write-Host "[ERROR] cl.exe not found in PATH after environment bootstrap. Cannot compile host code."
-  Write-Host "[HINT] Run this script from a Developer Command Prompt for VS, or ensure Visual Studio is installed."
-  exit 1
 }
 
 $srcRoot = Join-Path $PSScriptRoot '..\kernels\src'
-$buildDir = Join-Path $PSScriptRoot "..\build\$Configuration"
-New-Item -ItemType Directory -Force -Path $buildDir | Out-Null
+$outDir = Join-Path $PSScriptRoot "..\kernels\bin"
+New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
-$cuFiles = Get-ChildItem -Path $srcRoot -Filter '*.cu' -ErrorAction SilentlyContinue
-if (-not $cuFiles) {
-  Write-Host "No .cu files found in $srcRoot"
-  exit 0
-}
+$cuFiles = Get-ChildItem -Path $srcRoot -Filter '*.cu' -File
+if (-not $cuFiles) { Write-Host "No .cu files found"; exit 0 }
 
-$execCount = 0
-$ptxCount = 0
 foreach ($f in $cuFiles) {
-  $containsMain = Select-String -Pattern 'int main\s*\(' -Path $f.FullName -Quiet
-  if ($containsMain) {
-    $out = Join-Path $buildDir ("{0}.exe" -f $f.BaseName)
-    $cmd = "nvcc -o `"$out`" `"$($f.FullName)`" -O3 --use_fast_math"
+  $hasMain = Select-String -Pattern 'int\s+main\s*\(' -Path $f.FullName -Quiet
+  if ($hasMain) {
+    $outExe = Join-Path $outDir ("{0}.exe" -f $f.BaseName)
+    $cmd = "nvcc -arch=sm_120 -lineinfo -o `"$outExe`" `"$($f.FullName)`" -O3 --use_fast_math"
     Write-Host "[BUILD] $cmd"
     cmd /c $cmd
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-    $execCount++
-  }
-  else {
-    $out = Join-Path $buildDir ("{0}.ptx" -f $f.BaseName)
-    $cmd = "nvcc -ptx -o `"$out`" `"$($f.FullName)`" -O3 --use_fast_math"
-    Write-Host "[BUILD] $cmd"
-    cmd /c $cmd
-    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-    $ptxCount++
   }
 }
-
-Write-Host "[PASS] Build complete: $buildDir"
-Write-Host "[SUMMARY] ${execCount} executables and ${ptxCount} PTX files produced."
+Write-Host "[BUILD] Completed. Executables placed in $outDir"
