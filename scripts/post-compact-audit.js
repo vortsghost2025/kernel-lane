@@ -80,6 +80,11 @@ class PostCompactAudit {
             { name: 'private_pem', suffix: '.identity/private.pem', binary: true },
             { name: 'public_pem', suffix: '.identity/public.pem', binary: false },
             { name: 'snapshot_json', suffix: '.identity/snapshot.json', binary: false },
+            { name: 'keys_json', suffix: '.identity/keys.json', binary: false },
+            { name: 'lane_trust_store', suffix: 'lanes/broadcast/trust-store.json', binary: false },
+            { name: 'agents_md', suffix: 'AGENTS.md', binary: false },
+            { name: 'targets_json', suffix: 'config/targets.json', binary: false },
+            { name: 'convergence_protocol_md', suffix: 'lanes/broadcast/CONVERGENCE_PROTOCOL.md', binary: false }
         ];
         const trustStorePath = this.trustStorePath;
         const results = {};
@@ -111,7 +116,7 @@ class PostCompactAudit {
             };
             results[laneId] = laneFiles;
         }
-        return results;
+  return results;
     }
 
     _getLaneHeartbeats() {
@@ -149,13 +154,7 @@ class PostCompactAudit {
       handoff_hash: this._hashFile(this.handoffPath),
       lane_states: this._getLaneHeartbeats(),
       inbox_counts: {},
-        known_risks: [
-                'identity_soft_keys',
-                'determinism_not_guaranteed',
-                'kernel_partial_convergence',
-                'contract_alignment_ambiguous',
-                'subagent_code_destruction_surface'
-            ],
+known_risks: this._getKnownRisks(),
             file_integrity: this._getFileIntegrityChecks()
         };
 
@@ -185,7 +184,7 @@ class PostCompactAudit {
       handoff_hash: this._hashFile(this.handoffPath),
       lane_states: this._getLaneHeartbeats(),
         inbox_counts: {},
-            known_risks: [],
+            known_risks: this._getKnownRisks(),
             file_integrity: this._getFileIntegrityChecks()
         };
 
@@ -575,8 +574,16 @@ class PostCompactAudit {
 
     return audit;
   }
+  _getKnownRisks() {
+    return [
+      'identity_soft_keys',
+      'determinism_not_guaranteed',
+      'kernel_partial_convergence',
+      'contract_alignment_ambiguous',
+      'subagent_code_destruction_surface'
+    ];
+  }
 }
-
 module.exports = { PostCompactAudit };
 
 if (require.main === module) {
