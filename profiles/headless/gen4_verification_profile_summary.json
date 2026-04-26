@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-04-25T20:44:45.6593119-04:00",
+  "gpu": "NVIDIA GeForce RTX 5060",
+  "arch": "sm_120",
+  "metric_source": "Nsight Compute 2026.1.0",
+  "collected_metrics": [
+    "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active",
+    "sm__warps_active.avg.pct_of_peak_sustained_active",
+    "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum",
+    "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum"
+  ],
+  "async_kernel": null,
+  "optimized_kernels": null,
+  "baseline_kernel": null,
+  "notes": [
+    "matrix_tensor_async fp8 benchmark mode currently uses fp16 kernel fallback due fp8 WMMA fragment incompatibility in current toolchain"
+  ]
+}

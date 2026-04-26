@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-04-25T20:43:25.4728215-04:00",
+  "gpu": "NVIDIA GeForce RTX 5060",
+  "arch": "sm_120",
+  "dimensions": {
+    "M": 1024,
+    "N": 1024,
+    "K": 1024
+  },
+  "results": [
+    {
+      "kernel": "matrix_tensor_async",
+      "mode": "fp16",
+      "elapsed_seconds": 0.2396891,
+      "latency_ms": 239.6891,
+      "tflops": 0.008959454760354143,
+      "fp8_fallback_to_fp16": false,
+      "stdout": "Async GEMM fp16 completed in 0.0750992 s"
+    },
+    {
+      "kernel": "matrix_tensor_async",
+      "mode": "fp8",
+      "elapsed_seconds": 0.1284838,
+      "latency_ms": 128.4838,
+      "tflops": 0.016714042143834474,
+      "fp8_fallback_to_fp16": true,
+      "stdout": "Async GEMM fp16 completed in 0.0886171 s"
+    },
+    {
+      "kernel": "matrix_tensor_optimized",
+      "mode": "wmma-padded",
+      "elapsed_seconds": 0.2577421,
+      "latency_ms": 257.7421,
+      "tflops": 0.008331908710296067,
+      "fp8_fallback_to_fp16": false,
+      "stdout": "WMMA benchmark (M=N=K=1024)\nFP8 pad requirement marker: +4 columns\nbaseline-1warp: 0.751136 ms\npadded-4warp: 0.292256 ms\nasync-4warp: 0.326592 ms"
+    },
+    {
+      "kernel": "matrix_benchmark",
+      "mode": "baseline",
+      "elapsed_seconds": 0.4785609,
+      "latency_ms": 478.5609,
+      "tflops": 0.004487377986793321,
+      "fp8_fallback_to_fp16": false,
+      "stdout": "Matrix Size: 4096x4096\nLatency: 124.728 ms\nPerformance: 1.10191 TFlops"
+    }
+  ],
+  "notes": [
+    "fp8 mode currently executes fp16 async fallback due WMMA fp8 fragment/toolchain incompatibility"
+  ]
+}

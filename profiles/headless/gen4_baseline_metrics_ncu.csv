@@ -1,0 +1,7 @@
+==PROF== Connected to process 81540 (S:\kernel-lane\kernels\bin\matrix_benchmark.exe)
+==PROF== Disconnected from process 81540
+"ID","Process ID","Process Name","Host Name","Kernel Name","Context","Stream","Block Size","Grid Size","Device","CC","Section Name","Metric Name","Metric Unit","Metric Value"
+"0","81540","matrix_benchmark.exe","127.0.0.1","matrixMul(const float *, const float *, float *, int)","1","7","(32, 32, 1)","(128, 128, 1)","0","12.0","Command line profiler metrics","l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum","","3,221,225,472"
+"0","81540","matrix_benchmark.exe","127.0.0.1","matrixMul(const float *, const float *, float *, int)","1","7","(32, 32, 1)","(128, 128, 1)","0","12.0","Command line profiler metrics","l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum","","162,299,090"
+"0","81540","matrix_benchmark.exe","127.0.0.1","matrixMul(const float *, const float *, float *, int)","1","7","(32, 32, 1)","(128, 128, 1)","0","12.0","Command line profiler metrics","sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active","%","0"
+"0","81540","matrix_benchmark.exe","127.0.0.1","matrixMul(const float *, const float *, float *, int)","1","7","(32, 32, 1)","(128, 128, 1)","0","12.0","Command line profiler metrics","sm__warps_active.avg.pct_of_peak_sustained_active","%","66.66"
