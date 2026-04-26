@@ -1,0 +1,4 @@
+"Variant","KernelName","WarpsActiveSum","WarpsLaunchedSum","RegsPerThreadAvg","SharedAllocSum","DramReadSum","DramWriteSum","HmmaInstSum","SharedBankConflictsSum","LongScoreboardStallAvg"
+"async-4warp","matrixMul_wmma_async(const __half *, const __half *, float *, int, int, int)","1477261066.000000","4096.000000",,"3.400096","4.971008","4.084992","524288.000000","2,247,415",
+"async-8warp","matrixMul_wmma_async(const __half *, const __half *, float *, int, int, int)","1397632963.000000","4096.000000",,"3.053902","4.385280","4.008704","524288.000000","2,210,266",
+"async-8warp-triple","matrixMul_wmma_async_triple(const __half *, const __half *, float *, int, int, int)","1431718574.000000","4096.000000",,"4.565861","5.265920","3.974144","524288.000000","2,271,832",

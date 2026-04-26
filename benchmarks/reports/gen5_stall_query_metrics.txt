@@ -1,0 +1,25 @@
+sm__warps_active                                                              Counter         warp            cumulative # of warps in flight                                       
+sm__warps_active_realtime                                                     Counter         warp            cumulative # of warps in flight                                       
+sm__warps_active_shader_cs                                                    Counter         warp            cumulative # of active CS warps                                       
+sm__warps_active_shader_cs_realtime                                           Counter         warp            cumulative # of active CS warps                                       
+sm__warps_launched                                                            Counter         warp            # of warps launched                                                   
+sm__warps_launched_shader_cs                                                  Counter         warp            # of warps launched for CS                                            
+smsp__warp_issue_stalled_barrier_per_warp_active                            Ratio                           proportion of warps per cycle, waiting for sibling warps at a CTA     
+smsp__warp_issue_stalled_branch_resolving_per_warp_active                   Ratio                           proportion of warps per cycle, waiting for a branch target address to 
+smsp__warp_issue_stalled_dispatch_stall_per_warp_active                     Ratio                           proportion of warps per cycle, waiting on a dispatch stall            
+smsp__warp_issue_stalled_drain_per_warp_active                              Ratio                           proportion of warps per cycle, waiting after EXIT for all memory      
+smsp__warp_issue_stalled_lg_throttle_per_warp_active                        Ratio                           proportion of warps per cycle, waiting for a free entry in the LSU    
+smsp__warp_issue_stalled_long_scoreboard_per_warp_active                    Ratio                           proportion of warps per cycle, waiting for a scoreboard dependency on 
+smsp__warp_issue_stalled_long_scoreboard_pipe_l1tex_per_warp_active         Ratio                           proportion of warps per cycle, waiting for a scoreboard dependency on 
+smsp__warp_issue_stalled_math_pipe_throttle_per_warp_active                 Ratio                           proportion of warps per cycle, waiting for an execution pipe to be    
+smsp__warp_issue_stalled_membar_per_warp_active                             Ratio                           proportion of warps per cycle, waiting on a memory barrier            
+smsp__warp_issue_stalled_mio_throttle_per_warp_active                       Ratio                           proportion of warps per cycle, waiting for a free entry in the MIO    
+smsp__warp_issue_stalled_mio_throttle_pipe_mio_per_warp_active              Ratio                           proportion of warps per cycle, waiting for a free entry in the        
+smsp__warp_issue_stalled_misc_per_warp_active                               Ratio                           proportion of warps per cycle, waiting on a miscellaneous hardware    
+smsp__warp_issue_stalled_no_instruction_per_warp_active                     Ratio                           proportion of warps per cycle, waiting to be selected for instruction 
+smsp__warp_issue_stalled_not_selected_per_warp_active                       Ratio                           proportion of warps per cycle, waiting for the microscheduler to      
+smsp__warp_issue_stalled_selected_per_warp_active                           Ratio                           proportion of warps per cycle, selected by the microscheduler to      
+smsp__warp_issue_stalled_short_scoreboard_per_warp_active                   Ratio                           proportion of warps per cycle, waiting for a scoreboard dependency on 
+smsp__warp_issue_stalled_sleeping_per_warp_active                           Ratio                           proportion of warps per cycle, waiting for a nanosleep to expire      
+smsp__warp_issue_stalled_tex_throttle_per_warp_active                       Ratio                           proportion of warps per cycle, waiting for a free entry in the TEX    
+smsp__warp_issue_stalled_wait_per_warp_active                               Ratio                           proportion of warps per cycle, waiting on a fixed latency execution   

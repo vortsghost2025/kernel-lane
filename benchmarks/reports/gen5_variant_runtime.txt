@@ -1,0 +1,7 @@
+WMMA benchmark (M=N=K=1024)
+Default fast path: async-8warp
+FP8 pad requirement marker: +4 columns
+baseline-1warp: 0.45488 ms
+padded-4warp: 0.252 ms
+async-4warp: 0.367072 ms
+fastpath-async-8warp: 0.348288 ms
