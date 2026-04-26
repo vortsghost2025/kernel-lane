@@ -1,0 +1,7 @@
+==PROF== Connected to process 63996 (S:\kernel-lane\kernels\bin\matrix_tensor_async.exe)
+==PROF== Disconnected from process 63996
+"ID","Process ID","Process Name","Host Name","Kernel Name","Context","Stream","Block Size","Grid Size","Device","CC","Section Name","Metric Name","Metric Unit","Metric Value"
+"0","63996","matrix_tensor_async.exe","127.0.0.1","wmma_gemm_async_fp16(const __half *, const __half *, float *, int, int, int)","1","7","(128, 1, 1)","(64, 16, 1)","0","12.0","Command line profiler metrics","l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum","","0"
+"0","63996","matrix_tensor_async.exe","127.0.0.1","wmma_gemm_async_fp16(const __half *, const __half *, float *, int, int, int)","1","7","(128, 1, 1)","(64, 16, 1)","0","12.0","Command line profiler metrics","l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum","","1,045"
+"0","63996","matrix_tensor_async.exe","127.0.0.1","wmma_gemm_async_fp16(const __half *, const __half *, float *, int, int, int)","1","7","(128, 1, 1)","(64, 16, 1)","0","12.0","Command line profiler metrics","sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active","%","21.58"
+"0","63996","matrix_tensor_async.exe","127.0.0.1","wmma_gemm_async_fp16(const __half *, const __half *, float *, int, int, int)","1","7","(128, 1, 1)","(64, 16, 1)","0","12.0","Command line profiler metrics","sm__warps_active.avg.pct_of_peak_sustained_active","%","90.70"
