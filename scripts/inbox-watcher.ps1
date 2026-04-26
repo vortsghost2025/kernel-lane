@@ -53,14 +53,19 @@ function Count-Files([string]$dir, [string]$filter = "*.json") {
 
 function Run-Step([string]$name, [string]$script, [string[]]$args, [string]$cwd) {
   try {
+    $prevDir = Get-Location
+    if ($cwd) { Set-Location $cwd }
     $result = & node $script @args 2>&1
+    Set-Location $prevDir
     $resultStr = ($result | Out-String).Trim()
-    Write-Log "  [$name] $resultStr"
+    Write-Log " [$name] $resultStr"
     return $true
   } catch {
-    Write-Log "  [$name] ERROR: $_"
+    Set-Location $prevDir
+    Write-Log " [$name] ERROR: $_"
     return $false
   }
+}
 }
 
 Write-Log "[watcher] Started - poll ${PollSeconds}s - skipExecutor=$SkipExecutor - lanes: $($LaneRoots.Keys -join ',')"
