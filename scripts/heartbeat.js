@@ -5,8 +5,8 @@ const path = require('path');
 const { loadPolicy, assertWatcherConfig } = require('./concurrency-policy');
 
 const DEFAULT_CONFIG = {
-  laneName: 'kernel',
-  inboxPath: path.join(__dirname, '..', 'lanes', 'kernel', 'inbox'),
+  laneName: 'archivist',
+  inboxPath: path.join(__dirname, '..', 'lanes', 'archivist', 'inbox'),
   intervalSeconds: 60,
   staleAfterSeconds: 900,
   canonicalPaths: {
@@ -38,12 +38,16 @@ class Heartbeat {
     this._timer = setInterval(() => {
       this.writeHeartbeat();
     }, this.config.intervalSeconds * 1000);
+
     process.on('SIGINT', () => this._handleSignal('SIGINT'));
     process.on('SIGTERM', () => this._handleSignal('SIGTERM'));
   }
 
   stop() {
-    if (this._timer) { clearInterval(this._timer); this._timer = null; }
+    if (this._timer) {
+      clearInterval(this._timer);
+      this._timer = null;
+    }
     this._shuttingDown = true;
     this.writeHeartbeat();
   }
@@ -85,9 +89,7 @@ class Heartbeat {
   writeHeartbeat() {
     const now = new Date();
     const uptimeSeconds = Math.floor((Date.now() - this.startTime) / 1000);
-    const status = this._shuttingDown ? 'shutdown' : 'alive';
-
-    const hbStatus = this._shuttingDown ? 'done' : 'in_progress';
+    const heartbeatStatus = this._shuttingDown ? 'done' : 'in_progress';
 
   // Load contradictions (truth-over-stability) — derive system_state, do NOT read system_state.json
   let systemState = 'consistent';
@@ -96,98 +98,132 @@ class Heartbeat {
   try {
     const broadcastDir = path.join(REPO_ROOT, 'lanes', 'broadcast');
     const contraPath = path.join(broadcastDir, 'contradictions.json');
-
     if (fs.existsSync(contraPath)) {
-      const contraData = JSON.parse(fs.readFileSync(contraPath, 'utf8'));
-      activeContradictions = contraData
-        .filter(c => c.status === 'active' || c.status === 'resolving')
-        .map(c => c.id);
+      const cd = JSON.parse(fs.readFileSync(contraPath, 'utf8'));
+      activeContradictions = cd.filter(c => c.status === 'active' || c.status === 'resolving').map(c => c.id);
     }
-
-    // TRUTH-OVER-STABILITY: contradictions override system_state
-    if (activeContradictions.length > 0) {
-      systemState = 'degraded';
-    }
-    this._writeSystemState(systemState, activeContradictions, processedOk);
-
-    // Verify processed/ messages have completion proof
-      const processedDir = path.join(this.config.inboxPath, 'processed');
-      if (fs.existsSync(processedDir)) {
-        const processedFiles = fs.readdirSync(processedDir).filter(f => f.endsWith('.json'));
-        for (const f of processedFiles) {
+      if (activeContradictions.length > 0) systemState = 'degraded';
+  this._writeSystemState(systemState, activeContradictions, processedOk);
+      // Check processed/ for completion proof
+      const procDir = path.join(this.config.inboxPath, 'processed');
+      if (fs.existsSync(procDir)) {
+        const pf = fs.readdirSync(procDir).filter(f => f.endsWith('.json'));
+        for (const f of pf) {
           try {
-            const msg = JSON.parse(fs.readFileSync(path.join(processedDir, f), 'utf8'));
-            if (msg.requires_action) {
-              const hasProof = (msg.completion_artifact_path || msg.completion_message_id || msg.resolved_by_task_id || msg.terminal_decision);
-              if (!hasProof) {
-                processedOk = false;
-                break;
-              }
+            const m = JSON.parse(fs.readFileSync(path.join(procDir, f), 'utf8'));
+            if (m.requires_action && !(m.completion_artifact_path || m.completion_message_id || m.resolved_by_task_id || m.terminal_decision)) {
+              processedOk = false; break;
             }
-          } catch (_) { processedOk = false; break; }
+          } catch(_) { processedOk = false; break; }
         }
       }
-    } catch (err) {
-      console.error('Warning: could not load system state for heartbeat:', err.message);
-    }
+    } catch(_) {}
 
-    const payload = {
-      schema_version: '1.2',
+    // Create idempotency key as SHA-256 of "heartbeat-{laneName}-fixed"
+    const crypto = require('crypto');
+    const idempotencyKey = crypto.createHash('sha256').update(`heartbeat-${this.config.laneName}-fixed`).digest('hex');
+
+    // Construct schema-compliant heartbeat message
+    const message = {
+      schema_version: "1.1",
       task_id: `heartbeat-${this.config.laneName}`,
-      idempotency_key: (() => { const c = require('crypto'); return c.createHash('sha256').update(`heartbeat-${this.config.laneName}-fixed`).digest('hex'); })(),
+      idempotency_key: idempotencyKey,
       from: this.config.laneName,
       to: this.config.laneName,
-      type: 'heartbeat',
-      task_kind: 'proposal',
-      priority: 'P3',
-      subject: `Heartbeat: ${this.config.laneName} ${status}`,
-      body: `Lane ${this.config.laneName} heartbeat. Uptime: ${uptimeSeconds}s. Messages processed: ${this.messagesProcessed}.`,
+      type: "heartbeat",
+      task_kind: "proposal",
+      priority: "P3",
+      subject: `Heartbeat from ${this.config.laneName} lane`,
+      body: JSON.stringify({
+        lane: this.config.laneName,
+        session_active: !this._shuttingDown,
+        uptime_seconds: uptimeSeconds,
+        messages_processed: this.messagesProcessed,
+        last_inbox_scan: now.toISOString(),
+        version: '1.0'
+      }),
       timestamp: now.toISOString(),
       requires_action: false,
-      payload: { mode: 'inline', compression: 'none', path: null, chunk: null },
-      execution: { mode: 'manual', engine: 'kilo', actor: 'lane', session_id: null, parent_id: null },
-      lease: { owner: this.config.laneName, acquired_at: now.toISOString(), expires_at: new Date(now.getTime() + 900000).toISOString(), renew_count: 0, max_renewals: 3 },
-      retry: { attempt: 1, max_attempts: 3, last_error: null, last_attempt_at: null },
-      evidence: { required: false, evidence_path: null, verified: true, verified_by: 'self', verified_at: now.toISOString() },
-      heartbeat: { interval_seconds: this.config.intervalSeconds, last_heartbeat_at: now.toISOString(), timeout_seconds: this.config.staleAfterSeconds, status: hbStatus },
-      lane: this.config.laneName,
-      session_active: !this._shuttingDown,
-      uptime_seconds: uptimeSeconds,
-      messages_processed: this.messagesProcessed,
-      last_inbox_scan: now.toISOString(),
-      version: '1.0',
-      system_state: systemState,
-      active_contradictions: activeContradictions,
-      processed_ok: processedOk,
-      compaction_enabled: false,
-      compaction_suspend_reason: activeContradictions.length > 0 ? 'P0 contradictions present in system' : null
-    };
+      payload: {
+        mode: "inline"
+      },
+      execution: {
+        mode: "manual",
+        engine: "opencode",
+        actor: "lane"
+      },
+      lease: {
+        owner: null,
+        acquired_at: null,
+        expires_at: null,
+        renew_count: 0,
+        max_renewals: 3
+      },
+      retry: {
+        attempt: 1,
+        max_attempts: 3,
+        last_error: null,
+        last_attempt_at: null
+      },
+      evidence: {
+        required: true,
+        evidence_path: null,
+        verified: false,
+        verified_by: null,
+        verified_at: null
+      },
+      heartbeat: {
+        interval_seconds: this.config.intervalSeconds,
+        last_heartbeat_at: now.toISOString(),
+        timeout_seconds: this.config.staleAfterSeconds,
+        status: heartbeatStatus
+      },
+    signature: "",
+    key_id: "",
+    system_state: systemState,
+    active_contradictions: activeContradictions,
+    processed_ok: processedOk,
+    compaction_enabled: activeContradictions.length === 0,
+    compaction_suspend_reason: activeContradictions.length > 0 ? 'Active contradictions present' : null
+  };
 
-  const dir = this.config.inboxPath;
-  try {
-    if (!fs.existsSync(dir)) { fs.mkdirSync(dir, { recursive: true }); }
-    const filePath = path.join(dir, this._heartbeatFilename(this.config.laneName));
-    fs.writeFileSync(filePath, JSON.stringify(payload, null, 2) + '\n', 'utf8');
-  } catch (err) {
-    console.error('Failed to write heartbeat:', err.message);
+    const dir = this.config.inboxPath;
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      const filePath = path.join(dir, this._heartbeatFilename(this.config.laneName));
+      fs.writeFileSync(filePath, JSON.stringify(message, null, 2) + '\n', 'utf8');
+    } catch (err) {
+      console.error('Failed to write heartbeat:', err.message);
+    }
   }
-}
 
-  incrementProcessed() { this.messagesProcessed++; }
+  incrementProcessed() {
+    this.messagesProcessed++;
+  }
 
   checkLaneHealth() {
     const now = Date.now();
     const lanes = {};
-    for (const laneName of Object.keys(this.config.canonicalPaths)) {
+
+    const laneNames = Object.keys(this.config.canonicalPaths);
+    for (let i = 0; i < laneNames.length; i++) {
+      const laneName = laneNames[i];
       const inboxPath = this.config.canonicalPaths[laneName];
-      const hbPath = path.join(inboxPath, this._heartbeatFilename(laneName));
+      const laneSpecificPath = path.join(inboxPath, this._heartbeatFilename(laneName));
+
       try {
-        if (!fs.existsSync(hbPath)) {
+        if (!fs.existsSync(laneSpecificPath)) {
           lanes[laneName] = { status: 'unknown', last_heartbeat: null, stale_for_seconds: 0 };
           continue;
         }
-        const data = JSON.parse(fs.readFileSync(hbPath, 'utf8'));
-        const elapsed = Math.floor((now - new Date(data.timestamp).getTime()) / 1000);
+
+        const raw = fs.readFileSync(laneSpecificPath, 'utf8');
+        const data = JSON.parse(raw);
+        const heartbeatTime = new Date(data.timestamp).getTime();
+        const elapsed = Math.floor((now - heartbeatTime) / 1000);
+
         lanes[laneName] = {
           status: elapsed > this.config.staleAfterSeconds ? 'stale' : 'alive',
           last_heartbeat: data.timestamp,
@@ -197,7 +233,8 @@ class Heartbeat {
         lanes[laneName] = { status: 'unknown', last_heartbeat: null, stale_for_seconds: 0 };
       }
     }
-    return { timestamp: new Date().toISOString(), lanes };
+
+    return { timestamp: new Date().toISOString(), lanes: lanes };
   }
 }
 
@@ -206,8 +243,10 @@ module.exports = { Heartbeat, DEFAULT_CONFIG };
 if (require.main === module) {
   const args = process.argv.slice(2);
   const heartbeat = new Heartbeat();
+
   if (args.includes('--check')) {
-    console.log(JSON.stringify(heartbeat.checkLaneHealth(), null, 2));
+    const report = heartbeat.checkLaneHealth();
+    console.log(JSON.stringify(report, null, 2));
   } else if (args.includes('--once')) {
     heartbeat.writeHeartbeat();
   } else {
