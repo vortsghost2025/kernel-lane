@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # Pre-commit verification script
-# 1) Run lint if defined in package.json (npm script "lint")
+# 1) Run lint if defined in package.json (npm script "lint"). This step is optional and will be skipped if no package.json is present.
 # 2) Scan staged files for secret patterns (.pem, .key, .jws)
 # 3) Exit with non‑zero code on any failure to block the commit
 

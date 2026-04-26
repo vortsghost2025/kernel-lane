@@ -81,7 +81,10 @@ class PostCompactAudit {
             { name: 'public_pem', suffix: '.identity/public.pem', binary: false },
             { name: 'snapshot_json', suffix: '.identity/snapshot.json', binary: false },
             { name: 'keys_json', suffix: '.identity/keys.json', binary: false },
-            { name: 'lane_trust_store', suffix: 'lanes/broadcast/trust-store.json', binary: false }
+            { name: 'lane_trust_store', suffix: 'lanes/broadcast/trust-store.json', binary: false },
+            { name: 'agents_md', suffix: 'AGENTS.md', binary: false },
+            { name: 'targets_json', suffix: 'config/targets.json', binary: false },
+            { name: 'convergence_protocol_md', suffix: 'lanes/broadcast/CONVERGENCE_PROTOCOL.md', binary: false }
         ];
         const trustStorePath = this.trustStorePath;
         const results = {};
@@ -113,7 +116,23 @@ class PostCompactAudit {
             };
             results[laneId] = laneFiles;
         }
-        return results;
+// Deduplicate entries for globally-shared files (e.g., AGENTS.md, targets.json, CONVERGENCE_PROTOCOL.md)
+    const unique = {};
+    for (const [laneId, files] of Object.entries(results)) {
+      for (const [key, info] of Object.entries(files)) {
+        const pathKey = `${info.path}`;
+        if (!unique[pathKey]) {
+          unique[pathKey] = { ...info };
+        }
+      }
+    }
+    // Assign deduplicated results under a special 'global' lane identifier
+    results = { global: {} };
+    for (const [pathKey, info] of Object.entries(unique)) {
+      const name = info.name || pathKey.split('/').pop();
+      results.global[name] = info;
+    }
+    return results;
     }
 
     _getLaneHeartbeats() {

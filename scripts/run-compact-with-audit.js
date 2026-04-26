@@ -12,11 +12,11 @@ const { PostCompactAudit } = require('./post-compact-audit');
 const path = require('path');
 const fs = require('fs');
 
-// Placeholder for actual compact operation – to be replaced with real logic.
+// Placeholder for actual compact operation – replace with real logic when ready.
 async function performCompact() {
   console.log('[compact] Starting placeholder compact operation...');
-  // Insert real compact steps here (e.g., data pruning, artifact generation).
-  // For now we just simulate a short delay.
+  // TODO: Implement the real compact workflow (e.g., data pruning, artifact generation).
+  // This stub simulates a short delay for now.
   await new Promise((res) => setTimeout(res, 500));
   console.log('[compact] Placeholder compact completed.');
 }
