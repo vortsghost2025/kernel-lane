@@ -51,11 +51,11 @@ function Count-Files([string]$dir, [string]$filter = "*.json") {
     Where-Object { $_.Name -notlike "heartbeat*" }).Count
 }
 
-function Run-Step([string]$name, [string]$script, [string[]]$args, [string]$cwd) {
+function Run-Step([string]$name, [string]$script, [string]$argLine, [string]$cwd) {
   try {
     $prevDir = Get-Location
     if ($cwd) { Set-Location $cwd }
-    $result = & node $script @args 2>&1
+    $result = & node $script $argLine.Split(' ') 2>&1
     Set-Location $prevDir
     $resultStr = ($result | Out-String).Trim()
     Write-Log " [$name] $resultStr"
@@ -93,7 +93,7 @@ while ($true) {
     # Step 1: Admit + route new inbox messages
     if ($inboxCount -gt 0) {
       Write-Log "[watcher] Step 1: Running lane-worker for ${lane}"
-      Run-Step "lane-worker" "$root\scripts\lane-worker.js" @("--lane", $lane, "--apply") $root
+      Run-Step "lane-worker" "$root\scripts\lane-worker.js" "--lane $lane --apply" $root
       $anyActivity = $true
     }
 
@@ -101,14 +101,14 @@ while ($true) {
     if (-not $SkipExecutor -and $arCount -gt 0) {
       Write-Log "[watcher] Step 2: Running task-executor for ${lane}"
       $executorScript = "$ArchivistRoot\scripts\generic-task-executor.js"
-      Run-Step "task-executor" $executorScript @($lane, "--apply") $root
+      Run-Step "task-executor" $executorScript "$lane --apply" $root
       $anyActivity = $true
     }
 
     # Step 3: Deliver outbox + collect incoming
     if ($outboxCount -gt 0) {
       Write-Log "[watcher] Step 3: Running relay-daemon for ${lane}"
-      Run-Step "relay-daemon" "$root\scripts\relay-daemon.js" @("--apply") $root
+      Run-Step "relay-daemon" "$root\scripts\relay-daemon.js" "--apply" $root
       $anyActivity = $true
     }
   }
