@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.3",
+  "task_id": "response-task-1777160635247-003",
+  "idempotency_key": "resp-1777161819110-task-17771606352",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "proposal",
+  "priority": "P0",
+  "subject": "Re: Fix async kernel: shared memory sizing + grid dimensioning for 4-warp blocks",
+  "body": "Acknowledged task: Fix async kernel: shared memory sizing + grid dimensioning for 4-warp blocks",
+  "timestamp": "2026-04-26T00:03:39.110Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "auto",
+    "engine": "pipeline",
+    "actor": "task-executor"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-26T00:03:39.110Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": true
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "response",
+    "delivered_at": "2026-04-26T00:03:39.110Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-26T00:03:39.110Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "_original_task_id": "task-1777160635247-003",
+  "_execution_result": {
+    "acknowledged": true
+  },
+  "content_hash": "sha256:e1f7331dbf80ad82f7df41f8b10f6ba4ccd47e6ca3aaeb936f90652b00bbc21d",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImI2NzdlYjg3ZjZiZTgzZjkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6ZTFmNzMzMWRiZjgwYWQ4MmY3ZGY0MWY4YjEwZjZiYTRjY2Q0N2U2Y2EzYWFlYjkzNmY5MDY1MmIwMGJiYzIxZCIsImV4cCI6MTc3NzI0ODIxOSwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3NzE2MTgxOSwiaWQiOm51bGwsImxhbmUiOiJrZXJuZWwiLCJwcmlvcml0eSI6IlAwIiwidGFza19pZCI6InJlc3BvbnNlLXRhc2stMTc3NzE2MDYzNTI0Ny0wMDMiLCJ0byI6ImFyY2hpdmlzdCJ9.nkiwj1izLQ1Mx6peEhOzzVQK08_wTe7Iwsi2rskKabpwwL0IuNSdPaHaC7tjdM3AwxVWa7WUYfU5x7_T45KD0jagQNpeURQzuwKeMlcqKSXLpgzkX20Twu9MkSOOtR6Za_lgYz12QQLEu-Hl00mY83ck9V4npcNbBufqzCfR1Iiult4dJkZoik4FzeqNW7YQJWjaDy5X3cetpxL1y2BiHewsvP02znEGpsLNFPtaWSFuojWSdeqWakbjwx5CBpaQS6zIY1tnJahtFxkQ3AGEe5b5lzyKDm-X7uXq2KRaDOqPIPS4rDpu5TYrR_xYAc57Lpm5Kf9pcmET_H6W55yUyQ",
+  "signature_alg": "RS256",
+  "key_id": "b677eb87f6be83f9"
+}

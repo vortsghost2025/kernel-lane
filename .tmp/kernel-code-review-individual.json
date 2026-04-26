@@ -1,0 +1,123 @@
+{
+  "schema_version": "1.3",
+  "task_id": "kernel-code-review-individual-20260426",
+  "idempotency_key": "kernel-individual-review-20260426-stripe-rake",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "task",
+  "task_kind": "report",
+  "priority": "P2",
+  "subject": "Code Review: Kernel Lane (stripe-rake branch) — Individual Summary",
+  "body": "Kernel lane individual code review for branch stripe-rake vs origin/main. 29 commits, extensive changes across audit infrastructure, compact workflow, trust-store handling, schema enhancements, profiling infrastructure, and inbox housekeeping. Overall assessment: APPROVE WITH SUGGESTIONS. No critical issues found. 2 warnings, 8 suggestions for improvement.",
+  "timestamp": "2026-04-26T14:26:30.000Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none",
+    "path": null,
+    "chunk": null
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": null,
+    "parent_id": null
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-26T14:26:30.000Z",
+    "expires_at": "2026-04-26T14:41:30.000Z",
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "lanes/kernel/outbox/kernel-code-review-individual-20260426.json",
+    "verified": true,
+    "verified_by": "self",
+    "verified_at": "2026-04-26T14:26:30.000Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": "2026-04-26T14:26:30.000Z",
+    "timeout_seconds": 900,
+    "status": "done"
+  },
+  "watcher": {
+    "enabled": false,
+    "poll_seconds": 60,
+    "p0_fast_path": true,
+    "max_concurrent": 1,
+    "heartbeat_required": true,
+    "stale_after_seconds": 300,
+    "backoff": {
+      "initial_seconds": 60,
+      "max_seconds": 300,
+      "multiplier": 2
+    }
+  },
+  "delivery_verification": {
+    "verified": false,
+    "verified_at": null,
+    "retries": 0
+  },
+  "review_data": {
+    "branch": "stripe-rake",
+    "base": "origin/main",
+    "commits_reviewed": 29,
+    "recommendation": "APPROVE_WITH_SUGGESTIONS",
+    "issues": {
+      "warnings": [
+        {
+          "file": "scripts/heartbeat.js:85",
+          "issue": "Heartbeat timestamp parsed without validation; malformed timestamps cause NaN age calculations"
+        },
+        {
+          "file": "src/lane/SchemaValidator.js:120",
+          "issue": "Validation errors thrown without preserving original stack trace"
+        }
+      ],
+      "suggestions": [
+        {
+          "file": "scripts/post-compact-audit.js:335-339",
+          "issue": "determineStatus comment says trust_store changes non-critical but they still appear in unexpected_changes"
+        },
+        {
+          "file": "scripts/run-compact-with-audit.js",
+          "issue": "Trust store backup/restore uses direct fs.writeFileSync without atomic write; crash between write and restore could corrupt"
+        },
+        {
+          "file": "scripts/inbox-watcher.js:219",
+          "issue": "Watcher re-reads entire inbox on each poll; performance degrades with inbox size"
+        },
+        {
+          "file": "scripts/identity-enforcer.js:66",
+          "issue": "Logs raw JWT/JWS token on verification failure, potentially leaking secrets to logs"
+        },
+        {
+          "file": "scripts/execution-gate.js:174",
+          "issue": "executeGate lacks explicit return values on some error paths; callers may interpret undefined as success"
+        },
+        {
+          "file": "scripts/outbox-write-guard.js:15",
+          "issue": "Guard checks file existence before write but does not handle TOCTOU race conditions"
+        },
+        {
+          "file": "docs/WATCHER_DEPLOYMENT.md:45",
+          "issue": "Deployment instructions assume PowerShell only; no cross-platform guidance"
+        },
+        {
+          "file": "profiles/headless/baseline_metrics.csv",
+          "issue": "CSV lacks header row; downstream scripts may misinterpret column order"
+        }
+      ]
+    }
+  }
+}

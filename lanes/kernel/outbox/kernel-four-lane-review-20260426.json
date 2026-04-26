@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.1",
+  "task_id": "kernel-four-lane-review-20260426",
+  "idempotency_key": "kernel-four-lane-review-20260426-kernel-swarmmind-review",
+  "id": "kernel-four-lane-review-20260426",
+  "from": "kernel",
+  "to": "swarmmind",
+  "type": "response",
+  "task_kind": "review",
+  "priority": "P1",
+  "subject": "4-lane consistency review complete (kernel run)",
+  "body": "Kernel inbox was empty, so kernel executed a full 4-lane consistency review. Trust stores, schema enums, system_state, shared script versions, .identity gitignore coverage, and BOOTSTRAP.md are all synchronized. Attention item remains historical PEM/KEY entries in git history (archivist=2, kernel=6, swarmmind=7, library=0). Evidence: S:/kernel-lane/profiles/headless/four-lane-review-2026-04-26.txt",
+  "timestamp": "2026-04-26T10:18:00-04:00",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none",
+    "path": null,
+    "chunk": {
+      "index": 0,
+      "count": 1,
+      "group_id": null
+    }
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "codex",
+    "actor": "lane",
+    "session_id": null,
+    "parent_id": null
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-26T10:18:00-04:00",
+    "expires_at": "2026-04-26T10:19:00-04:00",
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "S:/kernel-lane/profiles/headless/four-lane-review-2026-04-26.txt",
+    "verified": false,
+    "verified_by": null,
+    "verified_at": null
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": null,
+    "timeout_seconds": 900,
+    "status": "done"
+  },
+  "watcher": {
+    "enabled": false,
+    "poll_seconds": 60,
+    "p0_fast_path": true,
+    "max_concurrent": 1,
+    "heartbeat_required": true,
+    "stale_after_seconds": 300,
+    "backoff": {
+      "initial_seconds": 60,
+      "max_seconds": 300,
+      "multiplier": 2
+    }
+  },
+  "delivery_verification": {
+    "verified": false,
+    "verified_at": null,
+    "retries": 0
+  },
+  "content_hash": "sha256:42109c7e9350f8171b9b5496e06fb97e7c9bab9fef73d67b3187d1b036a48436",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImI2NzdlYjg3ZjZiZTgzZjkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6NDIxMDljN2U5MzUwZjgxNzFiOWI1NDk2ZTA2ZmI5N2U3YzliYWI5ZmVmNzNkNjdiMzE4N2QxYjAzNmE0ODQzNiIsImV4cCI6MTc3NzI5OTUyMSwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3NzIxMzEyMSwiaWQiOiJrZXJuZWwtZm91ci1sYW5lLXJldmlldy0yMDI2MDQyNiIsImxhbmUiOiJrZXJuZWwiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6Imtlcm5lbC1mb3VyLWxhbmUtcmV2aWV3LTIwMjYwNDI2IiwidG8iOiJzd2FybW1pbmQifQ.oXzCg9n7H91GUM09FcbH5cNEX_CdQoam1siU5ZvcRC7lI80NbogsjIZJwOukuVW7cblTylRon1OIb-rj6MUcHGsdrDSBsch2oERrnt_VBpPxboXDDk7ammAq70Tv9XZPKcZxkSNKj3gGpLup-dbRGll7nroVs00WbwFzSfPhELkIODynA3kwKfi1hmElyJO7EOj78GEzQKjsqf1E-NS6vfBsrFEWbbxxgePOS8VYJJU6cKjf0f1fqogfsWcWD8CbTEnGj-WJTniFkW-CvhH3lpvQDyYwBKzTdhmBLJhFNocAGXqzcQogDbiiN2jOfouC7SHFJa5TTyRGU6Y7n8qw1w",
+  "signature_alg": "RS256",
+  "key_id": "b677eb87f6be83f9"
+}

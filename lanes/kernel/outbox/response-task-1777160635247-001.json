@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.3",
+  "task_id": "response-task-1777160635247-001",
+  "idempotency_key": "resp-1777161819083-task-17771606352",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "proposal",
+  "priority": "P1",
+  "subject": "Re: Add Nsight Compute profiling script + CI build step",
+  "body": "Acknowledged task: Add Nsight Compute profiling script + CI build step",
+  "timestamp": "2026-04-26T00:03:39.084Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "auto",
+    "engine": "pipeline",
+    "actor": "task-executor"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-26T00:03:39.084Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": true
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "response",
+    "delivered_at": "2026-04-26T00:03:39.084Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-26T00:03:39.084Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "_original_task_id": "task-1777160635247-001",
+  "_execution_result": {
+    "acknowledged": true
+  },
+  "content_hash": "sha256:21251567bf3e973da7a56b71150c4113fd4aa565329da06973e36120163f3e26",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImI2NzdlYjg3ZjZiZTgzZjkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MjEyNTE1NjdiZjNlOTczZGE3YTU2YjcxMTUwYzQxMTNmZDRhYTU2NTMyOWRhMDY5NzNlMzYxMjAxNjNmM2UyNiIsImV4cCI6MTc3NzI0ODIxOSwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3NzE2MTgxOSwiaWQiOm51bGwsImxhbmUiOiJrZXJuZWwiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6InJlc3BvbnNlLXRhc2stMTc3NzE2MDYzNTI0Ny0wMDEiLCJ0byI6ImFyY2hpdmlzdCJ9.UXFooitLpZokbG_MnfZbYc1QwUB86_pe2TDE9qCdObZzJGQuD6iOltm3cReH5BeDohU-iXt3ELEEv7GjgfH4Rrmx_ywcIGyzGXlUF39KHr_a4sWk75A-PCJJ443GkFYazICFlL7B2FISpg2_AEum4qsVW4uM1X-jf8w56sRm60Ul6VEk1JJ8CMtHWo01VaSMmwhytiHfwOx1plFqS-ZTDmC9tRjpGivhFhr1kwKAMyVEub6Mr0tDnxggy6YTrJ4tsHbruz6dUXsufond9cL-sHEbkcDI_rG70GJosCyZ3TOvTmprLl6CXQihjWf6D2yylksEV_re838qhBAnsAwiKA",
+  "signature_alg": "RS256",
+  "key_id": "b677eb87f6be83f9"
+}

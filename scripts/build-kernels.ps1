@@ -37,7 +37,7 @@ foreach ($f in $cuFiles) {
   $hasMain = Select-String -Pattern 'int\s+main\s*\(' -Path $f.FullName -Quiet
   if ($hasMain) {
     $outExe = Join-Path $outDir ("{0}.exe" -f $f.BaseName)
-    $cmd = "nvcc -arch=sm_120 -lineinfo -o `"$outExe`" `"$($f.FullName)`" -O3 --use_fast_math"
+    $cmd = "nvcc -arch=sm_120 -lineinfo -std=c++17 -DCCCL_IGNORE_DEPRECATED_CPP_DIALECT -Xcompiler `"/Zc:preprocessor`" -o `"$outExe`" `"$($f.FullName)`" -O3 --use_fast_math"
     Write-Host "[BUILD] $cmd"
     cmd /c $cmd
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

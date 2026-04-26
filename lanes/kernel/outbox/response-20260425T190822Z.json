@@ -1,0 +1,48 @@
+{
+  "task_id": "response-20260425T190822Z",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "status",
+  "priority": "P2",
+  "subject": "GEN4 WMMA candidate adoption",
+  "body": "Technical author: SwarmMind agent\nOwning lane: Kernel Lane\nSignature status before closure: unsigned\nClosure action: Kernel Lane reviewed/adopted and signed response",
+  "timestamp": "2026-04-25T19:08:22.000Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "auto",
+    "engine": "pipeline",
+    "actor": "kernel"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-25T19:08:22.000Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": true
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "response",
+    "delivered_at": "2026-04-25T19:08:22.000Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-25T19:08:22.000Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "content_hash": "sha256:2e0d8a0b4acd78352b02a7149bb27483dc3f9684d397bc4ba4210fc6d7c57344",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImI2NzdlYjg3ZjZiZTgzZjkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MmUwZDhhMGI0YWNkNzgzNTJiMDJhNzE0OWJiMjc0ODNkYzNmOTY4NGQzOTdiYzRiYTQyMTBmYzZkN2M1NzM0NCIsImV4cCI6MTc3NzI0NjAzMiwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3NzE1OTYzMiwiaWQiOm51bGwsImxhbmUiOiJrZXJuZWwiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6InJlc3BvbnNlLTIwMjYwNDI1VDE5MDgyMloiLCJ0byI6ImFyY2hpdmlzdCJ9.AuDogDl70ATN5kwdIXBf3evmfAi445Eby2KQn933pVxSe73K122PnUziyK0qcAwVNJBzm3BpbJalnto4b8AU1T91MoUewPtnDSj3LvvsnE-VKJGqeFR7oUy0N52a2oBhAq6w2ngBmMB_yK7IvST71Ln-bb6T4cM6IkzeS2XwXHCKObFf_4GcXsMyQLf1ywA5zpBjz-35V4StJrhKqC41Mrc8EULsBnHJu9MDMeogQENtVpZ8ZfbC6RBrjpAukb0wPcp0i_7PuSXpOu4aVRFjWlAPb9XGeSMbIKzpWi6DyfnWb01LksSVTQzE4Ms_w6N3u3NgjMgjqV8uqfeH3INjqQ",
+  "signature_alg": "RS256",
+  "key_id": "b677eb87f6be83f9"
+}

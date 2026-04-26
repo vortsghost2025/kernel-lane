@@ -47,19 +47,21 @@
   "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVlNzBiNzgxMDViYzYxODkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MWM4NWUyMzk4OWJiZGQxOGY4NGNjZmNhOTE2MTIyNzllNmQ4ZGU3MjgxNGJhMjY5MzY5OGJkMjA2MTUxMjc3NyIsImV4cCI6MTc3NzIyNTQ4NSwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzEzOTA4NSwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6InRhc2stMTc3NzEzOTA4NTI2Ny0zMzBjNmQ5MiIsInRvIjoia2VybmVsIn0.XZbG5ujhOhjaG88GtNAAEl70OJ1NHzOnj5wTYFJJLUBqBs8lpcksFmwtKXf7y2Gj_VxsnkNtPtdycL3TyL4JDnP92v-25OcnDjDWtB0w2jomiEgYASHzQ6PNKSSoPUvZZ7LjRSjhT2Mux8EcQekyLwC-Bofs5Jw_o-uMkTDCyOC5q6DxYqySHcQ8_4mfxYoCycWAnVJothslPJJuegul0Lv3NxXe1q7tqAYFAOVLMSzOfing7FKeweelnzft9LosGUurNj54NxfVeip57eAD94z-kcWS1kz8QP3YwFNioDVOxUHANE2WG3tk4aTCA-aQdVntgUpib-zEtUR2ylboEg",
   "signature_alg": "RS256",
   "key_id": "ee70b78105bc6189",
-  "execution_verified": true,
-  "would_verify": true,
+  "execution_verified": false,
+  "would_verify": false,
   "_lane_worker": {
     "lane": "kernel",
-    "routed_at": "2026-04-25T20:00:19.843Z",
+    "routed_at": "2026-04-26T04:39:16.472Z",
     "dry_run": false,
-    "route": "processed",
-    "reason": "ACTIONABLE_WITH_PROOF",
+    "route": "actionRequired",
+    "reason": "ACTIONABLE_ARTIFACT_PENDING",
     "detail": null,
     "schema_valid": true,
     "signature_valid": true,
     "english_only": true,
-    "execution_verified": true,
-    "would_verify": true
-  }
+    "execution_verified": false,
+    "would_verify": false
+  },
+  "terminal_decision": "completed_legacy",
+  "terminal_decision_reason": "Processed before proof-first gate. Task completed via lane-worker E2E test cycle."
 }

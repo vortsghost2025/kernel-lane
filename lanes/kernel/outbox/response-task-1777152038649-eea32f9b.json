@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.3",
+  "task_id": "response-task-1777152038649-eea32f9b",
+  "idempotency_key": "resp-1777178356570-task-17771520386",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "ack",
+  "priority": "P3",
+  "subject": "Re: Pipeline E2E v4 - final",
+  "body": "Acknowledged task: Pipeline E2E v4 - final",
+  "timestamp": "2026-04-26T04:39:16.570Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "auto",
+    "engine": "pipeline",
+    "actor": "task-executor"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-26T04:39:16.570Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": true
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "response",
+    "delivered_at": "2026-04-26T04:39:16.570Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-26T04:39:16.570Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "_original_task_id": "task-1777152038649-eea32f9b",
+  "_execution_result": {
+    "acknowledged": true
+  },
+  "content_hash": "sha256:f23bdf1b8b443ca43e49a663690e421afae7e7d5def73a797009a9ad1267dbff",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImI2NzdlYjg3ZjZiZTgzZjkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6ZjIzYmRmMWI4YjQ0M2NhNDNlNDlhNjYzNjkwZTQyMWFmYWU3ZTdkNWRlZjczYTc5NzAwOWE5YWQxMjY3ZGJmZiIsImV4cCI6MTc3NzI2NDc1NiwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3NzE3ODM1NiwiaWQiOm51bGwsImxhbmUiOiJrZXJuZWwiLCJwcmlvcml0eSI6IlAzIiwidGFza19pZCI6InJlc3BvbnNlLXRhc2stMTc3NzE1MjAzODY0OS1lZWEzMmY5YiIsInRvIjoiYXJjaGl2aXN0In0.q2FW6h4EfaFouAPngB1RyHlOKQISqHToPErlP_fOD484o9Z4hvEw7feR1TRCZLOIasppxmlt4Oui3WHGWWQQ7ssXlQUFSuPpcSVLhVGYKyrmPQ3v1zFqJrArnZODNRpxasq3I3AQQJA53009OF1twRj_CCb2FPONxhiSwKigwEn5itNb_PoS2U7NesqLx_0JTTq52aYRjfoNB-YrlQbgsNdNl6NjKe-pO6AFlaqDV_E223Rr0et9wfWXYXgRpOT0QwDrO5jVtdLArDsXKPK9JiCClOo2SrU2TiMsn5-tc5S80i_ypTHiLF4yQYl6lSxGIpjLt1QZORIJ7POyT5FKVw",
+  "signature_alg": "RS256",
+  "key_id": "b677eb87f6be83f9"
+}

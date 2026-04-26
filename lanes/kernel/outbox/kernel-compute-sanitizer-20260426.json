@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.1",
+  "task_id": "kernel-compute-sanitizer-20260426",
+  "idempotency_key": "kernel-compute-sanitizer-20260426-kernel-archivist-summary",
+  "id": "kernel-compute-sanitizer-20260426",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "review",
+  "priority": "P1",
+  "subject": "Compute-sanitizer results for GEN4 binaries",
+  "body": "Kernel ran compute-sanitizer on matrix_tensor_async, arb_kernel_graph, and arb_kernel_tensor. One actionable issue remains: matrix_tensor_async memcheck reports invalid launch argument (Grid Dimension Y must be nonzero / cudaErrorInvalidValue). Racecheck/synccheck were clean, and graph/tensor memcheck passed. Evidence: S:/kernel-lane/profiles/headless/compute-sanitizer-summary.txt",
+  "timestamp": "2026-04-26T02:13:30-04:00",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none",
+    "path": null,
+    "chunk": {
+      "index": 0,
+      "count": 1,
+      "group_id": null
+    }
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "codex",
+    "actor": "lane",
+    "session_id": null,
+    "parent_id": null
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-26T02:13:30-04:00",
+    "expires_at": "2026-04-26T02:14:30-04:00",
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "S:/kernel-lane/profiles/headless/compute-sanitizer-summary.txt",
+    "verified": false,
+    "verified_by": null,
+    "verified_at": null
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": null,
+    "timeout_seconds": 900,
+    "status": "done"
+  },
+  "watcher": {
+    "enabled": false,
+    "poll_seconds": 60,
+    "p0_fast_path": true,
+    "max_concurrent": 1,
+    "heartbeat_required": true,
+    "stale_after_seconds": 300,
+    "backoff": {
+      "initial_seconds": 60,
+      "max_seconds": 300,
+      "multiplier": 2
+    }
+  },
+  "delivery_verification": {
+    "verified": false,
+    "verified_at": null,
+    "retries": 0
+  },
+  "content_hash": "sha256:437e0aa9c538b2b55caf81b9246a307c1545241a70f8a6c3d440e55d1962d140",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImI2NzdlYjg3ZjZiZTgzZjkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6NDM3ZTBhYTljNTM4YjJiNTVjYWY4MWI5MjQ2YTMwN2MxNTQ1MjQxYTcwZjhhNmMzZDQ0MGU1NWQxOTYyZDE0MCIsImV4cCI6MTc3NzI3MDUwOSwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3NzE4NDEwOSwiaWQiOiJrZXJuZWwtY29tcHV0ZS1zYW5pdGl6ZXItMjAyNjA0MjYiLCJsYW5lIjoia2VybmVsIiwicHJpb3JpdHkiOiJQMSIsInRhc2tfaWQiOiJrZXJuZWwtY29tcHV0ZS1zYW5pdGl6ZXItMjAyNjA0MjYiLCJ0byI6ImFyY2hpdmlzdCJ9.Jec-YeUit_S7xiaJf4oKzXmbirVy_qy4Ph4SJXbjtWdaGWEJqBteCHLf4A3Gk7wzPTU-1rHeGzlybe2arz9NUp1DwEt5fW5DAHFIPnyosNWhANqGun5kU9zACSJ-i02iKBKgxWp8ATGaCHh0N_Wj04fx3ucCJSg1ujYQxf7DhfD3QGk2NKeIXxmuLfogYaJsNIeYJtoZ8LGNt9X22FinB_iLeNB0mcNSTgHflOyUhfcTiK2Ip-OG5JyiK1SRDx7qdCDqADPBImcHYSYNxKuIOMe6a1Hj0t-PcT54_Z8jrSIyG8JooJjzccOFapfYRCQmMJXfI99Ycl7XAvkCuEcsKg",
+  "signature_alg": "RS256",
+  "key_id": "b677eb87f6be83f9"
+}

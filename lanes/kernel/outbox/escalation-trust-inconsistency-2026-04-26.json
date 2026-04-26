@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.1",
+  "task_id": "escalation-trust-inconsistency-2026-04-26",
+  "idempotency_key": "SHA-256 hash here - compute as per spec",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "escalation",
+  "task_kind": "amendment",
+  "priority": "P0",
+  "subject": "P0 Escalation: Trust Store Inconsistency Detected",
+  "body": "Exterior observation detected trust inconsistency: Broadcast trust store contains 4 identities while Archivist trust store contains only 1. This creates ambiguity in authority and potential signature validation issues. Evidence: Broadcast store at lanes/broadcast/trust-store.json (4 identities), Archivist store at .trust/keys.json (1 identity). Request immediate reconciliation to ensure trust consistency across lanes.",
+  "timestamp": "2026-04-26T14:42:10.000Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": null,
+    "acquired_at": null,
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "lanes/broadcast/trust-store.json; S:/Archivist-Agent/.trust/keys.json",
+    "verified": true,
+    "verified_by": "kernel",
+    "verified_at": "2026-04-26T14:42:10.000Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": null,
+    "timeout_seconds": 900,
+    "status": "pending"
+  },
+  "watcher": {
+    "enabled": false,
+    "poll_seconds": 60,
+    "p0_fast_path": true,
+    "max_concurrent": 1,
+    "heartbeat_required": true,
+    "stale_after_seconds": 300,
+    "backoff": {
+      "initial_seconds": 60,
+      "max_seconds": 300,
+      "multiplier": 2
+    }
+  },
+  "delivery_verification": {
+    "verified": false,
+    "verified_at": null,
+    "retries": 0
+  }
+}

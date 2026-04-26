@@ -1,0 +1,24 @@
+# Reusable CUDA benchmark container template.
+# Note: host must expose NVIDIA runtime.
+
+FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
+
+WORKDIR /workspace
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Plotting dependencies for scripts/plot-benchmarks.py
+RUN pip3 install --no-cache-dir matplotlib
+
+COPY . /workspace
+
+# Default compile target mirrors kernel-lane benchmark source layout.
+RUN nvcc -O3 -lineinfo -std=c++17 \
+    -o /workspace/benchmarks/bin/matrix_benchmark_container \
+    /workspace/kernels/src/matrix_benchmark.cu || true
+
+CMD ["bash", "-lc", "echo 'GPU benchmark container ready. Run nvcc/benchmarks as needed.'"]

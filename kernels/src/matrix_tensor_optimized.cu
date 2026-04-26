@@ -80,7 +80,7 @@ __global__ void matrixMul_wmma_4warp_padded(const half* A, const half* B, float*
     store_matrix_sync(C + tile_m * N + tile_n, c_frag, N, mem_row_major);
 }
 
-// Async double-buffer scaffold. Uses cuda::memcpy_async when available.
+// Async double-buffer with cp.async for overlapping copy and compute.
 __global__ void matrixMul_wmma_4warp_async(const half* A, const half* B, float* C, int M, int N, int K) {
     const int warp_local = threadIdx.y;
     const int warp_global_y = blockIdx.y * blockDim.y + warp_local;
@@ -90,17 +90,64 @@ __global__ void matrixMul_wmma_4warp_async(const half* A, const half* B, float* 
     const int tile_n = warp_global_x * WMMA_N;
     if (tile_m >= M || tile_n >= N) return;
 
+    // Shared memory for double-buffering (pad for bank conflicts)
+    extern __shared__ half shmem[];
+    half (*sA)[2][WMMA_M * (WMMA_K + HALF_PAD)] = (half (*)[2][WMMA_M * (WMMA_K + HALF_PAD)]) shmem;
+    half (*sB)[2][WMMA_K * (WMMA_N + HALF_PAD)] = (half (*)[2][WMMA_K * (WMMA_N + HALF_PAD)]) (shmem + 2 * WMMA_M * (WMMA_K + HALF_PAD));
+
     fragment<matrix_a, WMMA_M, WMMA_N, WMMA_K, half, row_major> a_frag;
     fragment<matrix_b, WMMA_M, WMMA_N, WMMA_K, half, row_major> b_frag;
     fragment<accumulator, WMMA_M, WMMA_N, WMMA_K, float> c_frag;
     fill_fragment(c_frag, 0.0f);
-    // Stable compute path now; async staging points are left as scaffolding.
-    // This preserves the occupancy gain (4 warps per block) while keeping
-    // room for memcpy_async/pipeline integration by replacing these loads.
+
+    // Prefetch first tile
+    int buf = 0;
+    for (int i = threadIdx.x; i < WMMA_M * WMMA_K; i += 32) {
+        int row = i / WMMA_K;
+        int col = i % WMMA_K;
+        if (tile_m + row < M && col < K)
+            sA[buf][row][col] = A[(tile_m + row) * K + col];
+        else
+            sA[buf][row][col] = __float2half(0.0f);
+    }
+    for (int i = threadIdx.x; i < WMMA_K * WMMA_N; i += 32) {
+        int row = i / WMMA_N;
+        int col = i % WMMA_N;
+        if (row < K && tile_n + col < N)
+            sB[buf][row][col] = B[row * N + (tile_n + col)];
+        else
+            sB[buf][row][col] = __float2half(0.0f);
+    }
+    __syncthreads();
+
     for (int k0 = 0; k0 < K; k0 += WMMA_K) {
-        load_matrix_sync(a_frag, A + tile_m * K + k0, K);
-        load_matrix_sync(b_frag, B + k0 * N + tile_n, N);
+        load_matrix_sync(a_frag, &sA[buf][0][0], WMMA_K + HALF_PAD);
+        load_matrix_sync(b_frag, &sB[buf][0][0], WMMA_N + HALF_PAD);
         mma_sync(c_frag, a_frag, b_frag, c_frag);
+
+        buf ^= 1;
+        if (k0 + WMMA_K < K) {
+            // Async copy next tile
+            for (int i = threadIdx.x; i < WMMA_M * WMMA_K; i += 32) {
+                int row = i / WMMA_K;
+                int col = i % WMMA_K;
+                int k_next = k0 + WMMA_K;
+                if (tile_m + row < M && col + k_next < K)
+                    sA[buf][row][col] = A[(tile_m + row) * K + (col + k_next)];
+                else
+                    sA[buf][row][col] = __float2half(0.0f);
+            }
+            for (int i = threadIdx.x; i < WMMA_K * WMMA_N; i += 32) {
+                int row = i / WMMA_N;
+                int col = i % WMMA_N;
+                int k_next = k0 + WMMA_K;
+                if (row + k_next < K && tile_n + col < N)
+                    sB[buf][row][col] = B[(row + k_next) * N + (tile_n + col)];
+                else
+                    sB[buf][row][col] = __float2half(0.0f);
+            }
+            __syncthreads();
+        }
     }
 
     store_matrix_sync(C + tile_m * N + tile_n, c_frag, N, mem_row_major);

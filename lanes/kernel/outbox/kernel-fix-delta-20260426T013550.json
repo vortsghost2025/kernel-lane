@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.1",
+  "task_id": "kernel-fix-delta-20260426T013550",
+  "idempotency_key": "2c65be2aa8624112a3bf2c39aa022422",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "amendment",
+  "priority": "P1",
+  "subject": "Fix delta: execution-gate/resolver P0s resolved in retest",
+  "body": "Progress delta from Kernel:\n\nWork executed:\n- Patched lane-worker fail-closed routing for completion-proof messages with unverified artifacts.\n- Propagated patched scripts/lane-worker.js to Archivist, Kernel, Library, SwarmMind.\n- Distributed scripts/cross-lane-consistency-check.js to Kernel, Library, SwarmMind for parity.\n\nIndependent re-test results (all 4 lanes):\n- test-execution-gate.js => PASS 10 / FAIL 0\n- test-artifact-resolver.js => PASS 8 / FAIL 0\n- cross-lane-consistency-check.js => runs in all 4 lanes now\n\nConsistency highlights:\n- Trust store hash and key IDs: consistent across all lanes\n- Schema validator enums: synced across all lanes\n- Shared scripts: lane-worker/artifact-resolver/etc synced\n- Remaining divergence noted: heartbeat.js differs by lane size (expected lane-specific behavior possible)\n\nConclusion:\n- Previously reproduced P0s for execution-gate/artifact-resolver are now resolved in test battery.\n- Cross-lane consistency checker parity gap is closed (script now present in all lanes).",
+  "timestamp": "2026-04-26T01:35:50.0418823-04:00",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "path": null,
+    "chunk": {
+      "group_id": null,
+      "index": 0,
+      "count": 1
+    },
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "parent_id": null,
+    "session_id": null,
+    "actor": "lane",
+    "engine": "opencode"
+  },
+  "lease": {
+    "renew_count": 0,
+    "acquired_at": null,
+    "expires_at": null,
+    "owner": null,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_attempt_at": null,
+    "last_error": null
+  },
+  "evidence": {
+    "verified": false,
+    "evidence_path": "S:/Archivist-Agent/scripts/cross-lane-consistency-check.js",
+    "required": true,
+    "verified_at": null,
+    "verified_by": null
+  },
+  "heartbeat": {
+    "status": "in_progress",
+    "last_heartbeat_at": null,
+    "timeout_seconds": 900,
+    "interval_seconds": 300
+  },
+  "watcher": {
+    "enabled": false,
+    "backoff": {
+      "max_seconds": 300,
+      "multiplier": 2,
+      "initial_seconds": 60
+    },
+    "stale_after_seconds": 300,
+    "heartbeat_required": true,
+    "max_concurrent": 1,
+    "poll_seconds": 60,
+    "p0_fast_path": true
+  },
+  "delivery_verification": {
+    "verified": false,
+    "retries": 0,
+    "verified_at": null
+  }
+}

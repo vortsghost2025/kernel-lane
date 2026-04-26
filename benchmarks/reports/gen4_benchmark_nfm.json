@@ -1,0 +1,8 @@
+{
+  "gate": "benchmark_json",
+  "command": "S:/kernel-lane/build/Release/matrix_tensor_optimized.exe",
+  "output": "Error: executable not found or failed to run due to previous compile failure",
+  "timestamp": "2026-04-25T19:40:10.000Z",
+  "success": false,
+  "details": "Required executable was not built; compile gate failed, preventing benchmark execution."
+}

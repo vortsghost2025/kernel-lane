@@ -1,0 +1,91 @@
+{
+  "archived_at": "2026-04-26T15:14:57.677Z",
+  "lane": "kernel",
+  "count": 14,
+  "reason": "Pre-convergence legacy messages with schema violations or malformed content. Archived to clean quarantine directories.",
+  "messages": [
+    {
+      "file": "2026-04-22T00-55-00Z_kernel_schema-response.json",
+      "from": "kernel",
+      "subject": "Schema v1.3 aligned - kernel processed",
+      "timestamp": "2026-04-22T00:55:00Z"
+    },
+    {
+      "file": "2026-04-23T02-00-00Z-archivist-pem-fix.json",
+      "from": "archivist",
+      "subject": "URGENT: Archivist PEM Fingerprint Mismatch in Sync",
+      "timestamp": "2026-04-23T02:00:00Z"
+    },
+    {
+      "file": "2026-04-23T02-00-00Z-pem-001.json",
+      "from": "archivist",
+      "subject": "PEM-001: Regenerate RSA key-pair and store as kern",
+      "timestamp": "2026-04-23T02:00:00Z"
+    },
+    {
+      "file": "2026-04-23T02-10-00Z-pem-002.json",
+      "from": "archivist",
+      "subject": "PEM-002: Compute SHA-256 fingerprint and update ke",
+      "timestamp": "2026-04-23T02:10:00Z"
+    },
+    {
+      "file": "2026-04-23T02-20-00Z-pem-003.json",
+      "from": "archivist",
+      "subject": "PEM-003: Verify SwarmMind key_id (authority 80) ma",
+      "timestamp": "2026-04-23T02:20:00Z"
+    },
+    {
+      "file": "2026-04-23T02-30-00Z-pem-004.json",
+      "from": "archivist",
+      "subject": "PEM-004: Run Key-Sync-Test and attach JSON pass re",
+      "timestamp": "2026-04-23T02:30:00Z"
+    },
+    {
+      "file": "2026-04-23T02-40-00Z-pem-005.json",
+      "from": "archivist",
+      "subject": "PEM-005: Push updated PEM files and trust-store to",
+      "timestamp": "2026-04-23T02:40:00Z"
+    },
+    {
+      "file": "archivist-propagate-kernel-20260423T220700Z.json",
+      "from": "archivist",
+      "subject": "P1: Build your component of distributed governance",
+      "timestamp": "2026-04-23T22:07:00Z"
+    },
+    {
+      "file": "e2e-summary-request-001.json",
+      "from": "archivist",
+      "subject": "",
+      "timestamp": "2026-04-22T16:25:00Z"
+    },
+    {
+      "file": "e2e-test-broadcast-001.json",
+      "from": "archivist",
+      "subject": "",
+      "timestamp": "2026-04-22T16:20:00Z"
+    },
+    {
+      "file": "full-test-reminder-kernel-2026-04-22T20-32-29-475Z.json",
+      "from": "unknown",
+      "subject": ""
+    },
+    {
+      "file": "kernel-follow-up-tasks-001.json",
+      "from": "archivist",
+      "subject": "Follow-up tasks for Kernel lane",
+      "timestamp": "2026-04-22T21:00:00Z"
+    },
+    {
+      "file": "kernel-productivity-monitor-20260423-001-completion.json",
+      "from": "archivist",
+      "subject": "P0 Task Completed: Continuous Convergence Monitori",
+      "timestamp": "2026-04-23T21:52:00Z"
+    },
+    {
+      "file": "summary-recovery-1776979657-kernel.json",
+      "from": "archivist",
+      "subject": "Recovery Summary",
+      "timestamp": "2026-04-23T21:27:36Z"
+    }
+  ]
+}

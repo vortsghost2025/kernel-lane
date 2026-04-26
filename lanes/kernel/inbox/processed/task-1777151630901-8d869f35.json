@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.3",
+  "task_id": "task-1777151630901-8d869f35",
+  "idempotency_key": "cc737d63f5bc14e5eec6b611e919e51c7961595f5146afa82109b3ee143402ca",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "ack",
+  "priority": "P3",
+  "subject": "Pipeline E2E v3",
+  "body": "Automated pipeline test with execution enums fixed",
+  "timestamp": "2026-04-25T21:13:50.903Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-25T21:13:50.903Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/outbox/response-task-1777151630901-8d869f35.json",
+    "artifact_type": "response",
+    "delivered_at": "2026-04-25T21:13:50.903Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-25T21:13:50.903Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 3600
+  },
+  "content_hash": "sha256:b3c5a665f9b4d7d16e69fe2a861df82e4c86346afa9237286f4a3c3ef92792b1",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVlNzBiNzgxMDViYzYxODkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6YjNjNWE2NjVmOWI0ZDdkMTZlNjlmZTJhODYxZGY4MmU0Yzg2MzQ2YWZhOTIzNzI4NmY0YTNjM2VmOTI3OTJiMSIsImV4cCI6MTc3NzIzODAzMCwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzE1MTYzMCwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAzIiwidGFza19pZCI6InRhc2stMTc3NzE1MTYzMDkwMS04ZDg2OWYzNSIsInRvIjoia2VybmVsIn0.jr_6FsAR1DS6UA4LyHKvpXvyVxeVF4bk16IHrYb9enjoaEXJt2zC3CVOQNuyjdBoTRa-SxANJFRr7JkCN1sk26SUuZxe0Cx8GJc1hMNJS63TOTGKmWmffzh24NQHQyaY67gN2mjaiIQljRYFM7klmeBI87z9jnwFobgequsCcFvJRg8CkhRsqm01x-mXsinziSGtjzIOATfTwTN9fwhXibLuuhXo5QSI3rSJhtzt-lPaFZ6N_LWvxooGFvGyhi13tgvtHrTznvhvmaGcGk6GOjzLTrWv9PxWu6nJg3YP7ndCogeOA-qrQpgIsEZ73lvJweNTub4_wXFS4icTjJl7Ow",
+  "signature_alg": "RS256",
+  "key_id": "ee70b78105bc6189",
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-26T04:39:16.476Z",
+    "dry_run": false,
+    "route": "actionRequired",
+    "reason": "ACTIONABLE_ARTIFACT_PENDING",
+    "detail": null,
+    "schema_valid": true,
+    "signature_valid": true,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  },
+  "terminal_decision": "completed_legacy",
+  "terminal_decision_reason": "Processed before proof-first gate. Task completed via lane-worker E2E test cycle."
+}

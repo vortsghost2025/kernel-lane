@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.3",
+  "task_id": "response-task-1777150243859-cce01f9b",
+  "idempotency_key": "resp-1777178356561-task-17771502438",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "ack",
+  "priority": "P3",
+  "subject": "Re: Pipeline test: auto-execute",
+  "body": "Acknowledged task: Pipeline test: auto-execute",
+  "timestamp": "2026-04-26T04:39:16.561Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "auto",
+    "engine": "pipeline",
+    "actor": "task-executor"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-26T04:39:16.561Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": true
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "response",
+    "delivered_at": "2026-04-26T04:39:16.561Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-26T04:39:16.561Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "_original_task_id": "task-1777150243859-cce01f9b",
+  "_execution_result": {
+    "acknowledged": true
+  },
+  "content_hash": "sha256:26dd80d6bc28a218bdf26460bb2c6ea6e95d39e42e18fb05c9049d24e36eb18c",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImI2NzdlYjg3ZjZiZTgzZjkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MjZkZDgwZDZiYzI4YTIxOGJkZjI2NDYwYmIyYzZlYTZlOTVkMzllNDJlMThmYjA1YzkwNDlkMjRlMzZlYjE4YyIsImV4cCI6MTc3NzI2NDc1NiwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3NzE3ODM1NiwiaWQiOm51bGwsImxhbmUiOiJrZXJuZWwiLCJwcmlvcml0eSI6IlAzIiwidGFza19pZCI6InJlc3BvbnNlLXRhc2stMTc3NzE1MDI0Mzg1OS1jY2UwMWY5YiIsInRvIjoiYXJjaGl2aXN0In0.BLIGQS7j0yy6URFdNo6FRHqSWbTHMhhia4oXQT4KxsTSK-BqO02qvISteDbJMjM8bMLvDx2k0f22k4d0JHUKZND1J7MtRHsRV3KQohqI36Q3HKfZBzvL6KFA8u0AI9yQeJVhkbZnH56aWkrSwlSYHkIvWTXd5UsO2uLBEx_3ditrO_q3enMhiCLSsEpB4NiuQpB5-EkQ9s805kD5HOWxW0E5ujRIXiGEk1hIgjHwP-0l5wNeLIr1L3huhdurW1T3UQIB7zuxAC2npNOZ-wQCxjzDIhKXial7MVQT71bVPk6zE9LeKhlKHinjycuvZe-kvgushAlzB7GVTAPlu8klgQ",
+  "signature_alg": "RS256",
+  "key_id": "b677eb87f6be83f9"
+}

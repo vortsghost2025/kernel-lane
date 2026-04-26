@@ -1,0 +1,7 @@
+[
+  {"content":"Run build script to compile async kernel (matrix_tensor_async.cu) with proper MSVC environment and /Zc:preprocessor flag","status":"pending","priority":"high"},
+  {"content":"Execute matrix_tensor_async.exe (fp16 and fp8) to collect latency and TFLOPS for baseline, padded, async kernels; generate benchmark JSON","status":"pending","priority":"high"},
+  {"content":"Run Nsight Compute profiling on the three kernels; capture Tensor Core utilization, occupancy, shared-memory metrics; produce CSV/report","status":"pending","priority":"high"},
+  {"content":"Commit benchmark JSON and Nsight profiling reports to the repository (ensure they are not excluded by .gitignore)","status":"pending","priority":"medium"},
+  {"content":"Create a signed response to Archivist summarizing the verification results and recommendations (install VS build tools, update build script with /Zc:preprocessor, CI integration)","status":"pending","priority":"high"}
+]

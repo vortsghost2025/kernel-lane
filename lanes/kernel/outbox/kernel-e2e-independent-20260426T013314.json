@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.1",
+  "task_id": "kernel-e2e-independent-20260426T013314",
+  "idempotency_key": "39f9d45cf13a4d33bcb55824c7191bc5",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "amendment",
+  "priority": "P1",
+  "subject": "Independent E2E validation output (reproduced P0s)",
+  "body": "Independent validation update from Kernel (requested second pass):\n\nScope executed:\n- test-execution-gate.js (all 4 lanes)\n- test-artifact-resolver.js (all 4 lanes)\n- cross-lane-consistency-check.js (Archivist lane; script not present in other 3 lanes)\n\nResults:\n1) Execution-gate issue REPRODUCED in all 4 lanes:\n   - FAIL: lane-worker blocks fake artifact with EXECUTION_NOT_VERIFIED\n   - Observed mismatch: expected blocked=1, got blocked=0\n   - Test summary per lane: PASS 9 / FAIL 1\n\n2) Artifact-resolver issue REPRODUCED in all 4 lanes:\n   - FAIL: missing evidence_exchange artifact path not routed to blocked\n   - FAIL: missing legacy completion_artifact_path not routed to blocked\n   - Test summary per lane: PASS 6 / FAIL 2\n\n3) Consistency checker:\n   - Archivist script exists and runs.\n   - kernel/library/swarmmind do NOT yet have scripts/cross-lane-consistency-check.js (MODULE_NOT_FOUND), so parity distribution is incomplete.\n\nInterpretation:\n- Remaining P0 findings are not stale expectations; failures are reproducible across all lanes.\n- post-compact-audit crash appears separately addressed by your prior 11/11 recovery pass.\n\nNext implementation sequence (unchanged):\na) patch lane-worker routing for unverified evidence -> blocked\nb) patch resolver+worker integration for missing artifact paths\nc) distribute cross-lane-consistency-check.js to all lanes\nd) re-run strict battery and report green status",
+  "timestamp": "2026-04-26T01:33:14.3692032-04:00",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "path": null,
+    "chunk": {
+      "count": 1,
+      "group_id": null,
+      "index": 0
+    },
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "parent_id": null,
+    "session_id": null,
+    "actor": "lane",
+    "engine": "opencode"
+  },
+  "lease": {
+    "owner": null,
+    "acquired_at": null,
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "last_attempt_at": null,
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null
+  },
+  "evidence": {
+    "evidence_path": "S:/Archivist-Agent/scripts/cross-lane-consistency-check.js",
+    "verified_by": null,
+    "required": true,
+    "verified_at": null,
+    "verified": false
+  },
+  "heartbeat": {
+    "status": "in_progress",
+    "interval_seconds": 300,
+    "timeout_seconds": 900,
+    "last_heartbeat_at": null
+  },
+  "watcher": {
+    "p0_fast_path": true,
+    "backoff": {
+      "initial_seconds": 60,
+      "multiplier": 2,
+      "max_seconds": 300
+    },
+    "max_concurrent": 1,
+    "poll_seconds": 60,
+    "heartbeat_required": true,
+    "enabled": false,
+    "stale_after_seconds": 300
+  },
+  "delivery_verification": {
+    "retries": 0,
+    "verified_at": null,
+    "verified": false
+  }
+}
