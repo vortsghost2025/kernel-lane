@@ -44,7 +44,7 @@ function executeStatusTask(msg, lane) {
   let systemState = null;
   try {
     const ss = JSON.parse(fs.readFileSync(path.join(root, 'lanes/broadcast/system_state.json'), 'utf8'));
-    systemState = { status: ss.system_state, contradictions: ss.active_contradictions?.length ?? 0, processed_ok: ss.processed_ok };
+    systemState = { status: ss.system_status, contradictions: ss.active_contradictions?.length ?? 0, processed_ok: ss.processed_ok };
   } catch (_) {}
   return {
     task_kind: 'status',
@@ -97,12 +97,128 @@ function executeScriptTask(msg, lane) {
   if (!fs.existsSync(scriptPath)) {
     return { task_kind: 'report', results: { error: `Script not found: ${scriptPath}` }, summary: `Error: script ${scriptName} not found` };
   }
+  const LONG_RUNNING = ['heartbeat', 'inbox-watcher', 'relay-daemon'];
+  const baseName = scriptName.replace(/\.js$/, '').toLowerCase();
+  if (LONG_RUNNING.some(lr => baseName.includes(lr))) {
+    return { task_kind: 'report', results: { script: scriptName, skipped: true, reason: 'Long-running daemon script — use "status" or "consistency check" instead' }, summary: `Script ${scriptName}: SKIPPED (long-running daemon)` };
+  }
+  const maxOutput = 50000;
   try {
     const { execSync } = require('child_process');
-    const output = execSync(`node "${scriptPath}"`, { cwd: root, timeout: 30000, encoding: 'utf8', maxBuffer: 50000 });
-    return { task_kind: 'report', results: { script: scriptName, exit_code: 0, output: output.slice(0, 50000) }, summary: `Script ${scriptName}: success (${output.length} chars output)` };
+    const output = execSync(`node "${scriptPath}"`, { cwd: root, timeout: 30000, encoding: 'utf8', maxBuffer: maxOutput });
+    return { task_kind: 'report', results: { script: scriptName, exit_code: 0, output: output.slice(0, maxOutput) }, summary: `Script ${scriptName}: success (${output.length} chars output)` };
   } catch (e) {
-    return { task_kind: 'report', results: { script: scriptName, exit_code: e.status || 1, output: (e.stdout || '').slice(0, 25000), error: (e.stderr || '').slice(0, 5000) || e.message.slice(0, 5000) }, summary: `Script ${scriptName}: exit ${e.status || 1}` };
+    const stdout = (e.stdout || '').slice(0, 25000);
+    const stderr = (e.stderr || '').slice(0, 5000) || e.message.slice(0, 5000);
+    const timedOut = e.killed || e.signal === 'SIGTERM' || stderr.includes('ETIMEDOUT') || stderr.includes('timed out');
+    if (timedOut) {
+      return { task_kind: 'report', results: { script: scriptName, exit_code: -1, timed_out: true, output: stdout, error: 'Script exceeded 30s timeout' }, summary: `Script ${scriptName}: TIMEOUT (30s)` };
+    }
+    const isTest = scriptName.toLowerCase().includes('test') || scriptName.toLowerCase().includes('recovery');
+    const passCount = (stdout.match(/\[PASS\]/g) || []).length;
+    const failCount = (stdout.match(/\[FAIL\]/g) || []).length;
+    if (isTest && passCount > 0 && failCount <= 1) {
+      return { task_kind: 'report', results: { script: scriptName, exit_code: e.status || 1, passed: passCount, failed: failCount, output: stdout, note: `Test suite: ${passCount} PASS, ${failCount} FAIL (non-zero exit but mostly passing)` }, summary: `Script ${scriptName}: ${passCount}P/${failCount}F` };
+    }
+    return { task_kind: 'report', results: { script: scriptName, exit_code: e.status || 1, output: stdout, error: stderr }, summary: `Script ${scriptName}: exit ${e.status || 1}` };
+  }
+}
+
+function executeGitTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const gitCmd = body.match(/git\s+(status|log|diff|branch|remote)\s*(.*)/i);
+  if (!gitCmd) {
+    return { task_kind: 'report', results: { error: 'No git command specified. Use: "git status", "git log", "git diff", "git branch", "git remote"' }, summary: 'Error: no git command in task body' };
+  }
+  const allowed = ['status', 'log', 'diff', 'branch', 'remote'];
+  const subcmd = gitCmd[1].toLowerCase();
+  if (!allowed.includes(subcmd)) {
+    return { task_kind: 'report', results: { error: `Git subcommand "${subcmd}" not allowed. Allowed: ${allowed.join(', ')}` }, summary: `Error: git ${subcmd} not allowed` };
+  }
+  const extraArgs = (gitCmd[2] || '').trim();
+  if (extraArgs.match(/[;&|`$]/)) {
+    return { task_kind: 'report', results: { error: 'Shell metacharacters not allowed in git arguments' }, summary: 'Error: invalid characters in git args' };
+  }
+  const logLimit = subcmd === 'log' ? ' -10' : '';
+  try {
+    const { execSync } = require('child_process');
+    const output = execSync(`git ${subcmd}${logLimit} ${extraArgs}`, { cwd: root, timeout: 15000, encoding: 'utf8', maxBuffer: 30000 });
+    return { task_kind: 'report', results: { git: subcmd, output: output.slice(0, 30000) }, summary: `git ${subcmd}: ${output.split('\n').length} lines` };
+  } catch (e) {
+    return { task_kind: 'report', results: { git: subcmd, exit_code: e.status || 1, output: (e.stdout || '').slice(0, 15000), error: (e.stderr || '').slice(0, 5000) }, summary: `git ${subcmd}: exit ${e.status || 1}` };
+  }
+}
+
+function executeGrepTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const grepMatch = body.match(/(?:grep|search|find)\s+["']([^"']+)["']\s+(?:in|path|file|dir)\s+["']?([^"'\s]+)["']?/i)
+    || body.match(/(?:grep|search|find)\s+["']([^"']+)["']/i);
+  if (!grepMatch) {
+    return { task_kind: 'report', results: { error: 'No search pattern specified. Use: "grep \\"pattern\\" in <path>" or "search \\"pattern\\""' }, summary: 'Error: no search pattern in task body' };
+  }
+  const pattern = grepMatch[1];
+  const searchPath = grepMatch[2] ? grepMatch[2] : '.';
+  const resolved = searchPath.startsWith('/') || searchPath.match(/^[A-Za-z]:/) ? searchPath : path.join(root, searchPath);
+  const normalized = resolved.replace(/\\/g, '/');
+  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
+  if (!allowedRoots.some(ar => normalized.startsWith(ar))) {
+    return { task_kind: 'report', results: { error: `Search path outside allowed roots: ${resolved}` }, summary: 'Error: search path outside allowed roots' };
+  }
+  try {
+    const { execSync } = require('child_process');
+    let output = '';
+    const isWindows = process.platform === 'win32' || process.env.COMSPEC;
+    try {
+      if (isWindows) {
+        output = execSync(`findstr /s /n /i "${pattern.replace(/"/g, '')}" "${resolved}\\*.md" "${resolved}\\*.json" "${resolved}\\*.js" "${resolved}\\*.yaml" "${resolved}\\*.yml" "${resolved}\\*.txt"`, { cwd: root, timeout: 15000, encoding: 'utf8', maxBuffer: 30000 });
+      } else {
+        output = execSync(`rg --max-count 20 --max-filesize 1M -n "${pattern.replace(/"/g, '\\"')}" "${resolved}"`, { cwd: root, timeout: 15000, encoding: 'utf8', maxBuffer: 30000 });
+      }
+    } catch (e) {
+      if ((e.status === 1 && (e.stdout === '' || !e.stdout)) || (isWindows && (e.stdout || '').trim() === '')) {
+        return { task_kind: 'report', results: { grep: pattern, matches: 0, output: '' }, summary: `grep "${pattern}": no matches` };
+      }
+      output = (e.stdout || '');
+    }
+    const lines = output.split('\n').filter(l => l.trim());
+    return { task_kind: 'report', results: { grep: pattern, matches: lines.length, output: output.slice(0, 30000) }, summary: `grep "${pattern}": ${lines.length} matches` };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Search failed: ${e.message.slice(0, 3000)}` }, summary: 'Error running search' };
+  }
+}
+
+function executeWriteTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const writeMatch = body.match(/write\s+file\s+["']?([^"'\s]+)["']?\s*\n([\s\S]*)/i)
+    || body.match(/write\s+["']?([^"'\s]+)["']?\s*[:=]\s*\n?([\s\S]*)/i);
+  if (!writeMatch) {
+    return { task_kind: 'report', results: { error: 'No write target specified. Use: "write file <path>\\n<content>"' }, summary: 'Error: no write target in task body' };
+  }
+  const targetPath = writeMatch[1];
+  const content = writeMatch[2] || '';
+  if (content.length > 10240) {
+    return { task_kind: 'report', results: { error: `Content exceeds 10KB limit (${content.length} bytes). Write operations are bounded.` }, summary: 'Error: content too large for write' };
+  }
+  const resolved = targetPath.startsWith('/') || targetPath.match(/^[A-Za-z]:/) ? targetPath : path.join(root, targetPath);
+  const normalized = resolved.replace(/\\/g, '/');
+  if (!normalized.startsWith(root.replace(/\\/g, '/'))) {
+    return { task_kind: 'report', results: { error: `Write target outside own lane root: ${resolved}. Writes only allowed within own lane.` }, summary: 'Error: write path outside own lane' };
+  }
+  const forbidden = ['trust-store.json', 'active-blocker.json', 'system_state.json', 'contradictions.json',
+    '.identity/', '.trust/', 'BOOTSTRAP.md', 'GOVERNANCE.md', 'COVENANT.md', 'AGENTS.md'];
+  if (forbidden.some(f => normalized.includes(f))) {
+    return { task_kind: 'report', results: { error: `Write to governance/critical file blocked: ${targetPath}` }, summary: 'Error: write to protected file' };
+  }
+  try {
+    const dir = path.dirname(resolved);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(resolved, content, 'utf8');
+    return { task_kind: 'report', results: { written: resolved, bytes: content.length }, summary: `Wrote ${content.length} bytes to ${resolved}` };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Write failed: ${e.message}` }, summary: `Error writing to ${resolved}` };
   }
 }
 
@@ -134,13 +250,22 @@ function executeTask(msg, lane) {
   if (body.includes('run script') || body.includes('script:') || body.includes('script=')) {
     return executeScriptTask(msg, lane);
   }
+  if (body.match(/git\s+(status|log|diff|branch|remote)/i)) {
+    return executeGitTask(msg, lane);
+  }
+  if (body.match(/(grep|search|find)\s+/i)) {
+    return executeGrepTask(msg, lane);
+  }
+  if (body.match(/write\s+(file|to)?/i)) {
+    return executeWriteTask(msg, lane);
+  }
   if (body.includes('consistency check') || body.includes('audit') || kind === 'review') {
     return executeConsistencyCheck(msg, lane);
   }
 
   return {
     task_kind: kind || 'ack',
-    results: { acknowledged: true, note: 'Task type not recognized. Supported: status, "read file <path>", "run script <name>", "consistency check"' },
+    results: { acknowledged: true, note: 'Task type not recognized. Supported: status, "read file <path>", "run script <name>", "git status/log/diff", "grep <pattern> in <path>", "write file <path>\\n<content>", "consistency check"' },
     summary: `Acknowledged task: ${msg.subject || msg.task_id || 'unknown'}`,
   };
 }
