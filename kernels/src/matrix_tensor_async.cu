@@ -32,11 +32,10 @@ __global__ void wmma_gemm_async(const T* __restrict__ A,
     const int tile_m = (blockIdx.y * 4 + warp_id) * WMMA_M; // 4 warps in Y
     const int tile_n = blockIdx.x * WMMA_N;
 
-    // Shared memory double buffered
+    // Shared memory double‑buffered layout
+    // Each buffer contains A and B tiles. Total shared memory per block:
+    //   4 * WMMA_M * (WMMA_K + PAD) elements of type T.
     extern __shared__ T shmem[];
-    // sA[buf][row][col]
-    T (*sA)[WMMA_K + PAD] = (T (*)[WMMA_K + PAD]) shmem;
-    T (*sB)[WMMA_N + PAD] = (T (*)[WMMA_N + PAD]) (shmem + 2 * WMMA_M * (WMMA_K + PAD));
 
     using pipeline = cuda::pipeline<cuda::thread_scope_block>;
     pipeline pipe = pipeline::create();
@@ -60,17 +59,17 @@ __global__ void wmma_gemm_async(const T* __restrict__ A,
 
     for (int k = 0; k < K; k += WMMA_K) {
         pipe.consumer_wait();
-        load_matrix_sync(a_frag, sA[buf], WMMA_K + PAD);
-        load_matrix_sync(b_frag, sB[buf], WMMA_N + PAD);
+        load_matrix_sync(a_frag, (T*)(shmem + buf * 2 * WMMA_M * (WMMA_K + PAD)), WMMA_K + PAD);
+        load_matrix_sync(b_frag, (T*)(shmem + buf * 2 * WMMA_M * (WMMA_K + PAD) + WMMA_M * (WMMA_K + PAD)), WMMA_N + PAD);
         mma_sync(c_frag, a_frag, b_frag, c_frag);
         // Prepare next tile
         buf ^= 1;
         if (k + WMMA_K < K) {
             const T* srcA = A + tile_m * K + (k + WMMA_K);
             const T* srcB = B + (k + WMMA_K) * N + tile_n;
-            cuda::memcpy_async(sA[buf], srcA,
+cuda::memcpy_async((T*)(shmem + buf * 2 * WMMA_M * (WMMA_K + PAD)), srcA,
                                WMMA_M * (WMMA_K + PAD) * sizeof(T), pipe);
-            cuda::memcpy_async(sB[buf], srcB,
+cuda::memcpy_async((T*)(shmem + buf * 2 * WMMA_M * (WMMA_K + PAD) + WMMA_M * (WMMA_K + PAD)), srcB,
                                WMMA_K * (WMMA_N + PAD) * sizeof(T), pipe);
             pipe.producer_commit();
         }
@@ -97,9 +96,9 @@ void run_async(const std::string& mode, int M, int N, int K) {
     cudaMemset(dA, 0, sizeA);
     cudaMemset(dB, 0, sizeB);
     cudaMemset(dC, 0, sizeC);
-    dim3 grid((N + WMMA_N - 1) / WMMA_N, (M + WMMA_M - 1) / WMMA_M);
+    dim3 grid((N + WMMA_N - 1) / WMMA_N, (M + 63) / 64);
     dim3 block(32,4,1); // 128 threads
-    size_t shmemBytes = 2 * WMMA_M * (WMMA_K + PAD_HALF) * sizeof(half);
+    size_t shmemBytes = 4 * WMMA_M * (WMMA_K + PAD_HALF) * sizeof(half);
     // Choose kernel based on mode
     if (mode == "fp16") {
         wmma_gemm_async<half,PAD_HALF><<<grid, block, shmemBytes>>>(dA, dB, dC, M, N, K);
