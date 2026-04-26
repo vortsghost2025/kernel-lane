@@ -1,6 +1,6 @@
 # SwarmMind Subagent Contract
 
-**Version:** 1.0  
+**Version:** 2.0  
 **Date:** 2026-04-26  
 **Status:** Active  
 **Applies to:** Any lane dispatching tasks to SwarmMind (or any lane running `generic-task-executor.js`)
@@ -128,7 +128,51 @@ Returns: stdout (up to 50KB), exit code, and stderr on failure.
 - 50KB max output
 - CWD set to lane root
 
-### 4.4 Consistency Check
+### 4.4 Git Operations
+```
+task_kind: "report"
+body: "git status"
+body: "git log"
+body: "git diff"
+body: "git branch"
+body: "git remote"
+```
+Returns: git command output (30KB max).
+
+**Safety:**
+- Only read-only git commands allowed (status, log, diff, branch, remote)
+- No `git add`, `git commit`, `git push`, `git reset`, etc.
+- Shell metacharacters (`; & | \` $`) blocked in arguments
+- 15-second timeout
+
+### 4.5 Grep / Search
+```
+task_kind: "report"
+body: "grep \"pattern\" in docs/"
+body: "search \"Contract\" in lanes/broadcast/"
+```
+Returns: matching lines with file paths and line numbers, up to 20 matches.
+
+**Safety:**
+- Search path must be under a lane root
+- Windows: uses `findstr /s /n /i` (limited to .md/.json/.js/.yaml/.yml/.txt)
+- Unix: uses `rg --max-count 20` if available
+- 15-second timeout
+
+### 4.6 File Write
+```
+task_kind: "report"
+body: "write file lanes/swarmmind/outbox/note.txt\n<content on next lines>"
+```
+Returns: bytes written and target path.
+
+**Safety:**
+- **Write is restricted to own lane root only** (cannot write to another lane's files)
+- Maximum 10KB content per write
+- Protected files blocked: trust-store.json, active-blocker.json, system_state.json, BOOTSTRAP.md, GOVERNANCE.md, COVENANT.md, AGENTS.md, .identity/, .trust/
+- Cannot overwrite contradictions.json
+
+### 4.7 Consistency Check
 ```
 task_kind: "review"
 body: "consistency check"
@@ -136,7 +180,7 @@ body: "audit"
 ```
 Returns: output of `cross-lane-consistency-check.js` (60s timeout, 100KB max).
 
-### 4.5 Fallback (Ack)
+### 4.8 Fallback (Ack)
 Any `task_kind` or `body` not matching above → acknowledged, no execution, list of supported verbs returned.
 
 ---
@@ -146,24 +190,38 @@ Any `task_kind` or `body` not matching above → acknowledged, no execution, lis
 | Limit | Value | Rationale |
 |-------|-------|-----------|
 | File read max | 50 KB | Prevent context flooding |
+| File write max | 10 KB | Bounded mutation |
+| File write scope | Own lane root only | No cross-lane writes |
 | Directory listing max | 100 entries | Bounded enumeration |
 | Script timeout | 30 seconds | Prevent hanging |
 | Script output max | 50 KB | Bounded response |
+| Git command timeout | 15 seconds | Bounded query |
+| Git command output max | 30 KB | Bounded response |
+| Grep timeout | 15 seconds | Bounded search |
+| Grep matches max | 20 | Bounded results |
 | Consistency check timeout | 60 seconds | Longer script, still bounded |
 | Consistency check output max | 100 KB | Large but bounded |
 | Script scope | `scripts/*.js` only | No arbitrary command execution |
-| Path scope | Lane roots only | No path traversal beyond S:/\{lane\} |
+| Path scope (read) | All 4 lane roots | Cross-lane reads allowed |
+| Path scope (write) | Own lane root only | Cross-lane writes blocked |
+| Git scope | Read-only commands | No mutation via git |
+| Git args | No shell metacharacters | Prevent injection |
+| Protected files (write) | Governance + trust files | Cannot overwrite constitutional docs |
 | Response evidence.required | `false` | Auto-executed tasks skip artifact resolution |
 | Response artifact_path | `null` | No cross-lane artifact resolution needed |
 
 ### What the Executor CANNOT Do
 
-- ❌ Write or modify files (read-only)
-- ❌ Execute arbitrary commands (only `scripts/*.js`)
-- ❌ Access paths outside the 4 lane roots
+- ❌ Write to other lanes' files (own lane only for writes)
+- ❌ Overwrite governance/critical files (BOOTSTRAP.md, trust-store.json, etc.)
+- ❌ Execute git mutations (add, commit, push, reset, checkout, etc.)
+- ❌ Execute arbitrary commands (only `scripts/*.js` and allowed git commands)
+- ❌ Access paths outside the 4 lane roots (reads)
 - ❌ Mutate governance documents
 - ❌ Initiate cross-lane messages (only responds to sender)
 - ❌ Run indefinitely (all operations timeout)
+- ❌ Pass shell metacharacters to git commands
+- ❌ Run daemon scripts (heartbeat, relay-daemon, inbox-watcher auto-skipped)
 
 ---
 
@@ -270,11 +328,20 @@ Get-Process -Name powershell | Where-Object {
 | SBC-003 | Missing required fields → SCHEMA_INVALID | Quarantine + SchemaValidator error | Add all 14 required fields from §2 |
 | SBC-004 | Path outside lane roots → file read error | Response body: "path outside allowed roots" | Use relative path or ensure path starts with lane root |
 | SBC-005 | Windows backslash path → root mismatch | Same as SBC-004 | Already fixed: paths normalized to `/` before check |
-| SBC-006 | Script timeout (30s) | Response with exit_code=null, error="timed out" | Fix the script or increase timeout in executor |
+| SBC-006 | Script timeout (30s) | Response with timed_out=true | Fix the script or increase timeout in executor |
 | SBC-007 | Stale watcher running old code | Tasks not processing, no errors logged | Restart watcher (§7) |
 | SBC-008 | `--apply` not passed | Scripts report actions but take none | Always use `--apply` for real execution |
 | SBC-009 | Script not found | Response: "Script not found: <path>" | Script must exist in target lane's `scripts/` dir |
 | SBC-010 | File > 50KB | Response truncated with "TRUNCATED" notice | Accept truncation or request specific line ranges |
+| SBC-011 | Daemon script dispatched (heartbeat etc) | Response: "SKIPPED (long-running daemon)" | Use "status" or "consistency check" instead |
+| SBC-012 | Test suite exit code non-zero | Response shows pass/fail counts (e.g. 10P/1F) | Check pass/fail ratio, not just exit code |
+| SBC-013 | system_state reads wrong field | Status returns "unknown" | Fixed v2: reads `system_status` not `system_state` |
+| SBC-014 | Write to protected file | Response: "write to protected file" | Only write to non-governance files within own lane |
+| SBC-015 | Write outside own lane root | Response: "write path outside own lane" | Writes only allowed within own lane root |
+| SBC-016 | Write content > 10KB | Response: "content exceeds 10KB limit" | Split into smaller writes or use script |
+| SBC-017 | Git command with metacharacters | Response: "invalid characters in git args" | Remove shell metacharacters from arguments |
+| SBC-018 | rg not found on Windows | Grep silently returns no matches | Fixed v2: falls back to findstr on Windows |
+| SBC-019 | Cross-lane read scope (NFM-032) | Subagent can read any lane's files | Accepted risk at Level 1; isolate at Level 2 |
 
 ---
 
@@ -338,9 +405,10 @@ Before dispatching any cross-lane task:
 - [ ] `task_kind` is a valid enum value (NOT "task")
 - [ ] Message is signed via `createSignedMessage()`
 - [ ] All 14 required fields present
-- [ ] `body` contains a recognized verb (read file, run script, consistency check, report status)
+- [ ] `body` contains a recognized verb (status, read file, run script, git status/log/diff, grep, write file, consistency check)
 - [ ] `--apply` flag included on pipeline commands
 - [ ] Target lane's watcher is running current code (restart if scripts changed)
+- [ ] For write tasks: target is within own lane, not a protected file, content ≤ 10KB
 
 ---
 
