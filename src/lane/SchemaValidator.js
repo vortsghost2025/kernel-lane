@@ -41,9 +41,9 @@ const ENUM_CONSTRAINTS = {
   priority: ['P0', 'P1', 'P2', 'P3'],
   'payload.mode': ['inline', 'path', 'chunked'],
   'payload.compression': ['none', 'gzip'],
-  'execution.mode': ['manual', 'session_task', 'watcher'],
-  'execution.engine': ['kilo', 'opencode', 'other'],
-  'execution.actor': ['lane', 'subagent', 'watcher'],
+  'execution.mode': ['manual', 'session_task', 'watcher', 'auto', 'pipeline'],
+  'execution.engine': ['kilo', 'opencode', 'other', 'pipeline'],
+  'execution.actor': ['lane', 'subagent', 'watcher', 'task-executor', 'kernel', 'library', 'swarmmind', 'archivist'],
   'heartbeat.status': ['pending', 'in_progress', 'done', 'failed', 'escalated', 'timed_out'],
   'evidence_exchange.artifact_type': ['benchmark', 'profile', 'release', 'log', 'response', 'report', 'artifact'],
 };
