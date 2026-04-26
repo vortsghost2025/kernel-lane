@@ -63,9 +63,9 @@ function executeFileReadTask(msg, lane) {
     return { task_kind: 'report', results: { error: 'No file path specified. Use: "read file <path>" or "file: <path>"' }, summary: 'Error: no file path in task body' };
   }
   const resolved = targetPath.startsWith('/') || targetPath.match(/^[A-Za-z]:/) ? targetPath : path.join(root, targetPath);
-  const root = LANE_REGISTRY[lane].root;
-  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root);
-  if (!allowedRoots.some(ar => resolved.startsWith(ar)) && !resolved.match(/^[A-Za-z]:\//)) {
+  const normalized = resolved.replace(/\\/g, '/');
+  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
+  if (!allowedRoots.some(ar => normalized.startsWith(ar)) && !normalized.match(/^[A-Za-z]:\//)) {
     return { task_kind: 'report', results: { error: `Path outside allowed roots: ${resolved}` }, summary: `Error: path outside allowed roots` };
   }
   try {
