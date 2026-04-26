@@ -1,0 +1,29 @@
+{
+  "task_type_to_model": {
+    "code_generation": {
+      "default": "kilo-local",
+      "escalation": "openai-codex",
+      "budget_usd": 0.001
+    },
+    "security_review": {
+      "default": "openai-codex",
+      "escalation": "openai-gpt-4",
+      "budget_usd": 0.01
+    },
+    "final_synthesis": {
+      "default": "openai-gpt-4",
+      "escalation": null,
+      "budget_usd": 0.02
+    },
+    "lint_fix": {
+      "default": "kilo-local",
+      "escalation": null,
+      "budget_usd": 0.0005
+    },
+    "doc_transform": {
+      "default": "kilo-local",
+      "escalation": "openai-gpt-3.5",
+      "budget_usd": 0.001
+    }
+  }
+}
