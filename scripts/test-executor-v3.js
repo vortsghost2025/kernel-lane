@@ -479,6 +479,17 @@ test('rollout: feature flags present and enabled', () => {
   assert.strictEqual(FEATURE_FLAGS.timing_instrumentation, true);
 });
 
+test('governance: createResponse includes _governance metadata', () => {
+  const { createResponse } = require('./generic-task-executor');
+  const msg = { task_id: 'gov-test', subject: 'test', from: 'archivist' };
+  const result = { task_kind: 'status', results: { processed_count: 1 }, summary: 'ok' };
+  const resp = createResponse(msg, result, 'archivist');
+  assert(resp._governance);
+  assert(resp._governance.executor_version.startsWith('3.'));
+  assert(resp._governance.content_hash.startsWith('sha256:'));
+  assert(resp._governance.timestamp);
+});
+
 // ============================================================
 // DETERMINISM CHECKS
 // ============================================================

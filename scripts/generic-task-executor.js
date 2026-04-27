@@ -611,6 +611,9 @@ function executeTask(msg, lane) {
 }
 
 function createResponse(originalMsg, executionResult, lane) {
+  const resultJson = JSON.stringify(executionResult.results || {});
+  const crypto = require('crypto');
+  const contentHash = 'sha256:' + crypto.createHash('sha256').update(resultJson).digest('hex');
   return {
     schema_version: '1.3',
     task_id: `response-${originalMsg.task_id || Date.now()}`,
@@ -637,6 +640,7 @@ function createResponse(originalMsg, executionResult, lane) {
     heartbeat: { status: 'done', last_heartbeat_at: nowIso(), interval_seconds: 300, timeout_seconds: 900 },
     _original_task_id: originalMsg.task_id,
     _execution_result: executionResult.results,
+    _governance: { executor_version: EXECUTOR_VERSION, content_hash: contentHash, timestamp: nowIso() },
   };
 }
 
