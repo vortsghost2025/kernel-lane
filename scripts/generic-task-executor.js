@@ -222,6 +222,179 @@ function executeWriteTask(msg, lane) {
   }
 }
 
+function executeListDirTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const dirMatch = body.match(/list\s+(?:dir|directory|folder)\s+["']?([^"'\s]+)["']?/i)
+    || body.match(/ls\s+["']?([^"'\s]+)["']?/i)
+    || body.match(/list\s+["']?([^"'\s]+)["']?/i);
+  if (!dirMatch) {
+    return { task_kind: 'report', results: { error: 'No directory specified. Use: "list dir <path>" or "ls <path>"' }, summary: 'Error: no directory in task body' };
+  }
+  const targetPath = dirMatch[1];
+  const resolved = targetPath.startsWith('/') || targetPath.match(/^[A-Za-z]:/) ? targetPath : path.join(root, targetPath);
+  const normalized = resolved.replace(/\\/g, '/');
+  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
+  if (!allowedRoots.some(ar => normalized.startsWith(ar)) && !normalized.match(/^[A-Za-z]:\//)) {
+    return { task_kind: 'report', results: { error: `Path outside allowed roots: ${resolved}` }, summary: 'Error: path outside allowed roots' };
+  }
+  try {
+    const stat = fs.statSync(resolved);
+    if (!stat.isDirectory()) {
+      return { task_kind: 'report', results: { error: `Not a directory: ${resolved}` }, summary: `Error: ${resolved} is not a directory` };
+    }
+    const entries = fs.readdirSync(resolved).map(name => {
+      try {
+        const full = path.join(resolved, name);
+        const s = fs.statSync(full);
+        return { name, type: s.isDirectory() ? 'DIR' : 'FILE', size: s.size, modified: s.mtime.toISOString() };
+      } catch (_) {
+        return { name, type: 'UNKNOWN', size: 0, modified: null };
+      }
+    });
+    return { task_kind: 'report', results: { path: resolved, entries, count: entries.length }, summary: `Directory ${resolved}: ${entries.length} entries` };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Cannot list ${resolved}: ${e.message}` }, summary: `Error listing ${resolved}` };
+  }
+}
+
+function executeHashTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const hashMatch = body.match(/hash\s+(?:file\s+)?["']?([^"'\s]+)["']?/i)
+    || body.match(/sha(?:256)?\s+["']?([^"'\s]+)["']?/i)
+    || body.match(/checksum\s+["']?([^"'\s]+)["']?/i);
+  if (!hashMatch) {
+    return { task_kind: 'report', results: { error: 'No file specified. Use: "hash file <path>" or "sha256 <path>"' }, summary: 'Error: no file in task body' };
+  }
+  const targetPath = hashMatch[1];
+  const resolved = targetPath.startsWith('/') || targetPath.match(/^[A-Za-z]:/) ? targetPath : path.join(root, targetPath);
+  const normalized = resolved.replace(/\\/g, '/');
+  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
+  if (!allowedRoots.some(ar => normalized.startsWith(ar)) && !normalized.match(/^[A-Za-z]:\//)) {
+    return { task_kind: 'report', results: { error: `Path outside allowed roots: ${resolved}` }, summary: 'Error: path outside allowed roots' };
+  }
+  try {
+    const stat = fs.statSync(resolved);
+    if (stat.isDirectory()) {
+      return { task_kind: 'report', results: { error: `Cannot hash directory: ${resolved}` }, summary: 'Error: target is a directory' };
+    }
+    if (stat.size > 50000000) {
+      return { task_kind: 'report', results: { error: `File too large for hash: ${stat.size} bytes (50MB limit)` }, summary: 'Error: file too large' };
+    }
+    const crypto = require('crypto');
+    const content = fs.readFileSync(resolved);
+    const hash = crypto.createHash('sha256').update(content).digest('hex');
+    return { task_kind: 'report', results: { path: resolved, size: stat.size, sha256: hash, modified: stat.mtime.toISOString() }, summary: `SHA256 ${resolved}: ${hash.slice(0, 16)}... (${stat.size} bytes)` };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Hash failed: ${e.message}` }, summary: `Error hashing ${resolved}` };
+  }
+}
+
+function executeDiffTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const diffMatch = body.match(/diff\s+["']?([^"'\s]+)["']?\s+["']?([^"'\s]+)["']?/i)
+    || body.match(/compare\s+["']?([^"'\s]+)["']?\s+(?:to|with|and)\s+["']?([^"'\s]+)["']?/i);
+  if (!diffMatch) {
+    return { task_kind: 'report', results: { error: 'Need two file paths. Use: "diff <file1> <file2>" or "compare <file1> with <file2>"' }, summary: 'Error: need two file paths' };
+  }
+  const path1 = diffMatch[1];
+  const path2 = diffMatch[2];
+  const resolve = (p) => {
+    if (p.startsWith('/') || p.match(/^[A-Za-z]:/)) return p;
+    return path.join(root, p);
+  };
+  const resolved1 = resolve(path1);
+  const resolved2 = resolve(path2);
+  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
+  const norm1 = resolved1.replace(/\\/g, '/');
+  const norm2 = resolved2.replace(/\\/g, '/');
+  if (!allowedRoots.some(ar => norm1.startsWith(ar)) || !allowedRoots.some(ar => norm2.startsWith(ar))) {
+    return { task_kind: 'report', results: { error: 'One or both paths outside allowed roots' }, summary: 'Error: path outside allowed roots' };
+  }
+  try {
+    const content1 = fs.readFileSync(resolved1, 'utf8');
+    const content2 = fs.readFileSync(resolved2, 'utf8');
+    const lines1 = content1.split('\n');
+    const lines2 = content2.split('\n');
+    const maxLines = Math.max(lines1.length, lines2.length);
+    const diffs = [];
+    const maxDiffs = 200;
+    for (let i = 0; i < maxLines && diffs.length < maxDiffs; i++) {
+      const l1 = i < lines1.length ? lines1[i] : undefined;
+      const l2 = i < lines2.length ? lines2[i] : undefined;
+      if (l1 !== l2) {
+        diffs.push({ line: i + 1, left: l1 !== undefined ? l1.slice(0, 200) : '<EOF>', right: l2 !== undefined ? l2.slice(0, 200) : '<EOF>' });
+      }
+    }
+    const identical = diffs.length === 0 && lines1.length === lines2.length;
+    return {
+      task_kind: 'report',
+      results: { file1: resolved1, file2: resolved2, identical, total_lines_1: lines1.length, total_lines_2: lines2.length, diff_count: diffs.length, diffs: diffs.slice(0, 100), truncated: diffs.length > 100 },
+      summary: identical ? `Files identical (${lines1.length} lines)` : `${diffs.length} differences between ${path.basename(resolved1)} and ${path.basename(resolved2)}`
+    };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Diff failed: ${e.message}` }, summary: `Error running diff` };
+  }
+}
+
+function executeCountTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const countMatch = body.match(/count\s+["']([^"']+)["']\s+(?:in|path|file|dir)\s+["']?([^"'\s]+)["']?/i)
+    || body.match(/count\s+["']([^"']+)["']/i);
+  if (!countMatch) {
+    return { task_kind: 'report', results: { error: 'No pattern specified. Use: "count \\"pattern\\" in <path>"' }, summary: 'Error: no pattern in task body' };
+  }
+  const pattern = countMatch[1];
+  const searchPath = countMatch[2] || '.';
+  const resolved = searchPath.startsWith('/') || searchPath.match(/^[A-Za-z]:/) ? searchPath : path.join(root, searchPath);
+  const normalized = resolved.replace(/\\/g, '/');
+  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
+  if (!allowedRoots.some(ar => normalized.startsWith(ar))) {
+    return { task_kind: 'report', results: { error: `Search path outside allowed roots: ${resolved}` }, summary: 'Error: search path outside allowed roots' };
+  }
+  try {
+    const stat = fs.statSync(resolved);
+    if (stat.isDirectory()) {
+      return { task_kind: 'report', results: { error: `count requires a file, not directory: ${resolved}` }, summary: 'Error: target is a directory' };
+    }
+    const content = fs.readFileSync(resolved, 'utf8');
+    const re = new RegExp(pattern, 'gi');
+    const matches = content.match(re);
+    const count = matches ? matches.length : 0;
+    return { task_kind: 'report', results: { file: resolved, pattern, count }, summary: `"${pattern}" in ${path.basename(resolved)}: ${count} occurrences` };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Count failed: ${e.message}` }, summary: 'Error running count' };
+  }
+}
+
+const NLP_ROUTES = [
+  { patterns: [/trust.?store/, /trust.?integrit/, /key.?valid/, /identit.?health/], verb: 'consistency check' },
+  { patterns: [/check.*consist/, /system.?health/, /is.*consist/, /are.*lanes.*sync/, /cross.?lane.*check/], verb: 'consistency check' },
+  { patterns: [/how many.*process/, /inbox.*count/, /message.*count/, /what.*status/, /lane.*status/], verb: 'status' },
+  { patterns: [/what.*in.*dir/, /show.*folder/, /list.*file/, /what.*file.*exist/, /dir.*content/], verb: 'list dir' },
+  { patterns: [/is.*file.*same/, /file.*chang/, /has.*modif/, /file.*identical/, /doc.*chang/, /governance.*chang/], verb: 'diff' },
+  { patterns: [/verif.*integrit/, /file.*hash/, /checksum/, /sha.*of/], verb: 'hash file' },
+  { patterns: [/how many.*(?:occurrence|instance|match)/, /count.*pattern/, /how often/], verb: 'count' },
+  { patterns: [/show.*content/, /cat.*file/, /what.*in.*file/, /read.*content/, /display.*file/], verb: 'read file' },
+  { patterns: [/find.*text/, /where.*mention/, /where.*defin/, /search.*for/], verb: 'grep' },
+  { patterns: [/latest.*commit/, /recent.*change/, /commit.*hist/, /what.*chang/], verb: 'git log' },
+  { patterns: [/uncommit/, /stag/, /dirty/, /modif.*file/], verb: 'git status' },
+  { patterns: [/run.*test/, /execut.*test/, /run.*bench/], verb: 'run script' },
+];
+
+function nlpRoute(msg) {
+  const text = ((msg.body || '') + ' ' + (msg.subject || '')).toLowerCase();
+  for (const route of NLP_ROUTES) {
+    if (route.patterns.some(p => p.test(text))) {
+      return route.verb;
+    }
+  }
+  return null;
+}
+
 function executeConsistencyCheck(msg, lane) {
   const root = LANE_REGISTRY[lane].root;
   try {
@@ -244,6 +417,18 @@ function executeTask(msg, lane) {
   if (kind === 'status' || body.includes('report status') || body.includes('processed count')) {
     return executeStatusTask(msg, lane);
   }
+  if (body.match(/list\s+(dir|directory|folder)\s+/i) || body.match(/\bls\s+/i)) {
+    return executeListDirTask(msg, lane);
+  }
+  if (body.match(/hash\s+(?:file\s+)?/i) || body.match(/\bsha256?\s+/i) || body.match(/\bchecksum\s+/i)) {
+    return executeHashTask(msg, lane);
+  }
+  if (body.match(/\bdiff\s+/i) || body.match(/\bcompare\s+/i)) {
+    return executeDiffTask(msg, lane);
+  }
+  if (body.match(/\bcount\s+/i)) {
+    return executeCountTask(msg, lane);
+  }
   if (body.includes('read file') || body.includes('read ') || body.includes('file:') || body.includes('file=')) {
     return executeFileReadTask(msg, lane);
   }
@@ -263,9 +448,27 @@ function executeTask(msg, lane) {
     return executeConsistencyCheck(msg, lane);
   }
 
+  const nlpVerb = nlpRoute(msg);
+  if (nlpVerb) {
+    const nlpMsg = Object.assign({}, msg, { body: nlpVerb + ' ' + (msg.body || ''), _nlp_routed: true });
+    switch (nlpVerb) {
+      case 'status': return executeStatusTask(nlpMsg, lane);
+      case 'list dir': return executeListDirTask(nlpMsg, lane);
+      case 'hash file': return executeHashTask(nlpMsg, lane);
+      case 'diff': return executeDiffTask(nlpMsg, lane);
+      case 'count': return executeCountTask(nlpMsg, lane);
+      case 'read file': return executeFileReadTask(nlpMsg, lane);
+      case 'grep': return executeGrepTask(nlpMsg, lane);
+      case 'git log': return executeGitTask(Object.assign({}, nlpMsg, { body: 'git log' }), lane);
+      case 'git status': return executeGitTask(Object.assign({}, nlpMsg, { body: 'git status' }), lane);
+      case 'run script': return executeScriptTask(nlpMsg, lane);
+      case 'consistency check': return executeConsistencyCheck(nlpMsg, lane);
+    }
+  }
+
   return {
     task_kind: kind || 'ack',
-    results: { acknowledged: true, note: 'Task type not recognized. Supported: status, "read file <path>", "run script <name>", "git status/log/diff", "grep <pattern> in <path>", "write file <path>\\n<content>", "consistency check"' },
+    results: { acknowledged: true, note: 'Task type not recognized. Supported: status, "read file <path>", "run script <name>", "git status/log/diff", "grep <pattern> in <path>", "write file <path>\\n<content>", "list dir <path>", "hash file <path>", "diff <file1> <file2>", "count \\"pattern\\" in <path>", "consistency check" — or use natural language (e.g. "check if trust store is consistent")' },
     summary: `Acknowledged task: ${msg.subject || msg.task_id || 'unknown'}`,
   };
 }
@@ -419,4 +622,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { GenericTaskExecutor, executeTask, createResponse, LANE_REGISTRY };
+module.exports = { GenericTaskExecutor, executeTask, createResponse, LANE_REGISTRY, NLP_ROUTES };
