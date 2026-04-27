@@ -4,19 +4,39 @@
 const fs = require('fs');
 const path = require('path');
 
-const DEFAULT_ALLOWED_ROOTS = [
-  'S:/Archivist-Agent',
-  'S:/kernel-lane',
-  'S:/self-organizing-library',
-  'S:/SwarmMind',
-];
+let _discovery = null;
+try {
+  const { LaneDiscovery } = require('S:/Archivist-Agent/.global/lane-discovery');
+  _discovery = new LaneDiscovery();
+} catch (_) {}
 
-const TRAVERSAL_PATTERNS = /\.\./;
+function _getDefaultAllowedRoots() {
+  if (_discovery) {
+    const roots = [];
+    for (const laneId of _discovery.listLanes()) {
+      try { roots.push(_discovery.getLocalPath(laneId)); } catch (_) {}
+    }
+    if (roots.length > 0) return roots;
+  }
+  return ['S:/Archivist-Agent', 'S:/kernel-lane', 'S:/self-organizing-library', 'S:/SwarmMind'];
+}
+
+const DEFAULT_ALLOWED_ROOTS = _getDefaultAllowedRoots();
+
+function normalizePath(p) {
+  return p.replace(/\\/g, '/').toLowerCase();
+}
+
+function isContainedWithin(childResolved, rootNormalized) {
+  const childNorm = normalizePath(childResolved);
+  return childNorm === rootNormalized || childNorm.startsWith(rootNormalized + '/');
+}
 
 class ArtifactResolver {
   constructor(options = {}) {
     const rawRoots = options.allowedRoots || this._loadAllowedRoots(options.configPath);
-    this.allowedRoots = rawRoots.map(normalizePath);
+    this.allowedRoots = rawRoots.map(r => normalizePath(path.resolve(r)));
+    this._rawAllowedRoots = rawRoots;
     this.dryRun = options.dryRun !== undefined ? !!options.dryRun : true;
   }
 
@@ -26,7 +46,7 @@ class ArtifactResolver {
       path.join(process.cwd(), 'config', 'allowed_roots.json'),
     ];
 
-    for (const laneRoot of DEFAULT_ALLOWED_ROOTS) {
+    for (const laneRoot of _getDefaultAllowedRoots()) {
       searchPaths.push(path.join(laneRoot, 'config', 'allowed_roots.json'));
     }
 
@@ -40,40 +60,43 @@ class ArtifactResolver {
       } catch (_) {}
     }
 
-    return [...DEFAULT_ALLOWED_ROOTS];
+    return [..._getDefaultAllowedRoots()];
   }
 
   isWithinAllowedRoots(artifactPath) {
     if (!artifactPath || typeof artifactPath !== 'string') return false;
-    const normalized = normalizePath(artifactPath);
-    for (const root of this.allowedRoots) {
-      if (normalized.startsWith(root)) return true;
+    try {
+      const resolved = path.resolve(artifactPath);
+      for (const root of this.allowedRoots) {
+        if (isContainedWithin(resolved, root)) return true;
+      }
+    } catch (_) {
+      return false;
     }
     return false;
   }
 
   hasPathTraversal(artifactPath) {
     if (!artifactPath || typeof artifactPath !== 'string') return true;
-    // Check raw input before normalization — path.join resolves .. but we reject the intent
-    if (TRAVERSAL_PATTERNS.test(artifactPath)) return true;
-    const normalized = normalizePath(artifactPath);
-    if (TRAVERSAL_PATTERNS.test(normalized)) return true;
-    return false;
+    try {
+      const resolved = path.resolve(artifactPath);
+      return !this.isWithinAllowedRoots(resolved);
+    } catch (_) {
+      return true;
+    }
   }
 
   resolveRelativePath(artifactPath) {
     if (!artifactPath || typeof artifactPath !== 'string') return null;
     if (path.isAbsolute(artifactPath)) return artifactPath;
-    if (this.hasPathTraversal(artifactPath)) return null;
 
     const candidates = [];
-    for (const root of this.allowedRoots) {
-      const candidate = path.join(root, artifactPath);
-      const normalized = normalizePath(candidate);
-      if (normalized.startsWith(root.toLowerCase())) {
-        if (fs.existsSync(candidate)) return candidate;
-        candidates.push(candidate);
-      }
+    for (const rawRoot of this._rawAllowedRoots) {
+      const candidate = path.join(rawRoot, artifactPath);
+      const resolved = path.resolve(candidate);
+      if (!this.isWithinAllowedRoots(resolved)) continue;
+      if (fs.existsSync(candidate)) return candidate;
+      candidates.push(candidate);
     }
     return candidates.length > 0 ? candidates[0] : null;
   }
@@ -174,10 +197,6 @@ class ArtifactResolver {
       reason: fileResult.reason,
     };
   }
-}
-
-function normalizePath(p) {
-  return p.replace(/\\/g, '/').toLowerCase();
 }
 
 module.exports = { ArtifactResolver, normalizePath, DEFAULT_ALLOWED_ROOTS };
