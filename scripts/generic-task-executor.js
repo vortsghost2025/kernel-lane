@@ -5,6 +5,15 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
+const EXECUTOR_VERSION = '3.1.0';
+const FEATURE_FLAGS = {
+  v3_enabled: true,
+  nlp_routing: true,
+  timing_instrumentation: true,
+  safety_rails: true,
+  diff_size_limit: true,
+};
+
 const LANE_REGISTRY = {
   archivist: { root: 'S:/Archivist-Agent', inbox_target: 'S:/Archivist-Agent/lanes/archivist/inbox' },
   kernel: { root: 'S:/kernel-lane', inbox_target: 'S:/Archivist-Agent/lanes/archivist/inbox' },
@@ -750,4 +759,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { GenericTaskExecutor, executeTask, createResponse, LANE_REGISTRY, NLP_ROUTES, isPathAllowed };
+module.exports = { GenericTaskExecutor, executeTask, createResponse, LANE_REGISTRY, NLP_ROUTES, isPathAllowed, EXECUTOR_VERSION, FEATURE_FLAGS };

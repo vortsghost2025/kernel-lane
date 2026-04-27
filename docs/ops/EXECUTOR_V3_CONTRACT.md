@@ -1,6 +1,6 @@
 # Executor v3 Command Contract
 
-**Version:** 3.0.0
+**Version:** 3.1.0
 **Canonical source:** `scripts/generic-task-executor.js`
 **Date:** 2026-04-27
 **Status:** LOCKED — no verb additions without golden test coverage
@@ -115,7 +115,33 @@ Response validation rule:
 | NLP routing | 8 | 7 phrases + 12 route groups check |
 | Adversarial | 9 | empty + gibberish + conflict + traversal x2 + git x2 + trust-store + .identity |
 | Safety rails | 8 | grep/count/diff outside roots + BOOTSTRAP/GOVERNANCE/contradictions write + isPathAllowed unit x2 |
+| Instrumentation | 2 | timing explicit + timing NLP |
+| Rollout | 2 | version check + feature flags |
 | Determinism | 2 | status + hash |
+
+## Feature Flags
+
+```javascript
+const FEATURE_FLAGS = {
+  v3_enabled: true,           // Master switch — false falls back to v2
+  nlp_routing: true,          // Enable natural language routing
+  timing_instrumentation: true, // Attach _timing metadata
+  safety_rails: true,         // Enforce isPathAllowed + write denylist
+  diff_size_limit: true,      // Enforce 10MB diff limit
+};
+```
+
+## SLOs (Service Level Objectives)
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Golden test pass rate | 100% (60/60) | CI on every change |
+| Cross-lane consistency | 4/4 lanes pass | Per-lane test run |
+| Routing correctness | explicit > verb syntax > NLP > fallback | Covered by adversarial + conflict tests |
+| Safety rejection rate | 100% of out-of-bounds requests | Covered by safety rail + adversarial tests |
+| P95 latency (status) | <500ms | _timing metadata |
+| P95 latency (hash <1MB) | <1s | _timing metadata |
+| P95 latency (grep) | <15s | _timing metadata |
 
 ## Compatibility Guarantee
 

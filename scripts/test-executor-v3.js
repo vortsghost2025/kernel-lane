@@ -466,6 +466,19 @@ test('instrumentation: NLP routing includes timing', () => {
   assert.strictEqual(r.results._timing.source, 'nlp');
 });
 
+test('rollout: version is 3.x', () => {
+  const { EXECUTOR_VERSION } = require('./generic-task-executor');
+  assert(EXECUTOR_VERSION.startsWith('3.'));
+});
+
+test('rollout: feature flags present and enabled', () => {
+  const { FEATURE_FLAGS } = require('./generic-task-executor');
+  assert.strictEqual(FEATURE_FLAGS.v3_enabled, true);
+  assert.strictEqual(FEATURE_FLAGS.nlp_routing, true);
+  assert.strictEqual(FEATURE_FLAGS.safety_rails, true);
+  assert.strictEqual(FEATURE_FLAGS.timing_instrumentation, true);
+});
+
 // ============================================================
 // DETERMINISM CHECKS
 // ============================================================
