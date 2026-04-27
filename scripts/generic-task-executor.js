@@ -481,12 +481,14 @@ function executeConsistencyCheck(msg, lane) {
 }
 
 function executeTask(msg, lane) {
+  const t0 = Date.now();
   const kind = (msg.task_kind || '').toLowerCase();
   const body = (msg.body || '').toLowerCase();
   const attachRouting = (result, routing) => {
     const out = result || { task_kind: 'ack', results: {}, summary: 'No result' };
     if (!out.results) out.results = {};
     out.results._routing = routing;
+    out.results._timing = { ms: Date.now() - t0, verb: routing.verb, source: routing.source };
     return out;
   };
 

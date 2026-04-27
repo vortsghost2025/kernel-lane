@@ -451,6 +451,21 @@ test('safety: isPathAllowed accepts lane root', () => {
   assert.strictEqual(isPathAllowed('S:/Archivist-Agent/scripts/test.js'), true);
 });
 
+test('instrumentation: timing metadata on result', () => {
+  const r = executeTask(makeMsg('', { task_kind: 'status' }), LANE);
+  assert(r.results._timing);
+  assert(typeof r.results._timing.ms === 'number');
+  assert(r.results._timing.ms >= 0);
+  assert.strictEqual(r.results._timing.verb, 'status');
+  assert.strictEqual(r.results._timing.source, 'explicit');
+});
+
+test('instrumentation: NLP routing includes timing', () => {
+  const r = executeTask(makeMsg('what is the lane status'), LANE);
+  assert(r.results._timing);
+  assert.strictEqual(r.results._timing.source, 'nlp');
+});
+
 // ============================================================
 // DETERMINISM CHECKS
 // ============================================================
