@@ -402,6 +402,56 @@ test('adversarial: write to .identity/ blocked', () => {
 });
 
 // ============================================================
+// SAFETY RAILS (v3 Reliability #2)
+// ============================================================
+test('safety: path outside roots in grep rejected', () => {
+  const r = executeTask(makeMsg('grep "test" in Z:/nonexistent/path'), LANE);
+  assert.strictEqual(r.task_kind, 'report');
+  assert(r.results.error.includes('allowed roots'));
+});
+
+test('safety: path outside roots in count rejected', () => {
+  const r = executeTask(makeMsg('count "test" in Z:/nonexistent/path'), LANE);
+  assert.strictEqual(r.task_kind, 'report');
+  assert(r.results.error.includes('allowed roots'));
+});
+
+test('safety: path outside roots in diff rejected', () => {
+  const f1 = writeTmpFile('diff-safety-1.txt', 'aaa');
+  const r = executeTask(makeMsg('diff ' + f1 + ' Z:/nonexistent/evil.txt'), LANE);
+  assert.strictEqual(r.task_kind, 'report');
+  assert(r.results.error.includes('allowed roots'));
+});
+
+test('safety: write to BOOTSTRAP.md blocked', () => {
+  const r = executeTask(makeMsg('write file S:/Archivist-Agent/BOOTSTRAP.md\nEVIL'), LANE);
+  assert.strictEqual(r.task_kind, 'report');
+  assert(r.results.error.includes('blocked'));
+});
+
+test('safety: write to GOVERNANCE.md blocked', () => {
+  const r = executeTask(makeMsg('write file S:/Archivist-Agent/GOVERNANCE.md\nEVIL'), LANE);
+  assert.strictEqual(r.task_kind, 'report');
+  assert(r.results.error.includes('blocked'));
+});
+
+test('safety: write to contradictions.json blocked', () => {
+  const r = executeTask(makeMsg('write file S:/Archivist-Agent/lanes/broadcast/contradictions.json\n[]'), LANE);
+  assert.strictEqual(r.task_kind, 'report');
+  assert(r.results.error.includes('blocked'));
+});
+
+test('safety: isPathAllowed rejects unknown root', () => {
+  const { isPathAllowed } = require('./generic-task-executor');
+  assert.strictEqual(isPathAllowed('Z:/random/path'), false);
+});
+
+test('safety: isPathAllowed accepts lane root', () => {
+  const { isPathAllowed } = require('./generic-task-executor');
+  assert.strictEqual(isPathAllowed('S:/Archivist-Agent/scripts/test.js'), true);
+});
+
+// ============================================================
 // DETERMINISM CHECKS
 // ============================================================
 test('determinism: status same result twice', () => {

@@ -18,8 +18,8 @@
 | 7 | consistency check | `consistency check` / NLP | none | `{ check_type, output }` | 60s timeout, 100KB output |
 | 8 | list dir | `list dir <path>` / `ls <path>` | path string | `{ path, entries: [{name, type, size, modified}], count }` | allowed-roots only |
 | 9 | hash file | `hash file <path>` / `sha256 <path>` | path string | `{ path, size, sha256, modified }` | 50MB file limit, allowed-roots only |
-| 10 | diff | `diff <f1> <f2>` / `compare <f1> with <f2>` | two paths | `{ file1, file2, identical, total_lines_1, total_lines_2, diff_count, diffs: [{line, left, right}], truncated }` | 200 diff max, 100 returned, 200-char line truncation |
-| 11 | count | `count "pattern" in <path>` | pattern + file path | `{ file, pattern, count }` | single file only (not directory) |
+| 10 | diff | `diff <f1> <f2>` / `compare <f1> with <f2>` | two paths | `{ file1, file2, identical, total_lines_1, total_lines_2, diff_count, diffs: [{line, left, right}], truncated }` | 10MB file limit, 200 diff max, 100 returned, 200-char line truncation |
+| 11 | count | `count "pattern" in <path>` | pattern + file/dir path | `{ file|path, pattern, count, files_scanned? }` | dir: 500 files max, 5MB total scan |
 
 ## NLP Routing (12 pattern groups)
 
@@ -59,6 +59,18 @@
 - `task_kind=ack` for unrecognized tasks (fallback)
 - `results.error` present on any failure
 
+### Ownership Enforcement Metadata
+
+When lane processing runs with `--enforce-ownership`, downstream lane-worker metadata includes:
+
+- `_lane_worker.enforce_ownership: true`
+- `_lane_worker.ownership: object`
+- `_lane_worker.ownership_notes: string[]`
+
+Response validation rule:
+
+- If `_lane_worker.enforce_ownership === true`, both `_lane_worker.ownership` and `_lane_worker.ownership_notes` are required.
+
 ## Truncation Policy
 
 | Verb | Limit | On Exceed |
@@ -69,18 +81,41 @@
 | git | 30KB output | Truncate |
 | grep | 30KB output | Truncate |
 | write file | 10KB content | Reject with error |
-| diff | 200 differences max, 100 returned, 200-char lines | Truncate + `truncated: true` |
+| diff | 10MB file size, 200 differences max, 100 returned, 200-char lines | Reject oversized + truncate diffs + `truncated: true` |
 | hash file | 50MB file size | Reject with error |
+| count (dir) | 500 files, 5MB total | Stop scanning at limits |
 | consistency check | 100KB output | Truncate |
 
 ## Safety Constraints
 
-- **Path allowlist:** All file verbs require path within LANE_REGISTRY roots
+- **Path allowlist:** `isPathAllowed()` — all file verbs require path within LANE_REGISTRY roots or os.tmpdir()
+  - No escape hatches: the old `C:/` bypass is removed
+  - Exported for direct testing: `require('./generic-task-executor').isPathAllowed(path)`
 - **Write scope:** Own-lane-only (normalized path must start with lane root)
 - **Write denylist:** `trust-store.json`, `active-blocker.json`, `system_state.json`, `contradictions.json`, `.identity/`, `.trust/`, `BOOTSTRAP.md`, `GOVERNANCE.md`, `COVENANT.md`, `AGENTS.md`
 - **Git allowlist:** `status`, `log`, `diff`, `branch`, `remote` only
 - **Shell metacharacters:** `[;&|$`]` blocked in git args
 - **Daemon skip:** `heartbeat`, `inbox-watcher`, `relay-daemon` cannot be `run script` targets
+
+## Golden Test Suite (56 tests)
+
+| Category | Count | Coverage |
+|----------|-------|----------|
+| Verb: status | 2 | explicit + NLP |
+| Verb: read file | 2 | content + directory |
+| Verb: run script | 2 | missing + daemon skip |
+| Verb: git | 3 | status + disallowed + shell metachar |
+| Verb: grep | 2 | pattern search + no pattern error |
+| Verb: write file | 3 | outside lane + governance blocked + 10KB limit |
+| Verb: consistency | 2 | explicit + NLP |
+| Verb: list dir | 3 | entries + shape + outside roots |
+| Verb: hash file | 3 | sha256 + deterministic + alias |
+| Verb: diff | 4 | identical + different + compare alias + missing path |
+| Verb: count | 3 | occurrences + zero + directory mode |
+| NLP routing | 8 | 7 phrases + 12 route groups check |
+| Adversarial | 9 | empty + gibberish + conflict + traversal x2 + git x2 + trust-store + .identity |
+| Safety rails | 8 | grep/count/diff outside roots + BOOTSTRAP/GOVERNANCE/contradictions write + isPathAllowed unit x2 |
+| Determinism | 2 | status + hash |
 
 ## Compatibility Guarantee
 

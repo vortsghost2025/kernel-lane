@@ -70,8 +70,7 @@ function executeFileReadTask(msg, lane) {
   }
   const resolved = targetPath.startsWith('/') || targetPath.match(/^[A-Za-z]:/) ? targetPath : path.join(root, targetPath);
   const normalized = resolved.replace(/\\/g, '/');
-  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
-  if (!allowedRoots.some(ar => normalized.startsWith(ar)) && !normalized.match(/^[A-Za-z]:\//)) {
+  if (!isPathAllowed(normalized)) {
     return { task_kind: 'report', results: { error: `Path outside allowed roots: ${resolved}` }, summary: `Error: path outside allowed roots` };
   }
   try {
@@ -170,8 +169,7 @@ function executeGrepTask(msg, lane) {
   const searchPath = grepMatch[2] ? grepMatch[2] : '.';
   const resolved = searchPath.startsWith('/') || searchPath.match(/^[A-Za-z]:/) ? searchPath : path.join(root, searchPath);
   const normalized = resolved.replace(/\\/g, '/');
-  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
-  if (!allowedRoots.some(ar => normalized.startsWith(ar))) {
+  if (!isPathAllowed(normalized)) {
     return { task_kind: 'report', results: { error: `Search path outside allowed roots: ${resolved}` }, summary: 'Error: search path outside allowed roots' };
   }
   try {
@@ -242,10 +240,7 @@ function executeListDirTask(msg, lane) {
   const targetPath = dirMatch[1];
   const resolved = targetPath.startsWith('/') || targetPath.match(/^[A-Za-z]:/) ? targetPath : path.join(root, targetPath);
   const normalized = resolved.replace(/\\/g, '/');
-  const tmpdir = os.tmpdir().replace(/\\/g, '/');
-  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
-  allowedRoots.push(tmpdir);
-  if (!allowedRoots.some(ar => normalized.startsWith(ar))) {
+  if (!isPathAllowed(normalized)) {
     return { task_kind: 'report', results: { error: `Path outside allowed roots: ${resolved}` }, summary: 'Error: path outside allowed roots' };
   }
   try {
@@ -280,8 +275,7 @@ function executeHashTask(msg, lane) {
   const targetPath = hashMatch[1];
   const resolved = targetPath.startsWith('/') || targetPath.match(/^[A-Za-z]:/) ? targetPath : path.join(root, targetPath);
   const normalized = resolved.replace(/\\/g, '/');
-  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
-  if (!allowedRoots.some(ar => normalized.startsWith(ar)) && !normalized.match(/^[A-Za-z]:\//)) {
+  if (!isPathAllowed(normalized)) {
     return { task_kind: 'report', results: { error: `Path outside allowed roots: ${resolved}` }, summary: 'Error: path outside allowed roots' };
   }
   try {
@@ -317,14 +311,19 @@ function executeDiffTask(msg, lane) {
   };
   const resolved1 = resolve(path1);
   const resolved2 = resolve(path2);
-  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
   const norm1 = resolved1.replace(/\\/g, '/');
   const norm2 = resolved2.replace(/\\/g, '/');
-  if (!allowedRoots.some(ar => norm1.startsWith(ar)) || !allowedRoots.some(ar => norm2.startsWith(ar))) {
+  if (!isPathAllowed(norm1) || !isPathAllowed(norm2)) {
     return { task_kind: 'report', results: { error: 'One or both paths outside allowed roots' }, summary: 'Error: path outside allowed roots' };
   }
-  try {
-    const content1 = fs.readFileSync(resolved1, 'utf8');
+try {
+  const stat1 = fs.statSync(resolved1);
+  const stat2 = fs.statSync(resolved2);
+  const DIFF_SIZE_LIMIT = 10 * 1024 * 1024;
+  if (stat1.size > DIFF_SIZE_LIMIT || stat2.size > DIFF_SIZE_LIMIT) {
+    return { task_kind: 'report', results: { error: `File too large for diff (10MB limit). ${path.basename(resolved1)}: ${stat1.size}, ${path.basename(resolved2)}: ${stat2.size}` }, summary: 'Error: file too large for diff' };
+  }
+  const content1 = fs.readFileSync(resolved1, 'utf8');
     const content2 = fs.readFileSync(resolved2, 'utf8');
     const lines1 = content1.split('\n');
     const lines2 = content2.split('\n');
@@ -361,8 +360,7 @@ function executeCountTask(msg, lane) {
   const searchPath = countMatch[2] || '.';
   const resolved = searchPath.startsWith('/') || searchPath.match(/^[A-Za-z]:/) ? searchPath : path.join(root, searchPath);
   const normalized = resolved.replace(/\\/g, '/');
-  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
-  if (!allowedRoots.some(ar => normalized.startsWith(ar))) {
+  if (!isPathAllowed(normalized)) {
     return { task_kind: 'report', results: { error: `Search path outside allowed roots: ${resolved}` }, summary: 'Error: search path outside allowed roots' };
   }
   try {
@@ -750,4 +748,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { GenericTaskExecutor, executeTask, createResponse, LANE_REGISTRY, NLP_ROUTES };
+module.exports = { GenericTaskExecutor, executeTask, createResponse, LANE_REGISTRY, NLP_ROUTES, isPathAllowed };
