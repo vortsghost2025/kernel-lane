@@ -1,0 +1,39 @@
+name: FP8 Benchmark CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  fp8-bench:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up environment (MSVC + CUDA)
+        run: .\\scripts\\setup-env.ps1
+        shell: pwsh
+      - name: Build default (consumer) binary
+        run: .\\scripts\\build-kernels.ps1 -Configuration Release
+        shell: pwsh
+      - name: Build data‑center binary (SM 100)
+        run: .\\scripts\\build-kernels.ps1 -Configuration Release -DataCenterArch sm_100
+        shell: pwsh
+      - name: Run benchmark (consumer)
+        run: .\\scripts\\run-fp8-benchmark.ps1 -Sizes "1024,2048,4096" -SkipNcu
+        shell: pwsh
+      - name: Verify speed‑up ≥ 8×
+        run: |
+          $json = Get-Content benchmarks\\reports\\gen5_fp8_benchmark.json | ConvertFrom-Json
+          foreach($sz in $json.sizes.PSObject.Properties.Name){
+            $speedup = $json.sizes.$sz.speedup
+            if($speedup -lt 8){
+              Write-Error "Size $sz failed: speed‑up $speedup < 8"
+            }
+          }
+        shell: pwsh
+        continue-on-error: false
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fp8-benchmark-reports
+          path: benchmarks/reports/*
