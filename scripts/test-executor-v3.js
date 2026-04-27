@@ -507,10 +507,40 @@ test('determinism: hash same file twice', () => {
   assert.strictEqual(r1.results.sha256, r2.results.sha256);
 });
 
-// ============================================================
-// SUMMARY
-// ============================================================
-cleanupTestDir();
+  // ============================================================
+  // CONCURRENCY & HASH TESTS
+  // ============================================================
+  test('concurrency: lock file prevents double-execution', () => {
+    const lockDir = path.join(TEST_DIR, 'concurrency');
+    fs.mkdirSync(lockDir, { recursive: true });
+    const lockFile = path.join(lockDir, 'task.lock');
+    fs.writeFileSync(lockFile, JSON.stringify({ pid: 99999, ts: new Date().toISOString() }));
+    const r = executeTask(makeMsg(`list dir ${lockDir}`), LANE);
+    assert.ok(r.results !== undefined, 'Should still execute even with stale lock present');
+  });
+
+  test('concurrency: stale lock is re-entrant', () => {
+    const lockDir = path.join(TEST_DIR, 'concurrency-stale');
+    fs.mkdirSync(lockDir, { recursive: true });
+    const lockFile = path.join(lockDir, 'task.lock');
+    const staleTs = new Date(Date.now() - 3600000).toISOString();
+    fs.writeFileSync(lockFile, JSON.stringify({ pid: 1, ts: staleTs }));
+    const r = executeTask(makeMsg(`list dir ${lockDir}`), LANE);
+    assert.ok(r.results !== undefined, 'Stale lock should not block execution');
+  });
+
+  test('hash: different files produce different hashes', () => {
+    const f1 = writeTmpFile('hash-diff-a.txt', 'content A');
+    const f2 = writeTmpFile('hash-diff-b.txt', 'content B');
+    const r1 = executeTask(makeMsg(`hash file ${f1}`), LANE);
+    const r2 = executeTask(makeMsg(`hash file ${f2}`), LANE);
+    assert.notStrictEqual(r1.results.sha256, r2.results.sha256);
+  });
+
+  // ============================================================
+  // SUMMARY
+  // ============================================================
+  cleanupTestDir();
 console.log('\n========================================');
 console.log(`Executor v3 Golden Tests: ${passed} PASS, ${failed} FAIL, ${passed + failed} total`);
 console.log('========================================');

@@ -8,6 +8,7 @@ const cp = require('./completion-proof');
 const { ArtifactResolver } = require('./artifact-resolver');
 const { ExecutionGate } = require('./execution-gate');
 const { evaluateVerificationDomain } = require('./verification-domain-gate');
+const { getCodeVersionHash } = require('./code-version-hash');
 
 const ACTIONABLE_TYPES = new Set(['task', 'escalation', 'request']);
 const NON_ASCII_PATTERN = /[^\x00-\x7F]/;
@@ -41,6 +42,37 @@ function normalizeToAscii(str) {
 
 const SKIP_FILENAMES = new Set(['heartbeat.json', 'watcher.log', 'watcher.pid', 'readme.md']);
 const HEARTBEAT_PATTERN = /^heartbeat-.+\.json$/i;
+
+const SESSION_ID = process.env.LANE_SESSION_ID || `sess_${Date.now().toString(36)}_${process.pid}`;
+const SESSION_EPOCH = new Date().toISOString();
+const ORIGIN_RUNTIME = process.env.LANE_ORIGIN_RUNTIME || 'opencode';
+const ORIGIN_WORKSPACE = process.cwd();
+
+function getActiveOwner(laneRoot) {
+  const lockPath = path.join(laneRoot, 'lanes', laneRoot.split('/').pop().toLowerCase(), 'state', 'active-owner.json');
+  try {
+    if (fs.existsSync(lockPath)) {
+      return JSON.parse(fs.readFileSync(lockPath, 'utf8'));
+    }
+  } catch (_) {}
+  return null;
+}
+
+function claimActiveOwner(laneRoot, lane) {
+  const stateDir = path.join(laneRoot, 'lanes', lane, 'state');
+  if (!fs.existsSync(stateDir)) fs.mkdirSync(stateDir, { recursive: true });
+  const lockPath = path.join(stateDir, 'active-owner.json');
+  const owner = {
+    session_id: SESSION_ID,
+    lane,
+    claimed_at: nowIso(),
+    pid: process.pid,
+    origin_runtime: ORIGIN_RUNTIME,
+    origin_workspace: ORIGIN_WORKSPACE,
+  };
+  fs.writeFileSync(lockPath, JSON.stringify(owner, null, 2));
+  return owner;
+}
 
 const LANE_HINTS = [
   { hint: 'archivist-agent', lane: 'archivist' },
@@ -258,6 +290,8 @@ function createDefaultConfig(repoRoot, lane) {
       processed: path.join(inboxRoot, 'processed'),
       blocked: path.join(inboxRoot, 'blocked'),
       quarantine: path.join(inboxRoot, 'quarantine'),
+      needsReview: path.join(inboxRoot, 'needs-review'),
+      staleForeign: path.join(inboxRoot, 'stale-foreign'),
     },
   };
 }
@@ -281,7 +315,19 @@ class LaneWorker {
       dryRun: this.dryRun,
       resolver: this.artifactResolver,
     });
+    this.codeVersionHash = getCodeVersionHash(this.repoRoot);
     this.lastRun = null;
+    this.sessionId = SESSION_ID;
+    this.isOwner = false;
+    if (!this.dryRun) {
+      const existing = getActiveOwner(this.repoRoot);
+      if (!existing || existing.session_id === SESSION_ID || (Date.now() - new Date(existing.claimed_at).getTime()) > 900000) {
+        claimActiveOwner(this.repoRoot, this.lane);
+        this.isOwner = true;
+      }
+    } else {
+      this.isOwner = true;
+    }
   }
 
   _loadSchemaValidator() {
@@ -446,7 +492,11 @@ class LaneWorker {
   // Artifact resolution check: any message claiming completion proof MUST verify.
   // Fail-closed: if proof exists but cannot be verified, route to blocked.
   if (gate.pass && cp.hasCompletionProof(msg)) {
-    const domain = evaluateVerificationDomain(msg, { resolver: this.artifactResolver });
+    const domain = evaluateVerificationDomain(msg, {
+      resolver: this.artifactResolver,
+      localCodeVersionHash: this.codeVersionHash,
+      repoRoot: this.repoRoot,
+    });
     if (!domain.domain_valid) {
       if (domain.phase === 'post_execution') {
         return {
@@ -459,6 +509,7 @@ class LaneWorker {
           verification_outcome: 'INVALID_DOMAIN',
           execution_preserved: true,
           domain_validation: domain,
+          verification_path: ['domain_gate', 'execution_check', 'response_validation'],
           ownership,
           ownership_notes: ownershipNotes,
         };
@@ -473,6 +524,7 @@ class LaneWorker {
         verification_outcome: domain.verification_outcome,
         execution_preserved: false,
         domain_validation: domain,
+        verification_path: ['domain_gate', 'execution_check', 'response_validation'],
         ownership,
         ownership_notes: ownershipNotes,
       };
@@ -487,6 +539,7 @@ class LaneWorker {
         execution_would_verify: executionResult.would_verify === true,
         domain_gate_executed: true,
         verification_outcome: 'FAIL',
+        verification_path: ['domain_gate', 'execution_check', 'response_validation'],
         ownership,
         ownership_notes: ownershipNotes,
       };
@@ -494,7 +547,11 @@ class LaneWorker {
   }
   // Non-actionable messages claiming completion without verifiable artifact = blocked
   if (gate.pass && !isActionable(msg) && cp.hasCompletionProof(msg)) {
-    const domain = evaluateVerificationDomain(msg, { resolver: this.artifactResolver });
+    const domain = evaluateVerificationDomain(msg, {
+      resolver: this.artifactResolver,
+      localCodeVersionHash: this.codeVersionHash,
+      repoRoot: this.repoRoot,
+    });
     if (!domain.domain_valid) {
       if (domain.phase === 'post_execution') {
         return {
@@ -507,6 +564,7 @@ class LaneWorker {
           verification_outcome: 'INVALID_DOMAIN',
           execution_preserved: true,
           domain_validation: domain,
+          verification_path: ['domain_gate', 'execution_check', 'response_validation'],
           ownership,
           ownership_notes: ownershipNotes,
         };
@@ -521,6 +579,7 @@ class LaneWorker {
         verification_outcome: domain.verification_outcome,
         execution_preserved: false,
         domain_validation: domain,
+        verification_path: ['domain_gate', 'execution_check', 'response_validation'],
         ownership,
         ownership_notes: ownershipNotes,
       };
@@ -535,6 +594,7 @@ class LaneWorker {
           execution_would_verify: executionResult.would_verify === true,
           domain_gate_executed: true,
           verification_outcome: 'FAIL',
+          verification_path: ['domain_gate', 'execution_check', 'response_validation'],
           ownership,
           ownership_notes: ownershipNotes,
         };
@@ -549,6 +609,7 @@ class LaneWorker {
       execution_would_verify: cp.hasCompletionProof(msg),
       domain_gate_executed: true,
       verification_outcome: 'PASS',
+      verification_path: ['domain_gate', 'execution_check', 'response_validation'],
       ownership,
       ownership_notes: ownershipNotes
     };
@@ -568,7 +629,7 @@ class LaneWorker {
         detail: decision.detail || null,
         schema_valid: !!schemaResult.valid,
         signature_valid: !!signatureResult.valid,
-        remediation: remediation,
+        schema_remediation: remediation,
         english_only: isEnglishOnly(msg),
         execution_verified: decision.execution_verified !== undefined ? decision.execution_verified : false,
         would_verify: decision.execution_would_verify === true,
@@ -579,7 +640,14 @@ class LaneWorker {
         domain_gate_executed: decision.domain_gate_executed === true,
         verification_outcome: decision.verification_outcome || null,
         domain_validation: decision.domain_validation || null,
+      verification_path: decision.verification_path || null,
+      session_identity: {
+        session_id: SESSION_ID,
+        session_epoch_started_at: SESSION_EPOCH,
+        origin_runtime: ORIGIN_RUNTIME,
+        origin_workspace: ORIGIN_WORKSPACE,
       },
+    },
     };
     if (decision.reason === 'FORMAT_VIOLATION_NON_ASCII') {
       enriched.format_violation = true;
@@ -600,8 +668,43 @@ class LaneWorker {
       });
     }
 
-  let msg = rawRead.value;
-  let schemaResult = this.schemaValidator(msg);
+    let msg = rawRead.value;
+
+    if (!this.isOwner && msg.requires_action === true) {
+      const needsReviewDir = this.config.queues.needsReview || path.join(path.dirname(filePath), 'needs-review');
+      if (!fs.existsSync(needsReviewDir)) fs.mkdirSync(needsReviewDir, { recursive: true });
+      const nrPath = uniquePath(path.join(needsReviewDir, filename));
+      if (!this.dryRun) {
+        fs.renameSync(filePath, nrPath);
+      }
+      return {
+        source: filePath, filename, target_queue: 'needs-review',
+        target_path: nrPath, reason: 'FOREIGN_INSTANCE_ACTIONABLE',
+        detail: `Non-owner session ${SESSION_ID.slice(0,12)}: actionable message from different instance deferred`,
+        schema_valid: false, signature_valid: false, actionable: true,
+        has_completion_proof: false, dry_run: this.dryRun,
+      };
+    }
+
+    if (msg._lane_worker && msg._lane_worker.session_identity &&
+        msg._lane_worker.session_identity.session_id &&
+        msg._lane_worker.session_identity.session_id !== SESSION_ID) {
+      if (!msg.allow_cross_instance && msg.requires_action === true) {
+        const staleDir = this.config.queues.staleForeign || path.join(path.dirname(filePath), 'stale-foreign');
+        if (!fs.existsSync(staleDir)) fs.mkdirSync(staleDir, { recursive: true });
+        const sfPath = uniquePath(path.join(staleDir, filename));
+        if (!this.dryRun) { fs.renameSync(filePath, sfPath); }
+        return {
+          source: filePath, filename, target_queue: 'stale-foreign',
+          target_path: sfPath, reason: 'STALE_FOREIGN_INSTANCE',
+          detail: `Message from foreign session ${msg._lane_worker.session_identity.session_id.slice(0,12)}, cross-instance not allowed`,
+          schema_valid: false, signature_valid: false, actionable: true,
+          has_completion_proof: false, dry_run: this.dryRun,
+        };
+      }
+    }
+
+    let schemaResult = this.schemaValidator(msg);
   const signatureResult = this.signatureValidator(msg);
   let remediation = null;
   if (!schemaResult.valid && signatureResult.valid) {
@@ -640,8 +743,10 @@ class LaneWorker {
       verification_outcome: decision.verification_outcome || null,
       domain_validation: decision.domain_validation || null,
       domain_gate_executed: decision.domain_gate_executed === true,
-      dry_run: this.dryRun,
-    };
+  verification_path: decision.verification_path || null,
+  schema_remediation: remediation || null,
+  dry_run: this.dryRun,
+};
 
     if (!this.dryRun) {
       this._writeWithMetadata(targetPath, msg, decision, schemaResult, signatureResult, remediation);

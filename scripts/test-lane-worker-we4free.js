@@ -58,6 +58,13 @@ function writeMsg(inbox, filename, msg) {
   return p;
 }
 
+function readFirstJson(dirPath) {
+  const files = fs.existsSync(dirPath) ? fs.readdirSync(dirPath).filter((f) => f.endsWith('.json')) : [];
+  assert.ok(files.length > 0, `Expected JSON file in ${dirPath}`);
+  const fullPath = path.join(dirPath, files[0]);
+  return JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+}
+
 let passed = 0;
 let failed = 0;
 const results = [];
@@ -403,6 +410,178 @@ test('lane-worker never writes system_state.json', (tmpRoot) => {
     !workerCode.includes('system_state') || workerCode.includes('lane-worker must not write system_state'),
     'lane-worker code must not contain system_state write logic'
   );
+});
+
+// ============================================================
+// TEST 13: signed message missing known defaults -> remediated + processed
+// ============================================================
+test('signed message missing known default fields -> remediated + processed', (tmpRoot) => {
+  const schemaValidator = (msg) => {
+    const required = ['timestamp', 'payload', 'execution', 'lease', 'retry', 'evidence', 'evidence_exchange', 'heartbeat'];
+    const errors = [];
+    for (const field of required) {
+      if (!(field in (msg || {}))) errors.push(`Missing required field: ${field}`);
+    }
+    return { valid: errors.length === 0, errors };
+  };
+  const { worker, config } = makeWorker(tmpRoot, 'archivist', {
+    dryRun: false,
+    schemaValidator,
+    signatureValidator: () => ({ valid: true, reason: null, details: null }),
+  });
+  const msg = {
+    id: 'signed-remediate-known',
+    from: 'library',
+    to: 'archivist',
+    type: 'ack',
+    priority: 'P2',
+    requires_action: false,
+    subject: 'Remediation path',
+    body: 'Missing known defaults only',
+  };
+  writeMsg(config.queues.inbox, '2026-01-01_signed_remediate_known.json', msg);
+
+  const summary = worker.processOnce();
+  assert.strictEqual(summary.routed.processed, 1, 'Remediated signed message should process');
+  assert.strictEqual(summary.routed.quarantine, 0);
+  assert.ok(summary.routes[0].schema_remediation && summary.routes[0].schema_remediation.success === true);
+});
+
+// ============================================================
+// TEST 14: unsigned message missing fields -> quarantined
+// ============================================================
+test('unsigned message missing fields -> quarantined', (tmpRoot) => {
+  const schemaValidator = (msg) => {
+    const errors = [];
+    if (!msg.timestamp) errors.push('Missing required field: timestamp');
+    if (!msg.payload) errors.push('Missing required field: payload');
+    return { valid: errors.length === 0, errors };
+  };
+  const { worker, config } = makeWorker(tmpRoot, 'archivist', {
+    dryRun: false,
+    schemaValidator,
+    signatureValidator: () => ({ valid: false, reason: 'MISSING_SIGNATURE', details: null }),
+  });
+  const msg = {
+    id: 'unsigned-remediate-blocked',
+    from: 'library',
+    to: 'archivist',
+    type: 'ack',
+    priority: 'P2',
+    requires_action: false,
+    subject: 'Unsigned remediation should fail',
+    body: 'No signature',
+  };
+  writeMsg(config.queues.inbox, '2026-01-01_unsigned_missing_fields.json', msg);
+
+  const summary = worker.processOnce();
+  assert.strictEqual(summary.routed.quarantine, 1, 'Schema invalid should quarantine');
+  assert.strictEqual(summary.routes[0].schema_remediation, null, 'Unsigned messages must not be remediated');
+});
+
+// ============================================================
+// TEST 15: malformed schema field is not remediated silently
+// ============================================================
+test('malformed ownership/schema field -> not remediated silently', (tmpRoot) => {
+  const schemaValidator = (msg) => {
+    const errors = [];
+    if (!msg.timestamp) errors.push('Missing required field: timestamp');
+    if (msg.retry && typeof msg.retry !== 'object') errors.push('Field retry must be an object');
+    return { valid: errors.length === 0, errors };
+  };
+  const { worker, config } = makeWorker(tmpRoot, 'archivist', {
+    dryRun: false,
+    schemaValidator,
+    signatureValidator: () => ({ valid: true, reason: null, details: null }),
+  });
+  const msg = {
+    id: 'signed-malformed-field',
+    from: 'library',
+    to: 'archivist',
+    type: 'ack',
+    priority: 'P2',
+    requires_action: false,
+    subject: 'Malformed field',
+    body: 'retry has wrong type',
+    retry: 'not-an-object',
+  };
+  writeMsg(config.queues.inbox, '2026-01-01_signed_malformed_field.json', msg);
+
+  const summary = worker.processOnce();
+  assert.strictEqual(summary.routed.quarantine, 1, 'Malformed schema should quarantine');
+  assert.strictEqual(summary.routes[0].schema_remediation, null, 'Malformed fields must not be silently remediated');
+});
+
+// ============================================================
+// TEST 16: remediated message includes audit metadata
+// ============================================================
+test('remediated message includes schema_remediation audit metadata', (tmpRoot) => {
+  const schemaValidator = (msg) => {
+    const errors = [];
+    if (!msg.timestamp) errors.push('Missing required field: timestamp');
+    if (!msg.payload) errors.push('Missing required field: payload');
+    if (!msg.heartbeat) errors.push('Missing required field: heartbeat');
+    return { valid: errors.length === 0, errors };
+  };
+  const { worker, config } = makeWorker(tmpRoot, 'archivist', {
+    dryRun: false,
+    schemaValidator,
+    signatureValidator: () => ({ valid: true, reason: null, details: null }),
+  });
+  const msg = {
+    id: 'signed-remediation-audit',
+    from: 'library',
+    to: 'archivist',
+    type: 'ack',
+    priority: 'P2',
+    requires_action: false,
+    subject: 'Audit metadata',
+    body: 'Expect schema_remediation in metadata',
+  };
+  writeMsg(config.queues.inbox, '2026-01-01_signed_remediation_audit.json', msg);
+
+  worker.processOnce();
+  const enriched = readFirstJson(config.queues.processed);
+  assert.ok(enriched._lane_worker && enriched._lane_worker.schema_remediation, 'Missing _lane_worker.schema_remediation');
+  assert.strictEqual(enriched._lane_worker.schema_remediation.success, true);
+  assert.ok(Array.isArray(enriched._lane_worker.schema_remediation.applied_fields));
+});
+
+// ============================================================
+// TEST 17: remediation retries only once
+// ============================================================
+test('remediation retries only once', (tmpRoot) => {
+  let validateCalls = 0;
+  const schemaValidator = (msg) => {
+    validateCalls += 1;
+    const errors = [];
+    if (!msg.timestamp) errors.push('Missing required field: timestamp');
+    if (!msg.payload) errors.push('Missing required field: payload');
+    if (!msg.non_remediable_required) errors.push('Missing required field: non_remediable_required');
+    return { valid: errors.length === 0, errors };
+  };
+  const { worker, config } = makeWorker(tmpRoot, 'archivist', {
+    dryRun: false,
+    schemaValidator,
+    signatureValidator: () => ({ valid: true, reason: null, details: null }),
+  });
+  const msg = {
+    id: 'signed-one-retry-only',
+    from: 'library',
+    to: 'archivist',
+    type: 'ack',
+    priority: 'P2',
+    requires_action: false,
+    subject: 'Retry once',
+    body: 'Should remediate once then stop',
+  };
+  writeMsg(config.queues.inbox, '2026-01-01_signed_retry_once.json', msg);
+
+  const summary = worker.processOnce();
+  assert.strictEqual(summary.routed.quarantine, 1, 'Non-remediable missing field should still quarantine');
+  assert.strictEqual(validateCalls, 2, 'Schema validation should run exactly twice (initial + one retry)');
+  assert.ok(summary.routes[0].schema_remediation && summary.routes[0].schema_remediation.attempted === true);
+  assert.strictEqual(summary.routes[0].schema_remediation.success, false);
 });
 
 // ============================================================

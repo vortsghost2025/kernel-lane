@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.3",
+  "task_id": "summary-1777305907900-c2e341",
+  "idempotency_key": "daed26a0192a43a93eea566d42340a4b7a3c230eda33f3e3758601beb23d231a",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "report",
+  "task_kind": "report",
+  "priority": "P2",
+  "subject": "Implementation Summary: locks + code hash + concurrency proof",
+  "body": "Completed in Archivist:\n- Added truth-critical write lease support (.locks/truth-critical.lock.json) for executor writes to verification-critical scripts.\n- Added code_version_hash utility and stamping in executor response governance metadata.\n- Added domain-gate semantic check for code_version_hash drift (message hash vs local verifier hash).\n- Added verification_path metadata and validation order checks.\n- Added adversarial concurrency proof test: scripts/test-concurrency-attack-domain-gate.js.\n- Wired concurrency proof test into CI.\n- Verified test pass:\n  node scripts/test-lane-worker-we4free.js\n  node scripts/test-verification-domain-gate.js\n  node scripts/test-verification-domain-integration.js\n  node scripts/test-concurrency-attack-domain-gate.js",
+  "timestamp": "2026-04-27T16:05:07.900Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "archivist",
+    "acquired_at": "2026-04-27T16:05:07.900Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "evidence_exchange": {},
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-27T16:05:07.900Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "content_hash": "sha256:7ca707733cf20b464337577078b53d4c859b629aab215035a42bba3a18c1ece4",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVlNzBiNzgxMDViYzYxODkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6N2NhNzA3NzMzY2YyMGI0NjQzMzc1NzcwNzhiNTNkNGM4NTliNjI5YWFiMjE1MDM1YTQyYmJhM2ExOGMxZWNlNCIsImV4cCI6MTc3NzM5MjMwNywiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzMwNTkwNywiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6InN1bW1hcnktMTc3NzMwNTkwNzkwMC1jMmUzNDEiLCJ0byI6Imtlcm5lbCJ9.mIBQP6EC3g4Tv_ybQlt6U6WCn8EjzX_1um2-qhpt8SZXLPqg9BbZyyHuPuPYhkfelMFmq5XXpbgihyeOm0SkdkX1WqL31NGdKfwRVJINXhuJa96emfo3pCtnKmXh60wwaYOW1PtjN3EiOdntcBtlXi4s2_MTiqPd4rKMoFJ6Rz50jDsxjpJo6zUsTbGkRiRo5WBxSaGnwMBK46I1gRIupNq7pSV1WbvE6xbMJr2wKR1kxxb_L1iWKo_pN42Tq_2GXQnO5H7gHnqhq4y2t88mv4IR4OUg0Bx_GpkTLjfQQ8fJ2EyW4AcT7-l_yoKWFGtJBA9Du3G1UGnPDAP8Ke8UbQ",
+  "signature_alg": "RS256",
+  "key_id": "ee70b78105bc6189"
+}

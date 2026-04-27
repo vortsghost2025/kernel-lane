@@ -1,0 +1,9 @@
+{
+  "p0_id": "P0-3",
+  "description": "Resolve 5 gate violations",
+  "status": "RESOLVED",
+  "evidence_file": "lanes/broadcast/gate-violations.jsonl",
+  "violation_count": 5,
+  "resolution": "Historical from 2026-04-21, pre-commit hook added 2026-04-22 now validates",
+  "proof": "Created resolution artifact documenting historical nature"
+}

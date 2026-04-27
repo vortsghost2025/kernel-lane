@@ -1,0 +1,39 @@
+{
+  "lane": "archivist",
+  "resolved_at": "2026-04-22T22:35:00Z",
+  "p0_resolution": [
+    {
+      "p0_id": "P0-1",
+      "description": "Create edit-intent registry file",
+      "status": "RESOLVED",
+      "evidence_file": "lanes/broadcast/edit-intent-registry.json",
+      "file_line": "N/A (new file)",
+      "proof": "Registry file created with schema v1.0, empty entries array"
+    },
+    {
+      "p0_id": "P0-2",
+      "description": "Fix .trust/keys.json key_id",
+      "status": "RESOLVED",
+      "evidence_file": ".trust/keys.json",
+      "file_line": 5,
+      "before": "1a7741b8d353abee",
+      "after": "583b2c36f397ef01",
+      "proof": "Updated key_id to match canonical archivist key from trust-store"
+    },
+    {
+      "p0_id": "P0-3",
+      "description": "Resolve 5 gate violations",
+      "status": "RESOLVED",
+      "evidence_file": "lanes/broadcast/gate-violations.jsonl",
+      "violation_count": 5,
+      "violation_date": "2026-04-21",
+      "resolution": "Historical incidents from 2026-04-21, current gate protected by pre-commit hook added 2026-04-22",
+      "proof": "Created gate-violations-resolved.json documenting resolution"
+    }
+  ],
+  "summary": {
+    "total_p0": 3,
+    "resolved": 3,
+    "remaining": 0
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "p0_id": "P0-2",
+  "description": "Fix .trust/keys.json key_id",
+  "status": "RESOLVED",
+  "evidence_file": ".trust/keys.json",
+  "line": 5,
+  "old_value": "1a7741b8d353abee",
+  "new_value": "583b2c36f397ef01",
+  "proof": "Updated key_id to match canonical archivist key from trust-store"
+}

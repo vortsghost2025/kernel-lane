@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "artifact": "last-recovery",
+  "timestamp": "2026-04-27T22:08:52.120Z",
+  "suite": "recovery-verification-v1",
+  "verdict": "CONFLICTED",
+  "summary": {
+    "passed": 10,
+    "total": 11,
+    "all_passed": false
+  },
+  "claim": "Restored context has contradictions — cannot prove correctness",
+  "evidence": {
+    "relative": ".compact-audit/RECOVERY_TEST_RESULTS.json",
+    "absolute": "S:\\Archivist-Agent\\.compact-audit\\RECOVERY_TEST_RESULTS.json"
+  },
+  "lane_heartbeats": {
+    "archivist": {
+      "status": "alive",
+      "timestamp": "2026-04-27T22:08:24.058Z",
+      "age_seconds": 28
+    },
+    "library": {
+      "status": "alive",
+      "timestamp": "2026-04-27T21:53:57.329Z",
+      "age_seconds": 894
+    },
+    "swarmmind": {
+      "status": "stale",
+      "timestamp": "2026-04-27T16:40:01.6425537-04:00",
+      "age_seconds": 5330
+    },
+    "kernel": {
+      "status": "alive",
+      "timestamp": "2026-04-27T21:53:57.329Z",
+      "age_seconds": 894
+    }
+  },
+  "lane_liveness": {
+    "alive_count": 3,
+    "expected": 4
+  },
+  "run_by": "scripts/recovery-test-suite.js",
+  "archivist_repo_git_sha": "f8e5ee8b6ed625c859ef3ba8e3cedd61377de25e"
+}

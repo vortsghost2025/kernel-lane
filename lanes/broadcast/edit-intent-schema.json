@@ -1,0 +1,23 @@
+{
+  "schema": "edit-intent-registry",
+  "version": "1.0",
+  "description": "Append-only registry of edit intent claims. Each lane publishes intent before editing.",
+  "record_format": {
+    "lane": "string - lane id (archivist|library|swarmmind|kernel)",
+    "file": "string - absolute or canonical file path",
+    "scope": {
+      "type": "string - symbol|function|file|line-range",
+      "value": "string - specific identifier or range"
+    },
+    "action": "string - modify|add|delete|refactor",
+    "mode": "string - observe|shared|exclusive",
+    "status": "string - planning|editing|verifying|done|abandoned",
+    "claimed_at": "ISO8601 timestamp",
+    "expires_at": "ISO8601 timestamp",
+    "reason_class": "string - trust-resolution|schema-fix|watcher-runtime|identity-update|convergence",
+    "content_hidden": true,
+    "heartbeat_at": "ISO8601 timestamp - last renewal"
+  },
+  "lease_ttl_seconds": 300,
+  "heartbeat_interval_seconds": 60
+}

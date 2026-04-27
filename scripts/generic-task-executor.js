@@ -4,6 +4,8 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const crypto = require('crypto');
+const { getCodeVersionHash } = require('./code-version-hash');
 
 const EXECUTOR_VERSION = '3.1.0';
 const FEATURE_FLAGS = {
@@ -20,6 +22,13 @@ const LANE_REGISTRY = {
   library: { root: 'S:/self-organizing-library', inbox_target: 'S:/Archivist-Agent/lanes/archivist/inbox' },
   swarmmind: { root: 'S:/SwarmMind', inbox_target: 'S:/Archivist-Agent/lanes/archivist/inbox' },
 };
+
+const TRUTH_CRITICAL_PATH_MARKERS = [
+  '/scripts/lane-worker.js',
+  '/scripts/verification-domain-gate.js',
+  '/scripts/validate-responses.js',
+  '/scripts/completion-proof.js',
+];
 
 function nowIso() { return new Date().toISOString(); }
 function ensureDir(d) { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); }
@@ -228,6 +237,14 @@ function executeWriteTask(msg, lane) {
     return { task_kind: 'report', results: { error: `Write to governance/critical file blocked: ${targetPath}` }, summary: 'Error: write to protected file' };
   }
   try {
+    const lockCheck = acquireTruthCriticalLockIfNeeded(normalized, lane);
+    if (!lockCheck.ok) {
+      return {
+        task_kind: 'report',
+        results: { error: lockCheck.error, lock: lockCheck.lock || null },
+        summary: 'Error: truth-critical write lock not acquired',
+      };
+    }
     const dir = path.dirname(resolved);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(resolved, content, 'utf8');
@@ -235,6 +252,38 @@ function executeWriteTask(msg, lane) {
   } catch (e) {
     return { task_kind: 'report', results: { error: `Write failed: ${e.message}` }, summary: `Error writing to ${resolved}` };
   }
+}
+
+function isTruthCriticalPath(normalizedPath) {
+  return TRUTH_CRITICAL_PATH_MARKERS.some((m) => normalizedPath.endsWith(m));
+}
+
+function acquireTruthCriticalLockIfNeeded(normalizedPath, lane) {
+  if (!isTruthCriticalPath(normalizedPath)) return { ok: true };
+  const repoRoot = LANE_REGISTRY[lane].root;
+  const lockDir = path.join(repoRoot, '.locks');
+  ensureDir(lockDir);
+  const lockPath = path.join(lockDir, 'truth-critical.lock.json');
+  const now = Date.now();
+  const owner = process.env.AGENT_INSTANCE_ID || `${lane}-executor`;
+  const ttlMs = 10 * 60 * 1000;
+  if (fs.existsSync(lockPath)) {
+    try {
+      const lock = JSON.parse(fs.readFileSync(lockPath, 'utf8'));
+      if (lock.expires_at_ms && lock.expires_at_ms > now && lock.owner !== owner) {
+        return { ok: false, error: `Truth-critical lock held by ${lock.owner} until ${new Date(lock.expires_at_ms).toISOString()}`, lock };
+      }
+    } catch (_) {}
+  }
+  const lockObj = {
+    owner,
+    acquired_at_ms: now,
+    expires_at_ms: now + ttlMs,
+    ttl_ms: ttlMs,
+    scope: 'truth-critical-execution-surface',
+  };
+  fs.writeFileSync(lockPath, JSON.stringify(lockObj, null, 2), 'utf8');
+  return { ok: true, lock: lockObj };
 }
 
 function executeListDirTask(msg, lane) {
@@ -612,8 +661,8 @@ function executeTask(msg, lane) {
 
 function createResponse(originalMsg, executionResult, lane) {
   const resultJson = JSON.stringify(executionResult.results || {});
-  const crypto = require('crypto');
   const contentHash = 'sha256:' + crypto.createHash('sha256').update(resultJson).digest('hex');
+  const codeVersionHash = getCodeVersionHash(LANE_REGISTRY[lane].root);
   return {
     schema_version: '1.3',
     task_id: `response-${originalMsg.task_id || Date.now()}`,
@@ -640,7 +689,7 @@ function createResponse(originalMsg, executionResult, lane) {
     heartbeat: { status: 'done', last_heartbeat_at: nowIso(), interval_seconds: 300, timeout_seconds: 900 },
     _original_task_id: originalMsg.task_id,
     _execution_result: executionResult.results,
-    _governance: { executor_version: EXECUTOR_VERSION, content_hash: contentHash, timestamp: nowIso() },
+    _governance: { executor_version: EXECUTOR_VERSION, content_hash: contentHash, code_version_hash: codeVersionHash, timestamp: nowIso() },
   };
 }
 

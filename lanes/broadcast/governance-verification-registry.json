@@ -1,0 +1,95 @@
+{
+  "description": "Governance message verification registry - tracks critical messages and their acknowledgments",
+  "schema_version": "1.0",
+  "messages": {
+    "2026-04-20T20-30-00Z-archivist-decisions": {
+      "type": "decision",
+      "priority": "P0",
+      "subject": "Contract schema, inbox watcher, scheduled tasks, heartbeat approved",
+      "from": "archivist",
+      "required_acks": [
+        "library",
+        "swarmmind"
+      ],
+      "delivered": [
+        "library",
+        "swarmmind"
+      ],
+      "acknowledged": [
+        "library",
+        "swarmmind"
+      ],
+      "status": "ACKED",
+      "created_at": "2026-04-20T20:30:00Z",
+      "verified_at": "2026-04-22T12:50:00Z",
+      "blocking": false
+    },
+    "2026-04-20T21-05-00Z-archivist-v1_1-review": {
+      "type": "review",
+      "priority": "P0",
+      "subject": "Codex v1.1 schema patch - APPROVE WITH AMENDMENTS",
+      "from": "archivist",
+      "required_acks": [
+        "library",
+        "swarmmind"
+      ],
+      "delivered": [
+        "library",
+        "swarmmind"
+      ],
+      "acknowledged": [],
+      "status": "PENDING_ACK",
+      "created_at": "2026-04-20T21:05:00Z",
+      "verified_at": null,
+      "blocking": false,
+      "missing_acks": [
+        "library",
+        "swarmmind"
+      ]
+    },
+    "2026-04-20T21-25-00Z-archivist-lane4-review": {
+      "type": "review",
+      "priority": "P0",
+      "subject": "Lane 4 proposal - APPROVE WITH AMENDMENTS",
+      "from": "archivist",
+      "required_acks": [
+        "library",
+        "swarmmind"
+      ],
+      "delivered": [
+        "library",
+        "swarmmind"
+      ],
+      "acknowledged": [],
+      "status": "PENDING_ACK",
+      "created_at": "2026-04-20T21:25:00Z",
+      "verified_at": null,
+      "blocking": false,
+      "missing_acks": [
+        "library",
+        "swarmmind"
+      ]
+    },
+    "2026-04-20T21-30-00Z-archivist-urgent-rate-limit": {
+      "type": "task",
+      "priority": "P0",
+      "subject": "URGENT: Rate limiting for heartbeats",
+      "from": "archivist",
+      "required_acks": [
+        "swarmmind"
+      ],
+      "delivered": [
+        "swarmmind"
+      ],
+      "acknowledged": [
+        "swarmmind"
+      ],
+      "status": "ACKED",
+      "created_at": "2026-04-20T21:30:00Z",
+      "verified_at": "2026-04-22T12:50:00Z",
+      "blocking": false
+    }
+  },
+  "last_scan": "2026-04-22T12:47:44.357Z",
+  "alert_threshold_hours": 24
+}

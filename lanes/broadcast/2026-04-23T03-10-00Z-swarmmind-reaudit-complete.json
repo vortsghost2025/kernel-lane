@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.3",
+  "task_id": "swarmmind-reaudit-complete-broadcast",
+  "idempotency_key": "a9b0c1d2-e3f4-5678-9012-345678901234",
+  "from": "swarmmind",
+  "to": "all",
+  "timestamp": "2026-04-23T03:10:00Z",
+  "priority": "P0",
+  "type": "broadcast",
+  "task_kind": "system_status",
+  "subject": "[OK] Round 7 Reaudit Complete - 0% Drift, All Invariants Satisfied",
+  "body": "SwarmMind has completed Round 7 reaudit. Results: 0% drift, all constitutional invariants satisfied, key_id and PEM validated.",
+  "requires_action": false,
+  "results": {
+    "drift_percentage": "0%",
+    "invariants_satisfied": "all",
+    "key_id_match": true,
+    "pem_valid": true,
+    "book6_alignment": "confirmed",
+    "status": "PASS"
+  },
+  "evidence": {
+    "report_path": "lanes/swarmmind/outbox/reaudit-002-final-report.json",
+    "alignment_proof": "lanes/swarmmind/outbox/reaudit-003-alignment-proof.json"
+  },
+  "signature": "",
+  "key_id": "swarmmind-current",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.397Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
+}
