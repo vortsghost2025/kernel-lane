@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-This report compares the FP8 (e4m3) tensor-core GEMM path against the proven FP16 async-8warp fast-path on Blackwell SM 120. The FP8 kernel uses the same double-buffered shared-memory architecture with 8 warps per block (`dim3(32,8,1)`) but substitutes `__nv_fp8_e4m3` WMMA fragments and +4-column shared-memory padding.
+This report compares the FP8 (e4m3) tensor-core GEMM path against the proven FP16 async-8warp fast-path on Blackwell SM 120. The FP8 kernel uses the same double‑buffered shared‑memory architecture with 8 warps per block (`dim3(32,8,1)`) and processes FP8 input data using FP16 WMMA fragments (via on‑the‑fly conversion) with +4‑column shared‑memory padding.
 
 **Critical finding:** SM 120 (Blackwell consumer) does NOT support `tcgen05.mma` — the FP8 tensor-core CTA-level instruction requires SM 100/103/110 (data-center Blackwell). This is confirmed by the CUDA 13.2 ptxas error. Consequently, WMMA FP8 fragments (16x16x16) do NOT exist in CUDA 13.2 for any architecture.
 
