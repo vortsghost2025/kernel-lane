@@ -1,0 +1,37 @@
+{
+  "name": "gen5_fp8_vs_fp16",
+  "created_at_utc": "2026-04-27T00:35:27Z",
+  "gpu": "NVIDIA GeForce RTX 5060",
+  "build_flags": "nvcc -arch=sm_120 -O3 --use_fast_math -std=c++17",
+  "kernel_block": "dim3(32,8,1) = 256 threads / 8 warps per block",
+  "sizes": {
+    "2048": {
+      "fp8_fallback_ms": 3.323,
+      "cublaslt_fp8_ms": 0.161,
+      "fp16_ms": 2.67,
+      "speedup": 16.59,
+      "fp8_fallback_tflops": 5.1699877,
+      "cublaslt_fp8_tflops": 106.70726,
+      "fp16_tflops": 6.4344077
+    },
+    "1024": {
+      "fp8_fallback_ms": 0.377,
+      "cublaslt_fp8_ms": 0.047,
+      "fp16_ms": 0.349,
+      "speedup": 7.34,
+      "fp8_fallback_tflops": 5.696243,
+      "cublaslt_fp8_tflops": 45.691143,
+      "fp16_tflops": 6.1532483
+    },
+    "4096": {
+      "fp8_fallback_ms": 24.705,
+      "cublaslt_fp8_ms": 0.99,
+      "fp16_ms": 30.315,
+      "speedup": 30.62,
+      "fp8_fallback_tflops": 5.563204,
+      "cublaslt_fp8_tflops": 138.82722,
+      "fp16_tflops": 4.5336947
+    }
+  },
+  "ncu_profiles": []
+}

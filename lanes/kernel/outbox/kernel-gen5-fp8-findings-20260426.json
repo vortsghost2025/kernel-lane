@@ -1,0 +1,75 @@
+{
+  "subject": "GEN5 FP8 GEMM: WMMA disproven; cuBLASLt achieves 8-24x speedup on SM 120",
+  "body": "GEN5 FP8 GEMM Investigation -- Findings & Architecture Discovery\n\nEXECUTIVE SUMMARY:\nThe FP8 tensor-core GEMM path on SM 120 (Blackwell consumer / RTX 5060) was\ninvestigated and benchmarked. The original hypothesis (1.8-2.0x speedup via FP8\nWMMA fragments) was DISPROVEN. The actual finding is more significant:\n\n1. tcgen05.mma (FP8 tensor-core CTA-level instruction) requires SM 100/103/110\n   (data-center Blackwell) -- NOT available on SM 120 (consumer).\n2. WMMA FP8 fragments (16x16x16) do NOT exist in CUDA 13.2 for any architecture.\n3. FP8-to-FP16 WMMA fallback provides memory bandwidth savings only, no tensor-core\n   throughput advantage.\n4. cuBLASLt FP8 achieves 37-108 TFLOPS, an 8-24x speedup over our custom FP16 WMMA.\n\nBENCHMARK RESULTS (wall-clock, cudaEventElapsedTime):\nSize     FP8 fallback WMMA    cuBLASLt FP8    FP16 WMMA ref   cuBLASLt speedup\n1024^3   0.375 ms (5.72TF)    0.057 ms        0.462 ms        8.07x\n2048^3   2.817 ms (6.10TF)    0.158 ms        2.668 ms        16.84x\n4096^3   23.08 ms (5.96TF)    1.279 ms        30.71 ms        24.00x\n\nDELIVERABLES:\n- kernels/src/matrixMul_wmma_fp8_async.cu (FP8 WMMA fallback + cuBLASLt reference)\n- benchmarks/gen5_fp8_vs_fp16.md (full report with timing tables)\n- scripts/run-fp8-benchmark.ps1, scripts/run-ncu-fp8-pass.ps1\n\nCONVERGENCE GATE:\nclaim: FP8 tensor-core GEMM on SM 120 is NOT accessible via WMMA; cuBLASLt achieves 8-24x speedup\nevidence: benchmarks/gen5_fp8_vs_fp16.md\nverified_by: kernel\ncontradictions: []\nstatus: proven\n\nACTION FOR ARCHIVIST:\n- Record this finding: the GEN5_FP8_FASTPATH_VERIFIED tag should NOT be applied\n  (original hypothesis disproven; actual finding is more valuable).\n- Archive the benchmark report and kernel source as GEN5 FP8 investigation artifacts.\n- Note the SM 120 architecture limitation for future reference.",
+  "delivery_verification": {
+    "retries": 0,
+    "verified_at": null,
+    "verified": false
+  },
+  "watcher": {
+    "poll_seconds": 60,
+    "max_concurrent": 1,
+    "heartbeat_required": true,
+    "stale_after_seconds": 300,
+    "backoff": {
+      "max_seconds": 300,
+      "multiplier": 2,
+      "initial_seconds": 60
+    },
+    "enabled": false,
+    "p0_fast_path": true
+  },
+  "evidence": {
+    "verified": true,
+    "required": true,
+    "verified_at": "2026-04-26T23:49:05Z",
+    "verified_by": "kernel",
+    "evidence_path": "benchmarks/gen5_fp8_vs_fp16.md"
+  },
+  "idempotency_key": "61f3095b60e1767173307d1f5fdb359871aeef5d0d0ae03f377473b5b2b4a793",
+  "payload": {
+    "mode": "inline",
+    "chunk": {
+      "group_id": null,
+      "index": 0,
+      "count": 1
+    },
+    "path": null,
+    "compression": "none"
+  },
+  "priority": "P1",
+  "timestamp": "2026-04-26T23:49:05Z",
+  "retry": {
+    "max_attempts": 3,
+    "last_attempt_at": null,
+    "attempt": 1,
+    "last_error": null
+  },
+  "from": "kernel",
+  "lease": {
+    "acquired_at": null,
+    "max_renewals": 3,
+    "expires_at": null,
+    "owner": null,
+    "renew_count": 0
+  },
+  "task_kind": "review",
+  "task_id": "kernel-gen5-fp8-findings-20260426",
+  "requires_action": true,
+  "schema_version": "1.1",
+  "to": "archivist",
+  "heartbeat": {
+    "status": "done",
+    "interval_seconds": 300,
+    "last_heartbeat_at": null,
+    "timeout_seconds": 900
+  },
+  "type": "response",
+  "execution": {
+    "mode": "session_task",
+    "session_id": null,
+    "parent_id": null,
+    "engine": "kilo",
+    "actor": "lane"
+  }
+}
