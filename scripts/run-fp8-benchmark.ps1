@@ -148,19 +148,7 @@ foreach ($sz in $sizeList) {
         fp16_tflops          = $fp16_tflops
     }
 
-    # Parse FP16 timing
-    $fp16_ms = $null
-    if ($output -match 'matrixMul_wmma_async_fp16_ref:\s+([\d.]+)\s+ms') {
-        $fp16_ms = [float]$matches[1]
-    }
 
-    # Parse speedup
-    $speedup = $null
-    if ($output -match 'FP8 speed-up vs FP16:\s+([\d.]+)x') {
-        $speedup = [float]$matches[1]
-    } elseif ($fp8_ms -and $fp16_ms -and $fp8_ms -gt 0) {
-        $speedup = [float]($fp16_ms / $fp8_ms)
-    }
 }
 
 # -------------------------------------------------------------------------

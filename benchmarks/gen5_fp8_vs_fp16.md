@@ -13,7 +13,7 @@ This report compares the FP8 (e4m3) tensor-core GEMM path against the proven FP1
 
 **Critical finding:** SM 120 (Blackwell consumer) does NOT support `tcgen05.mma` — the FP8 tensor-core CTA-level instruction requires SM 100/103/110 (data-center Blackwell). This is confirmed by the CUDA 13.2 ptxas error. Consequently, WMMA FP8 fragments (16x16x16) do NOT exist in CUDA 13.2 for any architecture.
 
-**Empirical result:** FP8→FP16 WMMA fallback provides memory bandwidth savings (FP8 data = half global memory traffic) but not tensor-core throughput advantage. It is slightly slower than native FP16 at small sizes (conversion overhead) and slightly faster at 4096^3 (memory-bound regime). cuBLASLt FP8 achieves 37-108 TFLOPS, an 8-24x speedup over the custom FP16 WMMA kernel.
+**Empirical result:** FP8→FP16 WMMA fallback provides memory bandwidth savings (FP8 data = half global memory traffic) but not tensor-core throughput advantage. It is slightly slower than native FP16 at small sizes (conversion overhead) and slightly faster at 4096^3 (memory-bound regime). cuBLASLt FP8 achieves 45.7–138.8 TFLOPS, a 7.3–30.6× speedup over the custom FP16 WMMA kernel.
 
 ---
 
@@ -104,7 +104,7 @@ Result: FP8 fallback WMMA is **memory-bound** and exhibits ~equal or slightly wo
 
 3. **FP8→FP16 WMMA fallback** provides the memory bandwidth advantage (FP8 data = half the global memory traffic) but NOT the tensor-core throughput advantage. It is slightly slower than native FP16 at small sizes (due to conversion overhead) and slightly faster at 4096^3 (where memory bandwidth dominates).
 
-4. **cuBLASLt FP8** achieves 37-108 TFLOPS, which is 8-24x faster than the custom FP16 WMMA kernel. This indicates cuBLASLt uses an internal MMA path that is not exposed through the WMMA API (likely NVIDIA's proprietary, hand-coded assembly kernel using tcgen05.mma on supported SM).
+4. **cuBLASLt FP8** achieves 45.7–138.8 TFLOPS, which is 7.3–30.6× faster than the custom FP16 WMMA kernel. This indicates cuBLASLt uses an internal MMA path that is not exposed through the WMMA API (likely NVIDIA's proprietary, hand‑coded assembly kernel using tcgen05.mma on supported SM).
 
 5. **Congruence with Hopper:** The FP8 fallback regression at small sizes mirrors Hopper behavior — FP8 WMMA was also slower than FP16 at 256x256 due to conversion cost. The memory-bound crossover to FP8 advantage occurs at roughly 2048-4096.
 
