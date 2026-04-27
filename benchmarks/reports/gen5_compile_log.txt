@@ -1,0 +1,23 @@
+**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.0
+** Copyright (c) 2026 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_Z20matrixMul_wmma_asyncPK6__halfS1_Pfiii' for 'sm_120'
+ptxas info    : Function properties for _Z20matrixMul_wmma_asyncPK6__halfS1_Pfiii
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 30 registers, used 1 barriers
+ptxas info    : Compile time = 0.000 ms
+ptxas info    : Compiling entry function '_Z27matrixMul_wmma_4warp_paddedPK6__halfS1_Pfiii' for 'sm_120'
+ptxas info    : Function properties for _Z27matrixMul_wmma_4warp_paddedPK6__halfS1_Pfiii
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 38 registers, used 0 barriers
+ptxas info    : Compile time = 0.000 ms
+ptxas info    : Compiling entry function '_Z23matrixMul_wmma_baselinePK6__halfS1_Pfiii' for 'sm_120'
+ptxas info    : Function properties for _Z23matrixMul_wmma_baselinePK6__halfS1_Pfiii
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 34 registers, used 0 barriers
+ptxas info    : Compile time = 0.000 ms
+matrix_tensor_optimized.cu
+tmpxft_0001f204_00000000-7_matrix_tensor_optimized.cudafe1.cpp

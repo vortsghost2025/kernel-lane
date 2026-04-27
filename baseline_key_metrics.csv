@@ -1,0 +1,2 @@
+"ID","Kernel Name","sm__warps_active.sum","sm__warps_launched.sum","tpc__average_registers_per_thread.avg","tpc__l1tex_sram_bytes_mem_untagged_data_shared_allocated_compute.sum","dram__bytes_op_read.sum","dram__bytes_op_write.sum","sm__inst_executed_pipe_tensor_subpipe_hmma_op_hmma.sum","l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum","smsp__warp_issue_stalled_long_scoreboard_per_warp_active.avg"
+"0","matrixMul_wmma_baseline(const __half *, const __half *, float *, int, int, int)","443060037.000000","4096.000000",,"453.534024","4.764160","4.066304","524288.000000","655",

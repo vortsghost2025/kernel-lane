@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.3",
+  "task_id": "e2e-1777290391593-kernel-4",
+  "idempotency_key": "e2e-1777290391593-kernel-4",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "review",
+  "priority": "P2",
+  "subject": "count nlp",
+  "body": "how many occurrences of \"lane\" are in S:/kernel-lane/README.md",
+  "timestamp": "2026-04-27T11:46:34.785Z",
+  "requires_action": true
+}

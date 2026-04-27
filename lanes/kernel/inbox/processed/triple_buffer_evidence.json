@@ -1,0 +1,7 @@
+{
+  "claim": "Recompiled matrix_tensor_optimized.cu with ENABLE_TRIPLE_BUFFER_EXPERIMENT=1 and ran executable, capturing timings including exp-async-8warp-triple.",
+  "evidence": "S:/kernel-lane/kernels/bin/matrix_tensor_optimized.exe output showing: baseline-1warp: 0.459264 ms, padded-4warp: 0.252576 ms, async-4warp: 0.393952 ms, fastpath-async-8warp: 0.34928 ms, exp-async-8warp-triple: 0.417216 ms",
+  "verified_by": "self",
+  "contradictions": [],
+  "status": "proven"
+}

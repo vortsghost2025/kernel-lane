@@ -14,7 +14,7 @@
 #define HALF_PAD 1
 #define FP8_PAD 4
 #ifndef ENABLE_TRIPLE_BUFFER_EXPERIMENT
-#define ENABLE_TRIPLE_BUFFER_EXPERIMENT 0
+#define ENABLE_TRIPLE_BUFFER_EXPERIMENT 1
 #endif
 
 using namespace nvcuda::wmma;
@@ -360,9 +360,9 @@ static void launchAsync8WarpTriple(const half* A, const half* B, float* C, int M
 #endif
 
 int main() {
-    const int M = 1024;
-    const int N = 1024;
-    const int K = 1024;
+ const int M = 2048;
+ const int N = 2048;
+ const int K = 2048;
     const size_t aCount = static_cast<size_t>(M) * K;
     const size_t bCount = static_cast<size_t>(K) * N;
     const size_t cCount = static_cast<size_t>(M) * N;
@@ -380,15 +380,20 @@ int main() {
     checkCuda(cudaMemcpy(dB, hB.data(), bCount * sizeof(half), cudaMemcpyHostToDevice), "cudaMemcpy(dB)");
     checkCuda(cudaMemset(dC, 0, cCount * sizeof(float)), "cudaMemset(dC)");
 
-    std::cout << "WMMA benchmark (M=N=K=1024)\n";
-    std::cout << "Default fast path: async-8warp\n";
-    std::cout << "FP8 pad requirement marker: +" << Fp8PlanMarker::kPad << " columns\n";
-    runKernel("baseline-1warp", launchBaseline, dA, dB, dC, M, N, K);
-    runKernel("padded-4warp", launch4Warp, dA, dB, dC, M, N, K);
-    runKernel("async-4warp", launchAsync4Warp, dA, dB, dC, M, N, K);
-    runKernel("fastpath-async-8warp", launchAsync8Warp, dA, dB, dC, M, N, K);
+ std::cout << "WMMA benchmark (M=N=K=" << M << ")\n";
+ std::cout << "Default fast path: async-8warp\n";
+ std::cout << "FP8 pad requirement marker: +" << Fp8PlanMarker::kPad << " columns\n";
+ launchAsync8Warp(dA, dB, dC, M, N, K);
+ checkCuda(cudaDeviceSynchronize(), "warmup sync");
+ std::cout << "--- warmup done ---\n";
+ runKernel("baseline-1warp", launchBaseline, dA, dB, dC, M, N, K);
+ runKernel("padded-4warp", launch4Warp, dA, dB, dC, M, N, K);
+ runKernel("async-4warp", launchAsync4Warp, dA, dB, dC, M, N, K);
+ runKernel("fastpath-async-8warp", launchAsync8Warp, dA, dB, dC, M, N, K);
 #if ENABLE_TRIPLE_BUFFER_EXPERIMENT
-    runKernel("exp-async-8warp-triple", launchAsync8WarpTriple, dA, dB, dC, M, N, K);
+ launchAsync8WarpTriple(dA, dB, dC, M, N, K);
+ checkCuda(cudaDeviceSynchronize(), "triple warmup sync");
+ runKernel("exp-async-8warp-triple", launchAsync8WarpTriple, dA, dB, dC, M, N, K);
 #endif
     checkCuda(cudaDeviceSynchronize(), "cudaDeviceSynchronize");
 

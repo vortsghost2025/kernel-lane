@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.3",
+  "task_id": "e2e-1777289676473-kernel-2",
+  "idempotency_key": "e2e-1777289676473-kernel-2",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "review",
+  "priority": "P2",
+  "subject": "run script",
+  "body": "run script recovery-test-suite",
+  "timestamp": "2026-04-27T11:34:44.283Z",
+  "requires_action": true
+}

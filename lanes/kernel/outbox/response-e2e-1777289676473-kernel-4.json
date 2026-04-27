@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.3",
+  "task_id": "response-e2e-1777289676473-kernel-4",
+  "idempotency_key": "resp-1777289686455-e2e-177728967647",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "report",
+  "priority": "P2",
+  "subject": "Re: count nlp",
+  "body": "Consistency check: PASS",
+  "timestamp": "2026-04-27T11:34:46.455Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "auto",
+    "engine": "pipeline",
+    "actor": "task-executor"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-27T11:34:46.455Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": true
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "response",
+    "delivered_at": "2026-04-27T11:34:46.455Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-27T11:34:46.455Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "_original_task_id": "e2e-1777289676473-kernel-4",
+  "_execution_result": {
+    "check_type": "cross-lane-consistency",
+    "output": "=== CROSS-LANE CONSISTENCY CHECK ===\n\n1. TRUST STORES\n  archivist: hash=58a8aad5aa6597fe | archivist:ee70b78105bc6189, kernel:b677eb87f6be83f9, library:ea2a75bab220adc2, swarmmind:addb0afb8ee5c2ed\n  kernel: hash=58a8aad5aa6597fe | archivist:ee70b78105bc6189, kernel:b677eb87f6be83f9, library:ea2a75bab220adc2, swarmmind:addb0afb8ee5c2ed\n  library: hash=58a8aad5aa6597fe | archivist:ee70b78105bc6189, kernel:b677eb87f6be83f9, library:ea2a75bab220adc2, swarmmind:addb0afb8ee5c2ed\n  swarmmind: hash=58a8aad5aa6597fe | archivist:ee70b78105bc6189, kernel:b677eb87f6be83f9, library:ea2a75bab220adc2, swarmmind:addb0afb8ee5c2ed\n  Consistent: YES\n\n2. SCHEMA VALIDATOR ENUMS\n  execution.mode: SYNCED\n  execution.engine: SYNCED\n  execution.actor: SYNCED\n  task_kind: SYNCED\n  artifact_type: SYNCED\n  type: SYNCED\n  priority: SYNCED\n\n3. SYSTEM STATE\n  archivist: status=consistent | contradictions=0 | processed_ok=true\n  kernel: status=consistent | contradictions=0 | processed_ok=true\n  library: status=consistent | contradictions=0 | processed_ok=true\n  swarmmind: status=consistent | contradictions=0 | processed_ok=true\n\n4. SHARED SCRIPT VERSIONS (by file size)\n  lane-worker.js: SYNCED\n  generic-task-executor.js: SYNCED\n  post-compact-audit.js: SYNCED\n  create-signed-message.js: SYNCED\n  identity-enforcer.js: SYNCED\n  relay-daemon.js: SYNCED\n  artifact-resolver.js: SYNCED\n  completion-proof.js: SYNCED\n  heartbeat.js: SYNCED\n\n5. .IDENTITY IN .GITIGNORE\n  archivist: COVERED\n  kernel: COVERED\n  library: COVERED\n  swarmmind: COVERED\n\n6. PEM FILES IN GIT HISTORY\n  archivist: 2 PEM/KEY files found\n    .identity/private.pem\n    .identity/public.pem\n  kernel: 6 PEM/KEY files found\n  library: CLEAN\n  swarmmind: 7 PEM/KEY files found\n\n7. INBOX HYGIENE\n  archivist: root=14 ar=0 proc=80 block=0 quar=0\n  kernel: root=1 ar=1 proc=20 block=0 quar=0\n  library: root=0 ar=0 proc=20 block=0 quar=0\n  swarmmind: root=0 ar=0 proc=43 block=0 quar=0\n\n8. BOOTSTRAP.MD CONSISTENCY\n  Consistent: YES\n\n=== END CONSISTENCY CHECK ===\n"
+  },
+  "content_hash": "sha256:743b629f821367fe2dbcea7970f2a2ccca352df9a11f8d18fa7bb2da355d21c9",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImI2NzdlYjg3ZjZiZTgzZjkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6NzQzYjYyOWY4MjEzNjdmZTJkYmNlYTc5NzBmMmEyY2NjYTM1MmRmOWExMWY4ZDE4ZmE3YmIyZGEzNTVkMjFjOSIsImV4cCI6MTc3NzM3NjA4NiwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3NzI4OTY4NiwiaWQiOm51bGwsImxhbmUiOiJrZXJuZWwiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6InJlc3BvbnNlLWUyZS0xNzc3Mjg5Njc2NDczLWtlcm5lbC00IiwidG8iOiJhcmNoaXZpc3QifQ.nAILD5WHNGUsTeQu2xbNo_ps4-tQoSrfox0vmEODbiF2RgZ9d8CWjNt-8rVNUpjxngydQ6CK3YeHNMoCFAhtK2nSd5Rb9SmliqI2GTPHTjAbFu7-kFSWnKb8_PTg-iYWzslDl_BbTnW65GclYxYtKZK29yG_yg6jAYdl5g44cAORKUCsSxjT1dljPqDlX6PjptrUt72maBpHVccEe9I2LcqmHosgBBwa-ywWbEE4ZXwzwrhyduBW_zB9wPCrUjeN1Y9WPMiAR9krEhOnQDOFseQMwbbJHy7BBM2fCrCtNXZeVTFgczxYgdrQoUES0hWJZo9PI6wH49BLWNsxUUpwtw",
+  "signature_alg": "RS256",
+  "key_id": "b677eb87f6be83f9"
+}

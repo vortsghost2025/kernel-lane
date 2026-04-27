@@ -1,0 +1,3 @@
+"ID","Process ID","Process Name","Host Name","Kernel Name","Context","Stream","Block Size","Grid Size","Device","CC","memory_l1_wavefronts_shared"
+"","","","","","","","","","","","sectors"
+"0","90516","profile_async8.exe","127.0.0.1","matrixMul_wmma_async(const __half *, const __half *, float *, int, int, int)","1","7","(32, 8, 1)","(128, 16, 1)","0","12.0","50331648"

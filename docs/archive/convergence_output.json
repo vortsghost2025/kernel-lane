@@ -1,0 +1,22 @@
+{
+  "claim": "Compiled matrix_tensor_optimized.cu with nvcc -arch=sm_120 -O3 --ptxas-options=-v -lineinfo and executed to obtain kernel timings for baseline-1warp, padded-4warp, async-4warp.",
+  "evidence": "S:\\kernel-lane\\matrix_tensor_optimized.exe output: baseline-1warp: 1.24518 ms, padded-4warp: 0.288672 ms, async-4warp: 0.301536 ms",
+  "verified_by": "self",
+  "contradictions": [],
+  "status": "proven",
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-26T20:16:14.842Z",
+    "dry_run": false,
+    "route": "quarantine",
+    "reason": "SCHEMA_INVALID",
+    "detail": "Missing required field: schema_version; Missing required field: task_id; Missing required field: idempotency_key; Missing required field: from; Missing required field: to; Missing required field: type; Missing required field: priority; Missing required field: subject; Missing required field: body; Missing required field: timestamp; Missing required field: requires_action; Missing required field: payload; Missing required field: execution; Missing required field: lease; Missing required field: retry; Missing required field: evidence_exchange; Missing required field: heartbeat; Field \"evidence\" must be object, got string",
+    "schema_valid": false,
+    "signature_valid": false,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  }
+}

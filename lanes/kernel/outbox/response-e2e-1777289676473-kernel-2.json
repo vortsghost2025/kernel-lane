@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.3",
+  "task_id": "response-e2e-1777289676473-kernel-2",
+  "idempotency_key": "resp-1777289685000-e2e-177728967647",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "report",
+  "priority": "P2",
+  "subject": "Re: run script",
+  "body": "Script recovery-test-suite: 10P/1F",
+  "timestamp": "2026-04-27T11:34:45.000Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "auto",
+    "engine": "pipeline",
+    "actor": "task-executor"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-27T11:34:45.000Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": true
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "response",
+    "delivered_at": "2026-04-27T11:34:45.000Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-27T11:34:45.000Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "_original_task_id": "e2e-1777289676473-kernel-2",
+  "_execution_result": {
+    "script": "recovery-test-suite",
+    "exit_code": 1,
+    "passed": 10,
+    "failed": 1,
+    "output": "=== RECOVERY TEST SUITE ===\n\nProves: \"I restored the CORRECT context\" not just \"I can restore context\"\n\n  [PASS] trust_chain_continuity: 4/4 lanes have key IDs\n  [PASS] governance_integrity: gov=871b55a8... boot=7f21a9be...\n  [PASS] constraint_preservation: 4 constraints, required=4\n  [PASS] handoff_tamper_detection: sha256=7c6b2a73fe3200de...\n  [PASS] handoff_hash_logged: 7c6b2a73fe3200de...\n  [PASS] blocker_consistency: no active blocker\n  [PASS] message_inventory: total=13 {\"archivist\":12,\"library\":0,\"swarmmind\":0,\"kernel\":1}\n  [PASS] risk_set_preservation: 5 known risks in pre-compact snapshot\n  [FAIL] lane_liveness: 1/4 lanes alive\n  [PASS] multi_source_consistency: 6 sources, 0 contradictions\n  [PASS] contradiction_detection: status=drifted unexpected_changes=3\n\n=== RESULTS: 10/11 tests passed ===\nVerdict: RECOVERY CONFLICTED — contradictions detected\nReport: S:/Archivist-Agent/.compact-audit/RECOVERY_TEST_RESULTS.json\n",
+    "note": "Test suite: 10 PASS, 1 FAIL (non-zero exit but mostly passing)"
+  },
+  "content_hash": "sha256:6390704897a21d4eed2fbe44fe6e4d887003b06d62763068cf46b6dd071ea359",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImI2NzdlYjg3ZjZiZTgzZjkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6NjM5MDcwNDg5N2EyMWQ0ZWVkMmZiZTQ0ZmU2ZTRkODg3MDAzYjA2ZDYyNzYzMDY4Y2Y0NmI2ZGQwNzFlYTM1OSIsImV4cCI6MTc3NzM3NjA4NSwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3NzI4OTY4NSwiaWQiOm51bGwsImxhbmUiOiJrZXJuZWwiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6InJlc3BvbnNlLWUyZS0xNzc3Mjg5Njc2NDczLWtlcm5lbC0yIiwidG8iOiJhcmNoaXZpc3QifQ.W8aEq9-l0HQA1Cfq-Ny_isg4NrwGq_-CFS6bNdymFgvnpmJvX_o1M6--AVyoVOQbF-mNdi4Venwyg2yd1SnNTOAdNLxYhUN88ynMtZS6Se4BYUqOFWzo2tS4b4eTNmbI-tNvLvjBY1uIMFtsQve9aUDpohd7RX9EnzChs4yJPYfJxr9pG7VKOjBqAXphQ7xrpFk2sCvePadXoh-uVkX3WdQFVv3h_xop_nEfuDjcdSLgxWGX4HpmvfimZXlPgUfBNf4gCPhQNt9E9DEe1gkpRKaRm5yCDOasu3wzg6YW-_tcK6-hyS7_a-AHiYjBP0PC69ZLu8R3Me3-q5SZNbPPnw",
+  "signature_alg": "RS256",
+  "key_id": "b677eb87f6be83f9"
+}

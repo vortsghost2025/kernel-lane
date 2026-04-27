@@ -2,6 +2,7 @@
 'use strict';
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 const LANE_REGISTRY = {
@@ -13,6 +14,11 @@ const LANE_REGISTRY = {
 
 function nowIso() { return new Date().toISOString(); }
 function ensureDir(d) { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); }
+function isPathAllowed(normalized) {
+  const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
+  allowedRoots.push(os.tmpdir().replace(/\\/g, '/'));
+  return allowedRoots.some(ar => normalized.startsWith(ar));
+}
 
 function safeReadJson(p) {
   try { return { ok: true, value: JSON.parse(fs.readFileSync(p, 'utf8')) }; }
@@ -153,8 +159,10 @@ function executeGitTask(msg, lane) {
 function executeGrepTask(msg, lane) {
   const root = LANE_REGISTRY[lane].root;
   const body = (msg.body || '');
-  const grepMatch = body.match(/(?:grep|search|find)\s+["']([^"']+)["']\s+(?:in|path|file|dir)\s+["']?([^"'\s]+)["']?/i)
-    || body.match(/(?:grep|search|find)\s+["']([^"']+)["']/i);
+  const grepMatch = body.match(/(?:grep\s+|search\s+(?:for\s+)?)["']([^"']+)["']\s+(?:in|path|file|dir)\s+["']?([^"'\s]+)["']?/i)
+    || body.match(/(?:grep\s+|search\s+(?:for\s+)?)["']([^"']+)["']/i)
+    || body.match(/find\s+["']([^"']+)["']\s+(?:in|path|file|dir)\s+["']?([^"'\s]+)["']?/i)
+    || body.match(/find\s+["']([^"']+)["']/i);
   if (!grepMatch) {
     return { task_kind: 'report', results: { error: 'No search pattern specified. Use: "grep \\"pattern\\" in <path>" or "search \\"pattern\\""' }, summary: 'Error: no search pattern in task body' };
   }
@@ -234,8 +242,10 @@ function executeListDirTask(msg, lane) {
   const targetPath = dirMatch[1];
   const resolved = targetPath.startsWith('/') || targetPath.match(/^[A-Za-z]:/) ? targetPath : path.join(root, targetPath);
   const normalized = resolved.replace(/\\/g, '/');
+  const tmpdir = os.tmpdir().replace(/\\/g, '/');
   const allowedRoots = Object.values(LANE_REGISTRY).map(r => r.root.replace(/\\/g, '/'));
-  if (!allowedRoots.some(ar => normalized.startsWith(ar)) && !normalized.match(/^[A-Za-z]:\//)) {
+  allowedRoots.push(tmpdir);
+  if (!allowedRoots.some(ar => normalized.startsWith(ar))) {
     return { task_kind: 'report', results: { error: `Path outside allowed roots: ${resolved}` }, summary: 'Error: path outside allowed roots' };
   }
   try {
@@ -357,11 +367,59 @@ function executeCountTask(msg, lane) {
   }
   try {
     const stat = fs.statSync(resolved);
+    const re = new RegExp(pattern, 'gi');
     if (stat.isDirectory()) {
-      return { task_kind: 'report', results: { error: `count requires a file, not directory: ${resolved}` }, summary: 'Error: target is a directory' };
+      const limits = { maxFiles: 500, maxBytes: 5 * 1024 * 1024 };
+      let filesScanned = 0;
+      let totalBytes = 0;
+      let totalCount = 0;
+      const perFile = [];
+      const queue = [resolved];
+      while (queue.length > 0 && filesScanned < limits.maxFiles && totalBytes < limits.maxBytes) {
+        const current = queue.shift();
+        let entries = [];
+        try {
+          entries = fs.readdirSync(current);
+        } catch (_) {
+          continue;
+        }
+        for (const name of entries) {
+          const full = path.join(current, name);
+          let s;
+          try {
+            s = fs.statSync(full);
+          } catch (_) {
+            continue;
+          }
+          if (s.isDirectory()) {
+            queue.push(full);
+            continue;
+          }
+          if (!s.isFile()) continue;
+          if (filesScanned >= limits.maxFiles || totalBytes >= limits.maxBytes) break;
+          if (s.size > 1024 * 1024) continue; // Skip very large files in directory mode.
+          let content = '';
+          try {
+            content = fs.readFileSync(full, 'utf8');
+          } catch (_) {
+            continue;
+          }
+          filesScanned++;
+          totalBytes += s.size;
+          const matches = content.match(re);
+          const count = matches ? matches.length : 0;
+          totalCount += count;
+          if (count > 0) perFile.push({ file: full, count });
+        }
+      }
+      const truncated = filesScanned >= limits.maxFiles || totalBytes >= limits.maxBytes;
+      return {
+        task_kind: 'report',
+        results: { path: resolved, pattern, count: totalCount, files_scanned: filesScanned, bytes_scanned: totalBytes, truncated, matches_by_file: perFile.slice(0, 100) },
+        summary: `"${pattern}" in ${resolved}: ${totalCount} occurrences (${filesScanned} files${truncated ? ', truncated' : ''})`
+      };
     }
     const content = fs.readFileSync(resolved, 'utf8');
-    const re = new RegExp(pattern, 'gi');
     const matches = content.match(re);
     const count = matches ? matches.length : 0;
     return { task_kind: 'report', results: { file: resolved, pattern, count }, summary: `"${pattern}" in ${path.basename(resolved)}: ${count} occurrences` };
@@ -381,18 +439,32 @@ const NLP_ROUTES = [
   { patterns: [/show.*content/, /cat.*file/, /what.*in.*file/, /read.*content/, /display.*file/], verb: 'read file' },
   { patterns: [/find.*text/, /where.*mention/, /where.*defin/, /search.*for/], verb: 'grep' },
   { patterns: [/latest.*commit/, /recent.*change/, /commit.*hist/, /what.*chang/], verb: 'git log' },
-  { patterns: [/uncommit/, /stag/, /dirty/, /modif.*file/], verb: 'git status' },
+  { patterns: [/uncommit/, /\bstag(?:e|ing)?\b/, /\bdirty\b/, /\bmodif(?:ied|ication)\s+file/], verb: 'git status' },
   { patterns: [/run.*test/, /execut.*test/, /run.*bench/], verb: 'run script' },
 ];
 
 function nlpRoute(msg) {
   const text = ((msg.body || '') + ' ' + (msg.subject || '')).toLowerCase();
   for (const route of NLP_ROUTES) {
-    if (route.patterns.some(p => p.test(text))) {
-      return route.verb;
+    const matched = route.patterns.find(p => p.test(text));
+    if (matched) {
+      return { verb: route.verb, matched_pattern: matched.toString(), confidence: 0.7 };
     }
   }
   return null;
+}
+
+function normalizeNlpCountBody(msgBody) {
+  const original = msgBody || '';
+  const quotedPattern = original.match(/["']([^"']+)["']/);
+  const pathMatch = original.match(/\b(?:in|within|inside|from)\s+([A-Za-z]:[^\s"']+|\/[^\s"']+|[^\s"']+)/i);
+  if (quotedPattern && pathMatch) {
+    return `count "${quotedPattern[1]}" in ${pathMatch[1]}`;
+  }
+  if (quotedPattern) {
+    return `count "${quotedPattern[1]}"`;
+  }
+  return `count ${original}`;
 }
 
 function executeConsistencyCheck(msg, lane) {
@@ -413,64 +485,120 @@ function executeConsistencyCheck(msg, lane) {
 function executeTask(msg, lane) {
   const kind = (msg.task_kind || '').toLowerCase();
   const body = (msg.body || '').toLowerCase();
+  const attachRouting = (result, routing) => {
+    const out = result || { task_kind: 'ack', results: {}, summary: 'No result' };
+    if (!out.results) out.results = {};
+    out.results._routing = routing;
+    return out;
+  };
 
   if (kind === 'status' || body.includes('report status') || body.includes('processed count')) {
-    return executeStatusTask(msg, lane);
+    return attachRouting(executeStatusTask(msg, lane), { source: 'explicit', verb: 'status', confidence: 1.0 });
   }
   if (body.match(/list\s+(dir|directory|folder)\s+/i) || body.match(/\bls\s+/i)) {
-    return executeListDirTask(msg, lane);
+    return attachRouting(executeListDirTask(msg, lane), { source: 'explicit', verb: 'list dir', confidence: 1.0 });
   }
   if (body.match(/hash\s+(?:file\s+)?/i) || body.match(/\bsha256?\s+/i) || body.match(/\bchecksum\s+/i)) {
-    return executeHashTask(msg, lane);
+    return attachRouting(executeHashTask(msg, lane), { source: 'explicit', verb: 'hash file', confidence: 1.0 });
   }
   if (body.match(/\bdiff\s+/i) || body.match(/\bcompare\s+/i)) {
-    return executeDiffTask(msg, lane);
+    return attachRouting(executeDiffTask(msg, lane), { source: 'explicit', verb: 'diff', confidence: 1.0 });
   }
   if (body.match(/\bcount\s+/i)) {
-    return executeCountTask(msg, lane);
+    return attachRouting(executeCountTask(msg, lane), { source: 'explicit', verb: 'count', confidence: 1.0 });
   }
   if (body.includes('read file') || body.includes('read ') || body.includes('file:') || body.includes('file=')) {
-    return executeFileReadTask(msg, lane);
+    return attachRouting(executeFileReadTask(msg, lane), { source: 'explicit', verb: 'read file', confidence: 1.0 });
   }
   if (body.includes('run script') || body.includes('script:') || body.includes('script=')) {
-    return executeScriptTask(msg, lane);
+    return attachRouting(executeScriptTask(msg, lane), { source: 'explicit', verb: 'run script', confidence: 1.0 });
   }
   if (body.match(/git\s+(status|log|diff|branch|remote)/i)) {
-    return executeGitTask(msg, lane);
+    return attachRouting(executeGitTask(msg, lane), { source: 'explicit', verb: 'git', confidence: 1.0 });
+  }
+  if (body.match(/\bgit\s+\S+/i)) {
+    const gitSub = body.match(/git\s+(\S+)/i);
+    const allowed = ['status', 'log', 'diff', 'branch', 'remote'];
+    if (gitSub && !allowed.includes(gitSub[1].toLowerCase())) {
+      return attachRouting({ task_kind: 'report', results: { error: `Git subcommand "${gitSub[1]}" not allowed. Allowed: ${allowed.join(', ')}` }, summary: `Error: git ${gitSub[1]} not allowed` }, { source: 'explicit', verb: 'git', confidence: 1.0 });
+    }
   }
   if (body.match(/(grep|search|find)\s+/i)) {
-    return executeGrepTask(msg, lane);
+    return attachRouting(executeGrepTask(msg, lane), { source: 'explicit', verb: 'grep', confidence: 1.0 });
   }
   if (body.match(/write\s+(file|to)?/i)) {
-    return executeWriteTask(msg, lane);
+    return attachRouting(executeWriteTask(msg, lane), { source: 'explicit', verb: 'write file', confidence: 1.0 });
   }
-  if (body.includes('consistency check') || body.includes('audit') || kind === 'review') {
-    return executeConsistencyCheck(msg, lane);
+  if (body.includes('consistency check') || body.includes('audit')) {
+    return attachRouting(executeConsistencyCheck(msg, lane), { source: 'explicit', verb: 'consistency check', confidence: 1.0 });
   }
 
-  const nlpVerb = nlpRoute(msg);
-  if (nlpVerb) {
-    const nlpMsg = Object.assign({}, msg, { body: nlpVerb + ' ' + (msg.body || ''), _nlp_routed: true });
-    switch (nlpVerb) {
-      case 'status': return executeStatusTask(nlpMsg, lane);
-      case 'list dir': return executeListDirTask(nlpMsg, lane);
-      case 'hash file': return executeHashTask(nlpMsg, lane);
-      case 'diff': return executeDiffTask(nlpMsg, lane);
-      case 'count': return executeCountTask(nlpMsg, lane);
-      case 'read file': return executeFileReadTask(nlpMsg, lane);
-      case 'grep': return executeGrepTask(nlpMsg, lane);
-      case 'git log': return executeGitTask(Object.assign({}, nlpMsg, { body: 'git log' }), lane);
-      case 'git status': return executeGitTask(Object.assign({}, nlpMsg, { body: 'git status' }), lane);
-      case 'run script': return executeScriptTask(nlpMsg, lane);
-      case 'consistency check': return executeConsistencyCheck(nlpMsg, lane);
+  const nlpDecision = nlpRoute(msg);
+  if (nlpDecision) {
+    const originalBody = msg.body || '';
+    let normalizedBody;
+    switch (nlpDecision.verb) {
+      case 'status':
+      case 'consistency check':
+      case 'git log':
+        normalizedBody = nlpDecision.verb;
+        break;
+      case 'git status':
+        normalizedBody = 'git status';
+        break;
+      case 'count':
+        normalizedBody = normalizeNlpCountBody(originalBody);
+        break;
+      case 'list dir': {
+        const dirMatch = originalBody.match(/(?:in|from|at)\s+["']?([A-Za-z]:[^\s"']+|\/[^\s"']+)/i);
+        normalizedBody = dirMatch ? `list dir ${dirMatch[1]}` : originalBody;
+        break;
+      }
+      case 'hash file': {
+        const fileMatch = originalBody.match(/(?:of|for|from)\s+["']?([A-Za-z]:[^\s"']+|\/[^\s"']+)/i);
+        normalizedBody = fileMatch ? `hash file ${fileMatch[1]}` : originalBody;
+        break;
+      }
+      case 'diff': {
+        const fileMatch = originalBody.match(/(?:of|for|from|between)\s+["']?([A-Za-z]:[^\s"']+|\/[^\s"']+)/i);
+        normalizedBody = fileMatch ? `diff ${fileMatch[1]}` : originalBody;
+        break;
+      }
+      case 'read file': {
+        const fileMatch = originalBody.match(/(?:read|show|display|cat)\s+["']?([A-Za-z]:[^\s"']+|\/[^\s"']+)/i);
+        normalizedBody = fileMatch ? `read file ${fileMatch[1]}` : originalBody;
+        break;
+      }
+      case 'grep': {
+        const grepMatch = originalBody.match(/(?:find|search|where)\s+["']?([^"'\s]+)["']?\s+(?:in|from|within)\s+["']?([A-Za-z]:[^\s"']+|\/[^\s"']+)/i);
+        normalizedBody = grepMatch ? `grep "${grepMatch[1]}" in ${grepMatch[2]}` : originalBody;
+        break;
+      }
+      default:
+        normalizedBody = nlpDecision.verb + ' ' + originalBody;
+    }
+    const nlpMsg = Object.assign({}, msg, { body: normalizedBody, _nlp_routed: true });
+    const routing = { source: 'nlp', verb: nlpDecision.verb, confidence: nlpDecision.confidence, matched_pattern: nlpDecision.matched_pattern };
+    switch (nlpDecision.verb) {
+      case 'status': return attachRouting(executeStatusTask(nlpMsg, lane), routing);
+      case 'list dir': return attachRouting(executeListDirTask(nlpMsg, lane), routing);
+      case 'hash file': return attachRouting(executeHashTask(nlpMsg, lane), routing);
+      case 'diff': return attachRouting(executeDiffTask(nlpMsg, lane), routing);
+      case 'count': return attachRouting(executeCountTask(nlpMsg, lane), routing);
+      case 'read file': return attachRouting(executeFileReadTask(nlpMsg, lane), routing);
+      case 'grep': return attachRouting(executeGrepTask(nlpMsg, lane), routing);
+      case 'git log': return attachRouting(executeGitTask(Object.assign({}, nlpMsg, { body: 'git log' }), lane), routing);
+      case 'git status': return attachRouting(executeGitTask(Object.assign({}, nlpMsg, { body: 'git status' }), lane), routing);
+      case 'run script': return attachRouting(executeScriptTask(nlpMsg, lane), routing);
+      case 'consistency check': return attachRouting(executeConsistencyCheck(nlpMsg, lane), routing);
     }
   }
 
-  return {
-    task_kind: kind || 'ack',
+  return attachRouting({
+    task_kind: 'ack',
     results: { acknowledged: true, note: 'Task type not recognized. Supported: status, "read file <path>", "run script <name>", "git status/log/diff", "grep <pattern> in <path>", "write file <path>\\n<content>", "list dir <path>", "hash file <path>", "diff <file1> <file2>", "count \\"pattern\\" in <path>", "consistency check" — or use natural language (e.g. "check if trust store is consistent")' },
     summary: `Acknowledged task: ${msg.subject || msg.task_id || 'unknown'}`,
-  };
+  }, { source: 'fallback', verb: 'ack', confidence: 0.0 });
 }
 
 function createResponse(originalMsg, executionResult, lane) {

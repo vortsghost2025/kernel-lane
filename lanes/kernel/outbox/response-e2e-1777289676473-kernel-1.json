@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.3",
+  "task_id": "response-e2e-1777289676473-kernel-1",
+  "idempotency_key": "resp-1777289684310-e2e-177728967647",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "report",
+  "priority": "P2",
+  "subject": "Re: read file",
+  "body": "File S:/kernel-lane/README.md: 3669 bytes",
+  "timestamp": "2026-04-27T11:34:44.310Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "auto",
+    "engine": "pipeline",
+    "actor": "task-executor"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-27T11:34:44.310Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": true
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "response",
+    "delivered_at": "2026-04-27T11:34:44.310Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-27T11:34:44.310Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "_original_task_id": "e2e-1777289676473-kernel-1",
+  "_execution_result": {
+    "type": "file",
+    "path": "S:/kernel-lane/README.md",
+    "size": 3669,
+    "content": "# Kernel-Lane (Lane 4)\n\nKernel-Lane is the fourth isolated lane in the lattice.\nIts role is hardware-focused: compile, profile, benchmark, and optimize CUDA kernels for your RTX 5060 stack.\n\nIt exists so GPU/performance work can move fast without destabilizing governance, verification, or orchestration lanes.\n\n## How Lane 4 Fits the Other 3\n\n| Lane | Primary Role | Output |\n|---|---|---|\n| Archivist | Governance and cross-lane arbitration | Decisions, routing, escalation |\n| Library | Verification and attestation | Proof, hardening, validation |\n| SwarmMind | Multi-agent behavior and execution strategies | Behavioral traces, coordination patterns |\n| Kernel-Lane (this repo) | CUDA kernel performance engineering | Pinned release artifacts + perf evidence |\n\n### Integration Contract\n\nKernel-Lane does not replace the first three lanes. It feeds them:\n\n1. Archivist gets release decisions and promotion metadata.\n2. Library gets benchmark/profile evidence for verification.\n3. SwarmMind gets stable, pinned kernel artifacts to consume in runtime experiments.\n\n## Mission\n\n- Isolate GPU optimization from core governance/runtime lanes.\n- Produce measurable performance improvements with reproducible evidence.\n- Promote only immutable, pinned releases that other lanes can safely consume.\n\n## Hard Boundaries\n\nIn scope:\n- CUDA kernel source and compile flags\n- Nsight Systems/Compute profiling\n- Benchmark automation and regression checks\n- Release packaging and manifests\n\nOut of scope:\n- Editing global Kilo/OpenCode routing config\n- Cross-lane governance policy edits\n- Direct runtime orchestration logic in other repos\n\n## Upstream Source and Intake\n\n- Primary intake source: `S:\\snac-v2\\kimi-shared`\n- Intake pattern: copy/snapshot into this lane, then optimize here\n- Do not tune directly in shared runtime lanes\n\n## Release-Only Consumption Rule\n\nOther lanes must consume only promoted release artifacts listed in:\n- `releases/index.json`\n- `releases/<version>/manifest.json`\n\nNever consume:\n- `build/` outputs\n- unversioned temporary artifacts\n\n## Promotion Gate (Required)\n\nA release is valid only if all five exist:\n1. Built artifact\n2. Benchmark report JSON\n3. Nsight Systems report\n4. Nsight Compute report\n5. Release manifest\n\nPromotion command:\n\n```powershell\n.\\scripts\\promote-release.ps1 `\n  -Version v0.1.0 `\n  -ArtifactPath .\\build\\Release\\kernels-v0.1.0.zip `\n  -BenchmarkReportPath .\\benchmarks\\reports\\baseline.json `\n  -NsysReportPath .\\profiles\\nsys\\baseline.nsys-rep `\n  -NcuReportPath .\\profiles\\ncu\\baseline.ncu-rep `\n  -Notes \"Initial optimized baseline\"\n```\n\n## Typical Workflow\n\n```text\nIntake snapshot -> Build -> Benchmark -> Profile -> Compare vs baseline -> Promote release -> Hand off manifest\n```\n\nHand-off should include:\n- version\n- manifest path\n- key speedup/regression metrics\n- known tradeoffs\n\n## Quick Start\n\n```powershell\nSet-Location S:\\kernel-lane\n.\\scripts\\env-check.ps1\n.\\scripts\\build-kernels.ps1 -Configuration Release\n.\\scripts\\run-benchmarks.ps1 -Name baseline\n.\\scripts\\run-profiles.ps1 -ExecutablePath .\\build\\Release\\your-binary.exe -Args \"--size 1048576\" -Name baseline\n```\n\n## Why This Matters\n\nKernel work is high-impact and high-risk.\nBy isolating it as Lane 4, you get:\n- faster iteration on CUDA tuning\n- safer integration into the main lattice\n- deterministic convergence through evidence-backed releases\n\n## Head-less profiling\n\nRun the combined Nsight Systems + Nsight Compute headless capture:\n\n```powershell\n.\\scripts\\run-headless-profiling.ps1 -DurationSec 60\n```\n\nArtifacts are written to `profiles/headless/`. Use `.\\scripts\\check-profiling-regression.ps1` to compare against the baseline.\r\n\r\n"
+  },
+  "content_hash": "sha256:09bd9f047ff595236cb61b87e86e87fcd2a70808d6dfb5615a8ed50dd613a324",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImI2NzdlYjg3ZjZiZTgzZjkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MDliZDlmMDQ3ZmY1OTUyMzZjYjYxYjg3ZTg2ZTg3ZmNkMmE3MDgwOGQ2ZGZiNTYxNWE4ZWQ1MGRkNjEzYTMyNCIsImV4cCI6MTc3NzM3NjA4NCwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3NzI4OTY4NCwiaWQiOm51bGwsImxhbmUiOiJrZXJuZWwiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6InJlc3BvbnNlLWUyZS0xNzc3Mjg5Njc2NDczLWtlcm5lbC0xIiwidG8iOiJhcmNoaXZpc3QifQ.vYY_Ch-q0z7cg6OgxqRs1X_bWe70Wa4LQuvNEqBN7P1268miltXUPY0lEKb3qV9Wbi3vSNjytHka_2DPvbS8UTpdurfJuSCCq6XBl5pXjoZaLCAssn_drYQ4wuw9k5HmhqnABcH6fPgo-numKCTOBgQQUpwPJqefUZwN0TDRzvHsW5V13gkg_1Zo8JrzDAL1cRP-Gr1yh2xVpfLdHdlOtngmbi07hA7sRZ-HcRKxer8YgfqoIlQEL1LdehdqDwV-rah0S12Al03LuhBa9oEHEswtCPtFjRWHKgCgwp3Qj1ijszzKbSt-R59BJ6_p-dSFGwm43-QPf8IKGB7K48fNMw",
+  "signature_alg": "RS256",
+  "key_id": "b677eb87f6be83f9"
+}

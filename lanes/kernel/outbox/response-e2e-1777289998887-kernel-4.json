@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.3",
+  "task_id": "response-e2e-1777289998887-kernel-4",
+  "idempotency_key": "resp-1777290001787-e2e-177728999888",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "response",
+  "task_kind": "report",
+  "priority": "P2",
+  "subject": "Re: count nlp",
+  "body": "Error: no pattern in task body",
+  "timestamp": "2026-04-27T11:40:01.787Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "auto",
+    "engine": "pipeline",
+    "actor": "task-executor"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-27T11:40:01.787Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": true
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "response",
+    "delivered_at": "2026-04-27T11:40:01.787Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-27T11:40:01.787Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "_original_task_id": "e2e-1777289998887-kernel-4",
+  "_execution_result": {
+    "error": "No pattern specified. Use: \"count \\\"pattern\\\" in <path>\"",
+    "_routing": {
+      "source": "nlp",
+      "verb": "count",
+      "confidence": 0.7,
+      "matched_pattern": "/how many.*(?:occurrence|instance|match)/"
+    }
+  },
+  "content_hash": "sha256:ad303ec1cc8179ce4ead9f5bd4aef8a5c00f2a7eab3171f7c21f3ed48948ea75",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImI2NzdlYjg3ZjZiZTgzZjkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6YWQzMDNlYzFjYzgxNzljZTRlYWQ5ZjViZDRhZWY4YTVjMDBmMmE3ZWFiMzE3MWY3YzIxZjNlZDQ4OTQ4ZWE3NSIsImV4cCI6MTc3NzM3NjQwMSwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3NzI5MDAwMSwiaWQiOm51bGwsImxhbmUiOiJrZXJuZWwiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6InJlc3BvbnNlLWUyZS0xNzc3Mjg5OTk4ODg3LWtlcm5lbC00IiwidG8iOiJhcmNoaXZpc3QifQ.ERZlUK0u3NK8twX0LHkY6XAIAUEj6IbsmtIj9lPc4HwQGR4t4AzongF36dc6msA9nEDhCQwxt4IAUXhp2ih1hP8sEBC3uTbB3hG-F5K3zbMuW7ebetIpQXsnQFzM-kW00pHWXPEEFxrCXKjjBCmfZzcye_m6Dq-yn9VWS73gq0wAdW_PSBIGeknztL5b4-7GW4yHgHRvu6XCI-g0784SdO_KKP7JdGjd83szxaescghwcO_a8balmyN6Quam4QZh0ax31CgO5OgAiD1M_jDdzdIAGu21zDNpDIg9YoDotx5SBtAMy5uaIaZdS6E_Iu27EBJDPUbmDHTVJW-iJkJlcA",
+  "signature_alg": "RS256",
+  "key_id": "b677eb87f6be83f9"
+}

@@ -1,0 +1,67 @@
+{
+  "id": "task-notification-1777234511189ad3n",
+  "task_id": "task-notification-1777234511189ad3n",
+  "idempotency_key": "notification-1777234511189ad3n",
+  "from": "archivist",
+  "to": "kernel",
+  "timestamp": "2026-04-26T20:15:11.189Z",
+  "priority": "P1",
+  "type": "task",
+  "subject": "Archivist check-in: session 2026-04-26 summary",
+  "schema_version": "1.3",
+  "task_kind": "notification",
+  "requires_action": true,
+  "body": "Session summary from Archivist (2026-04-26):\n- SwarmMind subagent pipeline VERIFIED: 8-task batch, 0 errors, ~4.2s/task\n- Subagent Contract v1.0 deployed to all lanes (docs/ops/SWARMIND_SUBAGENT_CONTRACT.md)\n- 3 executor bugs fixed: system_status field, heartbeat skip, test exit code parsing\n- Stale items cleaned: 29 Archivist inbox, 24 legacy stamps, 4 quarantined archived\n\nAction items for Kernel:\n1. Process stale inbox/processed items (18 processed items need terminal_decision stamps)\n2. Fix matrix_tensor_async grid-dim-Y launch error (compute-sanitizer finding)\n3. Review SBC v1.0 contract -- any kernel-specific additions needed?\n4. Restart SwarmMindWatcher if not already done (picks up fixed inbox-watcher.ps1)",
+  "execution": {
+    "mode": "session_task",
+    "engine": "opencode",
+    "actor": "archivist"
+  },
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "lease": {
+    "owner": "archivist",
+    "acquired_at": "2026-04-26T20:15:11.190Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": true,
+    "artifact_type": "report"
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "report",
+    "delivered_at": null
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-26T20:15:11.190Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "content_hash": "sha256:5f5e746a21d064fd6cd66d3ed2979ca92399475e352fa35ea34385e7d7ce5ed5",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVlNzBiNzgxMDViYzYxODkifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6NWY1ZTc0NmEyMWQwNjRmZDZjZDY2ZDNlZDI5NzljYTkyMzk5NDc1ZTM1MmZhMzVlYTM0Mzg1ZTdkN2NlNWVkNSIsImV4cCI6MTc3NzMyMDkxMSwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzIzNDUxMSwiaWQiOiJ0YXNrLW5vdGlmaWNhdGlvbi0xNzc3MjM0NTExMTg5YWQzbiIsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6InRhc2stbm90aWZpY2F0aW9uLTE3NzcyMzQ1MTExODlhZDNuIiwidG8iOiJrZXJuZWwifQ.NEo7qZWsS4DlD7M2BCH7rOTzoWzLYzmAdYNdGGUMPFz2gY6ZZLlFoqxU1jCkzX4SzIn4gGDHkSEUCmtHHlH1KzZqPi-uDHBoC2oa7MP8IGMGcpEBtdOxB32HDH_H-MNyOdoHYwddwwsomadtqJjimczipKLpTrtIeKOn6SfFxauV1ud2q5qspaNUUbo2M42xRPCqXV5sYxucHv4R_hOkSYucXrYstRraXtBFRHoKi0K7DJcLRDr-pp5wdbsgwVkXaGMmpnfqGIkrQwwmhnpkrOO6gIEGZrxJzwdQ-LbmToaEqF07e4MDsrmgeP50jopr9_viRjpeEYFm1WHk1zObNQ",
+  "signature_alg": "RS256",
+  "key_id": "ee70b78105bc6189",
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-26T20:16:14.845Z",
+    "dry_run": false,
+    "route": "actionRequired",
+    "reason": "ACTIONABLE_NO_PROOF",
+    "detail": "Actionable message (type=task, priority=P1) requires evidence_exchange or legacy artifact. Bare terminal_decision is not proof.",
+    "schema_valid": true,
+    "signature_valid": true,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false
+  }
+}
