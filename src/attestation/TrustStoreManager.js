@@ -7,10 +7,14 @@
 
 const fs = require('fs');
 const path = require('path');
+const { LaneDiscovery } = require('S:/Archivist-Agent/.global/lane-discovery');
+
+const _discovery = new LaneDiscovery();
 
 class TrustStoreManager {
-constructor(options = {}) {
-this.trustStorePath = options.trustStorePath || path.join('S:', 'Archivist-Agent', '.trust', 'keys.json');
+  constructor(options = {}) {
+    const defaultTrustPath = path.join(_discovery.getLocalPath('archivist'), '.trust', 'keys.json');
+    this.trustStorePath = options.trustStorePath || defaultTrustPath;
 this.trustStore = null;
 this._load();
 }
