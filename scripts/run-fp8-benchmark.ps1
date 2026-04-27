@@ -22,6 +22,7 @@ param(
     [string]$Sizes = "1024,2048,4096",
     [switch]$SkipNcu,
     [switch]$SkipBuild,
+    [switch]$UseCuBLASLt,
     [string]$ReportDir = "benchmarks/reports"
 )
 
@@ -102,7 +103,8 @@ foreach ($sz in $sizeList) {
     Write-Host "`n[RUN] Benchmarking size ${sz}^3..."
 
     # Run FP8+FP16 comparison (the exe runs both when mode=both)
-    $output = & $fp8Exe $sz "both" 2>&1 | Out-String
+    $modeArg = if ($UseCuBLASLt) { "cublaslt" } else { "both" }
+$output = & $fp8Exe $sz $modeArg 2>&1 | Out-String
     Write-Host $output
 
     # Parse FP8 fallback WMMA timing
@@ -138,7 +140,11 @@ foreach ($sz in $sizeList) {
     $cublaslt_tflops = if ($cublaslt_ms) { [float]($flops / ($cublaslt_ms / 1000.0) / 1e12) } else { $null }
     $fp16_tflops    = if ($fp16_ms)     { [float]($flops / ($fp16_ms / 1000.0) / 1e12) } else { $null }
 
-    $results[$sz] = [ordered]@{
+    $relErr = $null
+if ($fp8_ms -and $fp16_ms -and $fp16_ms -gt 0) {
+    $relErr = [float]([math]::Abs($fp8_ms - $fp16_ms) / $fp16_ms)
+}
+$results[$sz] = [ordered]@{
         fp8_fallback_ms   = $fp8_ms
         cublaslt_fp8_ms   = $cublaslt_ms
         fp16_ms           = $fp16_ms
@@ -146,6 +152,7 @@ foreach ($sz in $sizeList) {
         fp8_fallback_tflops  = $fp8_tflops
         cublaslt_fp8_tflops  = $cublaslt_tflops
         fp16_tflops          = $fp16_tflops
+        relative_error   = $relErr
     }
 
 
@@ -244,6 +251,7 @@ foreach ($sz in $sizeList) {
         FP8_Fallback_TFLOPS  = if ($r.fp8_fallback_tflops)  { [math]::Round($r.fp8_fallback_tflops, 2)  } else { "N/A" }
         cuBLASLt_FP8_TFLOPS  = if ($r.cublaslt_fp8_tflops)  { [math]::Round($r.cublaslt_fp8_tflops, 2)  } else { "N/A" }
         FP16_TFLOPS          = if ($r.fp16_tflops)          { [math]::Round($r.fp16_tflops, 2)          } else { "N/A" }
+        Relative_Error   = if ($r.relative_error) { [math]::Round($r.relative_error, 4) } else { "N/A" }
     }
 }
 

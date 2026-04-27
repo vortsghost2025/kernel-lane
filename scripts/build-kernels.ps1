@@ -1,6 +1,7 @@
 param(
   [ValidateSet('Debug','Release')]
-  [string]$Configuration = 'Release'
+  [string]$Configuration = 'Release',
+  [string]$DataCenterArch = $null
 )
 
 # Ensure MSVC host compiler is available (cl.exe)
@@ -45,6 +46,21 @@ foreach ($f in $cuFiles) {
         Write-Host "[BUILD] $cmd"
         cmd /c $cmd
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+}
+# ----------------------------------------------------------
+# Optional data‑center Blackwell build (if $DataCenterArch is provided)
+if ($DataCenterArch) {
+    foreach ($f in $cuFiles) {
+        $hasMain = Select-String -Pattern 'int\s+main\s*\(' -Path $f.FullName -Quiet
+        if ($hasMain -and ($cublasFiles -contains $f.BaseName)) {
+            $outExeDc = Join-Path $outDir ("{0}_dc.exe" -f $f.BaseName)
+            $libs = '-lcublasLt -lcublas'
+            $cmdDc = "nvcc -arch=$DataCenterArch -lineinfo -std=c++17 -DCCCL_IGNORE_DEPRECATED_CPP_DIALECT -Xcompiler \"/Zc:preprocessor\" -o \"$outExeDc\" \"$($f.FullName)\" -O3 --use_fast_math $libs"
+            Write-Host "[BUILD-DC] $cmdDc"
+            cmd /c $cmdDc
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        }
     }
 }
 Write-Host "[BUILD] Completed. Executables placed in $outDir"
