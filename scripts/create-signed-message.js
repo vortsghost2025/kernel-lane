@@ -24,6 +24,108 @@ const LANE_IDENTITY_DIRS = {
   kernel: 'S:/kernel-lane/.identity',
 };
 
+const DEFAULT_PAYLOAD = { mode: 'inline', compression: 'none' };
+const DEFAULT_EXECUTION = { mode: 'manual', engine: 'pipeline', actor: 'lane' };
+const DEFAULT_RETRY = { attempt: 1, max_attempts: 3 };
+const DEFAULT_HEARTBEAT = {
+  status: 'pending',
+  last_heartbeat_at: null,
+  interval_seconds: 300,
+  timeout_seconds: 900,
+};
+
+const SESSION_ID = process.env.SESSION_ID || `sess-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+const ORIGIN_RUNTIME = process.env.ORIGIN_RUNTIME || 'opencode';
+const ORIGIN_WORKSPACE = process.env.ORIGIN_WORKSPACE || process.cwd();
+const SESSION_EPOCH = new Date().toISOString();
+
+function canonicalId(prefix = 'task') {
+  return `${prefix}-${Date.now()}`;
+}
+
+function buildCanonicalMessage(options = {}) {
+  const {
+    profile = 'default',
+    schema_version = '1.3',
+    task_id = canonicalId('task'),
+    idempotency_key = null,
+    from = 'archivist',
+    to = 'swarmmind',
+    type = 'task',
+    task_kind = 'proposal',
+    priority = 'P2',
+    subject = '',
+    body = '',
+    requires_action = true,
+    payload = {},
+    execution = {},
+    lease = {},
+    retry = {},
+    evidence = {},
+    evidence_exchange = {},
+    heartbeat = {},
+    extra = {},
+  } = options;
+
+  const now = new Date().toISOString();
+  const resolvedTaskId = task_id || canonicalId('task');
+  const resolvedIdempotency = idempotency_key || `${from}-${to}-${resolvedTaskId}`;
+
+  const profileDefaults = (() => {
+    if (profile === 'control_actionable_pre_execution') {
+      return {
+        requires_action: true,
+        evidence: { required: false, verified: false },
+        evidence_exchange: {},
+      };
+    }
+    return {};
+  })();
+
+  const mergedPayload = { ...DEFAULT_PAYLOAD, ...payload };
+  const mergedExecution = { ...DEFAULT_EXECUTION, ...execution };
+  const mergedLease = { owner: to, acquired_at: now, ...lease };
+  const mergedRetry = { ...DEFAULT_RETRY, ...retry };
+  const mergedEvidence = {
+    required: false,
+    verified: false,
+    ...profileDefaults.evidence,
+    ...evidence,
+  };
+  const mergedEvidenceExchange = {
+    ...profileDefaults.evidence_exchange,
+    ...evidence_exchange,
+  };
+  const mergedHeartbeat = {
+    ...DEFAULT_HEARTBEAT,
+    last_heartbeat_at: now,
+    ...heartbeat,
+  };
+
+  return {
+    schema_version,
+    task_id: resolvedTaskId,
+    idempotency_key: resolvedIdempotency,
+    from,
+    to,
+    type,
+    task_kind,
+    priority,
+    subject,
+    body,
+    timestamp: now,
+    requires_action: profileDefaults.requires_action !== undefined ? profileDefaults.requires_action : requires_action,
+    payload: mergedPayload,
+    execution: mergedExecution,
+    lease: mergedLease,
+    retry: mergedRetry,
+    evidence: mergedEvidence,
+    evidence_exchange: mergedEvidenceExchange,
+    heartbeat: mergedHeartbeat,
+    ...extra,
+  };
+}
+
 function stableStringify(value) {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return '[' + value.map(stableStringify).join(',') + ']';
@@ -112,6 +214,12 @@ function createSignedMessage(msg, laneId) {
     signature: jws,
     signature_alg: 'RS256',
     key_id: keyId,
+    session_identity: {
+      session_id: SESSION_ID,
+      session_epoch_started_at: SESSION_EPOCH,
+      origin_runtime: ORIGIN_RUNTIME,
+      origin_workspace: ORIGIN_WORKSPACE,
+    },
   };
 }
 
@@ -139,7 +247,13 @@ async function writeSignedMessage(msg, laneId, outboxPath) {
   return { filePath, keyId: signed.key_id, filename };
 }
 
-module.exports = { createSignedMessage, writeSignedMessage, findPassphrase, stableStringify };
+module.exports = {
+  createSignedMessage,
+  writeSignedMessage,
+  findPassphrase,
+  stableStringify,
+  buildCanonicalMessage,
+};
 
 if (require.main === module) {
   (async () => {
