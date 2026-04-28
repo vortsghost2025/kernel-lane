@@ -413,6 +413,7 @@ class LaneWorker {
         const lower = ent.name.toLowerCase();
         if (!lower.endsWith('.json')) continue;
         if (SKIP_FILENAMES.has(lower)) continue;
+        if (HEARTBEAT_PATTERN.test(lower)) continue;
         files.push(path.join(arDir, ent.name));
       }
     }
