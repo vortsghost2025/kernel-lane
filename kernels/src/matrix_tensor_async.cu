@@ -3,6 +3,7 @@
 // Based on NSIGHT_WMMA_ANALYSIS_SM120.md
 
 #include <cuda_runtime.h>
+#include <cuda_fp16.h>
 #include <mma.h>
 #include <cuda/pipeline>
 #include <cooperative_groups.h>
@@ -17,36 +18,112 @@ constexpr int WMMA_N = 16;
 constexpr int WMMA_K = 16;
 // Padding: +1 column for half (2 bytes), +4 for FP8 (1 byte)
 constexpr int PAD_HALF = 1;
+constexpr int WARP_SIZE = 32;
+constexpr int WARPS_PER_BLOCK = 4;  // 128 threads / 32 = 4 warps
 
 // ------------------------------------------------------------
-// Half-precision async kernel
+// Half-precision async kernel with double-buffered shared memory staging
 // ------------------------------------------------------------
 __global__ void wmma_gemm_async_fp16(const half* __restrict__ A,
-                                 const half* __restrict__ B,
-                                 float* __restrict__ C,
-                                 int M, int N, int K)
+                                  const half* __restrict__ B,
+                                  float* __restrict__ C,
+                                  int M, int N, int K)
 {
-    // 4 warps per block (128 threads)
+    // 4 warps per block (128 threads), 1D block layout
     const int warp_id = threadIdx.x / warpSize; // 0-3
     const int lane_id = threadIdx.x % warpSize;
-    const int tile_m = (blockIdx.y * 4 + warp_id) * WMMA_M; // 4 warps in Y
+
+    const int tile_m = (blockIdx.y * 4 + warp_id) * WMMA_M; // 4 warps in Y, each covers 16 rows
     const int tile_n = blockIdx.x * WMMA_N;
 
-    // This CUDA toolchain requires make_pipeline(...) with shared state.
-    __shared__ cuda::pipeline_shared_state<cuda::thread_scope_block, 1> pipe_state;
-    auto pipe = cuda::make_pipeline(cg::this_thread_block(), &pipe_state);
+    if (tile_m >= M || tile_n >= N) return;
+
+    // Double-buffered shared memory: 2× (A_tile + B_tile) per warp
+    extern __shared__ half shmem[];
+    constexpr int aStride = WMMA_M * WMMA_K;           // 16×16 = 256 halfs
+    constexpr int bStride = WMMA_K * WMMA_N;           // 16×16 = 256 halfs
+    constexpr int warpSharedHalfCount = 2 * (aStride + bStride);
+    half* warpShmem = shmem + warp_id * warpSharedHalfCount;
+    half* sA = warpShmem;                               // buffer 0 & 1 for A
+    half* sB = warpShmem + 2 * aStride;                // buffer 0 & 1 for B
 
     fragment<matrix_a, WMMA_M, WMMA_N, WMMA_K, half, row_major> a_frag;
     fragment<matrix_b, WMMA_M, WMMA_N, WMMA_K, half, col_major> b_frag;
     fragment<accumulator, WMMA_M, WMMA_N, WMMA_K, float> c_frag;
     fill_fragment(c_frag, 0.0f);
 
-    for (int k = 0; k < K; k += WMMA_K) {
-        const half* a_ptr = A + tile_m * K + k;
-        const half* b_ptr = B + k * N + tile_n;
-        load_matrix_sync(a_frag, a_ptr, K);
-        load_matrix_sync(b_frag, b_ptr, N);
+    int buf = 0;  // double-buffer toggle: 0 or 1
+
+    // Stage first tile (k=0) into buffer 0
+    #pragma unroll
+    for (int i = threadIdx.x; i < WMMA_M * (WMMA_K / 2); i += 32) {
+        const int row = i / (WMMA_K / 2);
+        const int col2 = i % (WMMA_K / 2);
+        const int col = col2 * 2;
+        half2 v = __floats2half2_rn(0.0f, 0.0f);
+        if (tile_m + row < M && col < K) {
+            v = reinterpret_cast<const half2*>(A + (tile_m + row) * K + col)[0];
+        }
+        half* rowPtr = sA + buf * aStride + row * WMMA_K;
+        rowPtr[col] = __low2half(v);
+        rowPtr[col + 1] = __high2half(v);
+    }
+
+    #pragma unroll
+    for (int i = threadIdx.x; i < WMMA_K * (WMMA_N / 2); i += 32) {
+        const int row = i / (WMMA_N / 2);
+        const int col2 = i % (WMMA_N / 2);
+        const int col = col2 * 2;
+        half2 v = __floats2half2_rn(0.0f, 0.0f);
+        if (row < K && tile_n + col < N) {
+            v = reinterpret_cast<const half2*>(B + row * N + tile_n + col)[0];
+        }
+        half* rowPtr = sB + buf * bStride + row * WMMA_N;
+        rowPtr[col] = __low2half(v);
+        rowPtr[col + 1] = __high2half(v);
+    }
+    __syncthreads();
+
+    for (int k0 = 0; k0 < K; k0 += WMMA_K) {
+        // Compute on current buffer
+        load_matrix_sync(a_frag, sA + buf * aStride, WMMA_K);
+        load_matrix_sync(b_frag, sB + buf * bStride, WMMA_N);
         mma_sync(c_frag, a_frag, b_frag, c_frag);
+
+        // Flip buffer for next iteration
+        buf ^= 1;
+
+        // Prefetch next tile if not at K boundary
+        if (k0 + WMMA_K < K) {
+            const int k_next = k0 + WMMA_K;
+            #pragma unroll
+            for (int i = threadIdx.x; i < WMMA_M * (WMMA_K / 2); i += 32) {
+                const int row = i / (WMMA_K / 2);
+                const int col2 = i % (WMMA_K / 2);
+                const int col = col2 * 2;
+                half2 v = __floats2half2_rn(0.0f, 0.0f);
+                if (tile_m + row < M && k_next + col < K) {
+                    v = reinterpret_cast<const half2*>(A + (tile_m + row) * K + (k_next + col))[0];
+                }
+                half* rowPtr = sA + buf * aStride + row * WMMA_K;
+                rowPtr[col] = __low2half(v);
+                rowPtr[col + 1] = __high2half(v);
+            }
+            #pragma unroll
+            for (int i = threadIdx.x; i < WMMA_K * (WMMA_N / 2); i += 32) {
+                const int row = i / (WMMA_N / 2);
+                const int col2 = i % (WMMA_N / 2);
+                const int col = col2 * 2;
+                half2 v = __floats2half2_rn(0.0f, 0.0f);
+                if (row + k_next < K && tile_n + col < N) {
+                    v = reinterpret_cast<const half2*>(B + (row + k_next) * N + (tile_n + col))[0];
+                }
+                half* rowPtr = sB + buf * bStride + row * WMMA_N;
+                rowPtr[col] = __low2half(v);
+                rowPtr[col + 1] = __high2half(v);
+            }
+            __syncthreads();  // ensure prefetch complete before next compute
+        }
     }
 
     if (tile_m < M && tile_n < N) {
@@ -70,9 +147,16 @@ void run_async(const std::string& mode, int M, int N, int K) {
     cudaMemset(dA, 0, sizeA);
     cudaMemset(dB, 0, sizeB);
     cudaMemset(dC, 0, sizeC);
+
+    // Grid: each block has 4 warps; each warp covers 16 rows → 64 rows per block
     dim3 grid((N + WMMA_N - 1) / WMMA_N, (M + 63) / 64);
-    dim3 block(128,1,1); // 4 warps per block
-    size_t shmemBytes = 0;
+    dim3 block(128, 1, 1);
+
+    // Shared memory: double-buffered tiles per warp (2 × (A_tile + B_tile))
+    constexpr size_t aStride = WMMA_M * WMMA_K;  // 256 halfs
+    constexpr size_t bStride = WMMA_K * WMMA_N;  // 256 halfs
+    size_t shmemBytes = WARPS_PER_BLOCK * 2 * (aStride + bStride) * sizeof(half);
+
     // Choose kernel based on mode
     if (mode == "fp16") {
         wmma_gemm_async_fp16<<<grid, block, shmemBytes>>>(dA, dB, dC, M, N, K);

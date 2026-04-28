@@ -56,7 +56,7 @@ if ($DataCenterArch) {
         if ($hasMain -and ($cublasFiles -contains $f.BaseName)) {
             $outExeDc = Join-Path $outDir ("{0}_dc.exe" -f $f.BaseName)
             $libs = '-lcublasLt -lcublas'
-            $cmdDc = "nvcc -arch=$DataCenterArch -lineinfo -std=c++17 -DCCCL_IGNORE_DEPRECATED_CPP_DIALECT -Xcompiler \"/Zc:preprocessor\" -o \"$outExeDc\" \"$($f.FullName)\" -O3 --use_fast_math $libs"
+            $cmdDc = "nvcc -arch=$DataCenterArch -lineinfo -std=c++17 -DCCCL_IGNORE_DEPRECATED_CPP_DIALECT -Xcompiler `"/Zc:preprocessor`" -o `"$outExeDc`" `"$($f.FullName)`" -O3 --use_fast_math $libs"
             Write-Host "[BUILD-DC] $cmdDc"
             cmd /c $cmdDc
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
