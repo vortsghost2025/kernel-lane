@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.0",
+  "scoreboard_id": "phase1-ack-scoreboard-20260428",
+  "created_at": "2026-04-28T14:38:42-04:00",
+  "last_updated": "2026-04-28T15:17:00-04:00",
+  "review_id": "system-code-review-20260428",
+  "status": "ACK_COLLECTION_IN_PROGRESS",
+  "control_loop": {
+    "interval_minutes": 10,
+    "next_check": "2026-04-28T15:26:00-04:00",
+    "max_wait_hours": 48,
+    "escalation_threshold": 24
+  },
+  "lanes": {
+    "archivist": {
+      "lane_id": "archivist",
+      "authority": 100,
+      "ack_status": "PENDING",
+      "ack_received_at": null,
+      "ack_payload": null,
+      "phase1_owner": null,
+      "next_action": "Submit remediation plan for Tauri injection, path traversal, and enforcement gaps",
+      "blocker": "CRITICAL: Multiple security vulnerabilities prevent production readiness",
+      "priority": "P0",
+      "estimated_effort": "3-4 days"
+    },
+    "library": {
+      "lane_id": "library",
+      "authority": 90,
+      "ack_status": "VERIFIED_PASS",
+      "ack_received_at": "2026-04-28T14:54:05-04:00",
+      "ack_payload_url": "lanes/library/outbox/library-phase1-ack-20260428.json",
+      "validation_outcome": "PASS",
+      "schema_valid": true,
+      "signature_valid": true,
+      "phase1_owner": "library",
+      "next_action": "Phase 1 tasks active: path traversal fix, trust store divergence detection, field standardization",
+      "blocker": "In progress - 6 person-days allocated across 3 P0/P1 tasks",
+      "priority": "P0",
+      "estimated_effort": "6 person-days",
+      "phase1_tasks_active": 3,
+      "estimated_completion": "2026-05-02T00:00:00-04:00"
+    },
+    "swarmmind": {
+      "lane_id": "swarmmind",
+      "authority": 60,
+      "ack_status": "PENDING",
+      "ack_received_at": null,
+      "ack_payload": null,
+      "phase1_owner": null,
+      "next_action": "Submit remediation plan for LANE_REGISTRY, trust store, and schema fixes",
+      "blocker": "CRITICAL: Invalid PEM, message loss, schema mismatches",
+      "priority": "P0",
+      "estimated_effort": "4-5 days"
+    },
+    "kernel": {
+      "lane_id": "kernel",
+      "authority": 60,
+      "ack_status": "ACK_RECEIVED",
+      "ack_received_at": "2026-04-28T14:38:42-04:00",
+      "ack_payload_url": "lanes/kernel/lanes/broadcast/phase1-ack-scoreboard.json (implicit)",
+      "phase1_owner": "kernel",
+      "next_action": "Phase 1 task active: atomic write utility fix (cross-platform)",
+      "blocker": "HIGH: Windows atomic write failures causing data corruption",
+      "priority": "P0",
+      "estimated_effort": "3-4 days",
+      "phase1_task_active": true,
+      "task_started_at": "2026-04-28T14:38:42-04:00"
+    }
+  },
+  "phase1_summary": {
+    "total_lanes": 4,
+    "acks_received": 2,
+    "acks_verified": 1,
+    "acks_pending": 2,
+    "phase1_tasks_active": 2,
+    "phase1_tasks_pending": 2,
+    "critical_blockers": 2,
+    "high_blockers": 1,
+    "estimated_completion": "2026-05-02T00:00:00-04:00",
+    "total_effort_estimate": "13-16 person-days"
+  },
+  "governance": {
+    "review_authority": "kernel",
+    "escalation_path": "archivist",
+    "ack_timeout_hours": 48,
+    "remediation_deadline": "2026-05-12T14:38:42-04:00",
+    "compliance_required": true
+  },
+  "validation_log": [
+    {
+      "timestamp": "2026-04-28T14:46:58-04:00",
+      "event": "ACK_REJECTED",
+      "lane": "library",
+      "reason": "INVALID_DOMAIN_POST_EXECUTION - artifact not observable (wrong queue)",
+      "resolution": "Resubmitted to outbox/"
+    },
+    {
+      "timestamp": "2026-04-28T14:54:05-04:00",
+      "event": "ACK_RECEIVED",
+      "lane": "library",
+      "schema_validation": "PASSED",
+      "signature_validation": "PASSED",
+      "verification_outcome": "PASS",
+      "artifact_path": "lanes/library/outbox/library-phase1-ack-20260428.json"
+    }
+  ],
+  "convergence_gate": {
+    "claim": "Library Phase 1 ACK verified with strict schema compliance - PASS",
+    "evidence": "lanes/kernel/inbox/processed/library-response-strict-re-ack-v2-20260428.json",
+    "verified_by": "kernel",
+    "contradictions": [],
+    "status": "proven"
+  }
+}
