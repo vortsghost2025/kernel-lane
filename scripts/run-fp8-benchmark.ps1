@@ -199,7 +199,7 @@ if (-not $SkipNcu) {
             $ncuOut = Join-Path $reportDirAbs "gen5_fp8_ncu_$sz"
             $ncuCsv = Join-Path $reportDirAbs "gen5_fp8_ncu_${sz}.csv"
 
-            $ncuCmd = "`"$ncuExe`" --set full -k matrixMul_fp8_fallback_wmma --launch-count 1 --metrics $metricList -o `"$ncuOut`" `"$fp8Exe`" $sz fp8"
+            $ncuCmd = "`"$ncuExe`" --set full -k matrixMul_fp8_fallback_wmma --launch-count 1 --metrics $metricList -o `"$ncuOut`" `"$fp8Exe`" `"$sz`" `"fp8`""
             Write-Host "[NCU] Profiling FP8 @ ${sz}^3..."
             cmd /c $ncuCmd
 

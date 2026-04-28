@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-This report compares the FP8 (e4m3) tensor-core GEMM path against the proven FP16 async-8warp fast-path on Blackwell SM 120. The FP8 kernel uses the same double‑buffered shared‑memory architecture with 8 warps per block (`dim3(32,8,1)`) and processes FP8 input data using FP16 WMMA fragments (via on‑the‑fly conversion) with +4‑column shared‑memory padding.
+This report compares the FP8 (e4m3) path against the proven FP16 async-8warp fast-path on Blackwell SM 120. The implementation uses the same double-buffered shared-memory tile layout with 8 warps per block (`dim3(32,8,1)`): inputs are `__nv_fp8_e4m3`, converted to `half` at load time, and computed with **FP16 WMMA** fragments (see §2). There are **no** `__nv_fp8_e4m3` WMMA fragment types in this build.
 
 **Critical finding:** SM 120 (Blackwell consumer) does NOT support `tcgen05.mma` — the FP8 tensor-core CTA-level instruction requires SM 100/103/110 (data-center Blackwell). This is confirmed by the CUDA 13.2 ptxas error. Consequently, WMMA FP8 fragments (16x16x16) do NOT exist in CUDA 13.2 for any architecture.
 
@@ -86,13 +86,13 @@ This means the CUDA headers declare the API signature but the backend has no cod
 
 ### 4.3 The "FP8 Fallback" Path
 
-What executes under `arch=sm_120` when compiling for FP8 WMMA:
+What executes under `arch=sm_120` in `matrixMul_fp8_fallback_wmma`:
 
-1. **No tensor core** — WMMA expands to a scalar/mma emulation path (not `tcgen05.mma`)
-2. **Conversion overhead** — each loaded FP8 element converts to FP16 before the MMA-like op
-3. **Memory bandwidth benefit only** — half the global traffic, but compute throughput identical to FP16 emulation
+1. **FP16 WMMA (HMMA) tensor cores** — after FP8→`half` conversion, `mma_sync` uses the same FP16 fragment path as the reference kernel. This is **not** a dedicated FP8 `tcgen05.mma` path.
+2. **Conversion overhead** — loads convert FP8 to `half` before staging; extra work vs native FP16 global loads.
+3. **Input bandwidth, not new math ISA** — half the bytes from global memory for A/B vs FP16 inputs, but per-step math remains FP16 WMMA throughput, not a higher-throughput native FP8 tensor op.
 
-Result: FP8 fallback WMMA is **memory-bound** and exhibits ~equal or slightly worse performance vs native FP16 WMMA at small sizes, with modest win at 4096^3 where memory bandwidth dominates.
+Result: the fallback is often **dominated by conversion + same HMMA rate** as FP16, so it tracks FP16 WMMA time (sometimes slightly worse at small sizes, comparable or better when memory bound at large sizes).
 
 ---
 
@@ -102,7 +102,7 @@ Result: FP8 fallback WMMA is **memory-bound** and exhibits ~equal or slightly wo
 
 2. **WMMA FP8 fragments (16x16x16) do NOT exist** in CUDA 13.2 for any architecture. The required fragment configuration for Blackwell's native MMA unit is absent.
 
-3. **FP8→FP16 WMMA fallback** provides the memory bandwidth advantage (FP8 data = half the global memory traffic) but NOT the tensor-core throughput advantage. It is slightly slower than native FP16 at small sizes (due to conversion overhead) and slightly faster at 4096^3 (where memory bandwidth dominates).
+3. **FP8→FP16 WMMA fallback** cuts global input traffic (FP8 vs `half`) but does **not** unlock a separate native-FP8 tensor ISA via WMMA; compute still goes through FP16 WMMA. It can be slightly slower than native FP16 at small sizes (conversion overhead) and trade off favorably at large sizes when input bandwidth dominates.
 
 4. **cuBLASLt FP8** achieves 45.7–138.8 TFLOPS, which is 7.3–30.6× faster than the custom FP16 WMMA kernel. This indicates cuBLASLt uses an internal MMA path that is not exposed through the WMMA API (likely NVIDIA's proprietary, hand‑coded assembly kernel using tcgen05.mma on supported SM).
 
