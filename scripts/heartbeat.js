@@ -5,14 +5,14 @@ const path = require('path');
 const { loadPolicy, assertWatcherConfig } = require('./concurrency-policy');
 
 const DEFAULT_CONFIG = {
-  laneName: 'archivist',
-  inboxPath: path.join(__dirname, '..', 'lanes', 'archivist', 'inbox'),
+  laneName: process.env.LANE_NAME || 'archivist',
+  inboxPath: path.join(__dirname, '..', 'lanes', process.env.LANE_NAME || 'archivist', 'inbox'),
   intervalSeconds: 60,
   staleAfterSeconds: 900,
   canonicalPaths: {
     archivist: 'S:/Archivist-Agent/lanes/archivist/inbox/',
     library: 'S:/self-organizing-library/lanes/library/inbox/',
-    swarmmind: 'S:/SwarmMind Self-Optimizing Multi-Agent AI System/lanes/swarmmind/inbox/',
+    swarmmind: 'S:/SwarmMind/lanes/swarmmind/inbox/',
     kernel: 'S:/kernel-lane/lanes/kernel/inbox/'
   }
 };
@@ -242,7 +242,14 @@ module.exports = { Heartbeat, DEFAULT_CONFIG };
 
 if (require.main === module) {
   const args = process.argv.slice(2);
-  const heartbeat = new Heartbeat();
+  const laneArgIndex = args.indexOf('--lane');
+  const laneName = laneArgIndex >= 0 && args[laneArgIndex + 1]
+    ? String(args[laneArgIndex + 1]).toLowerCase()
+    : DEFAULT_CONFIG.laneName;
+  const heartbeat = new Heartbeat({
+    laneName,
+    inboxPath: path.join(__dirname, '..', 'lanes', laneName, 'inbox'),
+  });
 
   if (args.includes('--check')) {
     const report = heartbeat.checkLaneHealth();

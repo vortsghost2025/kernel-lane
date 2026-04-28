@@ -14,7 +14,7 @@ const DEFAULT_ALLOWED_ROOTS = [
 'S:/Archivist-Agent',
 'S:/kernel-lane',
 'S:/self-organizing-library',
-'S:/SwarmMind Self-Optimizing Multi-Agent AI System',
+'S:/SwarmMind',
 ];
 
 const COMPLETION_WINDOW_MS = 5 * 60 * 1000;

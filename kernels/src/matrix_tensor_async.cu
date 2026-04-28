@@ -95,6 +95,19 @@ int main(int argc, char* argv[]) {
     if (argc > 2) N = std::atoi(argv[2]);
     if (argc > 3) K = std::atoi(argv[3]);
     if (argc > 4) mode = argv[4]; // fp16 or fp8
+
+    // Input validation: prevent zero/negative dimensions that cause cudaErrorInvalidValue
+    if (M <= 0 || N <= 0 || K <= 0) {
+        std::cerr << "Error: invalid matrix dimensions (must be > 0). Got M=" << M
+                  << " N=" << N << " K=" << K << std::endl;
+        std::cerr << "Usage: " << argv[0] << " [M] [N] [K] [mode]" << std::endl
+                  << "  M: matrix rows (default 1024)" << std::endl
+                  << "  N: matrix cols (default 1024)" << std::endl
+                  << "  K: inner dimension (default 1024)" << std::endl
+                  << "  mode: fp16 or fp8 (default fp16)" << std::endl;
+        return 1;
+    }
+
     auto start = std::chrono::high_resolution_clock::now();
     run_async(mode, M, N, K);
     auto end = std::chrono::high_resolution_clock::now();

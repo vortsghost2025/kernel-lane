@@ -250,3 +250,14 @@ When uncertain, ask:
 ## Key Insight
 
 > You're not trying to optimize everything — you're trying to make every optimization measurable and reproducible.
+
+---
+
+## Learned User Preferences
+
+- When a deliverable or protocol asks for action-style titles, use present-participle section headings (for example, "Analyzing," "Preparing," "Simulating").
+
+## Learned Workspace Facts
+
+- GPU benchmark evidence in this repo (for example, `kernels/benchmark_report.json`) may include a `verification` object that separates executable/runtime speedup checks from Nsight Compute (`ncu`) metrics; treat profiler-backed numbers as unproven until real `ncu` or exported CSV/JSON exists.
+- The default Windows development host may not be able to run Nsight Compute (`ncu`) or a full CUDA profiling loop; use blocked or pending status for on-device `ncu` and capture on a CUDA-capable machine when that evidence is required.

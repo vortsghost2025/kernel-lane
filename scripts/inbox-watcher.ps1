@@ -26,6 +26,7 @@ Skip task-executor step (for lanes that need human/agent execution).
 param(
   [int]$PollSeconds = 30,
   [string]$LogFile = "$PSScriptRoot\inbox-watcher.log",
+  [string]$NodeExe = "C:\Program Files\nodejs\node.exe",
   [switch]$SkipExecutor = $false
 )
 
@@ -52,20 +53,20 @@ function Count-Files([string]$dir, [string]$filter = "*.json") {
 }
 
 function Run-Step([string]$name, [string]$script, [string]$argLine, [string]$cwd) {
+  $prevDir = Get-Location
   try {
-    $prevDir = Get-Location
     if ($cwd) { Set-Location $cwd }
-    $result = & node $script $argLine.Split(' ') 2>&1
-    Set-Location $prevDir
+    $args = @($script) + @($argLine.Split(' ') | Where-Object { $_ })
+    $result = & $NodeExe @args 2>&1
     $resultStr = ($result | Out-String).Trim()
     Write-Log " [$name] $resultStr"
-    return $true
+    return ($LASTEXITCODE -eq 0)
   } catch {
-    Set-Location $prevDir
     Write-Log " [$name] ERROR: $_"
     return $false
+  } finally {
+    Set-Location $prevDir
   }
-}
 }
 
 Write-Log "[watcher] Started - poll ${PollSeconds}s - skipExecutor=$SkipExecutor - lanes: $($LaneRoots.Keys -join ',')"
@@ -94,6 +95,9 @@ while ($true) {
     if ($inboxCount -gt 0) {
       Write-Log "[watcher] Step 1: Running lane-worker for ${lane}"
       Run-Step "lane-worker" "$root\scripts\lane-worker.js" "--lane $lane --apply" $root
+      if ($lane -eq "swarmmind") {
+        Run-Step "codex-wake" "$root\scripts\codex-wake-packet.js" "--apply" $root
+      }
       $anyActivity = $true
     }
 
@@ -102,6 +106,9 @@ while ($true) {
       Write-Log "[watcher] Step 2: Running task-executor for ${lane}"
       $executorScript = "$ArchivistRoot\scripts\generic-task-executor.js"
       Run-Step "task-executor" $executorScript "$lane --apply" $root
+      if ($lane -eq "swarmmind") {
+        Run-Step "codex-wake" "$root\scripts\codex-wake-packet.js" "--apply" $root
+      }
       $anyActivity = $true
     }
 

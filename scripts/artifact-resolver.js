@@ -18,7 +18,7 @@ function _getDefaultAllowedRoots() {
     }
     if (roots.length > 0) return roots;
   }
-  return ['S:/Archivist-Agent', 'S:/kernel-lane', 'S:/self-organizing-library', 'S:/SwarmMind Self-Optimizing Multi-Agent AI System'];
+  return ['S:/Archivist-Agent', 'S:/kernel-lane', 'S:/self-organizing-library', 'S:/SwarmMind'];
 }
 
 const DEFAULT_ALLOWED_ROOTS = _getDefaultAllowedRoots();
