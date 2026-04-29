@@ -84,6 +84,47 @@ for (const laneId of _discovery.listLanes()) {
   try { _canonicalPaths[laneId] = _discovery.getInbox(laneId); } catch (_) {}
 }
 
+const PROCESSED_DIR_CAP = 200;
+
+function enforceProcessedDirCap(processedPath, laneName, repoRoot) {
+  let files;
+  try {
+    files = fs.readdirSync(processedPath).filter(f => f.endsWith('.json')).sort();
+  } catch (_) {
+    return { capped: false, removed: [] };
+  }
+  if (files.length <= PROCESSED_DIR_CAP) {
+    return { capped: false, removed: [], count: files.length };
+  }
+  const toRemove = files.slice(0, files.length - PROCESSED_DIR_CAP);
+  const removed = [];
+  for (const f of toRemove) {
+    try {
+      fs.unlinkSync(path.join(processedPath, f));
+      removed.push(f);
+    } catch (_) {}
+  }
+  if (removed.length > 0) {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      lane: laneName,
+      action: 'processed_dir_cap_truncation',
+      cap: PROCESSED_DIR_CAP,
+      previous_count: files.length,
+      removed_count: removed.length,
+      removed_files: removed
+    };
+    const logPath = path.join(repoRoot, 'logs', 'cps_log.jsonl');
+    try {
+      const logDir = path.dirname(logPath);
+      if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+      fs.appendFileSync(logPath, JSON.stringify(logEntry) + '\n', 'utf8');
+    } catch (_) {}
+    console.log(`[watcher] PROCESSED_DIR_CAP: removed ${removed.length} oldest files from ${processedPath} (cap=${PROCESSED_DIR_CAP})`);
+  }
+  return { capped: true, removed, count: files.length - removed.length };
+}
+
 const DEFAULT_CONFIG = {
   laneName: 'archivist',
   inboxPath: path.join(__dirname, '..', 'lanes', 'archivist', 'inbox'),
@@ -306,10 +347,15 @@ class InboxWatcher {
       } else {
         await moveFileWithLease(sourcePath, dest, this.config.laneName, 30000);
       }
-      this.processedKeys.add(filename);
+    this.processedKeys.add(filename);
+      this.enforceCap();
     } catch (e) {
       console.error(`[watcher] Cannot move ${filename}:`, e.message);
     }
+  }
+
+  enforceCap() {
+    enforceProcessedDirCap(this.config.processedPath, this.config.laneName, this.repoRoot);
   }
 
   async moveToExpired(filename, sourcePath) {
@@ -520,7 +566,7 @@ class InboxWatcher {
   }
 }
 
-module.exports = { InboxWatcher, DEFAULT_CONFIG, PRIORITY_ORDER };
+module.exports = { InboxWatcher, DEFAULT_CONFIG, PRIORITY_ORDER, enforceProcessedDirCap, PROCESSED_DIR_CAP };
 
 if (require.main === module) {
   (async () => {
