@@ -17,6 +17,7 @@ const VALID_TASK_KINDS = new Set([
   'status',
   'ack',
   'handoff',
+  'ratification',
 ]);
 
 function loadGateConfig(configPath = DEFAULT_CONFIG_PATH) {
@@ -50,12 +51,12 @@ function evaluateTemporal(msg) {
     };
   }
 
-  return {
-    valid: executionTs >= dispatchTs,
-    reason: executionTs >= dispatchTs ? null : 'execution timestamp precedes dispatch',
-    expected: 'execution_timestamp > dispatch_timestamp',
-    actual: executionTs >= dispatchTs,
-  };
+    return {
+      valid: executionTs >= dispatchTs,
+      reason: executionTs >= dispatchTs ? null : 'execution timestamp precedes dispatch',
+      expected: 'execution_timestamp >= dispatch_timestamp',
+      actual: executionTs >= dispatchTs,
+    };
 }
 
 function evaluateSemantic(msg, localCodeVersionHash = null) {

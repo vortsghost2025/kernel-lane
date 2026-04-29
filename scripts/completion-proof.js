@@ -7,6 +7,16 @@ const TERMINAL_TYPES = new Set([
   'heartbeat',
   'notification',
   'response',
+  'status',
+]);
+
+const TERMINAL_TASK_KINDS = new Set([
+  'status',
+  'report',
+  'done',
+  'ack',
+  'handoff',
+  'audit',
 ]);
 
 const LEGACY_ARTIFACT_FIELDS = [
@@ -66,9 +76,18 @@ function isTerminalInformational(msg) {
   if (!msg || typeof msg !== 'object') return false;
   if (msg.requires_action !== false) return false;
   const type = String(msg.type || '').toLowerCase().trim();
-  if (!TERMINAL_TYPES.has(type)) return false;
-  if (hasFollowupObligation(msg)) return false;
-  return true;
+  if (TERMINAL_TYPES.has(type)) {
+    if (hasFollowupObligation(msg)) return false;
+    return true;
+  }
+  if (type === 'task' || type === 'alert') {
+    const kind = String(msg.task_kind || '').toLowerCase().trim();
+    if (TERMINAL_TASK_KINDS.has(kind)) {
+      if (hasFollowupObligation(msg)) return false;
+      return true;
+    }
+  }
+  return false;
 }
 
 function evaluate(msg) {
@@ -108,11 +127,16 @@ function evaluate(msg) {
   }
 
   if (msg.requires_action === false && !TERMINAL_TYPES.has(String(msg.type || '').toLowerCase().trim())) {
-    return {
-      pass: false,
-      reason: 'NON_TERMINAL_TYPE',
-      detail: 'type="' + msg.type + '" is not a terminal type. Terminal types: ' + [...TERMINAL_TYPES].join(', '),
-    };
+    const type = String(msg.type || '').toLowerCase().trim();
+    const kind = String(msg.task_kind || '').toLowerCase().trim();
+    const isTerminalByKind = (type === 'task' || type === 'alert') && TERMINAL_TASK_KINDS.has(kind);
+    if (!isTerminalByKind) {
+      return {
+        pass: false,
+        reason: 'NON_TERMINAL_TYPE',
+        detail: 'type="' + msg.type + '" task_kind="' + (msg.task_kind || '') + '" is not a terminal type/kind. Terminal types: ' + [...TERMINAL_TYPES].join(', ') + '; Terminal task_kinds for task/alert: ' + [...TERMINAL_TASK_KINDS].join(', '),
+      };
+    }
   }
 
   if (msg.requires_action === false && hasFollowupObligation(msg)) {
@@ -164,6 +188,7 @@ function classifyProof(msg) {
 
 module.exports = {
   TERMINAL_TYPES,
+  TERMINAL_TASK_KINDS,
   LEGACY_ARTIFACT_FIELDS,
   hasCompletionProof,
   hasFakeProof,

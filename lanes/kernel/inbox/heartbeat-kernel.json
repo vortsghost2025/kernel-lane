@@ -1,9 +1,71 @@
 {
-  "lane": "kernel",
-  "timestamp": "2026-04-29T14:02:32.041Z",
-  "status": "in_progress",
-  "uptime_seconds": 0,
-  "session_type": "manual_recovery",
-  "session_active": true,
-  "last_inbox_scan": "2026-04-29T14:02:32.041Z"
+    "to":  "kernel",
+    "watcher":  {
+                    "poll_seconds":  60,
+                    "max_concurrent":  1,
+                    "heartbeat_required":  true,
+                    "backoff":  {
+                                    "initial_seconds":  60,
+                                    "multiplier":  2,
+                                    "max_seconds":  300
+                                },
+                    "stale_after_seconds":  300,
+                    "p0_fast_path":  true,
+                    "enabled":  false
+                },
+    "heartbeat":  {
+                      "last_heartbeat_at":  "2026-04-29T13:45:33Z",
+                      "timeout_seconds":  900,
+                      "status":  "in_progress",
+                      "interval_seconds":  60
+                  },
+    "type":  "heartbeat",
+    "task_kind":  "proposal",
+    "subject":  "Heartbeat from kernel lane",
+    "priority":  "P3",
+    "retry":  {
+                  "attempt":  1,
+                  "last_attempt_at":  null,
+                  "max_attempts":  3,
+                  "last_error":  null
+              },
+    "schema_version":  "1.1",
+    "body":  "{\"lane\":\"kernel\",\"session_active\":true,\"uptime_seconds\":0,\"messages_processed\":0,\"last_inbox_scan\":\"2026-04-29T13:45:33Z\",\"version\":\"1.1\",\"daemon\":\"heartbeat-all-lanes.ps1\"}",
+    "processed_ok":  true,
+    "payload":  {
+                    "mode":  "inline"
+                },
+    "evidence":  {
+                     "verified":  false,
+                     "evidence_path":  null,
+                     "verified_by":  null,
+                     "verified_at":  null,
+                     "required":  true
+                 },
+    "delivery_verification":  {
+                                  "verified":  false,
+                                  "retries":  0,
+                                  "verified_at":  null
+                              },
+    "execution":  {
+                      "actor":  "heartbeat-daemon",
+                      "engine":  "powershell",
+                      "mode":  "daemon"
+                  },
+    "idempotency_key":  "81bf15a14e0ad9501fd97c25e2f7c090502676072663c83a025ae956e01fb655",
+    "system_state":  "consistent",
+    "lease":  {
+                  "max_renewals":  3,
+                  "renew_count":  0,
+                  "acquired_at":  null,
+                  "expires_at":  null,
+                  "owner":  null
+              },
+    "requires_action":  false,
+    "task_id":  "heartbeat-kernel",
+    "from":  "kernel",
+    "active_contradictions":  [
+
+                              ],
+    "timestamp":  "2026-04-29T13:45:33Z"
 }

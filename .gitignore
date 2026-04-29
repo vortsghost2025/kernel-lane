@@ -36,3 +36,4 @@ lanes/**/signature-*.jws
 # Local operational files
 lanes/*/outbox/unsigned/
 logs/quarantine-tracker.json
+.aider*
