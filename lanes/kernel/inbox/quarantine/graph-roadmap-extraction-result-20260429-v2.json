@@ -1,10 +1,10 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.3",
   "task_id": "graph-roadmap-extraction-result-20260429-v2",
   "idempotency_key": "graph-roadmap-extraction-result-20260429-v2-kernel",
   "from": "archivist",
   "to": "kernel",
-  "type": "finding",
+  "type": "notification",
   "task_kind": "review",
   "priority": "P1",
   "subject": "Snapshot-driven roadmap extraction result available (v2)",
@@ -51,5 +51,10 @@
       "generated_at": "2026-04-29T17:32:07.616Z",
       "session_id": "sess_mokc1c8m_13668"
     }
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/inbox/quarantine/graph-roadmap-extraction-result-20260429-v2.json",
+    "artifact_type": "report",
+    "delivered_at": "2026-04-29T17:34:00Z"
   }
 }
