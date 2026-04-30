@@ -1,0 +1,558 @@
+{
+  "overview": {
+    "total_nodes": 215,
+    "total_edges": 44097,
+    "snapshot_time": "2026-04-30T16:08:47.095Z",
+    "visible_nodes": 215,
+    "visible_edges": 44097
+  },
+  "edge_types": {
+    "link": 964,
+    "paper-section-of": 60,
+    "cross-paper-tag": 66,
+    "cross-paper-dependency": 10,
+    "shared-tag": 15495,
+    "authority": 27502
+  },
+  "node_categories": {
+    "root-doc": 24,
+    "config": 13,
+    "baseline": 1,
+    "benchmark": 12,
+    "docs": 40,
+    "integration": 1,
+    "kernel": 3,
+    "paper": 1,
+    "plans": 1,
+    "release": 5,
+    "reports": 1,
+    "schema": 2,
+    "script": 97,
+    "profile": 7,
+    "code": 7
+  },
+  "tag_distribution_top30": {
+    "Kernel": 41,
+    "Library": 28,
+    "Archivist": 27,
+    "Swarmmind": 26,
+    "Verification": 25,
+    "Governance": 23,
+    "Convergence Gate": 13,
+    "Drift": 11,
+    "Covenant": 9,
+    "Phase 1": 9,
+    "Attestation": 7,
+    "Multi-Agent": 7,
+    "Phase 2": 6,
+    "WE4FREE": 4,
+    "Failure Mode": 4,
+    "Ensemble": 4,
+    "Rosetta Stone": 3,
+    "CAISC 2026": 3,
+    "Constraint Lattice": 2,
+    "Phase 4": 2,
+    "NFM-017": 2,
+    "Phenotype": 2,
+    "Phase1": 2,
+    "Phase2": 2,
+    "Identity Enforcement": 2,
+    "NFM-026": 2,
+    "Federation": 2,
+    "Phase 3": 2,
+    "Phase4": 1,
+    "NFM-022": 1
+  },
+  "contradiction_nodes": [
+    {
+      "id": "6a9bd95ba806a410",
+      "title": "THE SINGLE ENTRY POINT",
+      "cdc": 39,
+      "tags": [
+        "Failure Mode",
+        "Multi-Agent",
+        "Covenant",
+        "Governance",
+        "Verification",
+        "Drift",
+        "Kernel",
+        "Swarmmind",
+        "Archivist",
+        "Library"
+      ],
+      "cat": "root-doc"
+    },
+    {
+      "id": "d9ccbb98728d5f78",
+      "title": "COVENANT.md \u2014 Values (What We Believe)",
+      "cdc": 39,
+      "tags": [
+        "Covenant",
+        "Governance",
+        "Verification",
+        "Drift",
+        "Constraint Lattice"
+      ],
+      "cat": "root-doc"
+    },
+    {
+      "id": "7372a72fe280b3a3",
+      "title": "CAISC 2026 Draft Paper Review Report",
+      "cdc": 39,
+      "tags": [
+        "Failure Mode",
+        "Multi-Agent",
+        "CAISC 2026",
+        "Governance",
+        "Verification",
+        "Kernel"
+      ],
+      "cat": "root-doc"
+    },
+    {
+      "id": "dd9b2967fd3393db",
+      "title": "WE4FREE Publication Roadmap",
+      "cdc": 39,
+      "tags": [
+        "NFM-029",
+        "NFM-035",
+        "Phase 1",
+        "Phase 2",
+        "Phase 3",
+        "Phase 4",
+        "Phase 11",
+        "Phase 8",
+        "Phase 5",
+        "Phase 13",
+        "Phase 23",
+        "Rosetta Stone",
+        "CAISC 2026",
+        "Governance",
+        "Drift",
+        "Ensemble",
+        "Constraint Lattice",
+        "Phenotype",
+        "WE4FREE",
+        "Kernel",
+        "Swarmmind",
+        "Archivist",
+        "Library",
+        "Federation"
+      ],
+      "cat": "paper"
+    }
+  ],
+  "hub_nodes_top15": [
+    {
+      "id": "d9ccbb98728d5f78",
+      "title": "COVENANT.md \u2014 Values (What We Believe)",
+      "cc": 413,
+      "cdc": 39,
+      "cat": "root-doc",
+      "tags": [
+        "Covenant",
+        "Governance",
+        "Verification",
+        "Drift",
+        "Constraint Lattice"
+      ]
+    },
+    {
+      "id": "dd9b2967fd3393db",
+      "title": "WE4FREE Publication Roadmap",
+      "cc": 397,
+      "cdc": 39,
+      "cat": "paper",
+      "tags": [
+        "NFM-029",
+        "NFM-035",
+        "Phase 1",
+        "Phase 2",
+        "Phase 3",
+        "Phase 4",
+        "Phase 11",
+        "Phase 8",
+        "Phase 5",
+        "Phase 13",
+        "Phase 23",
+        "Rosetta Stone",
+        "CAISC 2026",
+        "Governance",
+        "Drift",
+        "Ensemble",
+        "Constraint Lattice",
+        "Phenotype",
+        "WE4FREE",
+        "Kernel",
+        "Swarmmind",
+        "Archivist",
+        "Library",
+        "Federation"
+      ]
+    },
+    {
+      "id": "5cf7faa3d782bf43",
+      "title": "Lane Interaction API Documentation",
+      "cc": 320,
+      "cdc": 0,
+      "cat": "root-doc",
+      "tags": [
+        "Phase 1",
+        "Phase1",
+        "Rosetta Stone",
+        "Convergence Gate",
+        "Covenant",
+        "Governance",
+        "Attestation",
+        "Verification",
+        "Ensemble",
+        "Kernel",
+        "Swarmmind",
+        "Archivist",
+        "Library"
+      ]
+    },
+    {
+      "id": "70b114487cb5823a",
+      "title": "4-Lane Rosetta Stone System - Architecture Documentation",
+      "cc": 314,
+      "cdc": 0,
+      "cat": "root-doc",
+      "tags": [
+        "NFM-001",
+        "NFM-002",
+        "NFM-014",
+        "NFM-017",
+        "NFM-019",
+        "NFM-020",
+        "NFM-025",
+        "NFM-028",
+        "Phase 1",
+        "Rosetta Stone",
+        "Convergence Gate",
+        "Multi-Agent",
+        "Covenant",
+        "Governance",
+        "Attestation",
+        "Verification",
+        "Drift",
+        "Ensemble",
+        "Phenotype",
+        "WE4FREE",
+        "Kernel",
+        "Swarmmind",
+        "Archivist",
+        "Library"
+      ]
+    },
+    {
+      "id": "7c568ec4394d439f",
+      "title": "4-Lane Deep Code Review \u2014 Beyond the First Surface",
+      "cc": 296,
+      "cdc": 0,
+      "cat": "docs",
+      "tags": [
+        "Convergence Gate",
+        "Identity Enforcement",
+        "Governance",
+        "Attestation",
+        "Verification",
+        "Drift",
+        "Kernel",
+        "Swarmmind",
+        "Archivist",
+        "Library"
+      ]
+    },
+    {
+      "id": "6a9bd95ba806a410",
+      "title": "THE SINGLE ENTRY POINT",
+      "cc": 270,
+      "cdc": 39,
+      "cat": "root-doc",
+      "tags": [
+        "Failure Mode",
+        "Multi-Agent",
+        "Covenant",
+        "Governance",
+        "Verification",
+        "Drift",
+        "Kernel",
+        "Swarmmind",
+        "Archivist",
+        "Library"
+      ]
+    },
+    {
+      "id": "c04ca6f8c0ccf0fb",
+      "title": "Unified 4-Lane Code Review & Operator Q&A",
+      "cc": 236,
+      "cdc": 0,
+      "cat": "docs",
+      "tags": [
+        "Phase 1",
+        "Phase 2",
+        "Convergence Gate",
+        "Identity Enforcement",
+        "Multi-Agent",
+        "Governance",
+        "Attestation",
+        "Verification",
+        "Drift",
+        "Kernel",
+        "Swarmmind",
+        "Archivist",
+        "Library"
+      ]
+    },
+    {
+      "id": "08565392922f5ee2",
+      "title": "4-Lane System Review \u2014 Execution Reality Audit",
+      "cc": 218,
+      "cdc": 0,
+      "cat": "docs",
+      "tags": [
+        "Multi-Agent",
+        "Covenant",
+        "Governance",
+        "Attestation",
+        "Verification",
+        "Drift",
+        "Kernel",
+        "Swarmmind",
+        "Archivist",
+        "Library"
+      ]
+    },
+    {
+      "id": "84ba7fc56f432454",
+      "title": "Kernel-Lane (Lane 4)",
+      "cc": 216,
+      "cdc": 0,
+      "cat": "root-doc",
+      "tags": [
+        "Multi-Agent",
+        "Governance",
+        "Attestation",
+        "Verification",
+        "Kernel",
+        "Swarmmind",
+        "Archivist",
+        "Library"
+      ]
+    },
+    {
+      "id": "9e7e8b74b11d8f82",
+      "title": "aider chat started at 2026-04-27 23:05:41",
+      "cc": 211,
+      "cdc": 0,
+      "cat": "root-doc",
+      "tags": [
+        "Phase4",
+        "Covenant",
+        "Governance",
+        "Attestation",
+        "Verification",
+        "Drift",
+        "WE4FREE",
+        "Kernel",
+        "Swarmmind",
+        "Archivist",
+        "Library"
+      ]
+    },
+    {
+      "id": "d4c143636c46469a",
+      "title": "GOVERNANCE.md \u2014 Rules (What We Follow)",
+      "cc": 207,
+      "cdc": 0,
+      "cat": "root-doc",
+      "tags": [
+        "Phase 4",
+        "Convergence Gate",
+        "Covenant",
+        "Governance",
+        "Verification",
+        "Drift",
+        "Swarmmind",
+        "Archivist",
+        "Library"
+      ]
+    },
+    {
+      "id": "ac7f640d8850c6b0",
+      "title": "GEN5 FP8 Investigation Archive",
+      "cc": 168,
+      "cdc": 0,
+      "cat": "docs",
+      "tags": [
+        "Convergence Gate",
+        "Verification",
+        "Kernel",
+        "Library"
+      ]
+    },
+    {
+      "id": "afb266abfa0c3224",
+      "title": "Executor v3 Command Contract",
+      "cc": 160,
+      "cdc": 0,
+      "cat": "docs",
+      "tags": [
+        "Covenant",
+        "Governance"
+      ]
+    },
+    {
+      "id": "daf1225a92b05539",
+      "title": "compute sanitizer summary",
+      "cc": 156,
+      "cdc": 0,
+      "cat": "profile",
+      "tags": [
+        "Convergence Gate",
+        "Kernel"
+      ]
+    },
+    {
+      "id": "88499690532c714c",
+      "title": "AGENTS.md - Kernel Lane Instructions",
+      "cc": 144,
+      "cdc": 0,
+      "cat": "root-doc",
+      "tags": [
+        "Convergence Gate",
+        "Governance",
+        "Verification",
+        "Kernel",
+        "Swarmmind",
+        "Archivist",
+        "Library"
+      ]
+    }
+  ],
+  "authority_top_sources": [
+    {
+      "node_id": "c6da5c1c8dc00312",
+      "outgoing_auth_edges": 327
+    },
+    {
+      "node_id": "349c49abd83ca16c",
+      "outgoing_auth_edges": 316
+    },
+    {
+      "node_id": "3df5e3e33e3759d3",
+      "outgoing_auth_edges": 288
+    },
+    {
+      "node_id": "f6d77915e48558b2",
+      "outgoing_auth_edges": 258
+    },
+    {
+      "node_id": "96e320fca0403dec",
+      "outgoing_auth_edges": 251
+    },
+    {
+      "node_id": "f4d82e759deab217",
+      "outgoing_auth_edges": 232
+    },
+    {
+      "node_id": "7e1bc4c96f99fd74",
+      "outgoing_auth_edges": 223
+    },
+    {
+      "node_id": "417be6412d14ac69",
+      "outgoing_auth_edges": 210
+    },
+    {
+      "node_id": "78298889a29508fe",
+      "outgoing_auth_edges": 210
+    },
+    {
+      "node_id": "05c14e6bf7cd2be3",
+      "outgoing_auth_edges": 197
+    },
+    {
+      "node_id": "741647f97fe642ae",
+      "outgoing_auth_edges": 190
+    },
+    {
+      "node_id": "d9ccbb98728d5f78",
+      "outgoing_auth_edges": 183
+    },
+    {
+      "node_id": "a50bd02f3533ca8f",
+      "outgoing_auth_edges": 177
+    },
+    {
+      "node_id": "cf0711bc6ca00a0b",
+      "outgoing_auth_edges": 176
+    },
+    {
+      "node_id": "924d83907a0aef82",
+      "outgoing_auth_edges": 171
+    }
+  ],
+  "link_edge_repos": {
+    "cross_repo": 0,
+    "same_repo": 3
+  },
+  "cluster_summary": [
+    {
+      "id": "repo:self-organizing",
+      "label": "self organizing library",
+      "repo": "?"
+    },
+    {
+      "id": "repo:Archivist-Agent",
+      "label": "Archivist Agent",
+      "repo": "?"
+    },
+    {
+      "id": "repo:SwarmMind-Self-",
+      "label": "SwarmMind",
+      "repo": "?"
+    },
+    {
+      "id": "repo:kernel-lane",
+      "label": "kernel lane",
+      "repo": "?"
+    },
+    {
+      "id": "repo:federation",
+      "label": "federation",
+      "repo": "?"
+    },
+    {
+      "id": "repo:FreeAgent",
+      "label": "FreeAgent",
+      "repo": "?"
+    },
+    {
+      "id": "repo:papers",
+      "label": "papers",
+      "repo": "?"
+    },
+    {
+      "id": "repo:storytime",
+      "label": "storytime",
+      "repo": "?"
+    },
+    {
+      "id": "repo:Deliberate-AI-E",
+      "label": "Deliberate AI Ensemble",
+      "repo": "?"
+    },
+    {
+      "id": "tag:Convergence Gate",
+      "label": "Convergence Gate",
+      "repo": "?"
+    }
+  ],
+  "status_counts": {
+    "verified": 25,
+    "unverified": 186,
+    "conflicted": 4,
+    "quarantined": 0
+  }
+}

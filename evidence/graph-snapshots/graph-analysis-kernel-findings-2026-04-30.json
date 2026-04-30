@@ -1,0 +1,1837 @@
+{
+  "snapshot": "2026-04-30T16:08:47",
+  "analyzer": "kernel",
+  "findings": [
+    {
+      "severity": "info",
+      "type": "contradiction_artifact",
+      "node": "6a9bd95ba806a410",
+      "title": "THE SINGLE ENTRY POINT",
+      "detail": "cdc=39 proven_spurious",
+      "status": "resolved"
+    },
+    {
+      "severity": "info",
+      "type": "contradiction_artifact",
+      "node": "d9ccbb98728d5f78",
+      "title": "COVENANT.md \u2014 Values (What We Believe)",
+      "detail": "cdc=39 proven_spurious",
+      "status": "resolved"
+    },
+    {
+      "severity": "info",
+      "type": "contradiction_artifact",
+      "node": "7372a72fe280b3a3",
+      "title": "CAISC 2026 Draft Paper Review Report",
+      "detail": "cdc=39 proven_spurious",
+      "status": "resolved"
+    },
+    {
+      "severity": "info",
+      "type": "contradiction_artifact",
+      "node": "dd9b2967fd3393db",
+      "title": "WE4FREE Publication Roadmap",
+      "detail": "cdc=39 proven_spurious",
+      "status": "resolved"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "9e7e8b74b11d8f82",
+      "title": "aider chat started at 2026-04-27 23:05:41",
+      "detail": "cc=211",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "88499690532c714c",
+      "title": "AGENTS.md - Kernel Lane Instructions",
+      "detail": "cc=144",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "6a9bd95ba806a410",
+      "title": "THE SINGLE ENTRY POINT",
+      "detail": "cc=270",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "d9ccbb98728d5f78",
+      "title": "COVENANT.md \u2014 Values (What We Believe)",
+      "detail": "cc=413",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "7068077618c7d8e3",
+      "title": "CUDA Kernel Optimization - Verified Results",
+      "detail": "cc=117",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "d4c143636c46469a",
+      "title": "GOVERNANCE.md \u2014 Rules (What We Follow)",
+      "detail": "cc=207",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "70b114487cb5823a",
+      "title": "4-Lane Rosetta Stone System - Architecture Documentation",
+      "detail": "cc=314",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "5cf7faa3d782bf43",
+      "title": "Lane Interaction API Documentation",
+      "detail": "cc=320",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "6d571e7cd343a393",
+      "title": "Phase 1 Completion Dashboard",
+      "detail": "cc=141",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "84ba7fc56f432454",
+      "title": "Kernel-Lane (Lane 4)",
+      "detail": "cc=216",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "7372a72fe280b3a3",
+      "title": "CAISC 2026 Draft Paper Review Report",
+      "detail": "cc=121",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "ae199f251609d734",
+      "title": "Lattice Autopilot \u2014 One-Click Starter",
+      "detail": "cc=114",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "69eaedd1bba8453a",
+      "title": "Four-lane coordination \u2014 Kernel lane update (2026-04-28)",
+      "detail": "cc=102",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "5d83ee51d6619cd9",
+      "title": "Four-Lane Ops Runbook",
+      "detail": "cc=108",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "08565392922f5ee2",
+      "title": "4-Lane System Review \u2014 Execution Reality Audit",
+      "detail": "cc=218",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "7c568ec4394d439f",
+      "title": "4-Lane Deep Code Review \u2014 Beyond the First Surface",
+      "detail": "cc=296",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "c3b79e966f17570d",
+      "title": "Cross-Lane Productivity Review \u2014 Unified Summary",
+      "detail": "cc=132",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "c04ca6f8c0ccf0fb",
+      "title": "Unified 4-Lane Code Review & Operator Q&A",
+      "detail": "cc=236",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "dd9b2967fd3393db",
+      "title": "WE4FREE Publication Roadmap",
+      "detail": "cc=397",
+      "status": "open",
+      "cat": "paper"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "afb266abfa0c3224",
+      "title": "Executor v3 Command Contract",
+      "detail": "cc=160",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "daf1225a92b05539",
+      "title": "compute sanitizer summary",
+      "detail": "cc=156",
+      "status": "open",
+      "cat": "profile"
+    },
+    {
+      "severity": "warning",
+      "type": "high_density_hub",
+      "node": "ac7f640d8850c6b0",
+      "title": "GEN5 FP8 Investigation Archive",
+      "detail": "cc=168",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "24e7f2d5343a2026",
+      "title": "CUDA KERNEL TASKQUEUE",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "e507375b3e7e67f0",
+      "title": "FINAL SUMMARY",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "a8522aae2c5012b4",
+      "title": "ncu metrics list",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "d98cd12c6d8f949b",
+      "title": "PROJECT SUMMARY",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "e45bf089c938ceb6",
+      "title": "TASK COMPLETE",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "e0b99ca5701f1053",
+      "title": "test",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "04f455e2370b8f7e",
+      "title": "tmp_message.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "933f2fff3559360e",
+      "title": "tmp_summary.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "88ea23bd271240a4",
+      "title": "todo_list.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "root-doc"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "d394b6f9fea48320",
+      "title": "canonical-message-builder.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "config"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "10d8786c9d910b9c",
+      "title": "deriveKeyId.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "config"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "9f9fdc61f624b5b0",
+      "title": "agent-manager.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "config"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "64508f8c36604c91",
+      "title": "package.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "config"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "0ac2650995add8af",
+      "title": "settings.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "config"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "28d7201ac6134174",
+      "title": "Baselines",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "baseline"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "02c837366b762856",
+      "title": "allowed_roots.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "config"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "a1e10b05906f4e93",
+      "title": "targets.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "config"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "785be9ee20f0f47d",
+      "title": "Promotion Checklist",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "2c0897786bced6d8",
+      "title": "UNIFIED_CROSS_LANE_REVIEW_20260429.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "a761cbc617378f09",
+      "title": "Integration Rules",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "integration"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "53e92998fc296551",
+      "title": "benchmark_report.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "kernel"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "0f716df08f1da3f2",
+      "title": "index.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "release"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "5bed56bbf206c5a3",
+      "title": "trust-consistency-report.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "reports"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "8414a5f8255776d6",
+      "title": "execution-gate-v1.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "schema"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "778cfdb019592dc8",
+      "title": "inbox-message-v1.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "schema"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "dd678891dd555027",
+      "title": "activate-identity.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "42dba7d1ecc69d9e",
+      "title": "artifact-resolver.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "4dd11c4e99c0417f",
+      "title": "atomic-write-util.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "02a90317d285514d",
+      "title": "audit-processed.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "f5b15cef4a732914",
+      "title": "auto-authority-executor.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "69200efc7d7665bc",
+      "title": "automatic-authority-simulation.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "5cffd81941bc226e",
+      "title": "build-copilot-package.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "0b7b53c4d2505137",
+      "title": "bulk-complete-reopened.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "3ffc299da00df2fa",
+      "title": "ci-execution-truth-guard.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "b04c52b84dec3481",
+      "title": "ci-integration-check.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "65ab5a7102a3b508",
+      "title": "code-version-hash.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "e3256d7a66f56031",
+      "title": "collision-check.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "d062f76c12d78312",
+      "title": "compact-restore-test.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "5696fb0b0ae31afd",
+      "title": "completion-gate-audit.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "afdbc63d8b3f51c5",
+      "title": "completion-gate-remediate.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "80cbab451b310554",
+      "title": "completion-gate-triage-remediate.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "868d71438f1e7b35",
+      "title": "completion-gate.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "c249d759b71f460b",
+      "title": "completion-proof-audit.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "e6db453217a29726",
+      "title": "completion-proof.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "e90a585e6de29502",
+      "title": "concurrency-policy.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "e5c2d342fd1a4bd7",
+      "title": "convergence-contradiction-check.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "11ee89d1f5e8f11c",
+      "title": "create-signed-message.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "bbc4a5d07dc750ec",
+      "title": "cross-lane-consistency-check.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "2dec255e859df699",
+      "title": "cross-lane-sync-gate.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "895f8af440b7046e",
+      "title": "cross-lane-sync.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "019f0e917be27c1d",
+      "title": "debug-ci.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "74f98cdf4c42c054",
+      "title": "debug-consistency.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "eaebd376027b88e1",
+      "title": "dispatch-kernel-tasks.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "b9bcf0668f385fac",
+      "title": "dispatch-task.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "4b366a4b0a491d86",
+      "title": "dispatch_message.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "9330ccb077d3ed82",
+      "title": "e2e-monitor.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "1a79b6c177f30d7b",
+      "title": "edit-lease-manager.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "276826b3e9171977",
+      "title": "enforce-consistency-invariant.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "126b01d64fd1d1a7",
+      "title": "enforce_consistency_invariant.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "00179ac9a08f99fe",
+      "title": "evidence-exchange-check.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "3f8f5f069911a58e",
+      "title": "execution-gate.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "4a955e4bf0ee7bff",
+      "title": "fix-processed-completion-proof.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "96031225056de7f7",
+      "title": "full-lane-review-and-dispatch.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "7ef074dfa66c4690",
+      "title": "gen-archivist-key.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "a0b6e2906cf8b3f7",
+      "title": "generic-task-executor.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "b64b93d9ade82a63",
+      "title": "governance-message-verifier.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "f8de15c1e3e22ad8",
+      "title": "health-core.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "554b44a3d1f7ce51",
+      "title": "heartbeat.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "1767b5d56b6b5be1",
+      "title": "identity-enforcer.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "d4503691ae61dc9c",
+      "title": "identity-self-healing.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "be8d95238cacf854",
+      "title": "inbox-watcher.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "a6821d7e95ea272e",
+      "title": "lane-health-monitor.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "553c5c9ec2977d13",
+      "title": "lane-worker.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "d751bde1d3bfa3b6",
+      "title": "lease-write.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "522bf73f5aaeb998",
+      "title": "monitor.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "599bda775e3c05bf",
+      "title": "nuke-lane-mail.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "577be77d652bd419",
+      "title": "outbox-write-guard.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "0e20bdb30555ea17",
+      "title": "patch-schema-execution-enums.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "17d06ce103ac6934",
+      "title": "path-normalization-guard.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "0957c3d414c22eb4",
+      "title": "plot-benchmarks.py",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "5edc9c59f9171db7",
+      "title": "post-compact-audit.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "81f936a515d96e8b",
+      "title": "recover-action-required-from-processed.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "b2daccac79677d49",
+      "title": "recovery-test-suite.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "1a873b70608e3ecc",
+      "title": "regenerate-trust-store.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "d6e53a06cb126ce2",
+      "title": "register-archivist-key.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "8e14edd8d0f58b94",
+      "title": "relay-daemon.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "2eae1147e08829a2",
+      "title": "remediate-execution-verified.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "f24e53209cdf6a59",
+      "title": "run-compact-with-audit.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "02e54822831b08a6",
+      "title": "sanitize-emoji.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "df187878c62e8ca7",
+      "title": "schema-validator.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "c2a1cd4485781319",
+      "title": "scrub-secrets-tree.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "5de00d6e241c03be",
+      "title": "send-reverse-test-messages.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "0dab202d2b32b54e",
+      "title": "send-test-messages.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "2b1c5113a8ad72f6",
+      "title": "sign-and-write.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "47a2ffcb58c18053",
+      "title": "sign-autopilot-summary.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "a32448859748ada5",
+      "title": "sign-outbox-message.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "d92c7a237c36057a",
+      "title": "sign-snapshot.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "e8444f9b9599af15",
+      "title": "smoke-core.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "1ab07ec67202322e",
+      "title": "start-core.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "b8abf2e3e78b9d21",
+      "title": "sync-identity-from-trust.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "5672792bd0038be8",
+      "title": "system-status.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "dbb15e44962ebd61",
+      "title": "task-executor.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "6590491f1720ca9b",
+      "title": "test-artifact-resolver.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "d9cea58d160818d6",
+      "title": "test-completion-proof.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "e6e2ef19019ef264",
+      "title": "test-execution-gate.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "214f429a1c11c5ce",
+      "title": "test-executor-v3.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "bda0cb53930dd5a2",
+      "title": "test-lane-worker-no-proof.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "b0d9c459105fc02f",
+      "title": "test-lane-worker-we4free.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "b3e8a4a2ec2557d3",
+      "title": "test-phase4-gates.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "b937137278f28568",
+      "title": "test-signed-message.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "65fa0e55fcbf06fc",
+      "title": "test-signed-messages.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "4f63c1f29c7fa958",
+      "title": "test-sync-all-lanes.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "2d87eb13f94024c7",
+      "title": "test-trust-consistency.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "69cf8ef1d01f9699",
+      "title": "tmp-sync-scripts.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "199b7fbd9bbd0353",
+      "title": "update_delivery_verified.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "50df970bf853fa47",
+      "title": "validate-responses.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "9d37bd17af48b24a",
+      "title": "validate-schema.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "86fe8cccb04baaee",
+      "title": "validate-system-anchor.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "fbdd29230465fefd",
+      "title": "validate_outbox.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "b1f391311bc01679",
+      "title": "verification-domain-gate.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "7d0500afed8e6318",
+      "title": "verify_continuity.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "script"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "df73c84a029053a9",
+      "title": "fp8-benchmark.yml",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "config"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "cd91936a7d1876e4",
+      "title": "profile.yml",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "config"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "a83bfb8536286709",
+      "title": "baseline.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "benchmark"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "6fea76d8591270a9",
+      "title": "gen3.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "benchmark"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "b222ec5ff1b5a7c0",
+      "title": "gen4_benchmark_nfm.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "benchmark"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "429faae32168b629",
+      "title": "gen4_compile_nfm.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "benchmark"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "87e7d94503d8daff",
+      "title": "gen4_nsight_nfm.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "benchmark"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "4e44e2cbfb4fdff7",
+      "title": "gen4_verification_benchmark.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "benchmark"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "ccd7ac68b24233aa",
+      "title": "gen5 compile log",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "benchmark"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "f5b9aa090b89a381",
+      "title": "gen5_fp8_benchmark.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "benchmark"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "d5cc7f7315c02ca3",
+      "title": "gen5 stall query metrics",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "benchmark"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "e5763899a5760107",
+      "title": "gen5 variant runtime",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "benchmark"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "f7e35439c0e066db",
+      "title": "convergence_output.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "069684e80dee189e",
+      "title": "evidence-exchange-report.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "797ce27814b4121e",
+      "title": "round-002-kernel-signing-audit.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "68db522fa043ac42",
+      "title": "round-002-kernel-trust-store-verify.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "6354f0c86ad22ab2",
+      "title": "README",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "kernel"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "9a9e5855bc64203a",
+      "title": "compute sanitizer doublebuffer",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "profile"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "a2396d484e0ba797",
+      "title": "gen4_verification_profile_summary.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "profile"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "5c37cf5c6d631c9a",
+      "title": "baseline_meta.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "profile"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "7548d2b7bb68149b",
+      "title": "daemon err",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "profile"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "2484a60934407fee",
+      "title": "daemon out",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "profile"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "1f2506ccd94e6402",
+      "title": "baseline.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "release"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "36cfec7e33340c05",
+      "title": "convergence.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "release"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "ae92c59f635f8578",
+      "title": "manifest.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "release"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "d2b0ab0dd969a20b",
+      "title": "constants.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "code"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "39b9c24c6c426349",
+      "title": "deriveKeyId.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "code"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "d55d4dbec93fae7f",
+      "title": "KeyManager.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "code"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "1084244162357a24",
+      "title": "Signer.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "code"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "fdf305352e371b3f",
+      "title": "stableStringify.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "code"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "2a7dacac76ad5d01",
+      "title": "TrustStoreManager.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "code"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "7da09b26d75349aa",
+      "title": "SchemaValidator.js",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "code"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "6687c6270c9c032f",
+      "title": "continual-learning-index.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "config"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "b800ae67c332f6b1",
+      "title": "continual-learning.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "config"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "38494fe1ce6cf032",
+      "title": "2026-04-22T00-55-00Z_kernel_schema-response.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "7ea6ebd948228087",
+      "title": "2026-04-23T02-00-00Z-archivist-pem-fix.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "1af35920666abb5b",
+      "title": "2026-04-23T02-00-00Z-pem-001.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "4c7c19edfc0c709c",
+      "title": "2026-04-23T02-10-00Z-pem-002.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "553c5eb685cb2443",
+      "title": "2026-04-23T02-20-00Z-pem-003.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "912bdadb89287401",
+      "title": "2026-04-23T02-30-00Z-pem-004.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "f388db6b7fd4d6b7",
+      "title": "2026-04-23T02-40-00Z-pem-005.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "90b3062a401349ba",
+      "title": "archivist-propagate-kernel-20260423T220700Z.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "0f6e5781661a2473",
+      "title": "e2e-summary-request-001.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "1435c4bbc0a072cb",
+      "title": "e2e-test-broadcast-001.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "a381ed0bac06dc48",
+      "title": "full-test-reminder-kernel-2026-04-22T20-32-29-475Z.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "650ce8802da0c5e5",
+      "title": "INDEX.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "385a2dbd65b5dc0e",
+      "title": "kernel-follow-up-tasks-001.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "77b6c669b126aecc",
+      "title": "kernel-productivity-monitor-20260423-001-completion.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "warning",
+      "type": "untagged_node",
+      "node": "a33be408061df63c",
+      "title": "summary-recovery-1776979657-kernel.json",
+      "detail": "No tags",
+      "status": "open",
+      "cat": "docs"
+    },
+    {
+      "severity": "info",
+      "type": "single_tag_node",
+      "node": "b9399d1741459ed8",
+      "title": "Autonomous Achievement: CUDA Kernel Optimization Initiative",
+      "detail": "Only tag: Kernel",
+      "status": "open"
+    },
+    {
+      "severity": "info",
+      "type": "single_tag_node",
+      "node": "dc849f4c76898e19",
+      "title": "4096^3 GEMM Benchmark: async-8warp vs triple-buffer",
+      "detail": "Only tag: Kernel",
+      "status": "open"
+    },
+    {
+      "severity": "info",
+      "type": "single_tag_node",
+      "node": "5d636ccc261c1318",
+      "title": "Lane Charter",
+      "detail": "Only tag: Kernel",
+      "status": "open"
+    },
+    {
+      "severity": "info",
+      "type": "single_tag_node",
+      "node": "b8370c2e4b1be6d9",
+      "title": "Nsight Headless Profiling Guide \u2014 kernel-lane",
+      "detail": "Only tag: Kernel",
+      "status": "open"
+    },
+    {
+      "severity": "info",
+      "type": "single_tag_node",
+      "node": "5d8a25163a408540",
+      "title": "NSIGHT WMMA ANALYSIS SM120",
+      "detail": "Only tag: Kernel",
+      "status": "open"
+    },
+    {
+      "severity": "info",
+      "type": "single_tag_node",
+      "node": "85db3fd3083ca4a1",
+      "title": "Release Contract",
+      "detail": "Only tag: Kernel",
+      "status": "open"
+    },
+    {
+      "severity": "info",
+      "type": "single_tag_node",
+      "node": "bc14e04bf31a6e60",
+      "title": "Releases",
+      "detail": "Only tag: Kernel",
+      "status": "open"
+    },
+    {
+      "severity": "info",
+      "type": "single_tag_node",
+      "node": "d63ada1ea67a4d06",
+      "title": "Kernel Sources \u2013 RTX 5060 (SM 120)",
+      "detail": "Only tag: Kernel",
+      "status": "open"
+    },
+    {
+      "severity": "warning",
+      "type": "siloed_categories",
+      "detail": "[('schema', 2), ('root-doc', 24), ('paper', 1), ('release', 5), ('benchmark', 12), ('plans', 1), ('profile', 7), ('code', 7), ('docs', 40), ('config', 13), ('reports', 1), ('script', 97), ('baseline', 1), ('integration', 1), ('kernel', 3)]",
+      "status": "open"
+    }
+  ],
+  "finding_count": 205
+}
