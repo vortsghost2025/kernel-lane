@@ -4,48 +4,49 @@
     "total_edges": 44097,
     "snapshot_time": "2026-04-30T16:08:47.095Z",
     "visible_nodes": 215,
-    "visible_edges": 44097
+    "visible_edges": 44097,
+    "untagged_nodes_after_auto_tag": 0
   },
   "edge_types": {
-    "link": 964,
-    "paper-section-of": 60,
-    "cross-paper-tag": 66,
-    "cross-paper-dependency": 10,
+    "authority": 27502,
     "shared-tag": 15495,
-    "authority": 27502
+    "link": 964,
+    "cross-paper-tag": 66,
+    "paper-section-of": 60,
+    "cross-paper-dependency": 10
   },
   "node_categories": {
+    "script": 97,
+    "docs": 40,
     "root-doc": 24,
     "config": 13,
-    "baseline": 1,
     "benchmark": 12,
-    "docs": 40,
-    "integration": 1,
+    "profile": 7,
+    "code": 7,
+    "release": 5,
     "kernel": 3,
+    "schema": 2,
+    "baseline": 1,
+    "integration": 1,
     "paper": 1,
     "plans": 1,
-    "release": 5,
-    "reports": 1,
-    "schema": 2,
-    "script": 97,
-    "profile": 7,
-    "code": 7
+    "reports": 1
   },
   "tag_distribution_top30": {
-    "Kernel": 41,
-    "Library": 28,
-    "Archivist": 27,
+    "Kernel": 211,
+    "Verification": 119,
+    "Governance": 42,
+    "Attestation": 39,
+    "Archivist": 32,
+    "Multi-Agent": 32,
+    "Library": 29,
     "Swarmmind": 26,
-    "Verification": 25,
-    "Governance": 23,
-    "Convergence Gate": 13,
+    "Convergence Gate": 17,
+    "Covenant": 11,
     "Drift": 11,
-    "Covenant": 9,
     "Phase 1": 9,
-    "Attestation": 7,
-    "Multi-Agent": 7,
+    "WE4FREE": 6,
     "Phase 2": 6,
-    "WE4FREE": 4,
     "Failure Mode": 4,
     "Ensemble": 4,
     "Rosetta Stone": 3,
@@ -84,7 +85,7 @@
     },
     {
       "id": "d9ccbb98728d5f78",
-      "title": "COVENANT.md \u2014 Values (What We Believe)",
+      "title": "COVENANT.md — Values (What We Believe)",
       "cdc": 39,
       "tags": [
         "Covenant",
@@ -145,7 +146,7 @@
   "hub_nodes_top15": [
     {
       "id": "d9ccbb98728d5f78",
-      "title": "COVENANT.md \u2014 Values (What We Believe)",
+      "title": "COVENANT.md — Values (What We Believe)",
       "cc": 413,
       "cdc": 39,
       "cat": "root-doc",
@@ -247,7 +248,7 @@
     },
     {
       "id": "7c568ec4394d439f",
-      "title": "4-Lane Deep Code Review \u2014 Beyond the First Surface",
+      "title": "4-Lane Deep Code Review — Beyond the First Surface",
       "cc": 296,
       "cdc": 0,
       "cat": "docs",
@@ -307,7 +308,7 @@
     },
     {
       "id": "08565392922f5ee2",
-      "title": "4-Lane System Review \u2014 Execution Reality Audit",
+      "title": "4-Lane System Review — Execution Reality Audit",
       "cc": 218,
       "cdc": 0,
       "cat": "docs",
@@ -363,7 +364,7 @@
     },
     {
       "id": "d4c143636c46469a",
-      "title": "GOVERNANCE.md \u2014 Rules (What We Follow)",
+      "title": "GOVERNANCE.md — Rules (What We Follow)",
       "cc": 207,
       "cdc": 0,
       "cat": "root-doc",
@@ -429,124 +430,6 @@
         "Archivist",
         "Library"
       ]
-    }
-  ],
-  "authority_top_sources": [
-    {
-      "node_id": "c6da5c1c8dc00312",
-      "outgoing_auth_edges": 327
-    },
-    {
-      "node_id": "349c49abd83ca16c",
-      "outgoing_auth_edges": 316
-    },
-    {
-      "node_id": "3df5e3e33e3759d3",
-      "outgoing_auth_edges": 288
-    },
-    {
-      "node_id": "f6d77915e48558b2",
-      "outgoing_auth_edges": 258
-    },
-    {
-      "node_id": "96e320fca0403dec",
-      "outgoing_auth_edges": 251
-    },
-    {
-      "node_id": "f4d82e759deab217",
-      "outgoing_auth_edges": 232
-    },
-    {
-      "node_id": "7e1bc4c96f99fd74",
-      "outgoing_auth_edges": 223
-    },
-    {
-      "node_id": "417be6412d14ac69",
-      "outgoing_auth_edges": 210
-    },
-    {
-      "node_id": "78298889a29508fe",
-      "outgoing_auth_edges": 210
-    },
-    {
-      "node_id": "05c14e6bf7cd2be3",
-      "outgoing_auth_edges": 197
-    },
-    {
-      "node_id": "741647f97fe642ae",
-      "outgoing_auth_edges": 190
-    },
-    {
-      "node_id": "d9ccbb98728d5f78",
-      "outgoing_auth_edges": 183
-    },
-    {
-      "node_id": "a50bd02f3533ca8f",
-      "outgoing_auth_edges": 177
-    },
-    {
-      "node_id": "cf0711bc6ca00a0b",
-      "outgoing_auth_edges": 176
-    },
-    {
-      "node_id": "924d83907a0aef82",
-      "outgoing_auth_edges": 171
-    }
-  ],
-  "link_edge_repos": {
-    "cross_repo": 0,
-    "same_repo": 3
-  },
-  "cluster_summary": [
-    {
-      "id": "repo:self-organizing",
-      "label": "self organizing library",
-      "repo": "?"
-    },
-    {
-      "id": "repo:Archivist-Agent",
-      "label": "Archivist Agent",
-      "repo": "?"
-    },
-    {
-      "id": "repo:SwarmMind-Self-",
-      "label": "SwarmMind",
-      "repo": "?"
-    },
-    {
-      "id": "repo:kernel-lane",
-      "label": "kernel lane",
-      "repo": "?"
-    },
-    {
-      "id": "repo:federation",
-      "label": "federation",
-      "repo": "?"
-    },
-    {
-      "id": "repo:FreeAgent",
-      "label": "FreeAgent",
-      "repo": "?"
-    },
-    {
-      "id": "repo:papers",
-      "label": "papers",
-      "repo": "?"
-    },
-    {
-      "id": "repo:storytime",
-      "label": "storytime",
-      "repo": "?"
-    },
-    {
-      "id": "repo:Deliberate-AI-E",
-      "label": "Deliberate AI Ensemble",
-      "repo": "?"
-    },
-    {
-      "id": "tag:Convergence Gate",
-      "label": "Convergence Gate",
-      "repo": "?"
     }
   ],
   "status_counts": {

@@ -1,0 +1,2125 @@
+{
+  "generated_at": "2026-04-30T16:52:13.876569Z",
+  "source_snapshot": "graph-snapshot-2026-04-30T16-08-47-full.json",
+  "total_nodes": 215,
+  "untagged_count": 170,
+  "single_tag_count": 8,
+  "assignments": [
+    {
+      "node_id": "24e7f2d5343a2026",
+      "title": "CUDA KERNEL TASKQUEUE",
+      "category": "root-doc",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "e507375b3e7e67f0",
+      "title": "FINAL SUMMARY",
+      "category": "root-doc",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "a8522aae2c5012b4",
+      "title": "ncu metrics list",
+      "category": "root-doc",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "d98cd12c6d8f949b",
+      "title": "PROJECT SUMMARY",
+      "category": "root-doc",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "e45bf089c938ceb6",
+      "title": "TASK COMPLETE",
+      "category": "root-doc",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "e0b99ca5701f1053",
+      "title": "test",
+      "category": "root-doc",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "04f455e2370b8f7e",
+      "title": "tmp_message.json",
+      "category": "root-doc",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "933f2fff3559360e",
+      "title": "tmp_summary.json",
+      "category": "root-doc",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "88ea23bd271240a4",
+      "title": "todo_list.json",
+      "category": "root-doc",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "d394b6f9fea48320",
+      "title": "canonical-message-builder.js",
+      "category": "config",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Governance",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "10d8786c9d910b9c",
+      "title": "deriveKeyId.js",
+      "category": "config",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Governance",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "9f9fdc61f624b5b0",
+      "title": "agent-manager.json",
+      "category": "config",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Governance",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "64508f8c36604c91",
+      "title": "package.json",
+      "category": "config",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Governance",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "0ac2650995add8af",
+      "title": "settings.json",
+      "category": "config",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Governance",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "28d7201ac6134174",
+      "title": "Baselines",
+      "category": "baseline",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "02c837366b762856",
+      "title": "allowed_roots.json",
+      "category": "config",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Governance",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "a1e10b05906f4e93",
+      "title": "targets.json",
+      "category": "config",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Governance",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "785be9ee20f0f47d",
+      "title": "Promotion Checklist",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "2c0897786bced6d8",
+      "title": "UNIFIED_CROSS_LANE_REVIEW_20260429.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "a761cbc617378f09",
+      "title": "Integration Rules",
+      "category": "integration",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Covenant",
+        "Governance",
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "53e92998fc296551",
+      "title": "benchmark_report.json",
+      "category": "kernel",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "0f716df08f1da3f2",
+      "title": "index.json",
+      "category": "release",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "5bed56bbf206c5a3",
+      "title": "trust-consistency-report.json",
+      "category": "reports",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "8414a5f8255776d6",
+      "title": "execution-gate-v1.json",
+      "category": "schema",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Governance",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "778cfdb019592dc8",
+      "title": "inbox-message-v1.json",
+      "category": "schema",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Governance",
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "dd678891dd555027",
+      "title": "activate-identity.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "42dba7d1ecc69d9e",
+      "title": "artifact-resolver.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "4dd11c4e99c0417f",
+      "title": "atomic-write-util.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "02a90317d285514d",
+      "title": "audit-processed.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "f5b15cef4a732914",
+      "title": "auto-authority-executor.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "69200efc7d7665bc",
+      "title": "automatic-authority-simulation.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "5cffd81941bc226e",
+      "title": "build-copilot-package.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "0b7b53c4d2505137",
+      "title": "bulk-complete-reopened.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "3ffc299da00df2fa",
+      "title": "ci-execution-truth-guard.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "b04c52b84dec3481",
+      "title": "ci-integration-check.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "65ab5a7102a3b508",
+      "title": "code-version-hash.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "e3256d7a66f56031",
+      "title": "collision-check.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "d062f76c12d78312",
+      "title": "compact-restore-test.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "5696fb0b0ae31afd",
+      "title": "completion-gate-audit.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "afdbc63d8b3f51c5",
+      "title": "completion-gate-remediate.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "80cbab451b310554",
+      "title": "completion-gate-triage-remediate.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "868d71438f1e7b35",
+      "title": "completion-gate.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "c249d759b71f460b",
+      "title": "completion-proof-audit.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "e6db453217a29726",
+      "title": "completion-proof.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "e90a585e6de29502",
+      "title": "concurrency-policy.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "e5c2d342fd1a4bd7",
+      "title": "convergence-contradiction-check.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Convergence Gate",
+        "Governance",
+        "Kernel",
+        "Library",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "11ee89d1f5e8f11c",
+      "title": "create-signed-message.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "bbc4a5d07dc750ec",
+      "title": "cross-lane-consistency-check.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "2dec255e859df699",
+      "title": "cross-lane-sync-gate.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "895f8af440b7046e",
+      "title": "cross-lane-sync.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "019f0e917be27c1d",
+      "title": "debug-ci.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "74f98cdf4c42c054",
+      "title": "debug-consistency.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "eaebd376027b88e1",
+      "title": "dispatch-kernel-tasks.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "b9bcf0668f385fac",
+      "title": "dispatch-task.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "4b366a4b0a491d86",
+      "title": "dispatch_message.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "9330ccb077d3ed82",
+      "title": "e2e-monitor.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "1a79b6c177f30d7b",
+      "title": "edit-lease-manager.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "276826b3e9171977",
+      "title": "enforce-consistency-invariant.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "126b01d64fd1d1a7",
+      "title": "enforce_consistency_invariant.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "00179ac9a08f99fe",
+      "title": "evidence-exchange-check.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "3f8f5f069911a58e",
+      "title": "execution-gate.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "4a955e4bf0ee7bff",
+      "title": "fix-processed-completion-proof.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "96031225056de7f7",
+      "title": "full-lane-review-and-dispatch.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "7ef074dfa66c4690",
+      "title": "gen-archivist-key.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Archivist",
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "a0b6e2906cf8b3f7",
+      "title": "generic-task-executor.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "b64b93d9ade82a63",
+      "title": "governance-message-verifier.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Convergence Gate",
+        "Governance",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "f8de15c1e3e22ad8",
+      "title": "health-core.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "554b44a3d1f7ce51",
+      "title": "heartbeat.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "1767b5d56b6b5be1",
+      "title": "identity-enforcer.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "d4503691ae61dc9c",
+      "title": "identity-self-healing.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "be8d95238cacf854",
+      "title": "inbox-watcher.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "a6821d7e95ea272e",
+      "title": "lane-health-monitor.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "553c5c9ec2977d13",
+      "title": "lane-worker.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "d751bde1d3bfa3b6",
+      "title": "lease-write.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "522bf73f5aaeb998",
+      "title": "monitor.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "599bda775e3c05bf",
+      "title": "nuke-lane-mail.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "577be77d652bd419",
+      "title": "outbox-write-guard.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "0e20bdb30555ea17",
+      "title": "patch-schema-execution-enums.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "17d06ce103ac6934",
+      "title": "path-normalization-guard.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "0957c3d414c22eb4",
+      "title": "plot-benchmarks.py",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "5edc9c59f9171db7",
+      "title": "post-compact-audit.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "81f936a515d96e8b",
+      "title": "recover-action-required-from-processed.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "b2daccac79677d49",
+      "title": "recovery-test-suite.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "1a873b70608e3ecc",
+      "title": "regenerate-trust-store.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "d6e53a06cb126ce2",
+      "title": "register-archivist-key.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Archivist",
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "8e14edd8d0f58b94",
+      "title": "relay-daemon.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "2eae1147e08829a2",
+      "title": "remediate-execution-verified.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "f24e53209cdf6a59",
+      "title": "run-compact-with-audit.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "02e54822831b08a6",
+      "title": "sanitize-emoji.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "df187878c62e8ca7",
+      "title": "schema-validator.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Archivist",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "c2a1cd4485781319",
+      "title": "scrub-secrets-tree.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "5de00d6e241c03be",
+      "title": "send-reverse-test-messages.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "0dab202d2b32b54e",
+      "title": "send-test-messages.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "2b1c5113a8ad72f6",
+      "title": "sign-and-write.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "47a2ffcb58c18053",
+      "title": "sign-autopilot-summary.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "a32448859748ada5",
+      "title": "sign-outbox-message.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Multi-Agent",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "d92c7a237c36057a",
+      "title": "sign-snapshot.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "e8444f9b9599af15",
+      "title": "smoke-core.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "1ab07ec67202322e",
+      "title": "start-core.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "b8abf2e3e78b9d21",
+      "title": "sync-identity-from-trust.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "5672792bd0038be8",
+      "title": "system-status.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "dbb15e44962ebd61",
+      "title": "task-executor.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "6590491f1720ca9b",
+      "title": "test-artifact-resolver.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "d9cea58d160818d6",
+      "title": "test-completion-proof.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "e6e2ef19019ef264",
+      "title": "test-execution-gate.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "214f429a1c11c5ce",
+      "title": "test-executor-v3.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "bda0cb53930dd5a2",
+      "title": "test-lane-worker-no-proof.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "b0d9c459105fc02f",
+      "title": "test-lane-worker-we4free.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent",
+        "Verification",
+        "WE4FREE"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "b3e8a4a2ec2557d3",
+      "title": "test-phase4-gates.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification",
+        "WE4FREE"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "b937137278f28568",
+      "title": "test-signed-message.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "65fa0e55fcbf06fc",
+      "title": "test-signed-messages.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "4f63c1f29c7fa958",
+      "title": "test-sync-all-lanes.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "2d87eb13f94024c7",
+      "title": "test-trust-consistency.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "69cf8ef1d01f9699",
+      "title": "tmp-sync-scripts.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "199b7fbd9bbd0353",
+      "title": "update_delivery_verified.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "50df970bf853fa47",
+      "title": "validate-responses.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "9d37bd17af48b24a",
+      "title": "validate-schema.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "86fe8cccb04baaee",
+      "title": "validate-system-anchor.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "fbdd29230465fefd",
+      "title": "validate_outbox.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Multi-Agent",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "b1f391311bc01679",
+      "title": "verification-domain-gate.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "7d0500afed8e6318",
+      "title": "verify_continuity.js",
+      "category": "script",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "df73c84a029053a9",
+      "title": "fp8-benchmark.yml",
+      "category": "config",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Governance",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "cd91936a7d1876e4",
+      "title": "profile.yml",
+      "category": "config",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Governance",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "a83bfb8536286709",
+      "title": "baseline.json",
+      "category": "benchmark",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "6fea76d8591270a9",
+      "title": "gen3.json",
+      "category": "benchmark",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "b222ec5ff1b5a7c0",
+      "title": "gen4_benchmark_nfm.json",
+      "category": "benchmark",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "429faae32168b629",
+      "title": "gen4_compile_nfm.json",
+      "category": "benchmark",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "87e7d94503d8daff",
+      "title": "gen4_nsight_nfm.json",
+      "category": "benchmark",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "4e44e2cbfb4fdff7",
+      "title": "gen4_verification_benchmark.json",
+      "category": "benchmark",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "ccd7ac68b24233aa",
+      "title": "gen5 compile log",
+      "category": "benchmark",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "f5b9aa090b89a381",
+      "title": "gen5_fp8_benchmark.json",
+      "category": "benchmark",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "d5cc7f7315c02ca3",
+      "title": "gen5 stall query metrics",
+      "category": "benchmark",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "e5763899a5760107",
+      "title": "gen5 variant runtime",
+      "category": "benchmark",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "f7e35439c0e066db",
+      "title": "convergence_output.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Convergence Gate",
+        "Governance",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "069684e80dee189e",
+      "title": "evidence-exchange-report.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "797ce27814b4121e",
+      "title": "round-002-kernel-signing-audit.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Multi-Agent",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "68db522fa043ac42",
+      "title": "round-002-kernel-trust-store-verify.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "6354f0c86ad22ab2",
+      "title": "README",
+      "category": "kernel",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "9a9e5855bc64203a",
+      "title": "compute sanitizer doublebuffer",
+      "category": "profile",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "a2396d484e0ba797",
+      "title": "gen4_verification_profile_summary.json",
+      "category": "profile",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "5c37cf5c6d631c9a",
+      "title": "baseline_meta.json",
+      "category": "profile",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "7548d2b7bb68149b",
+      "title": "daemon err",
+      "category": "profile",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "2484a60934407fee",
+      "title": "daemon out",
+      "category": "profile",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "1f2506ccd94e6402",
+      "title": "baseline.json",
+      "category": "release",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "36cfec7e33340c05",
+      "title": "convergence.json",
+      "category": "release",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Convergence Gate",
+        "Governance",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "ae92c59f635f8578",
+      "title": "manifest.json",
+      "category": "release",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "d2b0ab0dd969a20b",
+      "title": "constants.js",
+      "category": "code",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "39b9c24c6c426349",
+      "title": "deriveKeyId.js",
+      "category": "code",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "d55d4dbec93fae7f",
+      "title": "KeyManager.js",
+      "category": "code",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "1084244162357a24",
+      "title": "Signer.js",
+      "category": "code",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "fdf305352e371b3f",
+      "title": "stableStringify.js",
+      "category": "code",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "2a7dacac76ad5d01",
+      "title": "TrustStoreManager.js",
+      "category": "code",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "7da09b26d75349aa",
+      "title": "SchemaValidator.js",
+      "category": "code",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "6687c6270c9c032f",
+      "title": "continual-learning-index.json",
+      "category": "config",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Governance",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "b800ae67c332f6b1",
+      "title": "continual-learning.json",
+      "category": "config",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Governance",
+        "Kernel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "38494fe1ce6cf032",
+      "title": "2026-04-22T00-55-00Z_kernel_schema-response.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "7ea6ebd948228087",
+      "title": "2026-04-23T02-00-00Z-archivist-pem-fix.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Archivist",
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "1af35920666abb5b",
+      "title": "2026-04-23T02-00-00Z-pem-001.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "4c7c19edfc0c709c",
+      "title": "2026-04-23T02-10-00Z-pem-002.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "553c5eb685cb2443",
+      "title": "2026-04-23T02-20-00Z-pem-003.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "912bdadb89287401",
+      "title": "2026-04-23T02-30-00Z-pem-004.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "f388db6b7fd4d6b7",
+      "title": "2026-04-23T02-40-00Z-pem-005.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Attestation",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "90b3062a401349ba",
+      "title": "archivist-propagate-kernel-20260423T220700Z.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Archivist",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "0f6e5781661a2473",
+      "title": "e2e-summary-request-001.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "1435c4bbc0a072cb",
+      "title": "e2e-test-broadcast-001.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "a381ed0bac06dc48",
+      "title": "full-test-reminder-kernel-2026-04-22T20-32-29-475Z.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "650ce8802da0c5e5",
+      "title": "INDEX.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "node_id": "385a2dbd65b5dc0e",
+      "title": "kernel-follow-up-tasks-001.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Covenant",
+        "Governance",
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "77b6c669b126aecc",
+      "title": "kernel-productivity-monitor-20260423-001-completion.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    },
+    {
+      "node_id": "a33be408061df63c",
+      "title": "summary-recovery-1776979657-kernel.json",
+      "category": "docs",
+      "repo": "kernel-lane",
+      "current_tags": [],
+      "proposed_tags": [
+        "Kernel",
+        "Verification"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "supplements": [
+    {
+      "node_id": "b9399d1741459ed8",
+      "title": "Autonomous Achievement: CUDA Kernel Optimization Initiative",
+      "category": "root-doc",
+      "current_tags": [
+        "Kernel"
+      ],
+      "supplement_tags": [
+        "Verification"
+      ]
+    },
+    {
+      "node_id": "dc849f4c76898e19",
+      "title": "4096^3 GEMM Benchmark: async-8warp vs triple-buffer",
+      "category": "benchmark",
+      "current_tags": [
+        "Kernel"
+      ],
+      "supplement_tags": [
+        "Verification"
+      ]
+    },
+    {
+      "node_id": "5d636ccc261c1318",
+      "title": "Lane Charter",
+      "category": "docs",
+      "current_tags": [
+        "Kernel"
+      ],
+      "supplement_tags": [
+        "Multi-Agent"
+      ]
+    },
+    {
+      "node_id": "b8370c2e4b1be6d9",
+      "title": "Nsight Headless Profiling Guide — kernel-lane",
+      "category": "docs",
+      "current_tags": [
+        "Kernel"
+      ],
+      "supplement_tags": [
+        "Multi-Agent",
+        "Verification"
+      ]
+    },
+    {
+      "node_id": "5d8a25163a408540",
+      "title": "NSIGHT WMMA ANALYSIS SM120",
+      "category": "docs",
+      "current_tags": [
+        "Kernel"
+      ],
+      "supplement_tags": [
+        "Verification"
+      ]
+    },
+    {
+      "node_id": "d63ada1ea67a4d06",
+      "title": "Kernel Sources – RTX 5060 (SM 120)",
+      "category": "kernel",
+      "current_tags": [
+        "Kernel"
+      ],
+      "supplement_tags": [
+        "Verification"
+      ]
+    }
+  ]
+}
