@@ -1,0 +1,47 @@
+{
+  "analysis": "CONTRADICTS cross-ref semantic review",
+  "total_cross_refs": 1100,
+  "contradiction_tag_sources": 325,
+  "actual_contradicts_edges": 215,
+  "expected_183_match": false,
+  "classification": {
+    "genuine_conflict": 88,
+    "tag_artifact": 6,
+    "uncertain": 121
+  },
+  "contradiction_tags": [
+    "Drift",
+    "Failure Mode"
+  ],
+  "verification_tags": [
+    "Verification",
+    "Attestation",
+    "Convergence Gate",
+    "Identity Enforcement"
+  ],
+  "signing_tags": [
+    "Attestation",
+    "Identity Enforcement"
+  ],
+  "execution_tags": [
+    "Swarmmind",
+    "Multi-Agent",
+    "Kernel"
+  ],
+  "derivation_categories": [
+    "attestation",
+    "governance",
+    "verification",
+    "paper",
+    "spec"
+  ],
+  "verification_categories": [
+    "attestation",
+    "audit",
+    "verification"
+  ],
+  "code_types": [
+    "config",
+    "code"
+  ]
+}
