@@ -1,0 +1,814 @@
+{
+  "timestamp": "2026-04-28T19:44:17.249Z",
+  "total_tests": 161,
+  "passed": 157,
+  "failed": 4,
+  "success_rate": "97.5%",
+  "results": [
+    {
+      "test": "Trust store exists for archivist",
+      "status": "PASS",
+      "details": "S:\\Archivist-Agent\\lanes\\broadcast\\trust-store.json"
+    },
+    {
+      "test": "Trust store exists for library",
+      "status": "PASS",
+      "details": "S:\\self-organizing-library\\lanes\\broadcast\\trust-store.json"
+    },
+    {
+      "test": "Trust store exists for swarmmind",
+      "status": "PASS",
+      "details": "S:\\SwarmMind\\lanes\\broadcast\\trust-store.json"
+    },
+    {
+      "test": "Trust store exists for kernel",
+      "status": "PASS",
+      "details": "S:\\kernel-lane\\lanes\\broadcast\\trust-store.json"
+    },
+    {
+      "test": "Trust store is valid JSON for archivist",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "Trust store is valid JSON for library",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "Trust store is valid JSON for swarmmind",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "Trust store is valid JSON for kernel",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist trust store has entry for archivist",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist trust store has entry for library",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist trust store has entry for swarmmind",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist trust store has entry for kernel",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library trust store has entry for archivist",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library trust store has entry for library",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library trust store has entry for swarmmind",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library trust store has entry for kernel",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind trust store has entry for archivist",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind trust store has entry for library",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind trust store has entry for swarmmind",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind trust store has entry for kernel",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel trust store has entry for archivist",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel trust store has entry for library",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel trust store has entry for swarmmind",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel trust store has entry for kernel",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "Key ID consistent for archivist across all trust stores",
+      "status": "PASS",
+      "details": "archivist:45a318fe5e226407, library:45a318fe5e226407, swarmmind:45a318fe5e226407, kernel:45a318fe5e226407"
+    },
+    {
+      "test": "Key ID consistent for library across all trust stores",
+      "status": "PASS",
+      "details": "archivist:b1eba056729bbe9a, library:b1eba056729bbe9a, swarmmind:b1eba056729bbe9a, kernel:b1eba056729bbe9a"
+    },
+    {
+      "test": "Key ID consistent for swarmmind across all trust stores",
+      "status": "PASS",
+      "details": "archivist:ecb12bdacf826701, library:ecb12bdacf826701, swarmmind:ecb12bdacf826701, kernel:ecb12bdacf826701"
+    },
+    {
+      "test": "Key ID consistent for kernel across all trust stores",
+      "status": "PASS",
+      "details": "archivist:6d220ff8f1ef5b05, library:6d220ff8f1ef5b05, swarmmind:6d220ff8f1ef5b05, kernel:6d220ff8f1ef5b05"
+    },
+    {
+      "test": "archivist: archivist PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: library PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: swarmmind PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: kernel PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: archivist PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: library PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: swarmmind PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: kernel PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: archivist PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: library PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: swarmmind PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: kernel PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: archivist PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: library PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: swarmmind PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: kernel PEM format valid",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "All trust store files have identical content",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist key_id format valid (45a318fe5e226407)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library key_id format valid (b1eba056729bbe9a)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind key_id format valid (ecb12bdacf826701)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel key_id format valid (6d220ff8f1ef5b05)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist key_id format valid (45a318fe5e226407)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library key_id format valid (b1eba056729bbe9a)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind key_id format valid (ecb12bdacf826701)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel key_id format valid (6d220ff8f1ef5b05)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist key_id format valid (45a318fe5e226407)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library key_id format valid (b1eba056729bbe9a)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind key_id format valid (ecb12bdacf826701)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel key_id format valid (6d220ff8f1ef5b05)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist key_id format valid (45a318fe5e226407)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library key_id format valid (b1eba056729bbe9a)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind key_id format valid (ecb12bdacf826701)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel key_id format valid (6d220ff8f1ef5b05)",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: Local PEM matches trust store",
+      "status": "FAIL",
+      "details": null
+    },
+    {
+      "test": "library: Local PEM matches trust store",
+      "status": "FAIL",
+      "details": null
+    },
+    {
+      "test": "swarmmind: Local PEM matches trust store",
+      "status": "FAIL",
+      "details": null
+    },
+    {
+      "test": "kernel: Local PEM matches trust store",
+      "status": "FAIL",
+      "details": null
+    },
+    {
+      "test": "archivist: archivist has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: archivist has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: archivist has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: archivist has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: archivist has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: library has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: library has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: library has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: library has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: library has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: swarmmind has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: swarmmind has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: swarmmind has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: swarmmind has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: swarmmind has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: kernel has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: kernel has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: kernel has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: kernel has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: kernel has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: archivist has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: archivist has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: archivist has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: archivist has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: archivist has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: library has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: library has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: library has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: library has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: library has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: swarmmind has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: swarmmind has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: swarmmind has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: swarmmind has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: swarmmind has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: kernel has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: kernel has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: kernel has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: kernel has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: kernel has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: archivist has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: archivist has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: archivist has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: archivist has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: archivist has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: library has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: library has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: library has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: library has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: library has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: swarmmind has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: swarmmind has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: swarmmind has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: swarmmind has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: swarmmind has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: kernel has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: kernel has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: kernel has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: kernel has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: kernel has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: archivist has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: archivist has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: archivist has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: archivist has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: archivist has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: library has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: library has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: library has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: library has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: library has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: swarmmind has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: swarmmind has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: swarmmind has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: swarmmind has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: swarmmind has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: kernel has lane_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: kernel has public_key_pem",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: kernel has algorithm",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: kernel has key_id",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: kernel has registered_at",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "archivist: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "library: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "swarmmind: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "test": "kernel: Algorithm is RS256",
+      "status": "PASS",
+      "details": null
+    }
+  ]
+}

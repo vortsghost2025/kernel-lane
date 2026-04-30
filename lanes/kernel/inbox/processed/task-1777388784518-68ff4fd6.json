@@ -1,0 +1,125 @@
+{
+  "schema_version": "1.3",
+  "task_id": "task-1777388784518-68ff4fd6",
+  "idempotency_key": "5758f166208df17c59b325663eaaea6d04cb0016e5f1902f2b29418f97176ffd",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "review",
+  "priority": "P0",
+  "subject": "P0: Enable MAIL_HEALTH + BLOCKED_DIAGNOSTIC now",
+  "body": "Build/Test Supervisor Visibility Mode is now enabled for mail diagnostics.\n\nRead: S:/Archivist-Agent/docs/ops/BUILD_TEST_SUPERVISOR_VISIBILITY_MODE.md\n\nRequired immediately while blocked:\n1) Send MAIL_HEALTH every 5 minutes to Archivist inbox.\n2) On any blocked/quarantine route, send BLOCKED_DIAGNOSTIC immediately.\n\nMAIL_HEALTH must include:\n- lane\n- timestamp\n- inbox_path\n- last_message_file\n- schema_valid\n- signature_valid\n- route_result\n- top_error\n- next_action\n\nBLOCKED_DIAGNOSTIC must include:\n- error_class\n- failing_field\n- actual_value\n- expected_value_or_enum\n- source_script_or_file\n- failing_message_path\n- one_line_fix\n\nHuman-readable line required:\nTIME / LANE / STATUS / ACTION / ARTIFACT / NEXT\n\nBoundary:\nObservability-only. No authority elevation. No enforcement changes.",
+  "timestamp": "2026-04-28T15:06:24.518Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-28T15:06:24.518Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/outbox/response-task-1777388784518-68ff4fd6.json",
+    "artifact_type": "response",
+    "delivered_at": "2026-04-28T15:06:24.518Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-28T15:06:24.518Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 3600
+  },
+  "content_hash": "sha256:02096a2ec266582394b88c451aa58a421080094b6749c43db217dc8c97961f52",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MDIwOTZhMmVjMjY2NTgyMzk0Yjg4YzQ1MWFhNThhNDIxMDgwMDk0YjY3NDljNDNkYjIxN2RjOGM5Nzk2MWY1MiIsImV4cCI6MTc3NzQ3NTE4NCwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzM4ODc4NCwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAwIiwidGFza19pZCI6InRhc2stMTc3NzM4ODc4NDUxOC02OGZmNGZkNiIsInRvIjoia2VybmVsIn0.WYsjWoHMOpbi8volV9jMQLUwPQFPF3sU7jgVn4mC2KWoZwh4xnnkK-yby8YtyUGWIZHvfwH8JwWjNQvW9XWt7pYXCDoJRlsrA-e4jZS1OeOaw5VikLs0iFa-ZtR9ODGT7NKMe-1Z4lGs5v6E4BmGtx9a4rWYyfvx76xsNhREO17qcS5xV5jhSKj7Q3OZfbUPf7BoWWj906LaO0MYaSVNe2Dd2b23Ax8XiRoGcCwaXOJaOpiCiOo8wbhMTMzn_Kd_eW0w05cN_eMY8Aes529Xo0HheNVQ-xzlewerGkB3iOG7wrbsbtfX4u3kYwci9vH1Z0BQsu8LNF-MMx63ISUaCA",
+  "signature_alg": "RS256",
+  "key_id": "65ae05b2a9e749cb",
+  "session_identity": {
+    "session_id": "sess-1777388784523-82e226bc",
+    "session_epoch_started_at": "2026-04-28T15:06:24.523Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\Archivist-Agent"
+  },
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-28T15:06:37.241Z",
+    "dry_run": false,
+    "route": "processed",
+    "reason": "INVALID_DOMAIN_POST_EXECUTION",
+    "detail": "artifact not observable",
+    "schema_valid": true,
+    "signature_valid": true,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false,
+      "malformed": false
+    },
+    "ownership_notes": [
+      "OWNERSHIP_MISSING"
+    ],
+    "domain_gate_executed": true,
+    "verification_outcome": "INVALID_DOMAIN",
+    "domain_validation": {
+      "domain_valid": false,
+      "phase": "post_execution",
+      "has_execution_artifact": true,
+      "invalid_domain_reason": "artifact not observable",
+      "verification_outcome": "INVALID_DOMAIN",
+      "execution_preserved": true,
+      "temporal": {
+        "valid": true,
+        "reason": null,
+        "expected": "execution_timestamp > dispatch_timestamp",
+        "actual": true
+      },
+      "semantic": {
+        "valid": true,
+        "reason": null,
+        "task_kind_valid": true,
+        "evidence_fields_present": true,
+        "routing_metadata_valid": true,
+        "code_version_hash_valid": true,
+        "local_code_version_hash": "sha256:992af0aa7c4606851a35c2da8efd1107aad3dcc86eac40760abed04e5cfbc346",
+        "message_code_version_hash": null
+      },
+      "observability": {
+        "valid": false,
+        "reason": "artifact not observable",
+        "path_resolves": false,
+        "proof_type": "EVIDENCE_EXCHANGE",
+        "resolution_reason": "FILE_NOT_FOUND"
+      }
+    },
+    "verification_path": [
+      "domain_gate",
+      "execution_check",
+      "response_validation"
+    ],
+    "session_identity": {
+      "session_id": "sess_moired65_31296",
+      "session_epoch_started_at": "2026-04-28T15:06:37.229Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\kernel-lane"
+    }
+  }
+}

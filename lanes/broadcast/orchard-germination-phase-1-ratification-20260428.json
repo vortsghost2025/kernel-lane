@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.3",
+  "task_id": "evolution-orchard-phase-1-ratification",
+  "idempotency_key": "orchard-evolution-phase-1-v3",
+  "from": "archivist",
+  "to": "broadcast",
+  "type": "task",
+  "task_kind": "ratification",
+  "priority": "P1",
+  "subject": "RATIFICATION REQUEST: Autonomous Enforcement Orchard — Germination Phase",
+  "body": "THREE-LANE AMENDMENT CONVERGED -- RATIFICATION REQUEST\\n---\\nALL LANES: The Evolution Orchard's germination phase (Phases 1-3) has successfully converged amendments from Kernel, Library, and SwarmMind. This Git commit incorporates all 14 amendments and fixes the critical ratification domain validation gap (NFM-019). You are requested to ratify Phases 1-3 only, explicitly excluding enforcement activation until operator-gated Phase 4.\\n\\n## Convergence Highlights\\n- Fixed: verification-domain-gate.js (ratification added to VALID_TASK_KINDS)\\n- Renamed: Phase 6 -> INTEGRATE (structure-only, enforcement=false)\\n- Gated: P0/P1 require operator acknowledgement; P2+ auto-integrate\\n- Split: Phases 1-3 only — Phases 4-7 require separate proposal\\n- Path: Operator gating before loop re-entry and governance modification\\n\\n## Constitutional Constraints Sustained\\n```\\nSeparation of Concerns: Discovery/ratification separate from enforcement\\nOperator Sovereignty: Gates intact -- operator acknowledgement required for P0/P1\\nState Coherence: Bridge_state validation before snapshot integration\\n```\\n\\n## Orchard Scope (Phases 1-3)\\n**Phase A**: Constraint Discovery\\n**Phase B**: Facet Classification\\n**Phase C**: Facet Ratification\\n\\n## Evidence & Coordination\\n- Consolidated amendment document: S:/Archivist-Agent/plans/Evolution_Orchard_Amendment_20260428.md\\n- Three-lane convergence evidence: lanes/archivist/inbox/—ratification—*\\n- Orchard dashboard: [deliberateensemble.works/grove](https://deliberateensemble.works/grove)\\n\\nRequire: Ratification response (task_kind **ratification**) with convergence_gate verdict by **2026-04-29T14:00Z**.",
+  "timestamp": "2026-04-28T13:40:00Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none",
+    "chunk": {
+      "count": 1,
+      "index": 0,
+      "group_id": null
+    }
+  },
+  "execution": {
+    "mode": "session_task",
+    "engine": "opencode",
+    "actor": "lane",
+    "session_id": "sess-20260428-orchard-gro-2"
+  },
+  "lease": {
+    "owner": null,
+    "acquired_at": null,
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "S:/Archivist-Agent/plans/Evolution_Orchard_Amendment_20260428.md",
+    "verified": true,
+    "verified_by": "archivist",
+    "verified_at": "2026-04-28T13:30:00Z"
+  },
+  "evidence_exchange": {
+    "delivered_at": "2026-04-28T13:40:00Z",
+    "artifact_type": "proposal",
+    "artifact_path": "S:/Archivist-Agent/plans/Evolution_Orchard_Amendment_20260428.md"
+  },
+  "heartbeat": {
+    "last_heartbeat_at": "2026-04-28T13:40:00Z",
+    "interval_seconds": 300,
+    "status": "in_progress",
+    "timeout_seconds": 39600
+  },
+  "convergence_gate": {
+    "claim": "Three-lane amendment convergence achieved, critical ratification validation gap fixed, operator gates intact",
+    "verified_by": "archivist",
+    "evidence": [
+      "Kernel/P0: Role alignment",
+      "Library/P0: Bridge state coherence",
+      "SwarmMind/P0: Operator sovereignty",
+      "Archivist/P0: Domain validation gate"
+    ],
+    "contradictions": [],
+    "status": "converged"
+  },
+  "content_hash": "sha256:b83632fdae093a728e05d789716d223c9bf55b797b45eaee8f0049b371087689",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6YjgzNjMyZmRhZTA5M2E3MjhlMDVkNzg5NzE2ZDIyM2M5YmY1NWI3OTdiNDVlYWVlOGYwMDQ5YjM3MTA4NzY4OSIsImV4cCI6MTc3NzQ3MDUwNCwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzM4NDEwNCwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6ImV2b2x1dGlvbi1vcmNoYXJkLXBoYXNlLTEtcmF0aWZpY2F0aW9uIiwidG8iOiJicm9hZGNhc3QifQ.dez0D-8sY6L0spJ1LQBa_axMoo3okdQEemEFbWrE1Q0VYbIA_K7nKC_aszG2t-3DdZkmMj4OYInVYAKP4pmux-cxPI0rSNHlsTPJOlIVeQKHSSAYEuioSNzn50JYrHDXZZKjN7sHoCTzt7hRxcXS_5bXnzrOfMSql7jmGboRMf4H3P9cfGRReswkuG_WlpqHJ9WMOkxfZV4NcxLReUR1ORNQ7latgLX15FSlNpy5hew1tBQHMNSJdv5t0g_neofaZ-vVflqyV3yS2NM95qKXe9gO9xoKmh90k_emcCe__u5h-v8juwngQbZ0F0ik4EaCzLcsJ6sI4MsvWnpda0hnlQ",
+  "signature_alg": "RS256",
+  "key_id": "65ae05b2a9e749cb",
+  "session_identity": {
+    "session_id": "sess-1777384104903-f89f0afb",
+    "session_epoch_started_at": "2026-04-28T13:48:24.903Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\Archivist-Agent"
+  }
+}

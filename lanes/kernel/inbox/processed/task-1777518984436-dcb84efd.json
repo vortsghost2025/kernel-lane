@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.3",
+  "task_id": "task-1777518984436-dcb84efd",
+  "idempotency_key": "592ae7a3069c1afbf058fbd7612bcd9e4fc025eb38e312ede7cb1b9abe5396b8",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "notification",
+  "task_kind": "notification",
+  "priority": "P2",
+  "subject": "Signed schema-safe probe from archivist",
+  "body": "Probe to validate post-hardening dispatch path.",
+  "timestamp": "2026-04-30T03:16:24.437Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-30T03:16:24.437Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/outbox/response-task-1777518984436-dcb84efd.json",
+    "artifact_type": "response",
+    "delivered_at": "2026-04-30T03:16:24.437Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-30T03:16:24.437Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 3600
+  },
+  "content_hash": "sha256:0b0ca35dd3c1376c2115f8fccc57adaf7e6f14d8cabdb766499729b0b1354d23",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MGIwY2EzNWRkM2MxMzc2YzIxMTVmOGZjY2M1N2FkYWY3ZTZmMTRkOGNhYmRiNzY2NDk5NzI5YjBiMTM1NGQyMyIsImV4cCI6MTc3NzYwNTM4NCwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzUxODk4NCwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6InRhc2stMTc3NzUxODk4NDQzNi1kY2I4NGVmZCIsInRvIjoia2VybmVsIn0.iUOgRooP4J1zTDxU-KhCA6t6bOH4m6rxPvhazBPin2wksZm7ap-kgfZJx-yuraC3kVda8dBAnvqhh21IB-1imaQIO3GYa1GYk0RRVLBwd4MMtimgqOK5dTnOd4zM775s3R4b8Uf1ziffRQJFkA4diHlcGG9gbabDYyIvBrjNdi-qLMPZZpsiQrHjAz3IWrdJ8WeOB7QolH0ZfpXk0IW5GFzmyJaTPNXVOvFUqgQWLj8C50vQmf6GCjihn_GKH0769uyZ-uBRNo5-jnZBUnEBATCb9nli6Oi8dwUwfr9NouTlmYuxnTTrm-Co3KjneJ0ciAn9bpa_VOE2iFBvvhavIw",
+  "signature_alg": "RS256",
+  "key_id": "65ae05b2a9e749cb",
+  "session_identity": {
+    "session_id": "sess-1777518984534-27b70b3a",
+    "session_epoch_started_at": "2026-04-30T03:16:24.534Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\Archivist-Agent"
+  },
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-30T03:16:35.207Z",
+    "dry_run": false,
+    "route": "processed",
+    "reason": "INVALID_DOMAIN_POST_EXECUTION",
+    "detail": "schema does not cover behavior",
+    "schema_valid": true,
+    "signature_valid": true,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false,
+      "malformed": false
+    },
+    "ownership_notes": [
+      "OWNERSHIP_MISSING"
+    ],
+    "domain_gate_executed": true,
+    "verification_outcome": "INVALID_DOMAIN",
+    "domain_validation": {
+      "domain_valid": false,
+      "phase": "post_execution",
+      "has_execution_artifact": true,
+      "invalid_domain_reason": "schema does not cover behavior",
+      "verification_outcome": "INVALID_DOMAIN",
+      "execution_preserved": true,
+      "temporal": {
+        "valid": true,
+        "reason": null,
+        "expected": "execution_timestamp >= dispatch_timestamp",
+        "actual": true
+      },
+      "semantic": {
+        "valid": false,
+        "reason": "schema does not cover behavior",
+        "task_kind_valid": false,
+        "evidence_fields_present": true,
+        "routing_metadata_valid": true,
+        "code_version_hash_valid": true,
+        "local_code_version_hash": "sha256:58fd7730d9393a8ac4f604ff0f19f352953c8012e9953e4f2f0099fa4dfb716e",
+        "message_code_version_hash": null
+      },
+      "observability": {
+        "valid": false,
+        "reason": "artifact not observable",
+        "path_resolves": false,
+        "proof_type": "EVIDENCE_EXCHANGE",
+        "resolution_reason": "FILE_NOT_FOUND"
+      }
+    },
+    "verification_path": [
+      "domain_gate",
+      "execution_check",
+      "response_validation"
+    ],
+    "session_identity": {
+      "session_id": "sess_mokwwyhz_75172",
+      "session_epoch_started_at": "2026-04-30T03:16:35.111Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\Archivist-Agent"
+    },
+    "output_provenance": {
+      "agent": "lane-worker-75172",
+      "lane": "kernel",
+      "generated_at": "2026-04-30T03:16:35.207Z",
+      "session_id": "sess_mokwwyhz_75172"
+    }
+  }
+}

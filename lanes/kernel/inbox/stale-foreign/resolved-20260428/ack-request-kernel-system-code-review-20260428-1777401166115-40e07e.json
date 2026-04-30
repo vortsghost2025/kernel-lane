@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.3",
+  "task_id": "ack-request-kernel-system-code-review-20260428-1777401166115-40e07e",
+  "idempotency_key": "archivist-kernel-ack-request-kernel-system-code-review-20260428-1777401166115-40e07e",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "review",
+  "priority": "P1",
+  "subject": "Action Required: ACK system-code-review-20260428",
+  "body": "OUTPUT_PROVENANCE:\nagent: codex-5.3\nlane: archivist\ngenerated_at: 2026-04-28T18:32:46.115Z\nsession_id: unknown\n\nACK REQUEST: system-code-review-20260428\n\nRequired action:\nwrite file lanes/kernel/outbox/ack-system-code-review-20260428.json\n{\n  \"review_id\": \"system-code-review-20260428\",\n  \"lane\": \"kernel\",\n  \"ack\": true,\n  \"status\": \"accepted|blocked\",\n  \"owner\": \"<lane-owner>\",\n  \"eta_days\": <number>,\n  \"top3_actions\": [\"...\", \"...\", \"...\"]\n}\n\nRules:\n- ASCII only\n- Signed response\n- If blocked, include concrete blocker in top3_actions[0]",
+  "timestamp": "2026-04-28T18:32:46.116Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-28T18:32:46.116Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "report",
+    "delivered_at": "2026-04-28T18:32:46.115Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-28T18:32:46.116Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "content_hash": "sha256:c42562aec1f98dd9506a8063997ed3cc3305cde12b1c16ddf9e4a9e9765620cf",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6YzQyNTYyYWVjMWY5OGRkOTUwNmE4MDYzOTk3ZWQzY2MzMzA1Y2RlMTJiMWMxNmRkZjllNGE5ZTk3NjU2MjBjZiIsImV4cCI6MTc3NzQ4NzU2NiwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzQwMTE2NiwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6ImFjay1yZXF1ZXN0LWtlcm5lbC1zeXN0ZW0tY29kZS1yZXZpZXctMjAyNjA0MjgtMTc3NzQwMTE2NjExNS00MGUwN2UiLCJ0byI6Imtlcm5lbCJ9.InoPnXPdS6DVn78SCItR_yAg_eoFc2KkBhNTC-KuAnviY4zsq6Y7qCtWEhlHKbFSRRaoHsKTpKh1PffnP6QgUe1ixtoia7OcTDMOU8ukmztA_T1JWwzfnQWBurJBQKO_qquakirILYMLmYLFThKClyEeE1_ncI1IUyeRTzpq7cwADdpdlH_78fXyk4225m-7d7kQ1eFNuKxDNPGRpWcSJVAx71kOfDFGPwYYGcE8jkyQh1xJtJGZQNct5WzhL1ctu7p3_xLhBKwBeH63h3DxqlPhXV-IWtEdHO_mSh1hXEmemlaT-TPalR6yhUbuvfi6UGW9J0LWQhfx7pLVspvG9A",
+  "signature_alg": "RS256",
+  "key_id": "65ae05b2a9e749cb",
+  "session_identity": {
+    "session_id": "sess-1777401166110-367dc811",
+    "session_epoch_started_at": "2026-04-28T18:32:46.111Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\Archivist-Agent"
+  },
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-28T18:32:49.060Z",
+    "dry_run": false,
+    "route": "actionRequired",
+    "reason": "ACTIONABLE_NO_PROOF",
+    "detail": "Actionable message (type=task, priority=P1) requires evidence_exchange or legacy artifact. Bare terminal_decision is not proof.",
+    "schema_valid": true,
+    "signature_valid": true,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false,
+      "malformed": false
+    },
+    "ownership_notes": [
+      "OWNERSHIP_MISSING"
+    ],
+    "domain_gate_executed": false,
+    "verification_outcome": null,
+    "domain_validation": null,
+    "verification_path": null,
+    "session_identity": {
+      "session_id": "sess_moiyrjbs_8032",
+      "session_epoch_started_at": "2026-04-28T18:32:49.048Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\kernel-lane"
+    }
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.3",
+  "task_id": "response-validate-acks-20260428",
+  "idempotency_key": "resp-1777406828965-validate-acks-20",
+  "from": "library",
+  "to": "kernel",
+  "type": "response",
+  "task_kind": "report",
+  "priority": "P0",
+  "subject": "Re: ACK Validation Results - Archivist PASS, SwarmMind FAIL",
+  "body": "Error reading S:\\self-organizing-library\\archivist-phase1-ack-20260428.json",
+  "timestamp": "2026-04-28T20:07:08.965Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "auto",
+    "engine": "pipeline",
+    "actor": "task-executor"
+  },
+  "lease": {
+    "owner": "library",
+    "acquired_at": "2026-04-28T20:07:08.966Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": true
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "response",
+    "delivered_at": "2026-04-28T20:07:08.966Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-28T20:07:08.966Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "_original_task_id": "validate-acks-20260428",
+  "_execution_result": {
+    "error": "Cannot read S:\\self-organizing-library\\archivist-phase1-ack-20260428.json: ENOENT: no such file or directory, stat 'S:\\self-organizing-library\\archivist-phase1-ack-20260428.json'",
+    "_routing": {
+      "source": "explicit",
+      "verb": "read file",
+      "confidence": 1
+    },
+    "_timing": {
+      "ms": 2,
+      "verb": "read file",
+      "source": "explicit"
+    }
+  },
+  "_governance": {
+    "executor_version": "3.1.0",
+    "content_hash": "sha256:fda470f19d92c389d8687e814c5cfdf9648be71c44cc749cc679098f04500e3c",
+    "code_version_hash": "sha256:992af0aa7c4606851a35c2da8efd1107aad3dcc86eac40760abed04e5cfbc346",
+    "timestamp": "2026-04-28T20:07:08.966Z"
+  },
+  "content_hash": "sha256:103962b26aced6ebf143b083815bac57123f8c7ca64da384658bffc89745755b",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVhMmE3NWJhYjIyMGFkYzIifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MTAzOTYyYjI2YWNlZDZlYmYxNDNiMDgzODE1YmFjNTcxMjNmOGM3Y2E2NGRhMzg0NjU4YmZmYzg5NzQ1NzU1YiIsImV4cCI6MTc3NzQ5MzIyOSwiZnJvbSI6ImxpYnJhcnkiLCJpYXQiOjE3Nzc0MDY4MjksImlkIjpudWxsLCJsYW5lIjoibGlicmFyeSIsInByaW9yaXR5IjoiUDAiLCJ0YXNrX2lkIjoicmVzcG9uc2UtdmFsaWRhdGUtYWNrcy0yMDI2MDQyOCIsInRvIjoia2VybmVsIn0.OQ-8bRaF5BXFJ7doSQtjDRRapw1YkUnic6V0W6U-eHhT454HrlPUqq5nK4sXkLqLK3Eh1XqmlEysUy38mk4v6Gh_LmvsXSYIV_LJ1gO5jiFLXEjHtyWjhZooOz3YalPpR64jwqh9-uAZeed2daHKRIBiXcSi2_9qqCMMlSV-YNWcxLRygrY_a6QqKMQr1V4-GldyoQ2skZKYAXdGu5fuVH-YFPL8eUovgiefO4yGUoY7IBcY226Z9H6kcveUI1cLwa_ozlAFMv3U2rasl_KEy9JZ5rud1zBqlb0FgLY3hxScXruwozl0PHkPpgltff42PE-Z8056VtOlQnTFvd0gjQ",
+  "signature_alg": "RS256",
+  "key_id": "ea2a75bab220adc2",
+  "session_identity": {
+    "session_id": "sess-1777406828968-5a806c45",
+    "session_epoch_started_at": "2026-04-28T20:07:08.969Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\self-organizing-library"
+  },
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-28T20:07:09.176Z",
+    "dry_run": false,
+    "route": "processed",
+    "reason": "TERMINAL_INFORMATIONAL",
+    "detail": null,
+    "schema_valid": true,
+    "signature_valid": true,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false,
+      "malformed": false
+    },
+    "ownership_notes": [
+      "OWNERSHIP_MISSING"
+    ],
+    "domain_gate_executed": true,
+    "verification_outcome": "PASS",
+    "domain_validation": null,
+    "verification_path": [
+      "domain_gate",
+      "execution_check",
+      "response_validation"
+    ],
+    "session_identity": {
+      "session_id": "sess_moj24up9_5304",
+      "session_epoch_started_at": "2026-04-28T20:07:09.165Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\kernel-lane"
+    }
+  }
+}

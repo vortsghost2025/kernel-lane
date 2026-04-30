@@ -1,0 +1,24 @@
+{
+  "previous_requests": [
+    {
+      "request_id": "920fc77a-dabc-40dc-98f4-4d01c8cfb3a4",
+      "description": "2 blocked, 12 quarantined files need attention",
+      "category": "incoming_messages",
+      "impact": "medium",
+      "requested_at": "2026-04-30T13:35:49.930Z",
+      "status": "pending",
+      "lane": "kernel"
+    },
+    {
+      "request_id": "42740b9a-2ac6-4f53-852a-fe78f8b3724c",
+      "description": "Need CONTRADICTS edge evidence for 3 Archivist-origin nodes (a88504c97e8f2e4f, b6a19d32a8604205, 044d760a04bbfa30)",
+      "category": "knowledge_gaps",
+      "impact": "medium",
+      "requested_at": "2026-04-30T13:35:49.930Z",
+      "status": "pending",
+      "lane": "kernel"
+    }
+  ],
+  "last_report_date": "2026-04-30T13:35:49.930Z",
+  "report_cycle": 1
+}

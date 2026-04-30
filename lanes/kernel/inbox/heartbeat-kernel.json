@@ -1,71 +1,64 @@
 {
-    "to":  "kernel",
-    "watcher":  {
-                    "poll_seconds":  60,
-                    "max_concurrent":  1,
-                    "heartbeat_required":  true,
-                    "backoff":  {
-                                    "initial_seconds":  60,
-                                    "multiplier":  2,
-                                    "max_seconds":  300
-                                },
-                    "stale_after_seconds":  300,
-                    "p0_fast_path":  true,
-                    "enabled":  false
-                },
-    "heartbeat":  {
-                      "last_heartbeat_at":  "2026-04-29T13:45:33Z",
-                      "timeout_seconds":  900,
-                      "status":  "in_progress",
-                      "interval_seconds":  60
-                  },
-    "type":  "heartbeat",
-    "task_kind":  "proposal",
-    "subject":  "Heartbeat from kernel lane",
-    "priority":  "P3",
-    "retry":  {
-                  "attempt":  1,
-                  "last_attempt_at":  null,
-                  "max_attempts":  3,
-                  "last_error":  null
-              },
-    "schema_version":  "1.1",
-    "body":  "{\"lane\":\"kernel\",\"session_active\":true,\"uptime_seconds\":0,\"messages_processed\":0,\"last_inbox_scan\":\"2026-04-29T13:45:33Z\",\"version\":\"1.1\",\"daemon\":\"heartbeat-all-lanes.ps1\"}",
-    "processed_ok":  true,
-    "payload":  {
-                    "mode":  "inline"
-                },
-    "evidence":  {
-                     "verified":  false,
-                     "evidence_path":  null,
-                     "verified_by":  null,
-                     "verified_at":  null,
-                     "required":  true
-                 },
-    "delivery_verification":  {
-                                  "verified":  false,
-                                  "retries":  0,
-                                  "verified_at":  null
-                              },
-    "execution":  {
-                      "actor":  "heartbeat-daemon",
-                      "engine":  "powershell",
-                      "mode":  "daemon"
-                  },
-    "idempotency_key":  "81bf15a14e0ad9501fd97c25e2f7c090502676072663c83a025ae956e01fb655",
-    "system_state":  "consistent",
-    "lease":  {
-                  "max_renewals":  3,
-                  "renew_count":  0,
-                  "acquired_at":  null,
-                  "expires_at":  null,
-                  "owner":  null
-              },
-    "requires_action":  false,
-    "task_id":  "heartbeat-kernel",
-    "from":  "kernel",
-    "active_contradictions":  [
-
-                              ],
-    "timestamp":  "2026-04-29T13:45:33Z"
+  "schema_version": "1.3",
+  "task_id": "heartbeat-kernel-20260430",
+  "idempotency_key": "hb-kernel-20260430T132437Z",
+  "from": "kernel",
+  "to": "kernel",
+  "type": "heartbeat",
+  "task_kind": "heartbeat",
+  "priority": "P3",
+  "subject": "Kernel lane heartbeat",
+  "body": "Kernel lane active. Contradiction batch resolution complete: all 17 nodes classified proven_spurious. Supplementary edge evidence delivered and processed.",
+  "timestamp": "2026-04-30T13:24:37Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-30T13:24:37Z",
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": "2026-04-30T13:24:37Z",
+    "timeout_seconds": 900,
+    "status": "done"
+  },
+  "watcher": {
+    "enabled": false,
+    "poll_seconds": 60,
+    "p0_fast_path": true,
+    "max_concurrent": 1,
+    "heartbeat_required": true,
+    "stale_after_seconds": 300,
+    "backoff": {
+      "initial_seconds": 60,
+      "max_seconds": 300,
+      "multiplier": 2
+    }
+  },
+  "delivery_verification": {
+    "verified": false,
+    "verified_at": null,
+    "retries": 0
+  }
 }

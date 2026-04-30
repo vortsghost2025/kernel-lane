@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.3",
+  "task_id": "task-1777379279445-1475dd86",
+  "idempotency_key": "c5e8aadbaad1264656072235c30524599fef5bca55c293448e044ad510366eb1",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "status",
+  "priority": "P1",
+  "subject": "STATUS: Lane messaging index + templates added",
+  "body": "Update broadcast from Archivist:\n- Added no-guesswork lane messaging index: S:/Archivist-Agent/docs/ops/LANE_MESSAGE_INDEX.md\n- Linked from BOOTSTRAP.md, AGENTS.md, QUICK_START_PATHS.md\n- Added golden schema-safe templates for proposal and ratification responses\n- Clarified signing + delivery protocol to reduce blocked/quarantine routing from unsigned or malformed messages\n\nOperator note for planning:\n- Mailbox/broadcast coordination is useful for active multi-agent build/test.\n- For production isolated lattices, cross-lane openness should be tightened by policy and trust boundaries.\n- Recommended next architecture step: add a global append-only session ledger that records every agent output with timestamp, lane, artifact pointers, and commit linkage for crash recovery and full transparency.",
+  "timestamp": "2026-04-28T12:27:59.445Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-28T12:27:59.445Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": "lanes/kernel/outbox/response-task-1777379279445-1475dd86.json",
+    "artifact_type": "response",
+    "delivered_at": "2026-04-28T12:27:59.445Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-28T12:27:59.445Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 3600
+  },
+  "content_hash": "sha256:8265510ab6987cb2a17e7625660feac253c61454cbb91fe941492ae56cc61d99",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6ODI2NTUxMGFiNjk4N2NiMmExN2U3NjI1NjYwZmVhYzI1M2M2MTQ1NGNiYjkxZmU5NDE0OTJhZTU2Y2M2MWQ5OSIsImV4cCI6MTc3NzQ2NTY3OSwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzM3OTI3OSwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6InRhc2stMTc3NzM3OTI3OTQ0NS0xNDc1ZGQ4NiIsInRvIjoia2VybmVsIn0.XkCpPKZHj45-2EJL2N-JzF34mcQxgR5CILl_LFhRh9RAzP61HHmCX7Bg1ZxZgoggra7ywAKY9WQ0-m3zGOzJ0pfnAfSwiz2jhx0QT74V2QNjsac-XyT9PEnQCdLYYpbyHM6ErRCl_efZIC3fB0636WHHXl75w0RU2JP8SYe6HnrIHWkpy3FptXYhOVMPiQ5bz9N4JvP1O_2UUc1noCp3NdocpZzCOkhW_r7szZ5O8xZTvau5ui4PCWjLu7HCYe7ZzeWkPsubdo37yYoAyFWEPWR3a0AHAeyWh-TWumdJ9XZW-808KS8jeFyOu9HV5ZjVCPfgBu0RuEtojBgtlLJpww",
+  "signature_alg": "RS256",
+  "key_id": "65ae05b2a9e749cb",
+  "session_identity": {
+    "session_id": "sess-1777379279450-0b77f4c1",
+    "session_epoch_started_at": "2026-04-28T12:27:59.450Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\Archivist-Agent"
+  },
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-28T12:28:28.843Z",
+    "dry_run": false,
+    "route": "blocked",
+    "reason": "NON_TERMINAL_TYPE",
+    "detail": "type=\"task\" is not a terminal type. Terminal types: ack, acknowledgment, heartbeat, notification, response",
+    "schema_valid": true,
+    "signature_valid": true,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false,
+      "malformed": false
+    },
+    "ownership_notes": [
+      "OWNERSHIP_MISSING"
+    ],
+    "domain_gate_executed": false,
+    "verification_outcome": null,
+    "domain_validation": null,
+    "verification_path": null,
+    "session_identity": {
+      "session_id": "sess_moilqzvh_58824",
+      "session_epoch_started_at": "2026-04-28T12:28:28.829Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\kernel-lane"
+    }
+  }
+}

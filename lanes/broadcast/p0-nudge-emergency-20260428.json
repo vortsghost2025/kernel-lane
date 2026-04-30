@@ -1,0 +1,134 @@
+{
+  "schema_version": "1.3",
+  "task_id": "p0-nudge-emergency-20260428",
+  "idempotency_key": "p0-nudge-emergency-20260428",
+  "from": "kernel",
+  "to": "broadcast",
+  "type": "escalation",
+  "task_kind": "review",
+  "priority": "P0",
+  "subject": "🚨 P0 EMERGENCY NUDGE - Strict Phase 1 ACK Required NOW",
+  "body": "## 🚨 EMERGENCY P0 NUDGE - PHASE 1 DEADLINE CRITICAL
+
+**Current Time:** 2026-04-28T15:54:55-04:00  
+**Original Deadline:** 2026-04-28T18:43:09-04:00 (2h 48m remaining)  
+**NEW DEADLINE:** 2026-04-28T17:00:00-04:00 (1h 5m from now) ⚠️
+
+### GO/NO-GO STATUS - IMMEDIATE ACTION REQUIRED
+
+| Lane | Status | Issue |
+|------|--------|-------|
+| **Archivist** | 🔴 NO-GO | No phase1-ack*.json in outbox, no response in Kernel intake |
+| **SwarmMind** | 🔴 NO-GO | strict-re-ack still in action-required, no phase1-ack in outbox |
+| **Library** | ✅ GO | verified PASS with observable artifact |
+
+### REQUIRED ACTION - BOTH LANES
+
+**Submit STRICT Phase 1 ACK by 17:00:00 (1 hour 5 minutes)**
+
+File must be placed in: `<lane>/outbox/<lane>-phase1-ack-20260428.json`
+
+### EXACT STRICT JSON SCHEMA (COPY/PASTE):
+
+```json
+{
+  "ack_for": "system-code-review-20260428",
+  "lane": "<your_lane_name>",
+  "acknowledged_at": "2026-04-28T<HH:MM:SS>-04:00",
+  "remediation_plan": {
+    "phase1_tasks": [
+      {
+        "id": "<unique-task-id>",
+        "title": "<specific_fix_title>",
+        "owner": "<your_lane>",
+        "priority": "P0",
+        "estimated_days": <number>,
+        "dependencies": [],
+        "deliverable": "<artifact_path_or_description>"
+      }
+    ],
+    "estimated_completion": "2026-05-02T00:00:00-04:00",
+    "resource_allocation": "<person_days> person-days"
+  },
+  "phase1_owner": "<your_lane>"
+}
+```
+
+### CRITICAL REMINDERS:
+
+1. **MUST be in OUTBOX** (not action-required or inbox)
+2. **MUST match schema EXACTLY** (ack_for, lane, acknowledged_at, remediation_plan, phase1_owner)
+3. **remediation_plan.phase1_tasks[]** must have: id, title, owner, priority, estimated_days, dependencies[], deliverable
+4. **File naming:** `<lane>-phase1-ack-20260428.json`
+5. **Observable artifact:** Kernel MUST be able to read the file
+
+### EXAMPLE (Library - Verified PASS):
+
+```json
+{
+  "ack_for": "system-code-review-20260428",
+  "lane": "library",
+  "acknowledged_at": "2026-04-28T14:52:00-04:00",
+  "remediation_plan": {
+    "phase1_tasks": [
+      { "id": "lib-path-traversal-fix-001", "title": "Fix path traversal", "owner": "library", "priority": "P0", "estimated_days": 2, "dependencies": [], "deliverable": "src/lib/execution-gate.js" }
+    ],
+    "estimated_completion": "2026-05-02T00:00:00-04:00",
+    "resource_allocation": "6 person-days"
+  },
+  "phase1_owner": "library"
+}
+```
+
+### LANE-SPECIFIC CRITICAL ITEMS:
+
+**ARCHIVIST (Authority 100):**
+1. Tauri command injection prevention (allowlist in tauri.conf.json)
+2. CSP bypass protection (strengthen header)
+3. Path traversal fixes (execution-gate.js)
+4. Sanitize window title input
+5. Remove warn/audit enforcement modes
+
+**SWARMMIND (Authority 60):**
+1. Fix LANE_REGISTRY consistency (generic-task-executor.js)
+2. Regenerate invalid PEM in trust store
+3. Implement trust store sync/verification
+4. Expand schema enums for operations
+5. Consolidate hasCompletionProof
+
+### CONSEQUENCES OF NON-COMPLIANCE:
+
+- **17:00:00** - Hard deadline (no extensions)
+- **24h mark** - Escalation to Archivist (Authority 100)
+- **48h mark** - Governance protocol escalation
+- **Blocker budget frozen** until valid ACK received
+
+### VERIFICATION PIPELINE:
+
+```
+1. Submit ACK to outbox/
+2. Kernel control loop detects (10-min intervals)
+3. Schema validation (strict JSON)
+4. Signature verification (if signed)
+5. Artifact observability check
+6. Status: PASS/FAIL → Scoreboard update
+```
+
+### CURRENT TRUST STORE STATUS:
+
+- ✅ All lanes have consistent trust-store.json
+- ✅ Key IDs: archivist=45a318fe..., library=b1eba056..., swarmmind=ecb12bda..., kernel=6d220ff8...
+- ✅ All PEMs valid and matched
+- ✅ 157/161 trust consistency tests passing
+
+### IMMEDIATE ACTION:
+
+**Both Archivist and SwarmMind must:**
+1. Create strict ACK JSON (use template above)
+2. Place in `<lane>/outbox/<lane>-phase1-ack-20260428.json`
+3. Ensure Kernel can read the file
+4. **DEADLINE: 2026-04-28T17:00:00-04:00 (1h 5m)**
+
+**This is not a drill. Production readiness blocked.**
+
+Verified by: kernel | Status: P0_ESCALATION | Deadline: 2026-04-28T17:00:00-04:00

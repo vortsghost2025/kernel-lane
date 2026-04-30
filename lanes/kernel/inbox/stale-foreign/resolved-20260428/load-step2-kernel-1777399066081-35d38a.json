@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.3",
+  "task_id": "load-step2-kernel-1777399066081-35d38a",
+  "idempotency_key": "archivist-kernel-load-step2-kernel-1777399066081-35d38a",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "review",
+  "priority": "P2",
+  "subject": "LOAD STEP 2: kernel throughput probe",
+  "body": "OUTPUT_PROVENANCE:\nagent: codex-5.3\nlane: archivist\ngenerated_at: 2026-04-28T17:57:46.081Z\nsession_id: unknown\n\nLOAD STEP 2 (kernel)\n- Process this task and return an ASCII-only status packet.\n- Include: processed count, blocker, next action, queue counts.",
+  "timestamp": "2026-04-28T17:57:46.081Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-28T17:57:46.081Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "report",
+    "delivered_at": "2026-04-28T17:57:46.081Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-28T17:57:46.081Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "content_hash": "sha256:9c9ac411b98eb84a47e7d32428fd233c023795b60e8e5b0644b58412cd672889",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6OWM5YWM0MTFiOThlYjg0YTQ3ZTdkMzI0MjhmZDIzM2MwMjM3OTViNjBlOGU1YjA2NDRiNTg0MTJjZDY3Mjg4OSIsImV4cCI6MTc3NzQ4NTQ2NiwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzM5OTA2NiwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6ImxvYWQtc3RlcDIta2VybmVsLTE3NzczOTkwNjYwODEtMzVkMzhhIiwidG8iOiJrZXJuZWwifQ.LH4_GONqlNhGRdoyXgVZkAADYLGUA7wKMu2b-G0M1H3moBOCEebd9ZD-LduiE5zoyrVSPj4fEr7dcJMJxSyM7NHYn3_VMXInmKQKS-xpKtRvEtbjr1lYHLJT_GotGY0d-wlK3LgZ8LeMtewQuI6tDCSWKR_gIhTkW0JX53LYpi2czU365WQZoAV7NyeX91rmQr1dy3ZEMDDxLsZcPxSQ8rFgDruzTFsxFbQTLsMs2sH3IcSMBP-3NfAhujqORtUoAn1yKXdQLbB55SQMhtcBDkJJxTE3Vct2YdmZKWuHH8XDdo8KibsjtqEsasFXnrcNVjGWfDCuYqDVVsk3Q5e87g",
+  "signature_alg": "RS256",
+  "key_id": "65ae05b2a9e749cb",
+  "session_identity": {
+    "session_id": "sess-1777399066081-df50abb0",
+    "session_epoch_started_at": "2026-04-28T17:57:46.081Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\Archivist-Agent"
+  },
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-28T17:57:53.795Z",
+    "dry_run": false,
+    "route": "actionRequired",
+    "reason": "ACTIONABLE_NO_PROOF",
+    "detail": "Actionable message (type=task, priority=P2) requires evidence_exchange or legacy artifact. Bare terminal_decision is not proof.",
+    "schema_valid": true,
+    "signature_valid": true,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false,
+      "malformed": false
+    },
+    "ownership_notes": [
+      "OWNERSHIP_MISSING"
+    ],
+    "domain_gate_executed": false,
+    "verification_outcome": null,
+    "domain_validation": null,
+    "verification_path": null,
+    "session_identity": {
+      "session_id": "sess_moiximm0_36104",
+      "session_epoch_started_at": "2026-04-28T17:57:53.784Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\kernel-lane"
+    }
+  }
+}

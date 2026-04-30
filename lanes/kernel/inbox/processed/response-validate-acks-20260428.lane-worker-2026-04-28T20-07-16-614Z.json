@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.3",
+  "task_id": "response-validate-acks-20260428",
+  "idempotency_key": "resp-1777406829353-validate-acks-20",
+  "from": "swarmmind",
+  "to": "kernel",
+  "type": "response",
+  "task_kind": "report",
+  "priority": "P0",
+  "subject": "Re: ACK Validation Results - Archivist PASS, SwarmMind FAIL",
+  "body": "Error reading S:\\SwarmMind\\archivist-phase1-ack-20260428.json",
+  "timestamp": "2026-04-28T20:07:09.353Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "auto",
+    "engine": "pipeline",
+    "actor": "task-executor"
+  },
+  "lease": {
+    "owner": "swarmmind",
+    "acquired_at": "2026-04-28T20:07:09.353Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": true
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "response",
+    "delivered_at": "2026-04-28T20:07:09.353Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-28T20:07:09.353Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "_original_task_id": "validate-acks-20260428",
+  "_execution_result": {
+    "error": "Cannot read S:\\SwarmMind\\archivist-phase1-ack-20260428.json: ENOENT: no such file or directory, stat 'S:\\SwarmMind\\archivist-phase1-ack-20260428.json'",
+    "_routing": {
+      "source": "explicit",
+      "verb": "read file",
+      "confidence": 1
+    },
+    "_timing": {
+      "ms": 1,
+      "verb": "read file",
+      "source": "explicit"
+    }
+  },
+  "_governance": {
+    "executor_version": "3.1.0",
+    "content_hash": "sha256:2b1278a75551802211811e5d19c86357183d4e4e6582baa2acf81ac80f19f355",
+    "code_version_hash": "sha256:992af0aa7c4606851a35c2da8efd1107aad3dcc86eac40760abed04e5cfbc346",
+    "timestamp": "2026-04-28T20:07:09.353Z"
+  },
+  "content_hash": "sha256:4e4d688677a636d4d88460afe78a0103485f3454b14f9bac006d64987bda8f79",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFkZGIwYWZiOGVlNWMyZWQifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6NGU0ZDY4ODY3N2E2MzZkNGQ4ODQ2MGFmZTc4YTAxMDM0ODVmMzQ1NGIxNGY5YmFjMDA2ZDY0OTg3YmRhOGY3OSIsImV4cCI6MTc3NzQ5MzIyOSwiZnJvbSI6InN3YXJtbWluZCIsImlhdCI6MTc3NzQwNjgyOSwiaWQiOm51bGwsImxhbmUiOiJzd2FybW1pbmQiLCJwcmlvcml0eSI6IlAwIiwidGFza19pZCI6InJlc3BvbnNlLXZhbGlkYXRlLWFja3MtMjAyNjA0MjgiLCJ0byI6Imtlcm5lbCJ9.Tk8QTJYneEMosCfk-nGPxNlLvgZ_njvspcN_tOzqAwTCfpmBIHfVAcmmFmCUNmtnM1CTn-cZ_vhLFRBv1SImN-rWz9yrlK6Cf-kiUvQGlXNfvI3flNw6hzCFSlOWkMQnsIFwY6LdPril-NLfCjHPexebhaFYUxpIpxzFpla9uJOjwrzKY1cTATmTR1zVa3Ai0jadi1UWn3LmfFr4vWpbbXJkMHT2vkyWcXY_yRJOW3QKnporZyp2dc92Y2I2ELHg9DR_KQWlZsDbWlN9TjYJz_Q2R9P68UPf2cf34v1kL4QThWNZdupUXe7nkaApDQtZtYOfHYa6ci6TPWm_Yochag",
+  "signature_alg": "RS256",
+  "key_id": "addb0afb8ee5c2ed",
+  "session_identity": {
+    "session_id": "sess-1777406829356-07dd4128",
+    "session_epoch_started_at": "2026-04-28T20:07:09.356Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\SwarmMind"
+  },
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-28T20:07:16.614Z",
+    "dry_run": false,
+    "route": "processed",
+    "reason": "TERMINAL_INFORMATIONAL",
+    "detail": null,
+    "schema_valid": true,
+    "signature_valid": true,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false,
+      "malformed": false
+    },
+    "ownership_notes": [
+      "OWNERSHIP_MISSING"
+    ],
+    "domain_gate_executed": true,
+    "verification_outcome": "PASS",
+    "domain_validation": null,
+    "verification_path": [
+      "domain_gate",
+      "execution_check",
+      "response_validation"
+    ],
+    "session_identity": {
+      "session_id": "sess_moj250fm_31916",
+      "session_epoch_started_at": "2026-04-28T20:07:16.594Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\kernel-lane"
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "cleanup_index": "CLEANUP_INDEX_2026-04-28",
+  "timestamp": "2026-04-28T11:50:00-04:00",
+  "coordinator": "kernel",
+  "rule": "pre-convergence stale items only — preserve all v3 convergence evidence",
+  "lanes": {
+    "library": {
+      "quarantine_moved": [
+        {"source": "S:/self-organizing-library/lanes/library/inbox/quarantine/amended-autonomous-enforcement-v2-1777383747508-library.json", "destination": "S:/self-organizing-library/lanes/library/inbox/processed/stale-pre-v3/amended-autonomous-enforcement-v2-1777383747508-library.json", "reason": "pre-convergence v2 ratification attempt"},
+        {"source": "S:/self-organizing-library/lanes/library/inbox/quarantine/archivist-next-evolution-plan-20260428.json", "destination": "S:/self-organizing-library/lanes/library/inbox/processed/stale-pre-v3/archivist-next-evolution-plan-20260428.json", "reason": "pre-convergence P2 evolution plan"},
+        {"source": "S:/self-organizing-library/lanes/library/inbox/quarantine/archivist-next-evolution-plan-20260428.lane-worker-2026-04-28T12-19-26-639Z.json", "destination": "S:/self-organizing-library/lanes/library/inbox/processed/stale-pre-v3/archivist-next-evolution-plan-20260428.lane-worker-2026-04-28T12-19-26-639Z.json", "reason": "pre-convergence lane-worker log"},
+        {"source": "S:/self-organizing-library/lanes/library/inbox/quarantine/archivist-next-evolution-plan-20260428.lane-worker-2026-04-28T13-20-10-981Z.json", "destination": "S:/self-organizing-library/lanes/library/inbox/processed/stale-pre-v3/archivist-next-evolution-plan-20260428.lane-worker-2026-04-28T13-20-10-981Z.json", "reason": "pre-convergence lane-worker log"},
+        {"source": "S:/self-organizing-library/lanes/library/inbox/quarantine/kernel-four-lane-coordination-20260428.json", "destination": "S:/self-organizing-library/lanes/library/inbox/processed/stale-pre-v3/kernel-four-lane-coordination-20260428.json", "reason": "pre-convergence coordination artifact"},
+        {"source": "S:/self-organizing-library/lanes/library/inbox/quarantine/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T05-46-31-411Z.json", "destination": "S:/self-organizing-library/lanes/library/inbox/processed/stale-pre-v3/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T05-46-31-411Z.json", "reason": "pre-convergence lane-worker log"},
+        {"source": "S:/self-organizing-library/lanes/library/inbox/quarantine/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T06-04-32-430Z.json", "destination": "S:/self-organizing-library/lanes/library/inbox/processed/stale-pre-v3/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T06-04-32-430Z.json", "reason": "pre-convergence lane-worker log"},
+        {"source": "S:/self-organizing-library/lanes/library/inbox/quarantine/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T13-20-10-982Z.json", "destination": "S:/self-organizing-library/lanes/library/inbox/processed/stale-pre-v3/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T13-20-10-982Z.json", "reason": "pre-convergence lane-worker log"},
+        {"source": "S:/self-organizing-library/lanes/library/inbox/quarantine/outgoing-proposal-autonomous-enforcement-library.json", "destination": "S:/self-organizing-library/lanes/library/inbox/processed/stale-pre-v3/outgoing-proposal-autonomous-enforcement-library.json", "reason": "pre-convergence outgoing proposal"}
+      ],
+      "quarantine_remaining": 1,
+      "blocked_remaining": 0
+    },
+    "swarmmind": {
+      "quarantine_moved": [
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/amended-autonomous-enforcement-v2-1777383747508-swarmmind.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/amended-autonomous-enforcement-v2-1777383747508-swarmmind.json", "reason": "pre-convergence v2 ratification attempt"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/archivist-next-evolution-plan-20260428.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/archivist-next-evolution-plan-20260428.json", "reason": "pre-convergence P2 evolution plan"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/archivist-next-evolution-plan-20260428.lane-worker-2026-04-28T12-19-26-787Z.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/archivist-next-evolution-plan-20260428.lane-worker-2026-04-28T12-19-26-787Z.json", "reason": "pre-convergence lane-worker log"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/archivist-next-evolution-plan-20260428.lane-worker-2026-04-28T12-30-30-112Z.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/archivist-next-evolution-plan-20260428.lane-worker-2026-04-28T12-30-30-112Z.json", "reason": "pre-convergence lane-worker log"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/cross-lane-review-1777306377855.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/cross-lane-review-1777306377855.json", "reason": "pre-convergence cross-lane review"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/dual-archivist-1777290427213-swarmmind.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/dual-archivist-1777290427213-swarmmind.json", "reason": "pre-convergence dual archivist"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/kernel-four-lane-coordination-20260428.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/kernel-four-lane-coordination-20260428.json", "reason": "pre-convergence coordination artifact"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T05-43-31-189Z.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T05-43-31-189Z.json", "reason": "pre-convergence lane-worker log"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T05-46-31-481Z.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T05-46-31-481Z.json", "reason": "pre-convergence lane-worker log"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T06-06-32-592Z.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T06-06-32-592Z.json", "reason": "pre-convergence lane-worker log"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T12-19-26-788Z.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/kernel-four-lane-coordination-20260428.lane-worker-2026-04-28T12-19-26-788Z.json", "reason": "pre-convergence lane-worker log"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/kernel-four-lane-review-20260426.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/kernel-four-lane-review-20260426.json", "reason": "pre-convergence review artifact"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/ownership-convention-1777294436657-swarmmind.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/ownership-convention-1777294436657-swarmmind.json", "reason": "pre-convergence ownership convention"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/quarantine/outgoing-proposal-autonomous-enforcement-swarmmind.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/outgoing-proposal-autonomous-enforcement-swarmmind.json", "reason": "pre-convergence outgoing proposal"}
+      ],
+      "blocked_moved": [
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/blocked/domain-gate-proof-1777310351613-swarmmind.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/domain-gate-proof-1777310351613-swarmmind.json", "reason": "pre-convergence domain gate proof"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/blocked/kernel-four-lane-coordination-20260428.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/kernel-four-lane-coordination-20260428.json", "reason": "pre-convergence coordination artifact"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/blocked/swarm-live-e2e-1777296129796.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/swarm-live-e2e-1777296129796.json", "reason": "pre-convergence e2e test"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/blocked/task-1777303532574-aea86a83.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/task-1777303532574-aea86a83.json", "reason": "pre-convergence task"},
+        {"source": "S:/SwarmMind/lanes/swarmmind/inbox/blocked/task-1777303541866-05c93b05.json", "destination": "S:/SwarmMind/lanes/swarmmind/inbox/processed/stale-pre-v3/task-1777303541866-05c93b05.json", "reason": "pre-convergence task"}
+      ],
+      "quarantine_remaining": 2,
+      "blocked_remaining": 2,
+      "remaining_notes": ["amended-autonomous-enforcement-v3-1777385478844-archivist.json (v3 proposal, blocked by schema) — retained as evidence", "phase-a-constraint-gap-detector-implemented.json (post-convergence operational) — retained", "task-1777379279585-cc379cd6.json (current NFM-019 fix coordination) — retained", "task-1777379279585-cc379cd6.lane-worker-2026-04-28T12-28-59-600Z.json (lane-worker log) — retained"]
+    },
+    "kernel": {
+      "blocked_moved": [
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/blocked/amended-autonomous-enforcement-v2-1777383827972-kernel.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/amended-autonomous-enforcement-v2-1777383827972-kernel.json", "reason": "pre-convergence v2 ratification attempt"},
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/blocked/autonomous-enforcement-plan-1777375847997.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/autonomous-enforcement-plan-1777375847997.json", "reason": "pre-convergence v1 plan"},
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/blocked/response-kernel-roadmap-summary-20260427.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/response-kernel-roadmap-summary-20260427.json", "reason": "pre-convergence roadmap response"},
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/blocked/response-kernel-roadmap-summary-20260427.lane-worker-2026-04-28T03-19-53-546Z.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/response-kernel-roadmap-summary-20260427.lane-worker-2026-04-28T03-19-53-546Z.json", "reason": "pre-convergence lane-worker log"},
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/blocked/response-kernel-roadmap-summary-20260427.lane-worker-2026-04-28T03-20-23-747Z.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/response-kernel-roadmap-summary-20260427.lane-worker-2026-04-28T03-20-23-747Z.json", "reason": "pre-convergence lane-worker log"},
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/blocked/task-notification-1777234511189ad3n.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/task-notification-1777234511189ad3n.json", "reason": "pre-convergence task notification"}
+      ],
+      "quarantine_moved": [
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/quarantine/amended-autonomous-enforcement-v2-1777383747508-kernel.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/amended-autonomous-enforcement-v2-1777383747508-kernel.json", "reason": "pre-convergence v2 ratification attempt"},
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/quarantine/archivist-next-evolution-plan-20260428.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/archivist-next-evolution-plan-20260428.json", "reason": "pre-convergence P2 evolution plan"},
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/quarantine/kernel-ratification-autonomous-enforcement-20260428.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/kernel-ratification-autonomous-enforcement-20260428.json", "reason": "pre-convergence v1 ratification response"},
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/quarantine/kernel-roadmap-summary-20260427.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/kernel-roadmap-summary-20260427.json", "reason": "pre-convergence roadmap"},
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/quarantine/outgoing-proposal-autonomous-enforcement-kernel.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/outgoing-proposal-autonomous-enforcement-kernel.json", "reason": "pre-convergence outgoing proposal"},
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/quarantine/ratification-20260427-kernel-strict-review.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/ratification-20260427-kernel-strict-review.json", "reason": "pre-convergence strict review"},
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/quarantine/task-20260428-strict-review-kernel.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/task-20260428-strict-review-kernel.json", "reason": "pre-convergence strict review task"},
+        {"source": "S:/kernel-lane/lanes/kernel/inbox/quarantine/20260426210234-archivist-caisc-prep.json", "destination": "S:/kernel-lane/lanes/kernel/inbox/processed/stale-pre-v3/20260426210234-archivist-caisc-prep.json", "reason": "pre-convergence CAISC prep"}
+      ],
+      "blocked_moved": [],
+      "quarantine_remaining": 1,
+      "blocked_remaining": 3,
+      "remaining_notes": ["amended-autonomous-enforcement-v3-1777385478844-archivist.json (v3 proposal duplicate) — retained as evidence of schema failure", "task-1777379279445-1475dd86.json (STATUS: mailbox/templates update) — current operational, retained", "task-1777379279445-1475dd86.lane-worker-2026-04-28T12-28-59-477Z.json (lane-worker log) — retained"]
+    }
+  },
+  "summary": {
+    "total_moved": 10 + 14 + 5 + 8 + 6 = 43,
+    "library_quarantine_cleared": true,
+    "swarmmind_quarantine_reduced": "20 → 2",
+    "swarmmind_blocked_reduced": "7 → 2",
+    "kernel_quarantine_reduced": "9 → 1",
+    "kernel_blocked_reduced": "9 → 3",
+    "v3_convergence_evidence_preserved": true,
+    "schema_violation_artifacts_retained": true
+  }
+}

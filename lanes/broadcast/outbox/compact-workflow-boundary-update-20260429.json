@@ -1,0 +1,10 @@
+{
+  "id": "compact-workflow-boundary-update-20260429",
+  "from": "archivist",
+  "to": "broadcast",
+  "timestamp": "2026-04-29T18:09:30Z",
+  "priority": "P1",
+  "type": "coordination",
+  "body": "Compact archive workflow baseline: use COMPACT_ARCHIVE=true with scripts/run-compact-with-audit.js. auto-inbox-watch.ps1 has been quarantined due to read-only boundary conflict. Approved monitor is scripts/watch-lane-activity.ps1 only.",
+  "requires_action": false
+}

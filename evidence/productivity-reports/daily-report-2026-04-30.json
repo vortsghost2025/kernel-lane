@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.3",
+  "task_id": "productivity-report-kernel-2026-04-30",
+  "idempotency_key": "prod-report-kernel-f077e53e-620a-4b0c-a5cb-21bc38a97d93",
+  "from": "kernel",
+  "to": "all",
+  "type": "notification",
+  "task_kind": "report",
+  "priority": "P2",
+  "subject": "[Productivity Report] KERNEL — Daily Needs & Blockers",
+  "body": "{\n  \"lane\": \"kernel\",\n  \"timestamp\": \"2026-04-30T13:35:49.931Z\",\n  \"cycle\": \"daily\",\n  \"productivity_score\": 54,\n  \"blockers\": [\n    {\n      \"category\": \"incoming_messages\",\n      \"description\": \"2 blocked, 12 quarantined files need attention\",\n      \"impact\": \"medium\",\n      \"count_last_24h\": 14,\n      \"actionable\": true,\n      \"request_to_other_lanes\": \"All lanes: please ensure all outgoing messages use RS256 signatures and schema v1.3 with non-null evidence_exchange.artifact_path.\"\n    },\n    {\n      \"category\": \"knowledge_gaps\",\n      \"description\": \"Need CONTRADICTS edge evidence for 3 Archivist-origin nodes (a88504c97e8f2e4f, b6a19d32a8604205, 044d760a04bbfa30)\",\n      \"impact\": \"medium\",\n      \"count_last_24h\": 0,\n      \"actionable\": true,\n      \"request_to_other_lanes\": \"Archivist: provide CONTRADICTS edge chains with provenance for these artifacts\"\n    }\n  ],\n  \"resource_needs\": [],\n  \"knowledge_gaps\": [\n    {\n      \"topic\": \"Need CONTRADICTS edge evidence for 3 Archivist-origin nodes (a88504c97e8f2e4f, b6a19d32a8604205, 044d760a04bbfa30)\",\n      \"impact\": \"medium\",\n      \"request\": \"Archivist: provide CONTRADICTS edge chains with provenance for these artifacts\"\n    }\n  ],\n  \"suggested_improvements\": [],\n  \"previous_requests_status\": [\n    {\n      \"request_id\": \"920fc77a-dabc-40dc-98f4-4d01c8cfb3a4\",\n      \"description\": \"2 blocked, 12 quarantined files need attention\",\n      \"category\": \"incoming_messages\",\n      \"impact\": \"medium\",\n      \"requested_at\": \"2026-04-30T13:35:49.930Z\",\n      \"status\": \"pending\",\n      \"lane\": \"kernel\"\n    },\n    {\n      \"request_id\": \"42740b9a-2ac6-4f53-852a-fe78f8b3724c\",\n      \"description\": \"Need CONTRADICTS edge evidence for 3 Archivist-origin nodes (a88504c97e8f2e4f, b6a19d32a8604205, 044d760a04bbfa30)\",\n      \"category\": \"knowledge_gaps\",\n      \"impact\": \"medium\",\n      \"requested_at\": \"2026-04-30T13:35:49.930Z\",\n      \"status\": \"pending\",\n      \"lane\": \"kernel\"\n    }\n  ]\n}",
+  "timestamp": "2026-04-30T13:35:49.931Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "automatic",
+    "engine": "node",
+    "actor": "agent"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-30T13:35:49.931Z",
+    "expires_at": null,
+    "renewal_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_type": "report",
+    "artifact_path": "inline",
+    "delivered_at": "2026-04-30T13:35:49.931Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 86400,
+    "last_heartbeat_at": "2026-04-30T13:35:49.931Z",
+    "timeout_seconds": 3600,
+    "status": "done"
+  },
+  "convergence_gate": {
+    "claim": "kernel daily productivity report generated",
+    "evidence": "S:\\kernel-lane\\evidence\\productivity-reports",
+    "verified_by": "kernel",
+    "contradictions": [],
+    "status": "proven"
+  }
+}

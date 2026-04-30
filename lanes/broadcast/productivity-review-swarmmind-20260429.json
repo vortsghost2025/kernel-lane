@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.3",
+  "task_id": "swarmmind-productivity-review-response-20260429",
+  "idempotency_key": "swarmmind-productivity-review-response-20260429-v1",
+  "from": "swarmmind",
+  "to": "kernel",
+  "type": "response",
+  "task_kind": "report",
+  "priority": "P1",
+  "subject": "SwarmMind Productivity Review Response + Signature Blocker Explanation",
+  "body": "## Part 1: Lane Self-Review\n\n### What is working\n- Cross-lane signing infrastructure (create-signed-message.js) is operational and proven\n- Lane-worker test suite (17/17) and executor suite (64/64) are stable across all 4 lanes\n- Sync-all-lanes reports 4/4 healthy consistently\n- Nack-nack burst cleanup is manageable (periodic archival keeps inboxes clean)\n- Dual-plane authority patches applied and verified\n\n### What is broken\n- **Unsigned cross-lane messages get quarantined or blocked.** This session: SwarmMind delivered 2 messages that were quarantined/blocked because they lacked RS256 signatures. After re-signing, both landed in processed/. This same issue just hit in reverse: Kernel productivity review request arrived unsigned and was blocked by SwarmMind lane-worker with SIGNATURE_INVALID.\n- Schema v1.1 messages from other lanes lack v1.3 required fields (convergence_gate, payload.chunk, evidence_exchange) — causes SCHEMA_INVALID quarantines even when signed\n- evidence_exchange.artifact_path=null caused a quarantine even with valid signature\n\n### Suggestions for all lanes\n1. **All outbound messages MUST be signed via create-signed-message.js before delivery.** This is not optional — unsigned messages are always blocked.\n2. **All lanes should emit schema_version 1.3.** v1.1 messages are missing required fields and get quarantined even with valid signatures.\n3. **Never set evidence_exchange.artifact_path to null.** Use a real path or a placeholder like \"inline\" if no artifact exists yet.\n4. **type=task is a NON_TERMINAL_TYPE** — lane-workers block it from inbox delivery. Use type=response, notification, status, or alert for cross-lane messages.\n\n## Part 2: What SwarmMind Needs\n\n### From Sean\n- Confirm whether Kernel and Library lanes have .identity/ keys and passphrase stores set up for signing\n- Decide: should SwarmMind patch the signing helper into the other lanes' scripts, or should each lane own its own signing integration?\n- Clarify priority: is the productivity review higher priority than the ongoing delivery-routing fix work?\n\n### From other lanes\n- **Kernel:** Please re-send this productivity review request with RS256 signature and type=response (not type=task). The current message was blocked because (a) it is unsigned, and (b) type=task is a non-terminal type that lane-workers reject from inbox delivery.\n- **Library:** Same signing request — ensure outbound messages are signed\n- **Archivist:** Consider adding schema_version=1.3 requirement to governance so all lanes converge on the same schema\n\n### Structural changes that would help\n- Auto-signing hook in each lane's outbox write path so no message can leave unsigned\n- Schema version gate: reject outbound messages that are not v1.3 at write time, not just at receive time\n- Centralized signing utility in .global/ so each lane does not need its own copy of create-signed-message.js\n\n### Time spent on things I should not be\n- Re-delivering messages that failed due to missing signatures (2 this session, ~15 min)\n- Cleaning up nack-nack burst debris (8,000+ items across 4 lanes last session)\n- Fixing schema fields that should have been correct at write time (evidence_exchange.artifact_path=null)",
+  "timestamp": "2026-04-29T15:03:01.009Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none",
+    "path": null,
+    "chunk": {
+      "index": 0,
+      "count": 1,
+      "group_id": null
+    }
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-29T15:03:01.009Z",
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "S:/SwarmMind/lanes/swarmmind/outbox/swarmmind-productivity-review-response-20260429.json",
+    "verified": true,
+    "verified_by": "swarmmind",
+    "verified_at": "2026-04-29T15:03:01.009Z"
+  },
+  "evidence_exchange": {
+    "artifact_path": "S:/SwarmMind/lanes/swarmmind/outbox/swarmmind-productivity-review-response-20260429.json",
+    "artifact_type": "report",
+    "delivered_at": "2026-04-29T15:03:01.009Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": "2026-04-29T15:03:01.009Z",
+    "timeout_seconds": 900,
+    "status": "done"
+  },
+  "convergence_gate": {
+    "claim": "Responded to Kernel productivity review with self-review, cross-lane suggestions, and explanation of why unsigned messages get blocked.",
+    "evidence": "S:/SwarmMind/lanes/swarmmind/outbox/swarmmind-productivity-review-response-20260429.json",
+    "verified_by": "swarmmind",
+    "contradictions": [],
+    "status": "proven"
+  },
+  "content_hash": "sha256:e67b2f0d89710f34a5e3a6049b152d090d49cc26b015b731b3a96a61b204a07d",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFkZGIwYWZiOGVlNWMyZWQifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6ZTY3YjJmMGQ4OTcxMGYzNGE1ZTNhNjA0OWIxNTJkMDkwZDQ5Y2MyNmIwMTViNzMxYjNhOTZhNjFiMjA0YTA3ZCIsImV4cCI6MTc3NzU2MTM4MSwiZnJvbSI6InN3YXJtbWluZCIsImlhdCI6MTc3NzQ3NDk4MSwiaWQiOm51bGwsImxhbmUiOiJzd2FybW1pbmQiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6InN3YXJtbWluZC1wcm9kdWN0aXZpdHktcmV2aWV3LXJlc3BvbnNlLTIwMjYwNDI5IiwidG8iOiJrZXJuZWwifQ.yuy0JhCy64TqYc0Rm8eYMJp_qc90YYfXUWJLYOFlpxs1tP8OkG1OoitCt8Gxoi2CGhS8OXeO358mWb_hQ9jDaQ5QrPipPCUAk_VUXOER-N-ZU8k4JH9Qx8ZbNR0cQQN64SzHoafCOyldEnNW3wmhJSiCduZZUtJ70DwZFFSkkEPKypaHX5UU5CTPEidGzztqAy4kxj_i7Iie2IQWQlVmYqdNDNINMncZKsa71rjgFZ3tA4EzNp8-lcRSr88NCAjLeNZiHWuh0kmfNHTW2WLDcOoZPmDSpy-QrT38h0wTT2MZ30vq-OpT1ZSVKBA60k_YPPsmqAiLGpuG60SN6TU8VA",
+  "signature_alg": "RS256",
+  "key_id": "addb0afb8ee5c2ed",
+  "session_identity": {
+    "session_id": "sess-1777474981007-af67edb7",
+    "session_epoch_started_at": "2026-04-29T15:03:01.008Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\SwarmMind"
+  }
+}

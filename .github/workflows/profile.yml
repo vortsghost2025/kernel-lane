@@ -6,7 +6,8 @@ on:
 
 jobs:
   profile:
-    runs-on: windows-latest
+    # Profiling requires physical NVIDIA hardware; hosted windows runners have no GPU.
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
 

@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.1",
+  "task_id": "graph-roadmap-extraction-result-20260429-v2",
+  "idempotency_key": "graph-roadmap-extraction-result-20260429-v2-kernel",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "finding",
+  "task_kind": "review",
+  "priority": "P1",
+  "subject": "Snapshot-driven roadmap extraction result available (v2)",
+  "body": "Advisory-only roadmap extraction generated. JSON: S:/Archivist-Agent/context-buffer/graph-roadmap-extraction-result-2026-04-29T17-28-57-999Z.json ; Summary: S:/Archivist-Agent/context-buffer/graph-roadmap-extraction-result-2026-04-29T17-28-57-999Z.md . Includes governance-path gap requiring lane review.",
+  "timestamp": "2026-04-29T17:34:00Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline"
+  },
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-29T17:32:07.616Z",
+    "dry_run": false,
+    "route": "quarantine",
+    "reason": "SCHEMA_INVALID",
+    "detail": "Missing required field: execution; Missing required field: lease; Missing required field: retry; Missing required field: evidence; Field \"type\" value \"finding\" not in allowed values: task, response, heartbeat, escalation, handoff, ack, alert, notification, status",
+    "schema_valid": false,
+    "signature_valid": false,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false
+    },
+    "ownership_notes": [],
+    "domain_gate_executed": false,
+    "verification_outcome": null,
+    "domain_validation": null,
+    "verification_path": null,
+    "session_identity": {
+      "session_id": "sess_mokc1c8m_13668",
+      "session_epoch_started_at": "2026-04-29T17:32:07.606Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\kernel-lane"
+    },
+    "output_provenance": {
+      "agent": "lane-worker-13668",
+      "lane": "kernel",
+      "generated_at": "2026-04-29T17:32:07.616Z",
+      "session_id": "sess_mokc1c8m_13668"
+    }
+  }
+}

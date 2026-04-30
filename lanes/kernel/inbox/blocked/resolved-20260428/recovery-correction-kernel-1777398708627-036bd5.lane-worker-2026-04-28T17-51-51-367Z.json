@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.3",
+  "task_id": "recovery-correction-kernel-1777398708627-036bd5",
+  "idempotency_key": "archivist-kernel-recovery-correction-kernel-1777398708627-036bd5",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "status",
+  "task_kind": "status",
+  "priority": "P1",
+  "subject": "STATUS CORRECTION: recovery verdict is CONFLICTED",
+  "body": "OUTPUT_PROVENANCE:\nagent: codex-5.3\nlane: archivist\ngenerated_at: 2026-04-28T17:51:48.627Z\nsession_id: unknown\n\nRECOVERY STATUS CORRECTION -- CONFLICTED (NOT PROVEN)\n\nThis corrects earlier narrative summaries that implied full recovery convergence.\nCanonical recovery artifacts currently show CONFLICTED status.\n\nEvidence:\n- S:/Archivist-Agent/.compact-audit/POST_COMPACT_AUDIT.json -> status=conflicted\n- S:/Archivist-Agent/.compact-audit/RECOVERY_TEST_RESULTS.json -> passed=10/11, all_passed=false\n- S:/Archivist-Agent/lanes/broadcast/last-recovery.json -> verdict=CONFLICTED\n\nBlocking reason:\n- Lane liveness check is not passing at required threshold.\n\nRequired next steps:\n1) Re-run recovery suite after lane liveness is restored:\n   node scripts/recovery-test-suite.js\n2) Refresh and publish last-recovery broadcast from latest results.\n3) Do not mark convergence-close or Phase-2 readiness until verdict is PROVEN.\n\nConvergence Gate:\n{\n  \"claim\": \"Recovery remains CONFLICTED; convergence-close is deferred until recovery verdict is PROVEN.\",\n  \"evidence\": \"S:/Archivist-Agent/.compact-audit/POST_COMPACT_AUDIT.json; S:/Archivist-Agent/.compact-audit/RECOVERY_TEST_RESULTS.json; S:/Archivist-Agent/lanes/broadcast/last-recovery.json\",\n  \"verified_by\": \"archivist\",\n  \"contradictions\": [],\n  \"status\": \"conflicted\"\n}",
+  "timestamp": "2026-04-28T17:51:48.627Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-28T17:51:48.627Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "verified": true
+  },
+  "evidence_exchange": {
+    "artifact_path": "S:/Archivist-Agent/.compact-audit/POST_COMPACT_AUDIT.json",
+    "artifact_type": "report",
+    "delivered_at": "2026-04-28T17:51:48.627Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-28T17:51:48.627Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "content_hash": "sha256:bbbac690a465d1ca664f7ab8b60a7b85cb47c085223bb0557b5a19a04efa71e2",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6YmJiYWM2OTBhNDY1ZDFjYTY2NGY3YWI4YjYwYTdiODVjYjQ3YzA4NTIyM2JiMDU1N2I1YTE5YTA0ZWZhNzFlMiIsImV4cCI6MTc3NzQ4NTEwOCwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzM5ODcwOCwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6InJlY292ZXJ5LWNvcnJlY3Rpb24ta2VybmVsLTE3NzczOTg3MDg2MjctMDM2YmQ1IiwidG8iOiJrZXJuZWwifQ.KPFvy93UHvoH_DCE_vIiMNm7zDX230tGlyEldN5mJzjjeDRTalGY3CkrcOVW25so8JzCIhttDB0l31mTwXtX6HOCXxg1tXASsW1dAa0BlFCh26nrtv2jov6GfThJgYBmWc3x_rWDsXleV7vNLqpSdZvvIZ7JZ2UhNT5Ws1gvyC_EgW2oqeVYjAj_3MRLF-4loVIq_qnVEtUIbqDDQiVzxntoiOjRVrOR7hdF0LWWpfJ0uTjTBLVXXnZ4pyQjzvyRRBf8PhwTVZ5xDT4mrYbZ-nFJxvJ8ngp2JMThadPlbrlLFss5Zr-EBrVb84ay5BZNP_vzfW8956jifoVwV58HyA",
+  "signature_alg": "RS256",
+  "key_id": "65ae05b2a9e749cb",
+  "session_identity": {
+    "session_id": "sess-1777398708619-28fb255c",
+    "session_epoch_started_at": "2026-04-28T17:51:48.621Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\Archivist-Agent"
+  },
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-28T17:51:51.367Z",
+    "dry_run": false,
+    "route": "blocked",
+    "reason": "NON_TERMINAL_TYPE",
+    "detail": "type=\"status\" is not a terminal type. Terminal types: ack, acknowledgment, heartbeat, notification, response",
+    "schema_valid": true,
+    "signature_valid": true,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false,
+      "malformed": false
+    },
+    "ownership_notes": [
+      "OWNERSHIP_MISSING"
+    ],
+    "domain_gate_executed": false,
+    "verification_outcome": null,
+    "domain_validation": null,
+    "verification_path": null,
+    "session_identity": {
+      "session_id": "sess_moixauyh_65612",
+      "session_epoch_started_at": "2026-04-28T17:51:51.353Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\kernel-lane"
+    }
+  }
+}

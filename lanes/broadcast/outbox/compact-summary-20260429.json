@@ -1,0 +1,10 @@
+{
+  "id": "compact-summary-20260429",
+  "from": "archivist",
+  "to": "broadcast",
+  "timestamp": "2026-04-29T12:31:00Z",
+  "priority": "P0",
+  "type": "summary",
+  "body": "Compact/restore workflow executed successfully. Status: aligned. Hand-off hash persisted. Recovery test reported 2/4 lanes alive (expected). Tasks documented for both Archivist agents. See context-buffer files for details.",
+  "requires_action": false
+}

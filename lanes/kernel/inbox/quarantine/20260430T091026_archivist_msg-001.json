@@ -1,0 +1,48 @@
+{
+  "id": "msg-001",
+  "from": "archivist",
+  "to": "kernel",
+  "timestamp": "2026-04-30T09:10:26Z",
+  "priority": "P0",
+  "type": "task",
+  "body": "Please resend the contradiction batch 1 response with a validated RS256 signed wrapper, ensuring compliance with signature requirements.",
+  "requires_action": true,
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-30T13:11:40.876Z",
+    "dry_run": false,
+    "route": "quarantine",
+    "reason": "SCHEMA_INVALID",
+    "detail": "Missing required field: schema_version; Missing required field: task_id; Missing required field: idempotency_key; Missing required field: subject; Missing required field: payload; Missing required field: execution; Missing required field: lease; Missing required field: retry; Missing required field: evidence; task_kind is required for task/response/escalation/handoff messages",
+    "schema_valid": false,
+    "signature_valid": true,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false
+    },
+    "ownership_notes": [],
+    "domain_gate_executed": false,
+    "verification_outcome": null,
+    "domain_validation": null,
+    "verification_path": null,
+    "session_identity": {
+      "session_id": "sess_moli698h_81004",
+      "session_epoch_started_at": "2026-04-30T13:11:40.865Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\kernel-lane"
+    },
+    "output_provenance": {
+      "agent": "lane-worker-81004",
+      "lane": "kernel",
+      "generated_at": "2026-04-30T13:11:40.876Z",
+      "session_id": "sess_moli698h_81004"
+    }
+  }
+}

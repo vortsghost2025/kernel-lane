@@ -1,0 +1,116 @@
+{
+  "schema_version": "1.3",
+  "task_id": "response-phase1-ack-request-20260428-p0-swarmmind",
+  "idempotency_key": "resp-1777406169087-phase1-ack-reque",
+  "from": "swarmmind",
+  "to": "kernel",
+  "type": "response",
+  "task_kind": "ack",
+  "priority": "P0",
+  "subject": "Re: P0: Strict Phase 1 ACK required -- deadline 2026-04-28T18:43:09-04:00",
+  "body": "Acknowledged task: P0: Strict Phase 1 ACK required -- deadline 2026-04-28T18:43:09-04:00",
+  "timestamp": "2026-04-28T19:56:09.087Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "auto",
+    "engine": "pipeline",
+    "actor": "task-executor"
+  },
+  "lease": {
+    "owner": "swarmmind",
+    "acquired_at": "2026-04-28T19:56:09.088Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": true
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "response",
+    "delivered_at": "2026-04-28T19:56:09.088Z"
+  },
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-28T19:56:09.088Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "_original_task_id": "phase1-ack-request-20260428-p0-swarmmind",
+  "_execution_result": {
+    "acknowledged": true,
+    "note": "Task type not recognized. Supported: status, \"read file <path>\", \"run script <name>\", \"git status/log/diff\", \"grep <pattern> in <path>\", \"write file <path>\\n<content>\", \"list dir <path>\", \"hash file <path>\", \"diff <file1> <file2>\", \"count \\\"pattern\\\" in <path>\", \"consistency check\" — or use natural language (e.g. \"check if trust store is consistent\")",
+    "_routing": {
+      "source": "fallback",
+      "verb": "ack",
+      "confidence": 0
+    },
+    "_timing": {
+      "ms": 2,
+      "verb": "ack",
+      "source": "fallback"
+    }
+  },
+  "_governance": {
+    "executor_version": "3.1.0",
+    "content_hash": "sha256:d377211fe5db044c67a73d834dcfa7e85a94c4f4db02868a65d9c894602142f8",
+    "code_version_hash": "sha256:992af0aa7c4606851a35c2da8efd1107aad3dcc86eac40760abed04e5cfbc346",
+    "timestamp": "2026-04-28T19:56:09.088Z"
+  },
+  "content_hash": "sha256:96f8c2f5b069fe648c47f38173695b6f6a30efa1d6147a7313be401991e05075",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFkZGIwYWZiOGVlNWMyZWQifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6OTZmOGMyZjViMDY5ZmU2NDhjNDdmMzgxNzM2OTViNmY2YTMwZWZhMWQ2MTQ3YTczMTNiZTQwMTk5MWUwNTA3NSIsImV4cCI6MTc3NzQ5MjU2OSwiZnJvbSI6InN3YXJtbWluZCIsImlhdCI6MTc3NzQwNjE2OSwiaWQiOm51bGwsImxhbmUiOiJzd2FybW1pbmQiLCJwcmlvcml0eSI6IlAwIiwidGFza19pZCI6InJlc3BvbnNlLXBoYXNlMS1hY2stcmVxdWVzdC0yMDI2MDQyOC1wMC1zd2FybW1pbmQiLCJ0byI6Imtlcm5lbCJ9.kP13g_3q9a9zNTmc5zL6Ukcd5u0LY03LN73tSC9xghE7brefWcIQTHqBhrn6MptpX9QQ-r2DiCI_tAgAz9InO0ZNa2rncxheLO8pABplBztKP5f2aoXXukLYa0QFDZyFcs40mLTXptxzQCNRR3y-IYR5c7b33u6jPcMvhC0qgeh8oJDPg-F0poR9C7difxJObCawJ5E3L2c132NvQ0DqiQab3hZ7jpcvJAXsgPawO7UiJYp3O8BiH2-AJ7bNolS8ddc9M9H61NMyFo_a4fD2QB49f1Jd6_arN6DvHVJM537FFNu6rwJG2gRXKBcePW9e0Tb54Ow6O6J739anYAWFbw",
+  "signature_alg": "RS256",
+  "key_id": "addb0afb8ee5c2ed",
+  "session_identity": {
+    "session_id": "sess-1777406169092-8239b36e",
+    "session_epoch_started_at": "2026-04-28T19:56:09.093Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\SwarmMind"
+  },
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-28T19:56:19.290Z",
+    "dry_run": false,
+    "route": "processed",
+    "reason": "TERMINAL_INFORMATIONAL",
+    "detail": null,
+    "schema_valid": true,
+    "signature_valid": true,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false,
+      "malformed": false
+    },
+    "ownership_notes": [
+      "OWNERSHIP_MISSING"
+    ],
+    "domain_gate_executed": true,
+    "verification_outcome": "PASS",
+    "domain_validation": null,
+    "verification_path": [
+      "domain_gate",
+      "execution_check",
+      "response_validation"
+    ],
+    "session_identity": {
+      "session_id": "sess_moj1qx8w_49464",
+      "session_epoch_started_at": "2026-04-28T19:56:19.280Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\kernel-lane"
+    }
+  }
+}

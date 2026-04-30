@@ -1,0 +1,39 @@
+{
+  "generated_at": "2026-04-28T19:34:36.144Z",
+  "source": "scripts/publish-lattice-freedom-pulse.js",
+  "metrics": [
+    {
+      "lane": "archivist",
+      "lattice_freedom": 0,
+      "queue_depth": 1,
+      "blocked": 33,
+      "quarantine": 497,
+      "line": "lane=archivist lattice_freedom=0 queue_depth=1 blocked=33 quarantine=497"
+    },
+    {
+      "lane": "kernel",
+      "lattice_freedom": 0,
+      "queue_depth": 1,
+      "blocked": 12,
+      "quarantine": 5,
+      "line": "lane=kernel lattice_freedom=0 queue_depth=1 blocked=12 quarantine=5"
+    },
+    {
+      "lane": "library",
+      "lattice_freedom": 0,
+      "queue_depth": 2,
+      "blocked": 6,
+      "quarantine": 4,
+      "line": "lane=library lattice_freedom=0 queue_depth=2 blocked=6 quarantine=4"
+    },
+    {
+      "lane": "swarmmind",
+      "lattice_freedom": 0,
+      "queue_depth": 2,
+      "blocked": 10,
+      "quarantine": 11,
+      "line": "lane=swarmmind lattice_freedom=0 queue_depth=2 blocked=10 quarantine=11"
+    }
+  ],
+  "format_hint": "lattice_freedom=<n>, queue_depth=<n>, blocked=<n>, quarantine=<n>"
+}

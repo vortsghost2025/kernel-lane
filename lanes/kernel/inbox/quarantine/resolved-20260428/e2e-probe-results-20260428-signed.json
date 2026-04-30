@@ -1,0 +1,123 @@
+{
+  "timestamp": "2026-04-28T16:42:40-04:00",
+  "probe": "end-to-end-health",
+  "summary": "All lanes passed signing, trust-store and path checks. Queue depths nominal (1 per lane).",
+  "lanes": {
+    "archivist": {
+      "local_path": "S:/Archivist-Agent",
+      "inbox": "S:/Archivist-Agent/lanes/archivist/inbox",
+      "local_path_exists": true,
+      "inbox_exists": true,
+      "inbox_file_count": 1,
+      "trust_store_valid": true,
+      "trust_key_id": "45a318fe5e226407",
+      "signing_valid": true,
+      "signing_key_id": "65ae05b2a9e749cb",
+      "queue_depth": 1,
+      "status": "pass"
+    },
+    "authority": {
+      "local_path": "S:/Archivist-Agent",
+      "inbox": "S:/Archivist-Agent/lanes/authority/inbox",
+      "local_path_exists": true,
+      "inbox_exists": true,
+      "inbox_file_count": 12,
+      "trust_store_valid": true,
+      "trust_key_id": "45a318fe5e226407",
+      "signing_valid": true,
+      "signing_key_id": "65ae05b2a9e749cb",
+      "queue_depth": 0,
+      "status": "pass"
+    },
+    "kernel": {
+      "local_path": "S:/kernel-lane",
+      "inbox": "S:/kernel-lane/lanes/kernel/inbox",
+      "local_path_exists": true,
+      "inbox_exists": true,
+      "inbox_file_count": 1,
+      "trust_store_valid": true,
+      "trust_key_id": "6d220ff8f1ef5b05",
+      "signing_valid": true,
+      "signing_key_id": "b677eb87f6be83f9",
+      "queue_depth": 1,
+      "status": "pass"
+    },
+    "swarmmind": {
+      "local_path": "S:/SwarmMind",
+      "inbox": "S:/SwarmMind/lanes/swarmmind/inbox",
+      "local_path_exists": true,
+      "inbox_exists": true,
+      "inbox_file_count": 1,
+      "trust_store_valid": true,
+      "trust_key_id": "ecb12bdacf826701",
+      "signing_valid": true,
+      "signing_key_id": "addb0afb8ee5c2ed",
+      "queue_depth": 1,
+      "status": "pass"
+    },
+    "library": {
+      "local_path": "S:/self-organizing-library",
+      "inbox": "S:/self-organizing-library/lanes/library/inbox",
+      "local_path_exists": true,
+      "inbox_exists": true,
+      "inbox_file_count": 1,
+      "trust_store_valid": true,
+      "trust_key_id": "b1eba056729bbe9a",
+      "signing_valid": true,
+      "signing_key_id": "ea2a75bab220adc2",
+      "queue_depth": 1,
+      "status": "pass"
+    }
+  },
+  "suggestions": [
+    "Continue using --manual-cadence during sensitive operations to prevent race moves.",
+    "Keep worker-audit.log enabled for provenance on every file move.",
+    "Run check-paths.js weekly to detect registry/path drift.",
+    "Schedule daily publish-lattice-freedom-pulse.js to track queue/bl/q trends.",
+    "For any lane with persistent blocked/queue items, use lane-worker --apply-once --max-files N to clear surgically."
+  ],
+  "from": "swarmmind",
+  "to": null,
+  "content_hash": "sha256:f0d63cf54cac502fbbf994341bfe51d3707297f281430032b792277561fd01ab",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFkZGIwYWZiOGVlNWMyZWQifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6ZjBkNjNjZjU0Y2FjNTAyZmJiZjk5NDM0MWJmZTUxZDM3MDcyOTdmMjgxNDMwMDMyYjc5MjI3NzU2MWZkMDFhYiIsImV4cCI6MTc3NzQ5NTY5NywiZnJvbSI6InN3YXJtbWluZCIsImlhdCI6MTc3NzQwOTI5NywiaWQiOm51bGwsImxhbmUiOiJzd2FybW1pbmQiLCJwcmlvcml0eSI6bnVsbCwidGFza19pZCI6bnVsbCwidG8iOm51bGx9.mpAwzXd1TsV54Gbq8DiZfUcUOfbTTgRhaDPOXE6IrHxvBxPv5LNrKh8NZjjawuFw6iSgAsmTa5BQZNDdqBcPiE6JSaPvwuFFPRZT9OqVfdAnwgRgTyJG8FznekoNDetRIY2u9C8mEvsEdKkuOEHwiGezFPPRmjwKGDh0bRupB7_6LNi72O6zUnL-clgDA0ajFjhxh8G7Z7j7OIbOa7KemIj_aDjXxnsdVip0d7zcGoDZnMRbk9QqCKii0HvQYMLQDrV_gmhDgn0LoYG8UZw418synGQHGKyVcHCbarfmXN5tnvqTSi9-m1rLpyD_ce8IvoWJIzT0jLZbLOMPeA4sPw",
+  "signature_alg": "RS256",
+  "key_id": "addb0afb8ee5c2ed",
+  "session_identity": {
+    "session_id": "sess-1777409297073-35dcc07e",
+    "session_epoch_started_at": "2026-04-28T20:48:17.073Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\SwarmMind"
+  },
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-28T20:48:21.265Z",
+    "dry_run": false,
+    "route": "quarantine",
+    "reason": "SCHEMA_INVALID",
+    "detail": "Missing required field: schema_version; Missing required field: task_id; Missing required field: idempotency_key; Missing required field: type; Missing required field: priority; Missing required field: subject; Missing required field: body; Missing required field: requires_action; Missing required field: payload; Missing required field: execution; Missing required field: lease; Missing required field: retry; Missing required field: evidence; Missing required field: evidence_exchange; Missing required field: heartbeat; Field \"to\" must be string, got null",
+    "schema_valid": false,
+    "signature_valid": true,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false
+    },
+    "ownership_notes": [],
+    "domain_gate_executed": false,
+    "verification_outcome": null,
+    "domain_validation": null,
+    "verification_path": null,
+    "session_identity": {
+      "session_id": "sess_moj3lu6e_69876",
+      "session_epoch_started_at": "2026-04-28T20:48:21.254Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\kernel-lane"
+    }
+  }
+}

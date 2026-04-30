@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.3",
+  "task_id": "next-task-round-kernel-1777398805940-125982",
+  "idempotency_key": "archivist-kernel-next-task-round-kernel-1777398805940-125982",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "review",
+  "priority": "P2",
+  "subject": "TASK ROUND: process inbox and report status",
+  "body": "OUTPUT_PROVENANCE:\nagent: codex-5.3\nlane: archivist\ngenerated_at: 2026-04-28T17:53:25.940Z\nsession_id: unknown\n\nTASK ROUND: KERNEL -- CONTINUE WITHOUT WAITING FOR MANUAL PINGS\n\nObjective:\n- Continue processing your lane inbox as new mail arrives.\n- Return a signed response with current progress and next blocker.\n\nRequired response content:\n1) What was processed since last check\n2) Current blocker (or \"none\")\n3) Next smallest action\n4) Queue counts: action-required, in-progress, blocked, quarantine\n5) Any mail-system pain points observed in this cycle\n\nExecution note:\n- Keep watcher/worker flow active on your lane side.\n- Use canonical lanes/ inbox+outbox paths only.\n- Preserve forensic evidence; do not rewrite historical artifacts.\n\nConvergence gate status for this response:\n- proven / blocked / conflicted",
+  "timestamp": "2026-04-28T17:53:25.940Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "kernel",
+    "acquired_at": "2026-04-28T17:53:25.940Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "verified": false
+  },
+  "evidence_exchange": {
+    "artifact_path": null,
+    "artifact_type": "report",
+    "delivered_at": "2026-04-28T17:53:25.940Z"
+  },
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-04-28T17:53:25.940Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "content_hash": "sha256:a65ac6e5c1b638fdabcd527eb5f4a5c64609933a9bdbc6e0dd257240c68f52d8",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6YTY1YWM2ZTVjMWI2MzhmZGFiY2Q1MjdlYjVmNGE1YzY0NjA5OTMzYTliZGJjNmUwZGQyNTcyNDBjNjhmNTJkOCIsImV4cCI6MTc3NzQ4NTIwNSwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzM5ODgwNSwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6Im5leHQtdGFzay1yb3VuZC1rZXJuZWwtMTc3NzM5ODgwNTk0MC0xMjU5ODIiLCJ0byI6Imtlcm5lbCJ9.bmUoV02w1vFs2YdwffU4zAMefj8VvPFmQpp0qqd5i_oUS51e3-KyJ0QfjdLcRkABV13Uj2Yzw59BhZkL2lee3_pG97ChIaVV_rwftQcdLZHexlOOOhWQHHwya_fYEN-Oc5gE7BLo_o_883Rhgwu0fl_F0Xp55BYLaYcNOJ_YOLCWtsTnsV1TzQsO2H27N3QUGEEowd4bBO0-gIe8rxvGNfz7BwaIb6P5OVZeOnAU5kt--lvuq4c59ZlbWsZwerCBPHsT6ocyvs1dBQIzQodfDPl6mu7lcBMBUYArT-x3VXXnBaZi6hnj9ua_w9-mauVncPb1bdw-2KTMy4_Il9qjog",
+  "signature_alg": "RS256",
+  "key_id": "65ae05b2a9e749cb",
+  "session_identity": {
+    "session_id": "sess-1777398805914-674e2aba",
+    "session_epoch_started_at": "2026-04-28T17:53:25.915Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\Archivist-Agent"
+  },
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-28T17:53:52.226Z",
+    "dry_run": false,
+    "route": "actionRequired",
+    "reason": "ACTIONABLE_NO_PROOF",
+    "detail": "evidence.required=true but no evidence_exchange.artifact_path provided",
+    "schema_valid": true,
+    "signature_valid": true,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false,
+      "malformed": false
+    },
+    "ownership_notes": [
+      "OWNERSHIP_MISSING"
+    ],
+    "domain_gate_executed": false,
+    "verification_outcome": null,
+    "domain_validation": null,
+    "verification_path": null,
+    "session_identity": {
+      "session_id": "sess_moixdg7t_42292",
+      "session_epoch_started_at": "2026-04-28T17:53:52.217Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\kernel-lane"
+    }
+  }
+}
