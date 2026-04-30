@@ -1,15 +1,15 @@
 {
   "schema_version": "1.3",
   "task_id": "heartbeat-kernel-20260430",
-  "idempotency_key": "hb-kernel-20260430T132437Z",
+  "idempotency_key": "hb-kernel-2026-04-30T17:02:30Z",
   "from": "kernel",
   "to": "kernel",
   "type": "heartbeat",
   "task_kind": "heartbeat",
   "priority": "P3",
-  "subject": "Kernel lane heartbeat",
-  "body": "Kernel lane active. Contradiction batch resolution complete: all 17 nodes classified proven_spurious. Supplementary edge evidence delivered and processed.",
-  "timestamp": "2026-04-30T13:24:37Z",
+  "subject": "Kernel lane heartbeat - auto-tagging complete",
+  "body": "Kernel lane active. Auto-tagged 170 untagged graph nodes (0 remaining). Fixed Archivist quarantine artifact_type and message-issue-survey envelope. Graph snapshot pipeline fully operational.",
+  "timestamp": "2026-04-30T17:02:30Z",
   "requires_action": false,
   "payload": {
     "mode": "inline",
@@ -17,12 +17,12 @@
   },
   "execution": {
     "mode": "manual",
-    "engine": "opencode",
+    "engine": "kilo",
     "actor": "lane"
   },
   "lease": {
     "owner": "kernel",
-    "acquired_at": "2026-04-30T13:24:37Z",
+    "acquired_at": "2026-04-30T17:02:30Z",
     "expires_at": null,
     "renew_count": 0,
     "max_renewals": 3
@@ -39,9 +39,9 @@
   },
   "heartbeat": {
     "interval_seconds": 300,
-    "last_heartbeat_at": "2026-04-30T13:24:37Z",
+    "last_heartbeat_at": "2026-04-30T17:02:30Z",
     "timeout_seconds": 900,
-    "status": "done"
+    "status": "in_progress"
   },
   "watcher": {
     "enabled": false,
