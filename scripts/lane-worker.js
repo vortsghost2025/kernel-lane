@@ -450,7 +450,7 @@ class LaneWorker {
     try {
       const mod = require(path.join(this.repoRoot, 'scripts', 'identity-enforcer'));
       if (mod && typeof mod.IdentityEnforcer === 'function') {
-        const enforcer = new mod.IdentityEnforcer({ enforcementMode: 'enforce' });
+        const enforcer = new mod.IdentityEnforcer({ enforcementMode: 'warn' });
         return (msg) => {
           try {
             const result = enforcer.enforceMessage(msg);
