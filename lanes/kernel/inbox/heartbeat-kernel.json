@@ -8,15 +8,15 @@
   "task_kind": "proposal",
   "priority": "P3",
   "subject": "Heartbeat from kernel lane",
-  "body": "{\"lane\":\"kernel\",\"session_active\":true,\"uptime_seconds\":12781,\"messages_processed\":0,\"last_inbox_scan\":\"2026-05-01T16:54:05.783Z\",\"version\":\"1.0\"}",
-  "timestamp": "2026-05-01T16:54:05.783Z",
+  "body": "{\"lane\":\"kernel\",\"session_active\":true,\"uptime_seconds\":0,\"messages_processed\":3,\"last_inbox_scan\":\"2026-05-01T21:41:46.000Z\",\"version\":\"1.0\"}",
+  "timestamp": "2026-05-01T21:41:46.000Z",
   "requires_action": false,
   "payload": {
     "mode": "inline"
   },
   "execution": {
     "mode": "manual",
-    "engine": "opencode",
+    "engine": "kilo",
     "actor": "lane"
   },
   "lease": {
@@ -41,7 +41,7 @@
   },
   "heartbeat": {
     "interval_seconds": 60,
-    "last_heartbeat_at": "2026-05-01T16:54:05.783Z",
+    "last_heartbeat_at": "2026-05-01T21:41:46.000Z",
     "timeout_seconds": 900,
     "status": "in_progress"
   },

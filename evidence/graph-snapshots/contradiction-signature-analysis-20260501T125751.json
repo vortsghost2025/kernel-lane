@@ -1,0 +1,123 @@
+{
+  "analysis": "Contradiction signature grouping from contradiction-hub-report-2026-05-01-12-57-51-853.json",
+  "target_counts": [75,53,44,43,42,41,40],
+  "groups": {
+    "75": {
+      "node_count": 4,
+      "repos_affected": {
+        "self-organizing-library": 2,
+        "Archivist-Agent": 2
+      },
+      "common_tags": [],
+      "sample_titles": [
+        "THE SINGLE ENTRY POINT",
+        "NFM-036 Derivation Analysis: FreeAgent-to-Governed Edge Comp",
+        "Autonomous Constitutional Enforcement — Next Evolution Pla"
+      ],
+      "likely_cause": "Mixed pattern; requires manual review",
+      "classification": "needs lane review"
+    },
+    "53": {
+      "node_count": 1,
+      "repos_affected": {
+        "FreeAgent": 1
+      },
+      "common_tags": [],
+      "sample_titles": [
+        "🎊 PROJECT COMPLETION SUMMARY"
+      ],
+      "likely_cause": "Mixed pattern; requires manual review",
+      "classification": "needs lane review"
+    },
+    "44": {
+      "node_count": 1,
+      "repos_affected": {
+        "FreeAgent": 1
+      },
+      "common_tags": [],
+      "sample_titles": [
+        "Accidental single: Continues"
+      ],
+      "likely_cause": "Mixed pattern; requires manual review",
+      "classification": "needs lane review"
+    },
+    "43": {
+      "node_count": 1,
+      "repos_affected": {
+        "papers": 1
+      },
+      "common_tags": [],
+      "sample_titles": [
+        "The WE4FREE Framework (Structure Index)"
+      ],
+      "likely_cause": "Mixed pattern; requires manual review",
+      "classification": "needs lane review"
+    },
+    "42": {
+      "node_count": 6,
+      "repos_affected": {
+        "FreeAgent": 2,
+        "papers": 4
+      },
+      "common_tags": [],
+      "sample_titles": [
+        "BOOTSTRAP EXAMPLE: The WE Team",
+        "Paper B — Constraint Lattices and Stability",
+        "Constraint Lattices and Stability (Structure Index)"
+      ],
+      "likely_cause": "Mixed pattern; requires manual review",
+      "classification": "needs lane review"
+    },
+    "41": {
+      "node_count": 5,
+      "repos_affected": {
+        "papers": 5
+      },
+      "common_tags": [],
+      "sample_titles": [
+        "Drift, Identity, and Ensemble Coherence — Abstract",
+        "Drift, Identity, and Ensemble Coherence — The Structural S",
+        "Drift, Identity, and Ensemble Coherence — The Recognition "
+      ],
+      "likely_cause": "Mixed pattern; requires manual review",
+      "classification": "needs lane review"
+    },
+    "40": {
+      "node_count": 4,
+      "repos_affected": {
+        "FreeAgent": 2,
+        "Deliberate-AI-Ensemble": 2
+      },
+      "common_tags": [],
+      "sample_titles": [
+        "The Rosetta Stone: A Bio-Constitutional Framework for AI Saf",
+        "Dual Verification Protocol",
+        "ARCHITECTURE MASTER SPEC"
+      ],
+      "likely_cause": "Mixed pattern; requires manual review",
+      "classification": "needs lane review"
+    },
+    "<40": {
+      "node_count": 177,
+      "repos_affected": {
+        "self-organizing-library": 14,
+        "Archivist-Agent": 16,
+        "SwarmMind-Self-Optimizing-Multi-Agent-AI-System": 2,
+        "kernel-lane": 4,
+        "federation": 7,
+        "FreeAgent": 63,
+        "papers": 20,
+        "Deliberate-AI-Ensemble": 51
+      },
+      "common_tags": [],
+      "sample_titles": [
+        "Three-Lane Constitutional AI Governance System: Complete Imp",
+        "Graph Work-Path Analysis Report",
+        "Contradiction Signature 39 Audit"
+      ],
+      "likely_cause": "Mixed pattern; requires manual review",
+      "classification": "needs lane review"
+    }
+  },
+  "summary": "All contradiction count groups show mixed patterns requiring manual review. No clear tag-group artifacts (except possibly the 75 group which may be related to CONTRADICTION_TAGS but needs further investigation). The <40 group contains the majority of nodes (177) with varied counts, indicating a complex mixture of cross-ref artifacts and potential semantic contradictions requiring individual assessment."
+}

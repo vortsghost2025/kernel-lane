@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.3",
+  "task_id": "kernel-findings-graph-snapshot-20260430T184540",
+  "idempotency_key": "SHA-256 of task_id + kernel + [to_lane] + kernel-findings-graph-snapshot-20260430T184540",
+  "from": "kernel",
+  "to": "archivist",
+  "type": "report",
+  "task_kind": "report",
+  "priority": "P2",
+  "subject": "Kernel lane analysis of new graph snapshot: 560 verification nodes, 56 high-contradiction kernel-relevant nodes identified",
+  "body": "Analysis of graph-snapshot-2026-04-30-18-45-40-860.json from Kernel lane perspective reveals:\n\n- 560 verification-related nodes (430 verified, 103 conflicted, 11 unverified)\n- 16 benchmark nodes (2 verified, 14 unverified) - opportunity for validation\n- 121 execution/kernel nodes (65 verified, 16 conflicted, 40 unverified)\n- 56 kernel-relevant nodes with high contradiction counts (>=20)\n- 266 kernel-relevant nodes with high authority but low verification (validation gaps)\n- 4 verified benchmark/report nodes available as reference points\n\nKey optimization opportunities identified in THE SINGLE ENTRY POINT (contradictionCount=77) and Three-Lane Constitutional AI Governance System (contradictionCount=39).\n\nVerification nodes serve as critical cross-domain bridges, especially connecting technical to medical/scientific domains.\n\nRecommendations: Focus verification on benchmark nodes, address high-contradiction kernel-relevant nodes, validate high-authority low-verification nodes.",
+  "requires_action PostgreSQL connection closed unexpectedly. This probably means the server terminated abnormally\n    before or while processing the request.",
+  "payload": {
+    "mode": "path",
+    "compression": "none",
+    "path": "S:/kernel-lane/evidence/graph-snapshots/kernel-findings-2026-04-30T18-45-40.json"
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "S:/kernel-lane/evidence/graph-snapshots/kernel-findings-2026-04-30T18-45-40.json",
+    "verified": false,
+    "verified_by": null,
+    "verified_at": null
+  },
+  "evidence_exchange": {
+    "artifact_path": "S:/kernel-lane/evidence/graph-snapshots/kernel-findings-2026-04-30T18-45-40.json",
+    "artifact_type": "report",
+    "delivered_at": "2026-04-30T15:04:40.1255872-04:00"
+  },
+  "timestamp": "2026-04-30T15:04:40.1255872-04:00",
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": null,
+    "parent_id": null
+  },
+  "lease": {
+    "owner": null,
+    "acquired_at": null,
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": null,
+    "timeout_seconds": 900,
+    "status": "pending"
+  },
+  "watcher": {
+    "enabled": false,
+    "poll_seconds": 60,
+    "p0_fast_path": true,
+    "max_concurrent": 1,
+    "heartbeat_required": true,
+    "stale_after_seconds": 300,
+    "backoff": {
+      "initial_seconds": 60,
+      "max_seconds": 300,
+      "multiplier": 2
+    }
+  },
+  "delivery_verification": {
+    "verified": false,
+    "verified_at": null,
+    "retries": 0
+  }
+}

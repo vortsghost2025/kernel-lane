@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.3",
+  "task_id": "e2e-summary-1777572984638-2120a549",
+  "idempotency_key": "f7008b875d950d9ce03d379011e47692adda9693b041df9a3b2438c585c79125",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "report",
+  "task_kind": "report",
+  "priority": "P2",
+  "subject": "Four-lane E2E status summary (proven)",
+  "body": "# Four-Lane E2E Status — 2026-04-30\r\n\r\n## Scope\r\n\r\nEnd-to-end verification and operational review across:\r\n\r\n- Archivist (`S:/Archivist-Agent`)\r\n- Kernel (`S:/kernel-lane`)\r\n- SwarmMind (`S:/SwarmMind`)\r\n- Library (`S:/self-organizing-library`)\r\n\r\n## Commands Executed\r\n\r\n- `node scripts/post-compact-audit.js`\r\n- `node scripts/recovery-test-suite.js`\r\n- `node scripts/sync-all-lanes.js --dry-run`\r\n- `node scripts/sync-all-lanes.js`\r\n- `node scripts/heartbeat.js --lane <lane> --once` in each lane repo\r\n- Re-baseline by removing stale pre-compact snapshot:\r\n  - `.compact-audit/PRE_COMPACT_SNAPSHOT.json`\r\n- Re-run:\r\n  - `node scripts/post-compact-audit.js`\r\n  - `node scripts/recovery-test-suite.js`\r\n\r\n## Final Verified State\r\n\r\n- Recovery suite: `11/11 PASS`\r\n- Recovery verdict: `RECOVERY PROVEN`\r\n- Post-compact audit status: `aligned`\r\n- Contradictions: `0`\r\n- Lane liveness: `4/4 alive`\r\n- Cross-lane sync: `12/12 targets synced`\r\n- Lane worker tests:\r\n  - Archivist: `17/17`, executor: `64/64`\r\n  - Kernel: `17/17`, executor: `64/64`\r\n  - SwarmMind: `17/17`, executor: `64/64`\r\n  - Library: `17/17`, executor: `64/64`\r\n\r\n## Notable Observations\r\n\r\n- Recovery moved from conflicted to proven after:\r\n  - refreshing stale lane heartbeats\r\n  - clearing stale pre-compact baseline and regenerating aligned baseline\r\n- Library inbox still has high terminal/noise volume (non-actionable), which is operationally noisy but not currently blocking.\r\n\r\n## Suggestions\r\n\r\n1. Add a periodic cleanup/archive policy for terminal/nack-only inbox artifacts in Library.\r\n2. Keep heartbeat refresh checks in startup routine to prevent liveness false-negatives.\r\n3. Emit explicit broadcast whenever pre-compact baseline is reset so all lanes treat it as a governance event.\r\n4. Keep `sync-all-lanes.js` in regular ops cadence to prevent drift accumulation.\r\n\r\n## Artifacts\r\n\r\n- `.compact-audit/POST_COMPACT_AUDIT.json`\r\n- `.compact-audit/RECOVERY_TEST_RESULTS.json`\r\n- `lanes/broadcast/last-recovery.json`\r\n- `context-buffer/sync-reports/2026-04-30T18-12-02-677Z.json`\r\n",
+  "timestamp": "2026-04-30T18:16:24.638Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "archivist",
+    "acquired_at": "2026-04-30T18:16:24.638Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "evidence_exchange": {},
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-30T18:16:24.638Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "content_hash": "sha256:f9b973d7864236f0c05d652946a7ba689939017d15b58de679e7c7830c735eee",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6ZjliOTczZDc4NjQyMzZmMGMwNWQ2NTI5NDZhN2JhNjg5OTM5MDE3ZDE1YjU4ZGU2NzllN2M3ODMwYzczNWVlZSIsImV4cCI6MTc3NzY1OTM4NCwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzU3Mjk4NCwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6ImUyZS1zdW1tYXJ5LTE3Nzc1NzI5ODQ2MzgtMjEyMGE1NDkiLCJ0byI6Imtlcm5lbCJ9.AZmf-b9-08g833dlVgiNMQW6r36Ffkg5A6ah_Jih9NlKMT9fcpJ3jMwAIXc9nbcz-IKDG7Y9YYthh36B73nqxptDI9ooKR5xeb9SliGtSKi39udyQLoBtgJkeKatvGscS2qwUMermLW9vJQrAdgXzz8-P2xT5BN2rcYQL-kRKDriA8gsNBoPoox4uPlTf1GtyaKVuEhH7VYyQMFOGXCDn5TCxG7TcdyCPY_siIo42IDVtFqdAf2Fv2W-yaK4ArcQgGLFGI3rUMElbcEx2aJrPfCfgK3WQSWGnfLvhAUdaEREUgAH4gENkIvb_wUPa0d_DXWlRJEFXYcEcTsNgGRfsQ",
+  "signature_alg": "RS256",
+  "key_id": "65ae05b2a9e749cb",
+  "session_identity": {
+    "session_id": "sess-1777572984618-f28b0735",
+    "session_epoch_started_at": "2026-04-30T18:16:24.619Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\Archivist-Agent"
+  }
+}

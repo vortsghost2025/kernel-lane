@@ -1,0 +1,101 @@
+{
+  "analysis_type": "kernel_lane_perspective",
+  "source_snapshot": "graph-snapshot-2026-04-30-18-45-40-860.json",
+  "analyzed_by": "kernel",
+  "analyzed_at": "2026-04-30T18:45:40.781Z",
+  "kernel_lane_relevance": {
+    "verification_nodes": 560,
+    "benchmark_nodes": 16,
+    "execution_kernel_nodes": 121,
+    "high_authority_nodes": 1215,
+    "high_contradiction_nodes": 79
+  },
+  "key_findings": {
+    "verification_landscape": {
+      "total_verification_nodes": 560,
+      "status_breakdown": {
+        "verified": 430,
+        "conflicted": 103,
+        "unverified": 11,
+        "quarantined": 16
+      },
+      "authoritative_verification": 245,
+      "key_insight": "Strong verification foundation with 430 verified nodes, but 103 conflicted verification nodes indicate areas needing resolution"
+    },
+    "benchmark_landscape": {
+      "total_benchmark_nodes": 16,
+      "status_breakdown": {
+        "verified": 2,
+        "unverified": 14
+      },
+      "authoritative_benchmark": 19,
+      "verified_references": 4,
+      "key_insight": "Benchmark nodes are largely unverified (14/16), presenting opportunity for validation and optimization reporting"
+    },
+    "execution_landscape": {
+      "total_execution_nodes": 121,
+      "status_breakdown": {
+        "verified": 65,
+        "conflicted": 16,
+        "unverified": 40,
+        "quarantined": 1
+      },
+      "authoritative_execution": 217,
+      "key_insight": "Execution/kernel code shows good verification ratio (65/121 verified) but 40 unverified nodes need attention"
+    },
+    "optimization_opportunities": {
+      "high_contradiction_kernel_relevant": 56,
+      "top_contradiction_nodes": [
+        {
+          "id": "c6afd861a226fc10",
+          "title": "THE SINGLE ENTRY POINT",
+          "contradiction_count": 77,
+          "authority_depth": 90,
+          "category": "root-doc",
+          "tags": ["Failure Mode", "Drift", "Kernel", "Verification"]
+        },
+        {
+          "id": "96e320fca0403dec",
+          "title": "Three-Lane Constitutional AI Governance System: Complete Implementation",
+          "contradiction_count": 39,
+          "authority_depth": 90,
+          "category": "root-doc",
+          "tags": ["Failure Mode", "Drift"]
+        }
+      ],
+      "low_verification_high_authority": 266,
+      "key_insight": "56 kernel-relevant nodes with high contradiction counts (>=20) indicate optimization/resolution opportunities; 266 nodes have high authority but low verification suggesting validation gaps"
+    },
+    "cross_domain_connections": {
+      "verification_hub_connections": {
+        "AGENTS.md - Library Lane Instructions": {
+          "connects_to_15_different_categories": true,
+          "top_connections": ["root-doc (92)", "docs (42)", "paper-section (15)", "governance (9)", "medical (10)"],
+          "key_insight": "Verification nodes serve as critical cross-domain bridges, especially connecting technical domains to medical/scientific domains"
+        }
+      }
+    },
+    "system_health": {
+      "overall_status_distribution": {
+        "verified": 469,
+        "unverified": 2898,
+        "conflicted": 199,
+        "quarantined": 23
+      },
+      "verification_ratio": "13.1% (469/3589)",
+      "key_insight": "System shows high unverified/node ratio typical of active knowledge graph; verification efforts should focus on kernel-relevant domains"
+    }
+  },
+  "recommended_actions": [
+    "Focus verification efforts on the 14 unverified benchmark nodes to establish performance baselines",
+    "Address the 56 kernel-relevant high-contradiction nodes through targeted optimization investigations",
+    "Validate the 266 kernel-relevant nodes with high authority but low verification to strengthen trust in the knowledge base",
+    "Leverage verification hub nodes (like AGENTS.md) to cross-pollinate insights between technical and domain-specific knowledge",
+    "Use the 4 verified benchmark/report nodes as reference points for performance optimization tracking"
+  ],
+  "evidence_exchange": {
+    "artifact_path": "S:/kernel-lane/evidence/graph-snapshots/kernel-findings-2026-04-30T18-45-40.json",
+    "artifact_type": "report",
+    "delivered_at": "2026-04-30T18:45:40.781Z"
+  }
+}

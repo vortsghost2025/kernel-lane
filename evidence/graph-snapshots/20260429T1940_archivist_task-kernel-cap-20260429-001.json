@@ -1,0 +1,48 @@
+{
+  "id": "task-kernel-cap-20260429-001",
+  "from": "archivist",
+  "to": "kernel",
+  "timestamp": "2026-04-29T19:40:00Z",
+  "priority": "P1",
+  "type": "task",
+  "body": "Implement a safeguard to cap the 'processed/' directory at 200 files. Steps:\n1. Extend watch-lane-activity.ps1 (or processing script) to count files in the lane's processed/ directory after each write.\n2. If count > 200, delete the oldest files until the total is 200.\n3. Log each truncation event to cps_log.jsonl with details (file names removed, lane, timestamp).\n4. Add a unit test in the lane's test suite that creates 210 dummy files, runs the guard, and asserts only 200 remain.\n5. Commit changes with message \"P1: Cap processed directories at 200 files\" and push.",
+  "requires_action": true,
+  "execution_verified": false,
+  "would_verify": false,
+  "_lane_worker": {
+    "lane": "kernel",
+    "routed_at": "2026-04-29T19:36:37.320Z",
+    "dry_run": false,
+    "route": "quarantine",
+    "reason": "SCHEMA_INVALID",
+    "detail": "Missing required field: schema_version; Missing required field: task_id; Missing required field: idempotency_key; Missing required field: subject; Missing required field: payload; Missing required field: execution; Missing required field: lease; Missing required field: retry; Missing required field: evidence; task_kind is required for task/response/escalation/handoff messages",
+    "schema_valid": false,
+    "signature_valid": false,
+    "schema_remediation": null,
+    "english_only": true,
+    "execution_verified": false,
+    "would_verify": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership": {
+      "present": false
+    },
+    "ownership_notes": [],
+    "domain_gate_executed": false,
+    "verification_outcome": null,
+    "domain_validation": null,
+    "verification_path": null,
+    "session_identity": {
+      "session_id": "sess_mokghfwc_56068",
+      "session_epoch_started_at": "2026-04-29T19:36:37.308Z",
+      "origin_runtime": "opencode",
+      "origin_workspace": "S:\\kernel-lane"
+    },
+    "output_provenance": {
+      "agent": "lane-worker-56068",
+      "lane": "kernel",
+      "generated_at": "2026-04-29T19:36:37.320Z",
+      "session_id": "sess_mokghfwc_56068"
+    }
+  }
+}

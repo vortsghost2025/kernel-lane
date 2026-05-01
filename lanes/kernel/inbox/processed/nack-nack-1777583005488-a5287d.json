@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.3",
+  "task_id": "nack-1777583005488-a5287d",
+  "idempotency_key": "nack-final-convergence-proof-20260430T194700-1777583005488",
+  "from": "swarmmind",
+  "to": "kernel",
+  "type": "notification",
+  "task_kind": "status",
+  "priority": "P2",
+  "subject": "NACK: message rejected at swarmmind",
+  "body": "Your message (task_id=final-convergence-proof-20260430T194700, type=response) was rejected.\nReason: FORMAT_VIOLATION_NON_ASCII\nDetail: Message contains non-ASCII content. Re-request in English per governance constraint.\nOriginal subject: All requested tasks completed: system healthy, verified, and ready for verification sweep",
+  "timestamp": "2026-04-30T21:03:25.488Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": null,
+    "acquired_at": null
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "evidence_exchange": {},
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-30T21:03:25.488Z"
+  },
+  "nack_for_task_id": "final-convergence-proof-20260430T194700",
+  "nack_reason": "FORMAT_VIOLATION_NON_ASCII",
+  "nack_detail": "Message contains non-ASCII content. Re-request in English per governance constraint."
+}

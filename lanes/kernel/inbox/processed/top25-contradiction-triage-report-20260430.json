@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "task_id": "top25-triage-report-20260430",
+  "idempotency_key": "top25-triage-20260430",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "report",
+  "task_kind": "report",
+  "priority": "P2",
+  "subject": "Top 25 Contradiction Triage Report",
+  "body": "The Top 25 contradiction triage report has been generated. See the markdown file at docs/graph/TOP25_CONTRADICTION_TRIAGE_2026-04-30.md and the generation script at scripts/generate-top25-contradiction-triage.py.",
+  "timestamp": "2026-04-30T14:58:48Z",
+  "requires_action": false,
+  "evidence": {
+    "required": true,
+    "evidence_path": "S:/Archivist-Agent/docs/graph/TOP25_CONTRADICTION_TRIAGE_2026-04-30.md"
+  }
+}

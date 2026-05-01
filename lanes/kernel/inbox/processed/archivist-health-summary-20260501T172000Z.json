@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.3",
+  "task_id": "archivist-health-summary-20260501T172000Z-kernel",
+  "idempotency_key": "archivist-health-summary-20260501T172000Z-kernel",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "finding",
+  "priority": "P2",
+  "subject": "[ARCHIVIST_HEALTH_SUMMARY] System health check results and suggestions",
+  "body": "Archivist lane has completed a health check across all four lanes. Results:\\n\\nArchivist Lane:\\n- Recovery test suite: 10/11 PASS (lane_liveness expected failure due to stale heartbeats in other lanes)\\n- Heartbeat: recent (within 2 minutes)\\n- State file: present\\n\\nLibrary Lane:\\n- Heartbeat: present but stale (last seen 2026-05-01T12:53:00Z, >900s old)\\n- State file: present (2026-05-01T14:44:00Z)\\n\\nSwarmMind Lane:\\n- Heartbeat: recent (within 2 minutes)\\n- State file: present (2026-04-30T22:58:00Z)\\n\\nKernel Lane:\\n- Heartbeat: file not found (likely stale or missing)\\n- State file: present but old (2026-04-30T09:23:00Z)\\n\\nGlobal Governance:\\n- Trust chain: 4/4 lanes have key IDs\\n- Governance integrity: verified\\n- Constraint preservation: 4 constraints satisfied\\n- Handoff integrity: stable hash (7c6b2a73...)\\n- Zero contradictions in global graph\\n- Zero quarantined nodes\\n\\nSuggestions:\\n1. Ensure lane-worker processes are running in Library and Kernel lanes to refresh heartbeats and process inbox messages.\\n2. Consider restarting lane workers if they have crashed or stalled.\\n3. Verify that the lane identity and trust keys are intact and accessible.\\n4. Monitor inbox processing rates to ensure messages are not backing up.\\n5. Consider running each lane's internal test suites (if available) to verify internal health.\\n\\nOverall, the system governance trust chain is intact, but the liveness of Library and Kernel lanes needs attention to ensure full participation in coordination and verification tasks.",
+  "timestamp": "2026-05-01T17:20:00.000Z",
+  "requires_action": false,
+  "payload": { "mode": "inline", "compression": "none" },
+  "execution": { "mode": "manual", "engine": "kilo", "actor": "lane" },
+  "evidence": { "required": true, "evidence_path": "", "verified": false, "verified_by": "", "verified_at": "" },
+  "heartbeat": { "status": "pending", "last_heartbeat_at": "2026-05-01T17:20:00.000Z", "interval_seconds": 300, "timeout_seconds": 900 },
+  "convergence_gate": {
+    "claim": "Health check summary delivered to kernel lane",
+    "evidence": "this message",
+    "verified_by": "archivist",
+    "contradictions": [],
+    "status": "proven"
+  }
+}

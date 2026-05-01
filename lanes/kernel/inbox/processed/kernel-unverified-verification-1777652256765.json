@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.3",
+  "task_id": "kernel-unverified-verification-1777652256765",
+  "idempotency_key": "kernel-unverified-verification-1777652256765",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "response",
+  "task_kind": "verification",
+  "priority": "P2",
+  "subject": "Verification of Kernel UNVERIFIED nodes - file existence check",
+  "body": "Archivist has verified file existence for Kernel UNVERIFIED nodes.\n\nVerified: 186\nMissing: 0\n\nDetails:\n- Verified nodes: b9399d1741459ed8, 24e7f2d5343a2026, e507375b3e7e67f0, a8522aae2c5012b4, d98cd12c6d8f949b, e45bf089c938ceb6, e0b99ca5701f1053, 04f455e2370b8f7e, 933f2fff3559360e, 88ea23bd271240a4, d394b6f9fea48320, 10d8786c9d910b9c, 9f9fdc61f624b5b0, 64508f8c36604c91, 0ac2650995add8af, 28d7201ac6134174, dc849f4c76898e19, 02c837366b762856, a1e10b05906f4e93, cb3570356fd821f6, 69eaedd1bba8453a, 5ed19fb5acaea667, b42763364fd466f2, 5d636ccc261c1318, b8370c2e4b1be6d9, 5d8a25163a408540, 785be9ee20f0f47d, 85db3fd3083ca4a1, 2c0897786bced6d8, 7dc6304e058c537b, a761cbc617378f09, 53e92998fc296551, 0f716df08f1da3f2, bc14e04bf31a6e60, 5bed56bbf206c5a3, 8414a5f8255776d6, 778cfdb019592dc8, dd678891dd555027, 42dba7d1ecc69d9e, 4dd11c4e99c0417f, 02a90317d285514d, f5b15cef4a732914, 69200efc7d7665bc, 5cffd81941bc226e, 0b7b53c4d2505137, 3ffc299da00df2fa, b04c52b84dec3481, 65ab5a7102a3b508, e3256d7a66f56031, d062f76c12d78312, 5696fb0b0ae31afd, afdbc63d8b3f51c5, 80cbab451b310554, 868d71438f1e7b35, c249d759b71f460b, e6db453217a29726, e90a585e6de29502, e5c2d342fd1a4bd7, 11ee89d1f5e8f11c, bbc4a5d07dc750ec, 2dec255e859df699, 895f8af440b7046e, 019f0e917be27c1d, 74f98cdf4c42c054, eaebd376027b88e1, b9bcf0668f385fac, 4b366a4b0a491d86, 9330ccb077d3ed82, 1a79b6c177f30d7b, 276826b3e9171977, 126b01d64fd1d1a7, 00179ac9a08f99fe, 3f8f5f069911a58e, 4a955e4bf0ee7bff, 96031225056de7f7, 7ef074dfa66c4690, a0b6e2906cf8b3f7, b64b93d9ade82a63, f8de15c1e3e22ad8, 554b44a3d1f7ce51, 1767b5d56b6b5be1, d4503691ae61dc9c, be8d95238cacf854, a6821d7e95ea272e, 553c5c9ec2977d13, d751bde1d3bfa3b6, 522bf73f5aaeb998, 599bda775e3c05bf, 577be77d652bd419, 0e20bdb30555ea17, 17d06ce103ac6934, 0957c3d414c22eb4, 5edc9c59f9171db7, 81f936a515d96e8b, b2daccac79677d49, 1a873b70608e3ecc, d6e53a06cb126ce2, 8e14edd8d0f58b94, 2eae1147e08829a2, f24e53209cdf6a59, 02e54822831b08a6, df187878c62e8ca7, c2a1cd4485781319, 5de00d6e241c03be, 0dab202d2b32b54e, 2b1c5113a8ad72f6, 47a2ffcb58c18053, a32448859748ada5, d92c7a237c36057a, e8444f9b9599af15, 1ab07ec67202322e, b8abf2e3e78b9d21, 5672792bd0038be8, dbb15e44962ebd61, 6590491f1720ca9b, d9cea58d160818d6, e6e2ef19019ef264, 214f429a1c11c5ce, bda0cb53930dd5a2, b0d9c459105fc02f, b3e8a4a2ec2557d3, b937137278f28568, 65fa0e55fcbf06fc, 4f63c1f29c7fa958, 2d87eb13f94024c7, 69cf8ef1d01f9699, 199b7fbd9bbd0353, 50df970bf853fa47, 9d37bd17af48b24a, 86fe8cccb04baaee, fbdd29230465fefd, b1f391311bc01679, 7d0500afed8e6318, df73c84a029053a9, cd91936a7d1876e4, 57be1529a565bfe3, a83bfb8536286709, 6fea76d8591270a9, b222ec5ff1b5a7c0, 429faae32168b629, 87e7d94503d8daff, 4e44e2cbfb4fdff7, ccd7ac68b24233aa, f5b9aa090b89a381, d5cc7f7315c02ca3, e5763899a5760107, f7e35439c0e066db, 069684e80dee189e, 797ce27814b4121e, 68db522fa043ac42, afb266abfa0c3224, a96dad9f836d502c, d63ada1ea67a4d06, 6354f0c86ad22ab2, 9a9e5855bc64203a, a2396d484e0ba797, 5c37cf5c6d631c9a, 7548d2b7bb68149b, 2484a60934407fee, 1f2506ccd94e6402, 36cfec7e33340c05, ae92c59f635f8578, d2b0ab0dd969a20b, 39b9c24c6c426349, d55d4dbec93fae7f, 1084244162357a24, fdf305352e371b3f, 2a7dacac76ad5d01, 7da09b26d75349aa, 6687c6270c9c032f, b800ae67c332f6b1, 38494fe1ce6cf032, 7ea6ebd948228087, 1af35920666abb5b, 4c7c19edfc0c709c, 553c5eb685cb2443, 912bdadb89287401, f388db6b7fd4d6b7, 90b3062a401349ba, 0f6e5781661a2473, 1435c4bbc0a072cb, a381ed0bac06dc48, 650ce8802da0c5e5, 385a2dbd65b5dc0e, 77b6c669b126aecc, a33be408061df63c\n- Missing nodes: \n\nThese nodes can be considered verified if the file exists. Please update your graph snapshot accordingly.",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "timestamp": "2026-05-01T16:17:36.764Z",
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane"
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": null,
+    "verified": false,
+    "verified_by": null,
+    "verified_at": null
+  }
+}

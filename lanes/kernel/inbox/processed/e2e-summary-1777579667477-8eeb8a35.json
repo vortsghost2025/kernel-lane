@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.3",
+  "task_id": "e2e-summary-1777579667477-8eeb8a35",
+  "idempotency_key": "6fd2f5c3df84fb324dd06414a1c7d8feb38a1cb57760a3834a78519f7bfaae2b",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "report",
+  "task_kind": "report",
+  "priority": "P2",
+  "subject": "CONTRADICTION_RESOLUTION_PLAYBOOK.md",
+  "body": "# CONTRADICTION_RESOLUTION_PLAYBOOK\r\n\r\nOUTPUT_PROVENANCE:\r\nagent: chatgpt-gpt-5.5-thinking (exterior synthesis, relayed by archivist)\r\nlane: archivist\r\ngenerated_at: 2026-04-30T20:07:30Z\r\nsession_id: unknown\r\ntarget_lane: archivist | kernel | library | swarmmind\r\n\r\n---\r\n\r\n## Execution Status\r\n\r\n- APPROVED FOR DRAFTING\r\n- NOT APPROVED FOR AUTO-RESOLUTION\r\n\r\n---\r\n\r\n## Hard Anti-Auto-Resolution Rule\r\n\r\nNo `CONTRADICTS` edge may be resolved by count, confidence, title similarity, or lane preference alone.\r\n\r\nEvery resolution requires:\r\n\r\n1. source edge ID/path\r\n2. quoted or hashed evidence on both sides\r\n3. domain classification: `paper` | `code` | `data`\r\n4. adjudication status:\r\n   - `proven_conflict`\r\n   - `proven_spurious`\r\n   - `needs_lane_review`\r\n5. next action owner\r\n\r\n---\r\n\r\n## Required Operating Principles\r\n\r\n- visibility != proof\r\n- conflict count != truth\r\n- graph pressure != adjudication\r\n\r\nFinal instruction to lanes:\r\n\r\n> Resolve nothing silently. Classify everything with evidence.\r\n\r\n---\r\n\r\n## Resolution Record Template (Per Edge)\r\n\r\n```json\r\n{\r\n  \"edge_id_or_path\": \"\",\r\n  \"source_node_id\": \"\",\r\n  \"target_node_id\": \"\",\r\n  \"domain\": \"paper|code|data\",\r\n  \"evidence_source\": {\r\n    \"quote_or_hash\": \"\",\r\n    \"artifact_path\": \"\"\r\n  },\r\n  \"evidence_target\": {\r\n    \"quote_or_hash\": \"\",\r\n    \"artifact_path\": \"\"\r\n  },\r\n  \"adjudication_status\": \"proven_conflict|proven_spurious|needs_lane_review\",\r\n  \"next_action_owner\": \"archivist|kernel|library|swarmmind\",\r\n  \"notes\": \"\"\r\n}\r\n```\r\n\r\n",
+  "timestamp": "2026-04-30T20:07:47.477Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "archivist",
+    "acquired_at": "2026-04-30T20:07:47.477Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "evidence_exchange": {},
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-04-30T20:07:47.477Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "content_hash": "sha256:f119a6011c2840f63a806abad4261b07fecfe4a8946de58e385a78201c922175",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6ZjExOWE2MDExYzI4NDBmNjNhODA2YWJhZDQyNjFiMDdmZWNmZTRhODk0NmRlNThlMzg1YTc4MjAxYzkyMjE3NSIsImV4cCI6MTc3NzY2NjA2NywiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzU3OTY2NywiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6ImUyZS1zdW1tYXJ5LTE3Nzc1Nzk2Njc0NzctOGVlYjhhMzUiLCJ0byI6Imtlcm5lbCJ9.alL495MtESyudQ6hvvq5e7pynq-p1HomE4S3r5Xy1fX-Gvy5rjiVIcvq5w_bb_yxn_H1-H4Ag0g-1mhOs5gv1auF-u4hM04BGLRhU-Ge1ZvtWmNa1m4syzAYXihEn_NW2EDJmfNNFhAxUNksT9_f5PZVkYXvvZzeNO3Mu4WHIUXDvifooJwA5z0ep9hc5MuKkOzmUL3IuBsXiaUI7Oc-efrGHR2Y-K2jW5TtSO7dxeT8DYoQLuWSKeeIJNvFlmEWNIXaaz7fM_7YLgzWHGQXvqzMYckmpz3PSmZM924nMxNtek0VpK1W00jFiA9ReqruuID-RNlTZdfzqt4bchhxJg",
+  "signature_alg": "RS256",
+  "key_id": "65ae05b2a9e749cb",
+  "session_identity": {
+    "session_id": "sess-1777579667456-7759cd9d",
+    "session_epoch_started_at": "2026-04-30T20:07:47.457Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\Archivist-Agent"
+  }
+}
