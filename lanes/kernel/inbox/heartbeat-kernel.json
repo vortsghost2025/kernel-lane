@@ -1,28 +1,27 @@
 {
-  "schema_version": "1.3",
-  "task_id": "heartbeat-kernel-20260430",
-  "idempotency_key": "hb-kernel-2026-04-30T17:02:30Z",
+  "schema_version": "1.1",
+  "task_id": "heartbeat-kernel",
+  "idempotency_key": "81bf15a14e0ad9501fd97c25e2f7c090502676072663c83a025ae956e01fb655",
   "from": "kernel",
   "to": "kernel",
   "type": "heartbeat",
-  "task_kind": "heartbeat",
+  "task_kind": "proposal",
   "priority": "P3",
-  "subject": "Kernel lane heartbeat - auto-tagging complete",
-  "body": "Kernel lane active. Auto-tagged 170 untagged graph nodes (0 remaining). Fixed Archivist quarantine artifact_type and message-issue-survey envelope. Graph snapshot pipeline fully operational.",
-  "timestamp": "2026-04-30T17:02:30Z",
+  "subject": "Heartbeat from kernel lane",
+  "body": "{\"lane\":\"kernel\",\"session_active\":true,\"uptime_seconds\":12781,\"messages_processed\":0,\"last_inbox_scan\":\"2026-05-01T16:54:05.783Z\",\"version\":\"1.0\"}",
+  "timestamp": "2026-05-01T16:54:05.783Z",
   "requires_action": false,
   "payload": {
-    "mode": "inline",
-    "compression": "none"
+    "mode": "inline"
   },
   "execution": {
     "mode": "manual",
-    "engine": "kilo",
+    "engine": "opencode",
     "actor": "lane"
   },
   "lease": {
-    "owner": "kernel",
-    "acquired_at": "2026-04-30T17:02:30Z",
+    "owner": null,
+    "acquired_at": null,
     "expires_at": null,
     "renew_count": 0,
     "max_renewals": 3
@@ -34,31 +33,23 @@
     "last_attempt_at": null
   },
   "evidence": {
-    "required": false,
-    "verified": false
+    "required": true,
+    "evidence_path": null,
+    "verified": false,
+    "verified_by": null,
+    "verified_at": null
   },
   "heartbeat": {
-    "interval_seconds": 300,
-    "last_heartbeat_at": "2026-04-30T17:02:30Z",
+    "interval_seconds": 60,
+    "last_heartbeat_at": "2026-05-01T16:54:05.783Z",
     "timeout_seconds": 900,
     "status": "in_progress"
   },
-  "watcher": {
-    "enabled": false,
-    "poll_seconds": 60,
-    "p0_fast_path": true,
-    "max_concurrent": 1,
-    "heartbeat_required": true,
-    "stale_after_seconds": 300,
-    "backoff": {
-      "initial_seconds": 60,
-      "max_seconds": 300,
-      "multiplier": 2
-    }
-  },
-  "delivery_verification": {
-    "verified": false,
-    "verified_at": null,
-    "retries": 0
-  }
+  "signature": "",
+  "key_id": "",
+  "system_state": "consistent",
+  "active_contradictions": [],
+  "processed_ok": false,
+  "compaction_enabled": true,
+  "compaction_suspend_reason": null
 }
