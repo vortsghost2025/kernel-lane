@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { ArtifactResolver } = require('./artifact-resolver');
-const { LaneDiscovery } = require('S:/Archivist-Agent/.global/lane-discovery');
+const { LaneDiscovery } = require('./util/lane-discovery');
 
 const _discovery = new LaneDiscovery();
 const _validLanes = new Set(_discovery.listLanes());

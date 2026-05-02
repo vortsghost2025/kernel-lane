@@ -15,7 +15,7 @@
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const { atomicWriteWithLease } = require('S:/kernel-lane/scripts/atomic-write-util');
+const { atomicWriteWithLease } = require('./atomic-write-util');
 
 const ROOT = path.join(__dirname, '..');
 const IDENTITY_DIR = path.join(ROOT, '.identity');

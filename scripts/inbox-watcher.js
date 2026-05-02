@@ -10,7 +10,7 @@ const {
 } = require('./concurrency-policy');
 const { IdentityEnforcer } = require('./identity-enforcer');
 const { moveFileWithLease } = require('./lease-write');
-const { LaneDiscovery } = require('S:/Archivist-Agent/.global/lane-discovery');
+const { LaneDiscovery } = require('./util/lane-discovery');
 
 const PRIORITY_ORDER = { P0: 0, P1: 1, P2: 2, P3: 3 };
 const PREEMPTION_CYCLE_LIMIT = 2;

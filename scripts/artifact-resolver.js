@@ -6,7 +6,7 @@ const path = require('path');
 
 let _discovery = null;
 try {
-  const { LaneDiscovery } = require('S:/Archivist-Agent/.global/lane-discovery');
+  const { LaneDiscovery } = require('./util/lane-discovery');
   _discovery = new LaneDiscovery();
 } catch (_) {}
 

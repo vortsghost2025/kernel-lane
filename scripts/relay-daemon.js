@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { LaneDiscovery } = require('S:/Archivist-Agent/.global/lane-discovery');
+const { LaneDiscovery } = require('./util/lane-discovery');
 
 const _discovery = new LaneDiscovery();
 const CANONICAL_INBOX = {};

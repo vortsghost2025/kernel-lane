@@ -7,7 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { LaneDiscovery } = require('S:/Archivist-Agent/.global/lane-discovery');
+const { LaneDiscovery } = require('../../scripts/util/lane-discovery');
 
 const _discovery = new LaneDiscovery();
 
