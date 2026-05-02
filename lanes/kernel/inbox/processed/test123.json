@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.3",
+  "task_id": "test123",
+  "idempotency_key": "abc",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "proposal",
+  "priority": "P2",
+  "subject": "test",
+  "body": "test",
+  "timestamp": "2026-05-02T19:20:44.415Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "archivist",
+    "acquired_at": "2026-05-02T19:20:44.415Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "evidence_exchange": {},
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-05-02T19:20:44.415Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  }
+}

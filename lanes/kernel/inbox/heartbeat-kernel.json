@@ -2,20 +2,20 @@
   "schema_version": "1.1",
   "agent": "kernel-lane",
   "lane": "kernel",
-  "generated_at": "2026-05-02T18:37:41.217Z",
+  "generated_at": "2026-05-02T19:07:09.000Z",
   "status": "active",
   "ubuntu_node": {
-    "host": "192.168.0.170",
+    "host": "192.168.0.171",
     "status": "offline",
-    "last_seen": "2026-05-02T18:33:37Z",
+    "last_seen": "2026-05-02T19:07:09Z",
     "runner_deployed": true,
+    "runner_version": "1.0",
+    "runner_v2_ready": true,
     "node_version": "v20.20.2",
-    "tasks": [
-      "sovereignty_scan",
-      "graph_analysis",
-      "health_report"
-    ]
+    "repos_cloned": ["kernel-lane"],
+    "repos_pending": ["Archivist-Agent", "self-organizing-library", "SwarmMind"],
+    "tasks": ["sovereignty_scan", "graph_analysis", "health_report", "inbox_watch"]
   },
   "sovereignty": "compliant",
-  "last_commit": "a649ee9"
+  "session_work": "building_ubuntu_deployment_artifacts"
 }

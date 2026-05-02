@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.3",
+  "task_id": "broadcast-test-1777748907782-ee5b0c",
+  "idempotency_key": "68b2ddc9017cbac4025e3efdec80307cd09e6aa1212de30fb463591450be99ec",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "proposal",
+  "priority": "P2",
+  "subject": "Test broadcast",
+  "body": "This is a test broadcast message to all lanes.",
+  "timestamp": "2026-05-02T19:08:27.782Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": "archivist",
+    "acquired_at": "2026-05-02T19:08:27.782Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "evidence_exchange": {},
+  "heartbeat": {
+    "status": "pending",
+    "last_heartbeat_at": "2026-05-02T19:08:27.782Z",
+    "interval_seconds": 300,
+    "timeout_seconds": 900
+  },
+  "source_task_id": "broadcast-test-1777748907782-ee5b0c",
+  "source_message_hash": "8c3701e3965db3af721ef1955f591ee3ade0c582e87e5698d7e6916c81547cd5",
+  "normalizer_run_id": "norm-1777748907827-fbb0a416",
+  "content_hash": "sha256:0e1f86cc0013800c0054764360f75706b8fdb9d227332185d3f431a548bc2fe1",
+  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MGUxZjg2Y2MwMDEzODAwYzAwNTQ3NjQzNjBmNzU3MDZiOGZkYjlkMjI3MzMyMTg1ZDNmNDMxYTU0OGJjMmZlMSIsImV4cCI6MTc3NzgzNTMwNywiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3Nzc0ODkwNywiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6ImJyb2FkY2FzdC10ZXN0LTE3Nzc3NDg5MDc3ODItZWU1YjBjIiwidG8iOiJrZXJuZWwifQ.COkgWygELcmczUOJFRLdmIeReOeZi6ej8JE-S0VxQH5m26RtFK3mEb0q888Kk2dJTgJnPnpNBdGhojguVsn4hKFbbExYhkWO--oeQs9QYBbpk1IaXlMeU4HJZ1YWV_8Fv4t29stbB-JFgJMVWCM6KqyYLcfH90Etx6MNaNgefnI_P2J4HXuSjM7qQ9TIbo14w76PLGjB4J10X7i7D91XaPUub3JnU5t6ogsbFHfarUzKm9rk3b2PZtyg7l69fsZwFo3N4biZzVTT1kGkmQtWv65vslDNlVIMBattUdITul3AHpkGrgIz5ZdCrYnul_iZc5LMuO4sZv2H8jpsqVzAAQ",
+  "signature_alg": "RS256",
+  "key_id": "65ae05b2a9e749cb",
+  "session_identity": {
+    "session_id": "sess-1777748907826-562861a0",
+    "session_epoch_started_at": "2026-05-02T19:08:27.827Z",
+    "origin_runtime": "opencode",
+    "origin_workspace": "S:\\Archivist-Agent"
+  }
+}
