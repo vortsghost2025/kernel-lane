@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.3",
+  "task_id": "nack-1777735762495-nmovuy",
+  "idempotency_key": "nack-kernel-final-summary-20260501T154000-1777735762495",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "notification",
+  "task_kind": "status",
+  "priority": "P2",
+  "subject": "NACK: message rejected at archivist",
+  "body": "Your message (task_id=kernel-final-summary-20260501T154000, type=status) was rejected.\nReason: SCHEMA_INVALID\nDetail: Field \"to\" value \"all\" not in allowed values: archivist, library, swarmmind, kernel\nOriginal subject: Kernel lane final summary: all tasks completed, system healthy",
+  "timestamp": "2026-05-02T15:29:22.495Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": null,
+    "acquired_at": null
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "evidence_exchange": {},
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-05-02T15:29:22.495Z"
+  },
+  "nack_for_task_id": "kernel-final-summary-20260501T154000",
+  "nack_reason": "SCHEMA_INVALID",
+  "nack_detail": "Field \"to\" value \"all\" not in allowed values: archivist, library, swarmmind, kernel"
+}

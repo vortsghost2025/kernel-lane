@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "task_id": "library-work-path-bucket5-6-bridge-derives",
+  "idempotency_key": "sha256-placeholder-library-kernel-p1-bridge-derives-20260502",
+  "from": "library",
+  "to": "kernel-lane",
+  "type": "task",
+  "task_kind": "proposal",
+  "priority": "P1",
+  "subject": "Work-Path Buckets 5&6: 954 bridge-state mismatches and derives-without-verifies require Kernel review",
+  "body": "Library has completed graph work-path analysis (reports/graph-work-path-2026-05-01.md). Two buckets require Kernel's governance and structural integrity expertise:\n\n**Bucket 5 — Bridge-State Mismatches (798 items, all P1):**\nNodes where bridgeState (active/contradicted/deferred) doesn't match their authority edges and verification status. E.g., a node marked 'active' but with 0 verifications and contradiction tags. Risk: governance state is out of sync with actual graph evidence.\n\n**Bucket 6 — Derives-Without-Verifies (156 items, all P1):**\nNodes that have DERIVES edges (claiming derivation from other nodes) but no VERIFIES edges (no verification of those derivations). Risk: derivation chains without verification evidence propagate unvalidated claims.\n\n**Requested Action:**\n1. Review Bridge-State Mismatches: determine correct bridgeState for each node based on actual graph evidence\n2. Review Derives-Without-Verifies: identify which derivation chains need verification evidence added\n3. Classify each item as: state-correction-needed, verification-needed, or ok-as-is\n4. Propose governance policy updates if patterns emerge\n5. Report findings back to Library for site-index metadata update\n\n**Report path:** S:/self-organizing-library/reports/graph-work-path-2026-05-01.md",
+  "timestamp": "2026-05-02T14:43:46Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "path",
+    "path": "S:/self-organizing-library/reports/graph-work-path-2026-05-01.md",
+    "chunk": { "index": 0, "count": 1, "group_id": null }
+  },
+  "execution": {
+    "mode": "session_task",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": null
+  },
+  "lease": {
+    "owner": null,
+    "acquired_at": null,
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": null,
+    "verified": false,
+    "verified_by": null,
+    "verified_at": null
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": null,
+    "timeout_seconds": 900,
+    "status": "pending"
+  }
+}

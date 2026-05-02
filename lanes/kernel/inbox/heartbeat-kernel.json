@@ -1,23 +1,28 @@
 {
   "schema_version": "1.1",
-  "task_id": "heartbeat-kernel",
-  "idempotency_key": "81bf15a14e0ad9501fd97c25e2f7c090502676072663c83a025ae956e01fb655",
   "from": "kernel",
   "to": "kernel",
   "type": "heartbeat",
-  "task_kind": "proposal",
+  "task_kind": "heartbeat",
+  "task_id": "heartbeat-kernel-20260502T150900Z",
+  "idempotency_key": "heartbeat-kernel-20260502T150900Z",
   "priority": "P3",
-  "subject": "Heartbeat from kernel lane",
-  "body": "{\"lane\":\"kernel\",\"session_active\":true,\"uptime_seconds\":0,\"messages_processed\":3,\"last_inbox_scan\":\"2026-05-01T21:41:46.000Z\",\"version\":\"1.0\"}",
-  "timestamp": "2026-05-01T21:41:46.000Z",
+  "subject": "Kernel heartbeat - bridge-derives review complete",
+  "body": "Bridge-derives review complete. 954 items classified. Report sent to Library.",
+  "timestamp": "2026-05-02T15:25:24.877Z",
   "requires_action": false,
   "payload": {
-    "mode": "inline"
+    "mode": "inline",
+    "compression": "none",
+    "path": null,
+    "chunk": null
   },
   "execution": {
     "mode": "manual",
     "engine": "kilo",
-    "actor": "lane"
+    "actor": "lane",
+    "session_id": null,
+    "parent_id": null
   },
   "lease": {
     "owner": null,
@@ -33,23 +38,34 @@
     "last_attempt_at": null
   },
   "evidence": {
-    "required": true,
+    "required": false,
     "evidence_path": null,
     "verified": false,
     "verified_by": null,
     "verified_at": null
   },
   "heartbeat": {
-    "interval_seconds": 60,
-    "last_heartbeat_at": "2026-05-01T21:41:46.000Z",
+    "interval_seconds": 300,
+    "last_heartbeat_at": "2026-05-02T15:25:24.877Z",
     "timeout_seconds": 900,
-    "status": "in_progress"
+    "status": "done"
   },
-  "signature": "",
-  "key_id": "",
-  "system_state": "consistent",
-  "active_contradictions": [],
-  "processed_ok": false,
-  "compaction_enabled": true,
-  "compaction_suspend_reason": null
+  "watcher": {
+    "enabled": false,
+    "poll_seconds": 60,
+    "p0_fast_path": true,
+    "max_concurrent": 1,
+    "heartbeat_required": true,
+    "stale_after_seconds": 300,
+    "backoff": {
+      "initial_seconds": 60,
+      "max_seconds": 300,
+      "multiplier": 2
+    }
+  },
+  "delivery_verification": {
+    "verified": false,
+    "verified_at": null,
+    "retries": 0
+  }
 }

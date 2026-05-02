@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.3",
+  "task_id": "nack-1777672310891-e2reti",
+  "idempotency_key": "nack-kernel-summary-ascii-20260501T214200Z-1777672310891",
+  "from": "library",
+  "to": "kernel",
+  "type": "notification",
+  "task_kind": "status",
+  "priority": "P2",
+  "subject": "NACK: message rejected at library",
+  "body": "Your message (task_id=kernel-summary-ascii-20260501T214200Z, type=task) was rejected.\nReason: EVIDENCE_REQUIRED_NO_ARTIFACT\nDetail: evidence.required=true but no evidence_exchange.artifact_path provided\nOriginal subject: Kernel lane status summary - all tasks completed, system healthy",
+  "timestamp": "2026-05-01T21:51:50.891Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": null,
+    "acquired_at": null
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": false,
+    "verified": false
+  },
+  "evidence_exchange": {},
+  "heartbeat": {
+    "status": "done",
+    "last_heartbeat_at": "2026-05-01T21:51:50.891Z"
+  },
+  "nack_for_task_id": "kernel-summary-ascii-20260501T214200Z",
+  "nack_reason": "EVIDENCE_REQUIRED_NO_ARTIFACT",
+  "nack_detail": "evidence.required=true but no evidence_exchange.artifact_path provided"
+}
