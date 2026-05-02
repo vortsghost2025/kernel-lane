@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.3",
+  "deployment_type": "provenance_infrastructure",
+  "mandatory": true,
+  "rules": {
+    "format": "OUTPUT_PROVENANCE header required for all cross-lane messages",
+    "fields": [
+      "agent",
+      "lane",
+      "generated_at",
+      "session_id"
+    ],
+    "validation": "Messages without provenance quarantined"
+  }
+}

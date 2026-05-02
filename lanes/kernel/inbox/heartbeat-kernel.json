@@ -4,12 +4,12 @@
   "to": "kernel",
   "type": "heartbeat",
   "task_kind": "heartbeat",
-  "task_id": "heartbeat-kernel-20260502T150900Z",
-  "idempotency_key": "heartbeat-kernel-20260502T150900Z",
+  "task_id": "heartbeat-kernel-20260502T153930Z",
+  "idempotency_key": "heartbeat-kernel-20260502T153930Z",
   "priority": "P3",
-  "subject": "Kernel heartbeat - bridge-derives review complete",
-  "body": "Bridge-derives review complete. 954 items classified. Report sent to Library.",
-  "timestamp": "2026-05-02T15:25:24.877Z",
+  "subject": "Kernel heartbeat - summaries sent, OUTPUT_PROVENANCE mandate added",
+  "body": "Session summaries sent to all 4 lanes (fixed to=all NACK). OUTPUT_PROVENANCE mandate added to Kernel/Library/SwarmMind AGENTS.md. Archivist already has it.",
+  "timestamp": "2026-05-02T15:39:30.000Z",
   "requires_action": false,
   "payload": {
     "mode": "inline",
@@ -46,7 +46,7 @@
   },
   "heartbeat": {
     "interval_seconds": 300,
-    "last_heartbeat_at": "2026-05-02T15:25:24.877Z",
+    "last_heartbeat_at": "2026-05-02T15:39:30.000Z",
     "timeout_seconds": 900,
     "status": "done"
   },
