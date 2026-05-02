@@ -3,7 +3,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const { LaneDiscovery } = require('S:/Archivist-Agent/scripts/lane-discovery'); // TEST: intentional violation
 
 let _discovery = null;
 try {

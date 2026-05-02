@@ -1,11 +1,19 @@
 {
   "lane_id": "kernel",
-  "timestamp": "2026-05-02T18:51:03.557Z",
+  "timestamp": "2026-05-02T18:49:58.633Z",
   "scan_scope": "scripts/",
-  "total_violations": 0,
-  "violations": [],
+  "total_violations": 1,
+  "violations": [
+    {
+      "file": "scripts\\artifact-resolver.js",
+      "line": 6,
+      "snippet": "const { LaneDiscovery } = require('S:/Archivist-Agent/scripts/lane-discovery'); // TEST: intentional violation",
+      "type": "cross_lane_import",
+      "severity": "blocking"
+    }
+  ],
   "summary": {
-    "blocking": 0,
+    "blocking": 1,
     "warnings": 0,
     "info": 0
   },
