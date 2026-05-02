@@ -9,10 +9,11 @@ const SCRIPTS_DIR = path.join(LANE_ROOT, 'scripts');
 const LANE_ID = 'kernel';
 
 const CROSS_LANE_INDICATORS = [
-  // Require statements importing from other lanes (actual code imports)
-  /require\s*\(\s*['"]S:\/(archivist|self-organizing-library|SwarmMind)/,
-  // Import statements importing from other lanes (actual code imports)
-  /import\s+.*\s+from\s+['"]S:\/(archivist|self-organizing-library|SwarmMind)/
+// Require statements importing from other lanes (actual code imports)
+// Matches both forward-slash (S:/Archivist-Agent) and backslash (S:\Archivist-Agent) paths
+/require\s*\(\s*['"]S:[\\\/](Archivist-Agent|self-organizing-library|SwarmMind)/i,
+// Import statements importing from other lanes (actual code imports)
+/import\s+.*\s+from\s+['"]S:[\\\/](Archivist-Agent|self-organizing-library|SwarmMind)/i
 ];
 
 const COMMENT_PATTERNS = [
