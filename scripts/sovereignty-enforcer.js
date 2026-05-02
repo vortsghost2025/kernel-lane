@@ -134,10 +134,19 @@ function scanDirectory(dirPath, baseDir) {
   return violations;
 }
 
-function scanLane(laneName) {
-  console.log(`🔍 Scanning ${laneName} lane...`);
+function resolveLaneName(input) {
+ const lower = input.toLowerCase();
+ for (const key of Object.keys(LANES)) {
+  if (key.toLowerCase() === lower) return key;
+ }
+ return input;
+}
 
-  const scriptsDir = path.join(LANES[laneName], 'scripts');
+function scanLane(laneName) {
+ const resolvedName = resolveLaneName(laneName);
+ console.log(`🔍 Scanning ${resolvedName} lane...`);
+
+ const scriptsDir = path.join(LANES[resolvedName], 'scripts');
 
   if (!fs.existsSync(scriptsDir)) {
     console.log(` ❌ No scripts directory in ${laneName}\n`);
@@ -196,12 +205,12 @@ console.log('══════════════════════�
 
 const allViolations = [];
 
-const lanesToScan = targetLane ? [targetLane] : Object.keys(LANES);
+const lanesToScan = targetLane ? [resolveLaneName(targetLane)] : Object.keys(LANES);
 lanesToScan.forEach(lane => {
-  const violations = scanLane(lane);
-  allViolations.push(...violations.map(v => ({
-    lane,
-    file: path.join(LANES[lane], 'scripts', v.file),
+ const violations = scanLane(lane);
+ allViolations.push(...violations.map(v => ({
+  lane,
+  file: path.join(LANES[resolveLaneName(lane)], 'scripts', v.file),
     violations: v.violations
   })));
 });
