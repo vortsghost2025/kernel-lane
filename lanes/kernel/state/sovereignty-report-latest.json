@@ -1,23 +1,39 @@
 {
-  "lane_id": "kernel",
-  "timestamp": "2026-05-02T18:52:14.652Z",
-  "scan_scope": "scripts/",
-  "total_violations": 0,
-  "violations": [],
+  "timestamp": "2026-05-02T20:06:30.665Z",
+  "scanner": "sovereignty-enforcer",
+  "rule": "NO_CROSS_LANE_REQUIRE",
+  "total_violations": 2,
+  "lanes_scanned": 4,
+  "violations": [
+    {
+      "lane": "SwarmMind",
+      "file": "S:\\SwarmMind\\scripts\\scripts\\send-library-automation-offer.js",
+      "violations": [
+        {
+          "line": 70,
+          "code": "const { createSignedMessage } = require('S:/SwarmMind/scripts/create-signed-message.js');",
+          "violation": "Cross-lane import from SwarmMind",
+          "type": "cross_lane_require"
+        }
+      ]
+    },
+    {
+      "lane": "SwarmMind",
+      "file": "S:\\SwarmMind\\scripts\\scripts\\sign-and-deliver-contradiction-responses.js",
+      "violations": [
+        {
+          "line": 7,
+          "code": "const { createSignedMessage } = require('S:/SwarmMind/scripts/create-signed-message.js');",
+          "violation": "Cross-lane import from SwarmMind",
+          "type": "cross_lane_require"
+        }
+      ]
+    }
+  ],
   "summary": {
-    "blocking": 0,
-    "warnings": 0,
-    "info": 0
-  },
-  "enforcement": {
-    "pre_commit_hook": true,
-    "block_on_violation": true,
-    "strict_mode": true
-  },
-  "recommendations": [
-    "Move cross-lane dependencies to local scripts/util/ implementations",
-    "Replace absolute paths with relative local imports",
-    "Document utility origins with ORIGIN: comments",
-    "Run: node scripts/sovereignty-enforcer.js to verify"
-  ]
+    "Archivist": 0,
+    "Kernel": 0,
+    "Library": 1,
+    "SwarmMind": 0
+  }
 }

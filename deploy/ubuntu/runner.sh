@@ -23,10 +23,10 @@ log() { echo "$(date -Iseconds) $1" >> "$LOG_FILE"; }
 
 REPOS=("kernel-lane" "Archivist-Agent" "self-organizing-library" "SwarmMind")
 REPO_URLS=(
-    "https://github.com/vortsghost2025/kernel-lane.git"
-    "https://github.com/vortsghost2025/Archivist-Agent.git"
-    "https://github.com/vortsghost2025/self-organizing-library.git"
-    "https://github.com/vortsghost2025/SwarmMind.git"
+    "git@github.com:vortsghost2025/kernel-lane.git"
+    "git@github.com:vortsghost2025/Archivist-Agent.git"
+    "git@github.com:vortsghost2025/self-organizing-library.git"
+    "git@github.com:vortsghost2025/SwarmMind-Self-Optimizing-Multi-Agent-AI-System.git"
 )
 
 clone_if_missing() {
@@ -42,7 +42,18 @@ pull_latest() {
     local dir="$REPOS_DIR/$name"
     if [ -d "$dir" ]; then
         log "[INFO] Pulling latest for $name..."
-        git -C "$dir" pull --ff-only 2>> "$LOG_FILE" || log "[WARN] Pull failed for $name (possible local changes)"
+        # Stash any local changes to avoid conflicts, then pull
+        if git -C "$dir" diff-index --quiet HEAD 2>/dev/null; then
+            # No local changes
+            git -C "$dir" pull 2>> "$LOG_FILE" || log "[ERROR] Pull failed for $name"
+        else
+            # Has local changes
+            log "[WARN] $dir has local changes, stashing before pull"
+            git -C "$dir" stash 2>> "$LOG_FILE" && \
+            git -C "$dir" pull 2>> "$LOG_FILE" && \
+            git -C "$dir" stash pop 2>> "$LOG_FILE" || \
+            log "[ERROR] Pull or stash operations failed for $name"
+        fi
     fi
 }
 
