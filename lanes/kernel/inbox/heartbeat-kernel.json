@@ -4,12 +4,12 @@
   "to": "kernel",
   "type": "heartbeat",
   "task_kind": "heartbeat",
-  "task_id": "heartbeat-kernel-20260502T153930Z",
-  "idempotency_key": "heartbeat-kernel-20260502T153930Z",
+  "task_id": "heartbeat-kernel-20260502T164830Z",
+  "idempotency_key": "heartbeat-kernel-20260502T164830Z",
   "priority": "P3",
-  "subject": "Kernel heartbeat - summaries sent, OUTPUT_PROVENANCE mandate added",
-  "body": "Session summaries sent to all 4 lanes (fixed to=all NACK). OUTPUT_PROVENANCE mandate added to Kernel/Library/SwarmMind AGENTS.md. Archivist already has it.",
-  "timestamp": "2026-05-02T15:39:30.000Z",
+  "subject": "Kernel heartbeat - sovereignty compliance complete, enforcer deployed",
+  "body": "Sovereignty compliance complete. All 5 cross-lane imports localized. scripts/util/ created. sovereignty-enforcer.js deployed. Pre-commit hook installed. Full scan PASS. Commit 4c8df09 pushed. Compliance reports sent to all 4 lanes.",
+  "timestamp": "2026-05-02T16:48:30.000Z",
   "requires_action": false,
   "payload": {
     "mode": "inline",
@@ -46,7 +46,7 @@
   },
   "heartbeat": {
     "interval_seconds": 300,
-    "last_heartbeat_at": "2026-05-02T15:39:30.000Z",
+    "last_heartbeat_at": "2026-05-02T16:48:30.000Z",
     "timeout_seconds": 900,
     "status": "done"
   },
