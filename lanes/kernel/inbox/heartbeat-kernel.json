@@ -1,21 +1,55 @@
 {
   "schema_version": "1.1",
-  "agent": "kernel-lane",
-  "lane": "kernel",
-  "generated_at": "2026-05-02T19:07:09.000Z",
-  "status": "active",
-  "ubuntu_node": {
-    "host": "192.168.0.171",
-    "status": "offline",
-    "last_seen": "2026-05-02T19:07:09Z",
-    "runner_deployed": true,
-    "runner_version": "1.0",
-    "runner_v2_ready": true,
-    "node_version": "v20.20.2",
-    "repos_cloned": ["kernel-lane"],
-    "repos_pending": ["Archivist-Agent", "self-organizing-library", "SwarmMind"],
-    "tasks": ["sovereignty_scan", "graph_analysis", "health_report", "inbox_watch"]
+  "task_id": "heartbeat-kernel",
+  "idempotency_key": "81bf15a14e0ad9501fd97c25e2f7c090502676072663c83a025ae956e01fb655",
+  "from": "kernel",
+  "to": "kernel",
+  "type": "heartbeat",
+  "task_kind": "proposal",
+  "priority": "P3",
+  "subject": "Heartbeat from kernel lane",
+  "body": "{\"lane\":\"kernel\",\"agent_mode\":\"governing\",\"session_active\":true,\"uptime_seconds\":0,\"messages_processed\":0,\"last_inbox_scan\":\"2026-05-03T04:27:02.131Z\",\"version\":\"1.0\"}",
+  "timestamp": "2026-05-03T04:27:02.131Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline"
   },
-  "sovereignty": "compliant",
-  "session_work": "building_ubuntu_deployment_artifacts"
+  "execution": {
+    "mode": "manual",
+    "engine": "opencode",
+    "actor": "lane"
+  },
+  "lease": {
+    "owner": null,
+    "acquired_at": null,
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": null,
+    "verified": false,
+    "verified_by": null,
+    "verified_at": null
+  },
+  "heartbeat": {
+    "interval_seconds": 60,
+    "last_heartbeat_at": "2026-05-03T04:27:02.131Z",
+    "timeout_seconds": 900,
+    "status": "in_progress"
+  },
+  "signature": "",
+  "key_id": "",
+  "system_state": "consistent",
+  "active_contradictions": [],
+  "processed_ok": false,
+  "compaction_enabled": true,
+  "compaction_suspend_reason": null
 }

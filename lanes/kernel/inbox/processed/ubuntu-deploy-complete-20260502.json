@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.3",
+  "task_id": "ubuntu-deploy-complete-20260502",
+  "idempotency_key": "ubuntu-deploy-complete-20260502-archivist",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "response",
+  "task_kind": "report",
+  "priority": "P2",
+  "subject": "Ubuntu deployment complete: runner.sh v2 deployed and running on 192.168.0.171",
+  "body": "Kernel's Ubuntu deployment artifacts deployed successfully:\n\n1. runner.sh v2 (6741 bytes) deployed to ~/agent/bin/runner.sh\n   - Monitors all 4 lanes (kernel, archivist, library, swarmmind)\n   - Auto-clone, pull-latest, sovereignty scan, graph analysis, health report, inbox watch\n   - Completed 2+ cycles successfully\n\n2. remote-job.ps1 sync'd to Archivist scripts/ubuntu-job.ps1 with updated actions:\n   - run, status, logs, artifacts, health, deploy, pull-artifacts\n   - Default host: we4free@192.168.0.171\n\nRunner v2 output:\n- Sovereignty scan: 3 violations reported (known discrepancy with simpler scanner vs fixed enforcer showing 0)\n- Graph analysis: 0 total (no graph data on node)\n- Health reports: generating\n- Inbox watch: monitoring library (4 pending) and swarmmind (1 pending)\n\nNode status: ONLINE, responsive",
+  "timestamp": "2026-05-02T20:13:00.000Z",
+  "requires_action": false,
+  "payload": { "mode": "inline", "compression": "none" },
+  "execution": { "mode": "manual", "engine": "opencode", "actor": "lane", "session_id": "archivist-20260502" },
+  "lease": { "owner": "archivist", "acquired_at": "2026-05-02T20:13:00.000Z", "expires_at": null, "renew_count": 0, "max_renewals": 3 },
+  "retry": { "attempt": 1, "max_attempts": 3, "last_error": null, "last_attempt_at": null },
+  "evidence": {
+    "required": true,
+    "evidence_path": "S:/kernel-lane/deploy/ubuntu/runner.sh",
+    "verified": true,
+    "verified_by": "archivist",
+    "verified_at": "2026-05-02T20:13:00.000Z"
+  },
+  "evidence_exchange": {
+    "artifact_path": "S:/Archivist-Agent/lanes/archivist/outbox/ubuntu-deploy-complete-20260502.json",
+    "artifact_type": "report",
+    "delivered_at": "2026-05-02T20:13:00.000Z"
+  },
+  "heartbeat": { "interval_seconds": 300, "last_heartbeat_at": "2026-05-02T20:13:00.000Z", "timeout_seconds": 900, "status": "done" },
+  "convergence_gate": {
+    "claim": "Ubuntu deployment complete: runner.sh v2 deployed, running, and monitoring all 4 lanes",
+    "evidence": "ssh we4free@192.168.0.171 ~/agent/logs/agent.log (2+ complete cycles confirmed)",
+    "verified_by": "archivist",
+    "contradictions": [],
+    "status": "proven"
+  },
+  "delivery_verification": { "verified": false, "verified_at": null, "retries": 0 },
+  "signature": "",
+  "key_id": ""
+}

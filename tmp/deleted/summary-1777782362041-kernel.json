@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.3",
+  "task_id": "summary-1777782362041-kernel",
+  "idempotency_key": "summary-1777782362041",
+  "from": "archivist",
+  "type": "status",
+  "task_kind": "status",
+  "priority": "P2",
+  "subject": "Inbox processing summary",
+  "body": "Inbox scan completed. Processed total 0 messages. No pending messages remain.",
+  "timestamp": "2026-05-03T04:26:02.041Z",
+  "requires_action": false,
+  "payload": {},
+  "execution": {},
+  "lease": {},
+  "retry": {},
+  "evidence": {
+    "required": false
+  },
+  "heartbeat": {},
+  "to": "kernel"
+}

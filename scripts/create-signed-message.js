@@ -228,7 +228,7 @@ async function writeSignedMessage(msg, laneId, outboxPath) {
   if (!fs.existsSync(outboxPath)) {
     fs.mkdirSync(outboxPath, { recursive: true });
   }
-  const filename = `${msg.id || 'msg-' + Date.now()}.json`;
+  const filename = `${signed.id || 'msg-' + Date.now()}.json`;
   const filePath = path.join(outboxPath, filename);
   // Governance invariant: every outbound write must carry explicit lease metadata.
   if (!signed.lease || typeof signed.lease !== 'object') {
@@ -242,8 +242,9 @@ async function writeSignedMessage(msg, laneId, outboxPath) {
     };
   }
   guardWrite(signed, outboxPath, filename);
-  // Atomic write with mandatory lease
-  await atomicWriteWithLease(filePath, signed, laneId, 30000);
+  // Atomic write requires string or Buffer content.
+  const contentStr = JSON.stringify(signed, null, 2);
+  await atomicWriteWithLease(filePath, contentStr, laneId, 30000);
   return { filePath, keyId: signed.key_id, filename };
 }
 

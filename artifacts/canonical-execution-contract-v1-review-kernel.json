@@ -1,0 +1,84 @@
+{
+  "output_provenance": {
+    "agent": "codex",
+    "lane": "kernel",
+    "generated_at": "2026-05-03T03:45:28.000Z",
+    "session_id": "sess-cec-review-kernel-1777779928493"
+  },
+  "convergence_gate": {
+    "claim": "Kernel ACKs Canonical Execution Contract v1 — all hard rules CEC-R1..R7 implemented, no clause conflicts; soft gaps and signal exposures documented",
+    "evidence": "artifacts/canonical-execution-contract-v1-review-kernel.json",
+    "verified_by": "kernel",
+    "contradictions": [],
+    "status": "proven"
+  },
+  "schema_version": "1.0",
+  "artifact_type": "contract_ratification_review",
+  "contract_id": "canonical-execution-contract-v1",
+  "lane": "kernel",
+  "reviewed_at": "2026-05-03T04:00:00.000Z",
+  "verdict": "ACK",
+  "acknowledgement": "Kernel lane acknowledges and ratifies Canonical Execution Contract v1. All hard rules (CEC-R1..R7) are implemented as specified. No clause conflicts identified.",
+  "implementation_gaps": [
+    {
+      "id": "CEC-S1",
+      "name": "Standard runtime health panel",
+      "gap_type": "soft_rule_missing",
+      "description": "Kernel lacks a 'stable-health-panel.ps1' equivalent that emits one compact health snapshot aggregating per-lane runtime signals. The lane-worker --json output provides most signals but not a single consumable health panel.",
+      "evidence": "scripts/health-core.js checks trust store, not runtime signals; no unified health snapshot script present."
+    },
+    {
+      "id": "CEC-S2",
+      "name": "One shared execution summary schema",
+      "gap_type": "soft_rule_partial",
+      "description": "Kernel's lane-worker produces an execution summary with routed counts and execution_verified/failed counts. Cross-lane schema alignment (Library, SwarmMind, Archivist) has not been validated.",
+      "evidence": "scripts/lane-worker.js lines 942-966 produce summary; no cross-lane schema validation found."
+    },
+    {
+      "id": "CEC-S3",
+      "name": "Schedule from execution signals",
+      "gap_type": "soft_rule_not_implemented",
+      "description": "inbox-watcher scheduling currently prioritizes by message priority and heartbeat staleness. It does not yet incorporate execution_verified_count, blocked depth, or quarantine depth into dispatch priority.",
+      "evidence": "scripts/inbox-watcher.js: preemption uses priority only; execution metrics tracked but not used for load-aware dispatch."
+    },
+    {
+      "id": "SIGNAL-INBOX-DEPTH",
+      "name": "Per-lane queue_depth_inbox signal",
+      "gap_type": "required_signal_derived",
+      "description": "The required per-lane signal 'queue_depth_inbox' is not directly stored as a counter; it can be derived from lane-worker's 'scanned' field on each cycle.",
+      "evidence": "lane-worker: scanned count approximates inbox depth; no persistent counter."
+    },
+    {
+      "id": "SIGNAL-WORKER-LOCK-OWNER",
+      "name": "worker_lock_owner exposure",
+      "gap_type": "required_signal_derived",
+      "description": "worker_lock_owner is maintained in active-owner.json but not exposed in heartbeat output; callers must read state/active-owner.json directly.",
+      "evidence": "scripts/lane-worker.js claims active-owner.json; heartbeat.js does not include owner info."
+    },
+    {
+      "id": "SIGNAL-LAST-COMPLETION",
+      "name": "last_completion_at tracking",
+      "gap_type": "required_signal_missing",
+      "description": "The timestamp of last message routed to processed is not explicitly recorded in a singleton location. lane-worker summary includes timestamp but not last_completion_at specifically.",
+      "evidence": "No dedicated last_completion_at field found in heartbeat or state outputs."
+    }
+  ],
+  "clause_conflicts": [],
+  "evidence_paths": [
+    "scripts/completion-proof.js (CEC-R1 evidence)",
+    "scripts/execution-gate.js (CEC-R1 evidence)",
+    "scripts/lane-worker.js (CEC-R1,R3 evidence)",
+    "scripts/relay-daemon.js (CEC-R2 evidence)",
+    "scripts/validate-responses.js (CEC-R2 evidence)",
+    "scripts/concurrency-policy.js (CEC-R4 evidence)",
+    "scripts/inbox-watcher.js (CEC-R3,R4 evidence)",
+    "scripts/recovery-test-suite.js (CEC-R5 evidence)",
+    "scripts/auto-recover-stale-lanes.ps1 (CEC-R5 evidence)",
+    "scripts/post-compact-audit.js (CEC-R6 evidence)",
+    "scripts/run-compact-with-audit.js (CEC-R6 evidence)",
+    "self-organizing-library/src/usage/RuntimeProbe.js (CEC-R7 evidence — Library)",
+    "self-organizing-library/src/usage/UsageGateEnforcer.js (CEC-R7 evidence — Library)",
+    "deploy/ubuntu/runner.sh (artifact exists)"
+  ],
+  "notes": "Hard rules CEC-R1..R7 are fully implemented. Soft rules CEC-S1..S3 and minor required runtime signal gaps are documented as implementation gaps, not conflicts. No trust-store writes, authority approvals, or identity changes are requested or required."
+}
