@@ -1,0 +1,362 @@
+{
+  "verifier": "kernel-independent-contradiction-verifier",
+  "timestamp": "2026-05-03T20:21:47.988Z",
+  "data_source": "S:/self-organizing-library/data/site-index.json",
+  "data_generated_at": "2026-05-02T16:57:24.257Z",
+  "total_entries": 3827,
+  "total_cross_refs": 1100,
+  "total_authority_edges": 1164,
+  "authority_edge_type_counts": {
+    "DEPENDS_ON": 306,
+    "CONTRADICTS": 263,
+    "DERIVES_FROM": 329,
+    "VERIFIES": 146,
+    "EXECUTES": 120
+  },
+  "contradicts_edge_count": 263,
+  "independent_status_counts": {
+    "VERIFIED": 538,
+    "UNVERIFIED": 3104,
+    "CONFLICTED": 162,
+    "QUARANTINED": 23
+  },
+  "reported_counts": {
+    "CONFLICTED": 199,
+    "QUARANTINED": 23
+  },
+  "match_exact_equality": false,
+  "verification_status": "unproven",
+  "top_30_conflicted": [
+    {
+      "rank": 1,
+      "title": "THE SINGLE ENTRY POINT",
+      "id": "c6afd861a226fc10",
+      "repo": "self-organizing-library",
+      "governanceLayer": "unknown",
+      "contradictionCount": 28,
+      "verificationCount": 0
+    },
+    {
+      "rank": 2,
+      "title": "🎊 PROJECT COMPLETION SUMMARY",
+      "id": "6d0633a09714073b",
+      "repo": "Deliberate-AI-Ensemble",
+      "governanceLayer": "constitutional",
+      "contradictionCount": 27,
+      "verificationCount": 0
+    },
+    {
+      "rank": 3,
+      "title": "Drift Identity and Ensemble Coherence",
+      "id": "ec498514c4ad3f3c",
+      "repo": "papers",
+      "governanceLayer": "theoretical",
+      "contradictionCount": 17,
+      "verificationCount": 0
+    },
+    {
+      "rank": 4,
+      "title": "Drift, Identity, and Ensemble Coherence (Structure Index)",
+      "id": "924d83907a0aef82",
+      "repo": "papers",
+      "governanceLayer": "theoretical",
+      "contradictionCount": 16,
+      "verificationCount": 1
+    },
+    {
+      "rank": 5,
+      "title": "🎊 PROJECT COMPLETION SUMMARY",
+      "id": "bfcfc95ede211094",
+      "repo": "FreeAgent",
+      "governanceLayer": "application_adjacent",
+      "contradictionCount": 14,
+      "verificationCount": 0
+    },
+    {
+      "rank": 6,
+      "title": "Graph Readability and Snapshot Roadmap Review",
+      "id": "a3dd76422db83d0b",
+      "repo": "self-organizing-library",
+      "governanceLayer": "unknown",
+      "contradictionCount": 7,
+      "verificationCount": 0
+    },
+    {
+      "rank": 7,
+      "title": "Archivist Quick Reference: Governance Root (Lane 1) — 1-Page Summary",
+      "id": "f48c014cec555c6e",
+      "repo": "self-organizing-library",
+      "governanceLayer": "constitutional",
+      "contradictionCount": 7,
+      "verificationCount": 0
+    },
+    {
+      "rank": 8,
+      "title": "Multi-AI Collaboration Methodology: Persistent Evolution Through Verified Unity",
+      "id": "b79b4e273f15f915",
+      "repo": "Deliberate-AI-Ensemble",
+      "governanceLayer": "constitutional",
+      "contradictionCount": 7,
+      "verificationCount": 0
+    },
+    {
+      "rank": 9,
+      "title": "Accidental single: Continues",
+      "id": "c898563bcc9b2f3f",
+      "repo": "FreeAgent",
+      "governanceLayer": "theoretical",
+      "contradictionCount": 6,
+      "verificationCount": 0
+    },
+    {
+      "rank": 10,
+      "title": "Multi-AI Collaboration Methodology: Persistent Evolution Through Verified Unity",
+      "id": "a3d19542b1d97381",
+      "repo": "FreeAgent",
+      "governanceLayer": "application_adjacent",
+      "contradictionCount": 6,
+      "verificationCount": 0
+    },
+    {
+      "rank": 11,
+      "title": "Constraint Lattices and Stability (Structure Index)",
+      "id": "8314e863b8d59045",
+      "repo": "papers",
+      "governanceLayer": "theoretical",
+      "contradictionCount": 6,
+      "verificationCount": 0
+    },
+    {
+      "rank": 12,
+      "title": "The Rosetta Stone (Structure Index)",
+      "id": "417be6412d14ac69",
+      "repo": "papers",
+      "governanceLayer": "theoretical",
+      "contradictionCount": 6,
+      "verificationCount": 0
+    },
+    {
+      "rank": 13,
+      "title": "The WE4FREE Framework (Structure Index)",
+      "id": "618dfb4ede98a6f7",
+      "repo": "papers",
+      "governanceLayer": "theoretical",
+      "contradictionCount": 6,
+      "verificationCount": 1
+    },
+    {
+      "rank": 14,
+      "title": "Declaration of Intent Protocol",
+      "id": "79c9991d0f133a56",
+      "repo": "FreeAgent",
+      "governanceLayer": "application_adjacent",
+      "contradictionCount": 5,
+      "verificationCount": 0
+    },
+    {
+      "rank": 15,
+      "title": "VS Code Agent Status",
+      "id": "34720bc702042abe",
+      "repo": "FreeAgent",
+      "governanceLayer": "theoretical",
+      "contradictionCount": 5,
+      "verificationCount": 0
+    },
+    {
+      "rank": 16,
+      "title": "WE4FREE Papers — Complete Series",
+      "id": "c69c93fbbf6da944",
+      "repo": "FreeAgent",
+      "governanceLayer": "theoretical",
+      "contradictionCount": 5,
+      "verificationCount": 0
+    },
+    {
+      "rank": 17,
+      "title": "Phenotype Selection in Constraint-Governed Systems (Structure Index)",
+      "id": "f1d45dc5a47a223c",
+      "repo": "papers",
+      "governanceLayer": "theoretical",
+      "contradictionCount": 5,
+      "verificationCount": 0
+    },
+    {
+      "rank": 18,
+      "title": "Declaration of Intent Protocol",
+      "id": "e423425eac7b55aa",
+      "repo": "Deliberate-AI-Ensemble",
+      "governanceLayer": "constitutional",
+      "contradictionCount": 5,
+      "verificationCount": 0
+    },
+    {
+      "rank": 19,
+      "title": "Federation",
+      "id": "6f54cd4a19f0274a",
+      "repo": "federation",
+      "governanceLayer": "theoretical",
+      "contradictionCount": 4,
+      "verificationCount": 0
+    },
+    {
+      "rank": 20,
+      "title": "WE4FREE CONSTITUTIONAL GIFT KIT",
+      "id": "7c5b9c5b5d10f81c",
+      "repo": "FreeAgent",
+      "governanceLayer": "application_adjacent",
+      "contradictionCount": 4,
+      "verificationCount": 0
+    },
+    {
+      "rank": 21,
+      "title": "Federation Coordinator Spec",
+      "id": "bc85ab6ebb94770f",
+      "repo": "FreeAgent",
+      "governanceLayer": "theoretical",
+      "contradictionCount": 4,
+      "verificationCount": 0
+    },
+    {
+      "rank": 22,
+      "title": "Phenotype Selection in Constraint-Governed Systems — Catastrophic Collapse",
+      "id": "81e0b90eb44de696",
+      "repo": "papers",
+      "governanceLayer": "theoretical",
+      "contradictionCount": 4,
+      "verificationCount": 0
+    },
+    {
+      "rank": 23,
+      "title": "Session Continuation Protocol",
+      "id": "21b180e92dcbaafa",
+      "repo": "Deliberate-AI-Ensemble",
+      "governanceLayer": "constitutional",
+      "contradictionCount": 4,
+      "verificationCount": 0
+    },
+    {
+      "rank": 24,
+      "title": "WE4FREE CONSTITUTIONAL GIFT KIT",
+      "id": "cf71bc64ce8668df",
+      "repo": "Deliberate-AI-Ensemble",
+      "governanceLayer": "constitutional",
+      "contradictionCount": 4,
+      "verificationCount": 0
+    },
+    {
+      "rank": 25,
+      "title": "VS Code Agent Status",
+      "id": "3cbf0e3db2967fee",
+      "repo": "Deliberate-AI-Ensemble",
+      "governanceLayer": "theoretical",
+      "contradictionCount": 4,
+      "verificationCount": 0
+    },
+    {
+      "rank": 26,
+      "title": "BOOTSTRAP EXAMPLE: The WE Team",
+      "id": "704392bf27412eb6",
+      "repo": "FreeAgent",
+      "governanceLayer": "application_adjacent",
+      "contradictionCount": 3,
+      "verificationCount": 0
+    },
+    {
+      "rank": 27,
+      "title": "CONSTITUTIONAL BOOTSTRAP TEMPLATE",
+      "id": "6ed054b4a438d970",
+      "repo": "FreeAgent",
+      "governanceLayer": "application_adjacent",
+      "contradictionCount": 3,
+      "verificationCount": 0
+    },
+    {
+      "rank": 28,
+      "title": "Session Continuation Protocol",
+      "id": "9fa005ce2d01c670",
+      "repo": "FreeAgent",
+      "governanceLayer": "application_adjacent",
+      "contradictionCount": 3,
+      "verificationCount": 0
+    },
+    {
+      "rank": 29,
+      "title": "LICENSE COVENANT",
+      "id": "a85605cd2c6ae377",
+      "repo": "FreeAgent",
+      "governanceLayer": "application_adjacent",
+      "contradictionCount": 3,
+      "verificationCount": 0
+    },
+    {
+      "rank": 30,
+      "title": "Federation Expansion Engine",
+      "id": "58bbf5fd8f64bd5f",
+      "repo": "FreeAgent",
+      "governanceLayer": "application_adjacent",
+      "contradictionCount": 3,
+      "verificationCount": 0
+    }
+  ],
+  "governance_layer_status_counts": {
+    "unknown": {
+      "VERIFIED": 188,
+      "UNVERIFIED": 1211,
+      "CONFLICTED": 6,
+      "QUARANTINED": 1
+    },
+    "theoretical": {
+      "VERIFIED": 93,
+      "UNVERIFIED": 283,
+      "CONFLICTED": 64,
+      "QUARANTINED": 4
+    },
+    "operational": {
+      "VERIFIED": 17,
+      "UNVERIFIED": 405,
+      "CONFLICTED": 10,
+      "QUARANTINED": 0
+    },
+    "constitutional": {
+      "VERIFIED": 93,
+      "UNVERIFIED": 301,
+      "CONFLICTED": 42,
+      "QUARANTINED": 0
+    },
+    "evidence": {
+      "VERIFIED": 1,
+      "UNVERIFIED": 16,
+      "CONFLICTED": 0,
+      "QUARANTINED": 0
+    },
+    "historical": {
+      "VERIFIED": 0,
+      "UNVERIFIED": 1,
+      "CONFLICTED": 0,
+      "QUARANTINED": 18
+    },
+    "application_adjacent": {
+      "VERIFIED": 146,
+      "UNVERIFIED": 887,
+      "CONFLICTED": 40,
+      "QUARANTINED": 0
+    }
+  },
+  "repo_conflict_counts": {
+    "self-organizing-library": 6,
+    "Deliberate-AI-Ensemble": 53,
+    "papers": 27,
+    "FreeAgent": 60,
+    "federation": 6,
+    "Archivist-Agent": 7,
+    "SwarmMind-Self-Optimizing-Multi-Agent-AI-System": 2,
+    "storytime": 1
+  },
+  "algorithm_notes": [
+    "Exact replica of truth-routing.ts computeAuthorityEdges + computeNodeStatuses",
+    "CONTRADICTS edges are bidirectional (both source and target get increment)",
+    "Tag-group sampling: TAG_GROUP_CAP=40, TAG_GROUP_LARGE_SAMPLE=15, MAX_PAIR_EDGES=20",
+    "QUARANTINED status by category only (scratch, pending, sensitive)",
+    "CONFLICTED if contradictionCount > 0 regardless of verificationCount"
+  ]
+}
