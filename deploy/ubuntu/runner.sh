@@ -60,8 +60,10 @@ pull_latest() {
 task_sovereignty_scan() {
     log "[TASK] Sovereignty scan across all lanes..."
     local result_file="$ARTIFACTS_DIR/sovereignty-scan-$(date +%Y%m%d-%H%M%S).json"
-    local violations=0
-    local details="[]"
+    local total_violations=0
+    local total_lanes=0
+    local compliant_lanes=0
+    local lane_results=""
 
     for repo in "${REPOS[@]}"; do
         local dir="$REPOS_DIR/$repo"
@@ -69,13 +71,51 @@ task_sovereignty_scan() {
             log "[WARN] $repo not found, skipping"
             continue
         fi
-        local count
-        count=$(grep -rl "require.*['\"]S:[\\\/]\(Archivist-Agent\|self-organizing-library\|SwarmMind\|kernel-lane\)" "$dir/src" "$dir/scripts" 2>/dev/null | grep -v "node_modules" | grep -v ".git" | wc -l || true)
-        if [ "$count" -gt 0 ]; then
-            violations=$((violations + count))
-            log "[VIOLATION] $repo has $count cross-lane imports"
+
+        # Determine lane name from repo name
+        local lane_name
+        case "$repo" in
+            kernel-lane) lane_name="Kernel" ;;
+            Archivist-Agent) lane_name="Archivist" ;;
+            self-organizing-library) lane_name="Library" ;;
+            SwarmMind) lane_name="swarmmind" ;;
+            *) lane_name="$repo" ;;
+        esac
+
+        total_lanes=$((total_lanes + 1))
+
+        # Use the lane's fine-tuned sovereignty enforcer (supports --lane flag with case-insensitive matching)
+        local enforcer="$dir/scripts/sovereignty-enforcer.js"
+        if [ ! -f "$enforcer" ]; then
+            log "[WARN] Sovereignty enforcer not found in $repo, skipping"
+            continue
+        fi
+
+        log "[TASK] Running sovereignty scan for $lane_name ($repo)..."
+        local report_file="$dir/lanes/$lane_name/state/sovereignty-report-latest.json"
+
+        # Remove old report so we know if new one was generated
+        rm -f "$report_file" 2>/dev/null
+
+        if node "$enforcer" --lane "$lane_name" --strict >/dev/null 2>&1; then
+            compliant_lanes=$((compliant_lanes + 1))
+            local violations=0
+            # Try to extract violation count from report
+            if [ -f "$report_file" ]; then
+                violations=$(node -e "try{const r=require('$report_file');console.log(r.violations||0)}catch(e){console.log(0)}" 2>/dev/null || echo 0)
+            fi
+            total_violations=$((total_violations + violations))
+            log "[PASS] $lane_name: sovereignty-compliant"
+            lane_results="$lane_results\n    \"$lane_name\": {\"status\":\"compliant\",\"violations\":$violations}"
         else
-            log "[PASS] $repo sovereignty-compliant"
+            # Count violations from report if available
+            local violations=1
+            if [ -f "$report_file" ]; then
+                violations=$(node -e "try{const r=require('$report_file');console.log(r.violations||1)}catch(e){console.log(1)}" 2>/dev/null || echo 1)
+            fi
+            total_violations=$((total_violations + violations))
+            log "[VIOLATION] $lane_name: $violations cross-lane import violation(s)"
+            lane_results="$lane_results\n    \"$lane_name\": {\"status\":\"violations_found\",\"violations\":$violations}"
         fi
     done
 
@@ -83,9 +123,15 @@ task_sovereignty_scan() {
 {
     "task": "sovereignty_scan",
     "timestamp": "$(date -Iseconds)",
-    "total_violations": $violations,
-    "lanes_scanned": ${#REPOS[@]},
-    "status": "$([ "$violations" -eq 0 ] && echo "compliant" || echo "violations_found")"
+    "total_violations": $total_violations,
+    "total_lanes_scanned": $total_lanes,
+    "compliant_lanes": $compliant_lanes,
+    "lane_results": {$lane_results
+    },
+    "status": "$([ "$total_violations" -eq 0 ] && echo "compliant" || echo "violations_found")"
+}
+JSONEOF
+    log "[TASK] Sovereignty scan complete: $total_violations violations across $total_lanes lanes -> $result_file"
 }
 JSONEOF
     log "[TASK] Sovereignty scan complete: $violations violations -> $result_file"
