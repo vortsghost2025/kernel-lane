@@ -4,6 +4,19 @@
 const fs = require('fs');
 const path = require('path');
 
+function safeUnlink(filePath, context) {
+  try {
+    fs.unlinkSync(filePath);
+    return 'ok';
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      console.log('[watcher] RACE_SKIPPED: ' + (context || 'file') + ' already removed by another process');
+      return 'race_skipped';
+    }
+    throw e;
+  }
+}
+
 const KERNEL_ROOT = 'S:/kernel-lane';
 const { atomicWriteWithLease } = require(path.join(KERNEL_ROOT, 'scripts', 'atomic-write-util'));
 
@@ -27,7 +40,7 @@ async function moveFileWithLease(sourcePath, destPath, laneId, timeoutMs = 30000
   ensureParentDir(destPath);
 
   if (fs.existsSync(destPath)) {
-    fs.unlinkSync(sourcePath);
+    safeUnlink(sourcePath, path.basename(sourcePath));
     return { moved: false, reason: 'DEST_EXISTS_SOURCE_DROPPED', sourcePath, destPath };
   }
 

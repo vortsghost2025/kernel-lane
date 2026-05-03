@@ -27,15 +27,17 @@
       "type": "string",
       "default": "library"
     },
-    "to": {
-      "type": "string",
-      "enum": [
-        "archivist",
-        "library",
-        "swarmmind",
-        "kernel"
-      ]
-    },
+  "to": {
+    "type": "string",
+    "enum": [
+      "archivist",
+      "library",
+      "swarmmind",
+      "kernel",
+      "broadcast",
+      "all"
+    ]
+  },
   "type": {
     "type": "string",
     "enum": [

@@ -1,6 +1,19 @@
 #!/usr/bin/env node
 'use strict';
 
+function safeUnlink(filePath, context) {
+  try {
+    fs.unlinkSync(filePath);
+    return 'ok';
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      console.log('[watcher] RACE_SKIPPED: ' + (context || 'file') + ' already removed by another process');
+      return 'race_skipped';
+    }
+    throw e;
+  }
+}
+
 const fs = require('fs');
 const path = require('path');
 const {
@@ -127,6 +140,7 @@ function enforceProcessedDirCap(processedPath, laneName, repoRoot) {
 
 const DEFAULT_CONFIG = {
   laneName: 'archivist',
+  agentMode: process.env.AGENT_MODE || 'governing',
   inboxPath: path.join(__dirname, '..', 'lanes', 'archivist', 'inbox'),
   processedPath: path.join(__dirname, '..', 'lanes', 'archivist', 'inbox', 'processed'),
   outboxPath: path.join(__dirname, '..', 'lanes', 'archivist', 'outbox'),
@@ -343,7 +357,7 @@ class InboxWatcher {
     const dest = path.join(this.config.processedPath, filename);
     try {
       if (fs.existsSync(dest)) {
-        if (fs.existsSync(sourcePath)) fs.unlinkSync(sourcePath);
+        if (fs.existsSync(sourcePath)) safeUnlink(sourcePath, filename);
       } else {
         await moveFileWithLease(sourcePath, dest, this.config.laneName, 30000);
       }
@@ -375,7 +389,7 @@ class InboxWatcher {
         const qDest = path.join(this.config.quarantinePath, filename);
         if (fs.existsSync(sourcePath)) {
           if (fs.existsSync(qDest)) {
-            fs.unlinkSync(sourcePath);
+            safeUnlink(sourcePath, filename);
           } else {
             await moveFileWithLease(sourcePath, qDest, this.config.laneName, 30000);
           }
@@ -387,7 +401,7 @@ class InboxWatcher {
       }
 
       if (fs.existsSync(dest)) {
-        if (fs.existsSync(sourcePath)) fs.unlinkSync(sourcePath);
+        if (fs.existsSync(sourcePath)) safeUnlink(sourcePath, filename);
       } else {
         await moveFileWithLease(sourcePath, dest, this.config.laneName, 30000);
       }
@@ -405,7 +419,7 @@ class InboxWatcher {
         fs.mkdirSync(this.config.actionRequiredPath, { recursive: true });
       }
       if (fs.existsSync(dest)) {
-        if (fs.existsSync(sourcePath)) fs.unlinkSync(sourcePath);
+        if (fs.existsSync(sourcePath)) safeUnlink(sourcePath, filename);
       } else {
         await moveFileWithLease(sourcePath, dest, this.config.laneName, 30000);
       }

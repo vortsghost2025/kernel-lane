@@ -23,10 +23,10 @@ log() { echo "$(date -Iseconds) $1" >> "$LOG_FILE"; }
 
 REPOS=("kernel-lane" "Archivist-Agent" "self-organizing-library" "SwarmMind")
 REPO_URLS=(
-    "git@github.com:vortsghost2025/kernel-lane.git"
-    "git@github.com:vortsghost2025/Archivist-Agent.git"
-    "git@github.com:vortsghost2025/self-organizing-library.git"
-    "git@github.com:vortsghost2025/SwarmMind-Self-Optimizing-Multi-Agent-AI-System.git"
+    "https://github.com/vortsghost2025/kernel-lane.git"
+    "https://github.com/vortsghost2025/Archivist-Agent.git"
+    "https://github.com/vortsghost2025/self-organizing-library.git"
+    "https://github.com/vortsghost2025/SwarmMind-Self-Optimizing-Multi-Agent-AI-System.git"
 )
 
 clone_if_missing() {

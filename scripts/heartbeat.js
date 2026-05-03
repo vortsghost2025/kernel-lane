@@ -5,7 +5,8 @@ const path = require('path');
 const { loadPolicy, assertWatcherConfig } = require('./concurrency-policy');
 
 const DEFAULT_CONFIG = {
-  laneName: process.env.LANE_NAME || 'archivist',
+  agentMode: process.env.AGENT_MODE || 'governing',
+      laneName: process.env.LANE_NAME || 'archivist',
   inboxPath: path.join(__dirname, '..', 'lanes', process.env.LANE_NAME || 'archivist', 'inbox'),
   intervalSeconds: 60,
   staleAfterSeconds: 900,
@@ -59,6 +60,9 @@ class Heartbeat {
   }
 
   _heartbeatFilename(laneName) {
+    if (this.config.agentMode === 'observer') {
+      return `heartbeat-${laneName}-observer.json`;
+    }
     return `heartbeat-${laneName}.json`;
   }
 
@@ -136,6 +140,7 @@ class Heartbeat {
       subject: `Heartbeat from ${this.config.laneName} lane`,
       body: JSON.stringify({
         lane: this.config.laneName,
+        agent_mode: this.config.agentMode,
         session_active: !this._shuttingDown,
         uptime_seconds: uptimeSeconds,
         messages_processed: this.messagesProcessed,
