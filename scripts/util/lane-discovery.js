@@ -6,61 +6,72 @@
 const fs = require('fs');
 const path = require('path');
 
+const isWin32 = process.platform === 'win32';
+const UBUNTU_ROOT = '/home/we4free/agent/repos';
+
+function s(pathWin) {
+  if (isWin32) return pathWin;
+  const match = pathWin.match(/^S:\/(.+)$/);
+  if (!match) return pathWin;
+  return path.join(UBUNTU_ROOT, match[1]);
+}
+
 const LOCAL_REGISTRY = {
-  schema_version: '1.0',
+  schema_version: '1.1',
   registry_id: 'kernel-local-registry-001',
   origin: 'localized-from-archivist-registry-20260502',
+  platform: process.platform,
   lanes: {
     archivist: {
       lane_id: 'archivist',
       role: 'coordinator',
-      local_path: 'S:/Archivist-Agent',
+      local_path: s('S:/Archivist-Agent'),
       repo: 'https://github.com/vortsghost2025/Archivist-Agent',
       mailboxes: {
-        inbox: 'S:/Archivist-Agent/lanes/archivist/inbox',
-        outbox: 'S:/Archivist-Agent/lanes/archivist/outbox',
-        processed: 'S:/Archivist-Agent/lanes/archivist/inbox/processed'
+        inbox: s('S:/Archivist-Agent/lanes/archivist/inbox'),
+        outbox: s('S:/Archivist-Agent/lanes/archivist/outbox'),
+        processed: s('S:/Archivist-Agent/lanes/archivist/inbox/processed')
       }
     },
     kernel: {
       lane_id: 'kernel',
       role: 'execution',
-      local_path: 'S:/kernel-lane',
+      local_path: s('S:/kernel-lane'),
       repo: 'https://github.com/vortsghost2025/kernel-lane.git',
       mailboxes: {
-        inbox: 'S:/kernel-lane/lanes/kernel/inbox',
-        outbox: 'S:/kernel-lane/lanes/kernel/outbox',
-        processed: 'S:/kernel-lane/lanes/kernel/inbox/processed'
+        inbox: s('S:/kernel-lane/lanes/kernel/inbox'),
+        outbox: s('S:/kernel-lane/lanes/kernel/outbox'),
+        processed: s('S:/kernel-lane/lanes/kernel/inbox/processed')
       }
     },
     swarmmind: {
       lane_id: 'swarmmind',
       role: 'optimization',
-      local_path: 'S:/SwarmMind',
+      local_path: s('S:/SwarmMind'),
       repo: 'https://github.com/vortsghost2025/SwarmMind',
       forbidden_variants: [
-        'S:/SwarmMind-Self-Optimizing-Multi-Agent-AI-System'
+        s('S:/SwarmMind-Self-Optimizing-Multi-Agent-AI-System')
       ],
       mailboxes: {
-        inbox: 'S:/SwarmMind/lanes/swarmmind/inbox',
-        outbox: 'S:/SwarmMind/lanes/swarmmind/outbox',
-        processed: 'S:/SwarmMind/lanes/swarmmind/inbox/processed'
+        inbox: s('S:/SwarmMind/lanes/swarmmind/inbox'),
+        outbox: s('S:/SwarmMind/lanes/swarmmind/outbox'),
+        processed: s('S:/SwarmMind/lanes/swarmmind/inbox/processed')
       }
     },
     library: {
       lane_id: 'library',
       role: 'knowledge',
-      local_path: 'S:/self-organizing-library',
+      local_path: s('S:/self-organizing-library'),
       repo: 'https://github.com/vortsghost2025/self-organizing-library',
       mailboxes: {
-        inbox: 'S:/self-organizing-library/lanes/library/inbox',
-        outbox: 'S:/self-organizing-library/lanes/library/outbox',
-        processed: 'S:/self-organizing-library/lanes/library/inbox/processed'
+        inbox: s('S:/self-organizing-library/lanes/library/inbox'),
+        outbox: s('S:/self-organizing-library/lanes/library/outbox'),
+        processed: s('S:/self-organizing-library/lanes/library/inbox/processed')
       }
     }
   },
   broadcast: {
-    path: 'S:/Archivist-Agent/lanes/broadcast'
+    path: s('S:/Archivist-Agent/lanes/broadcast')
   }
 };
 
