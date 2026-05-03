@@ -1,0 +1,6 @@
+"ID","Process ID","Process Name","Host Name","Kernel Name","Context","Stream","Block Size","Grid Size","Device","CC","gpu__time_duration.sum","l1tex__t_sectors_pipe_lsu_mem_global_op_ld.sum","sm__throughput.avg.pct_of_peak_sustained_elapsed"
+"","","","","","","","","","","","ms","sector","%"
+"3","30408","matrix_tensor_optimized.exe","127.0.0.1","matrixMul_wmma_async(const __half *, const __half *, float *, int, int, int)","1","7","(32, 4, 1)","(128, 32, 1)","0","12.0","3.210688","67108864.000000","43.242869"
+"4","30408","matrix_tensor_optimized.exe","127.0.0.1","matrixMul_wmma_async(const __half *, const __half *, float *, int, int, int)","1","7","(32, 8, 1)","(128, 16, 1)","0","12.0","3.130624","67108864.000000","44.339787"
+"5","30408","matrix_tensor_optimized.exe","127.0.0.1","matrixMul_wmma_async_triple(const __half *, const __half *, float *, int, int, int)","1","7","(32, 8, 1)","(128, 16, 1)","0","12.0","5.804608","67108864.000000","27.077535"
+"6","30408","matrix_tensor_optimized.exe","127.0.0.1","matrixMul_wmma_async_triple(const __half *, const __half *, float *, int, int, int)","1","7","(32, 8, 1)","(128, 16, 1)","0","12.0","4.736896","67108864.000000","27.927290"

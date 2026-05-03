@@ -35,36 +35,50 @@
     "1024": { "status": "PASS (abs)", "max_abs_err": 0.016224, "abs_outliers": 0, "cross_kernel_consistency": "PASS (0 error)", "fp8_vs_cublaslt": "PASS (0 error)" },
     "notes": "Relative error failures are false alarms from near-zero outputs; absolute error well within FP16 rounding bounds. All 3 FP16 WMMA kernels produce identical output. All FP8 paths match quantized CPU reference exactly."
   },
-  "ncu_profiles": {
-    "fp8_fallback_wmma": {
-      "1024": {
-        "gpu_time_us": 510.3,
-        "tensor_active_pct": 11.85,
-        "sm_throughput_pct": 37.57,
-        "warps_active_pct": 75.94,
-        "dram_read_pct_peak": 0.94,
-        "dram_write_pct_peak": 0.09,
-        "stall_long_scoreboard_pct": 15.57,
-        "stall_short_scoreboard_pct": 2.09
-      },
-      "4096": {
-        "gpu_time_ms": 25.55,
-        "tensor_active_pct": 15.39,
-        "sm_throughput_pct": 48.48,
-        "warps_active_pct": 84.92,
-        "dram_read_pct_peak": 0.86,
-        "dram_write_pct_peak": 0.72,
-        "stall_long_scoreboard_pct": 13.26,
-        "stall_short_scoreboard_pct": 2.20
-      },
-      "bottleneck": "DRAM bandwidth (0.86-0.94% of peak read). Kernel is memory-bound. Long scoreboard stalls 13-16%.",
-      "ncu_reps": ["kernels/bin/gen5_fp8_ncu_1024.ncu-rep", "kernels/bin/gen5_fp8_ncu_4096.ncu-rep"]
-    }
-  },
-  "missing_metrics": [
-    "ncu profiling for cuBLASLt FP8 kernel (proprietary, may not be profilable)",
-    "FP8 numerical accuracy verification at 4096³"
-  ],
+ "ncu_profiles": {
+ "fp8_fallback_wmma": {
+ "1024": {
+ "gpu_time_us": 510.3,
+ "tensor_active_pct": 11.85,
+ "sm_throughput_pct": 37.57,
+ "warps_active_pct": 75.94,
+ "dram_read_pct_peak": 0.94,
+ "dram_write_pct_peak": 0.09,
+ "stall_long_scoreboard_pct": 15.57,
+ "stall_short_scoreboard_pct": 2.09
+ },
+ "4096": {
+ "gpu_time_ms": 25.55,
+ "tensor_active_pct": 15.39,
+ "sm_throughput_pct": 48.48,
+ "warps_active_pct": 84.92,
+ "dram_read_pct_peak": 0.86,
+ "dram_write_pct_peak": 0.72,
+ "stall_long_scoreboard_pct": 13.26,
+ "stall_short_scoreboard_pct": 2.20
+ },
+ "bottleneck": "DRAM bandwidth (0.86-0.94% of peak read). Kernel is memory-bound. Long scoreboard stalls 13-16%.",
+ "ncu_reps": ["kernels/bin/gen5_fp8_ncu_1024.ncu-rep", "kernels/bin/gen5_fp8_ncu_4096.ncu-rep"]
+ },
+ "fp16_fastpath_async_8warp": {
+ "2048": {
+ "gpu_time_ms": 3.13,
+ "sm_throughput_pct": 44.34,
+ "l1tex_read_sectors": 67108864,
+ "bottleneck": "SM throughput 44% — compute-bound but tensor core underutilization. WMMA mma.sync limits vs HMMA async.",
+ "ncu_rep": "kernels/bin/gen5_fp16_ncu_1024.ncu-rep"
+ }
+ }
+ },
+ "missing_metrics": [
+ "ncu profiling for cuBLASLt FP8 kernel (proprietary, may not be profilable)",
+ "FP8 numerical accuracy verification at 4096³"
+ ],
+ "next_steps": [
+ "Verify FP8 numerical accuracy at 4096³",
+ "Profile inference sub-kernels with ncu",
+ "Investigate higher arithmetic intensity tiling to close gap with cuBLASLt"
+ ],
   "next_steps": [
     "Verify FP8 numerical accuracy at 4096³",
     "Profile inference sub-kernels with ncu",

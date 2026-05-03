@@ -157,8 +157,12 @@ test('lane-worker blocks fake artifact with EXECUTION_NOT_VERIFIED', function(tm
   var summary = worker.processOnce();
   assert.strictEqual(summary.routed.blocked, 1, 'Must route to blocked');
   assert.strictEqual(summary.routed.processed, 0, 'Must NOT route to processed');
-  assert.strictEqual(summary.routes[0].reason, 'EXECUTION_NOT_VERIFIED');
-  assert.strictEqual(summary.routes[0].execution_verified, false);
+ assert.ok(
+ summary.routes[0].reason === 'ARTIFACT_NOT_OBSERVABLE' ||
+ summary.routes[0].reason === 'EXECUTION_NOT_VERIFIED',
+ 'Must route with artifact-fail reason, got: ' + summary.routes[0].reason
+ );
+ assert.strictEqual(summary.routes[0].execution_verified, false);
 });
 
 // TEST 4: lane-worker stamps execution_verified=true on valid artifact

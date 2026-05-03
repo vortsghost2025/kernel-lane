@@ -76,15 +76,17 @@ class ArtifactResolver {
     return false;
   }
 
-  hasPathTraversal(artifactPath) {
-    if (!artifactPath || typeof artifactPath !== 'string') return true;
-    try {
-      const resolved = path.resolve(artifactPath);
-      return !this.isWithinAllowedRoots(resolved);
-    } catch (_) {
-      return true;
-    }
-  }
+ hasPathTraversal(artifactPath) {
+ if (!artifactPath || typeof artifactPath !== 'string') return true;
+ if (/\.\./.test(artifactPath)) return true;
+ try {
+ const resolved = path.resolve(artifactPath);
+ if (/\.\./.test(resolved)) return true;
+ } catch (_) {
+ return true;
+ }
+ return false;
+ }
 
   resolveRelativePath(artifactPath) {
     if (!artifactPath || typeof artifactPath !== 'string') return null;

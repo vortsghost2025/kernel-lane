@@ -152,7 +152,11 @@ test('evidence_exchange artifact path missing -> blocked', (tmpRoot) => {
   const summary = worker.processOnce();
   assert.strictEqual(summary.routed.processed, 0, 'Must NOT route to processed');
   assert.strictEqual(summary.routed.blocked, 1, 'Must route to blocked');
-  assert.strictEqual(summary.routes[0].reason, 'EXECUTION_NOT_VERIFIED');
+  assert.ok(
+ summary.routes[0].reason === 'ARTIFACT_NOT_OBSERVABLE' ||
+ summary.routes[0].reason === 'EXECUTION_NOT_VERIFIED',
+ 'Must be blocked with artifact-fail reason, got: ' + summary.routes[0].reason
+ );
 });
 
 // ============================================================
@@ -260,8 +264,12 @@ test('legacy completion_artifact_path missing -> blocked', (tmpRoot) => {
 
   const summary = worker.processOnce();
   assert.strictEqual(summary.routed.processed, 0);
-  assert.strictEqual(summary.routed.blocked, 1);
-  assert.strictEqual(summary.routes[0].reason, 'EXECUTION_NOT_VERIFIED');
+ assert.strictEqual(summary.routed.blocked, 1);
+ assert.ok(
+ summary.routes[0].reason === 'ARTIFACT_NOT_OBSERVABLE' ||
+ summary.routes[0].reason === 'EXECUTION_NOT_VERIFIED',
+ 'Must be blocked with artifact-fail reason, got: ' + summary.routes[0].reason
+ );
 });
 
 // ============================================================

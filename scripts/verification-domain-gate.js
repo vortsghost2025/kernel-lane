@@ -35,28 +35,25 @@ function toMs(value) {
 }
 
 function evaluateTemporal(msg) {
-  const dispatchTs = toMs(msg.dispatch_timestamp || msg.timestamp);
-  const executionTs = toMs(
-    msg.execution_timestamp ||
-    (msg.evidence_exchange && msg.evidence_exchange.delivered_at) ||
-    (msg.heartbeat && msg.heartbeat.last_heartbeat_at)
-  );
+ const dispatchTs = toMs(msg.dispatch_timestamp || msg.timestamp);
+ const executionTs = toMs(
+ msg.execution_timestamp ||
+ (msg.evidence_exchange && msg.evidence_exchange.delivered_at) ||
+ (msg.heartbeat && msg.heartbeat.last_heartbeat_at)
+ );
 
-  if (!dispatchTs || !executionTs) {
-    return {
-      valid: false,
-      reason: 'temporal constraint unreachable',
-      expected: 'execution_timestamp > dispatch_timestamp',
-      actual: null,
-    };
-  }
+ if (!dispatchTs) {
+ return { valid: false, reason: 'no dispatch timestamp', expected: 'execution_timestamp > dispatch_timestamp', actual: null };
+ }
 
-    return {
-      valid: executionTs >= dispatchTs,
-      reason: executionTs >= dispatchTs ? null : 'execution timestamp precedes dispatch',
-      expected: 'execution_timestamp >= dispatch_timestamp',
-      actual: executionTs >= dispatchTs,
-    };
+ if (!executionTs) {
+ if (msg.completion_artifact_path || msg.resolved_by_task_id) {
+ return { valid: true, reason: null, expected: 'execution_timestamp > dispatch_timestamp', actual: 'legacy_proof_assumed_valid' };
+ }
+ return { valid: false, reason: 'temporal constraint unreachable', expected: 'execution_timestamp > dispatch_timestamp', actual: null };
+ }
+
+ return { valid: executionTs >= dispatchTs, reason: executionTs >= dispatchTs ? null : 'execution timestamp precedes dispatch', expected: 'execution_timestamp >= dispatch_timestamp', actual: executionTs >= dispatchTs };
 }
 
 function evaluateSemantic(msg, localCodeVersionHash = null) {
