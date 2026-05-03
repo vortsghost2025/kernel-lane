@@ -35,7 +35,7 @@ $cuFiles = Get-ChildItem -Path $srcRoot -Filter '*.cu' -File
 if (-not $cuFiles) { Write-Host "No .cu files found"; exit 0 }
 
 # Files that need additional libraries (cuBLASLt for FP8 GEMM)
-$cublasFiles = @('matrixMul_wmma_fp8_async')
+$cublasFiles = @('matrixMul_wmma_fp8_async', 'test_gemm_correctness')
 
 foreach ($f in $cuFiles) {
     $hasMain = Select-String -Pattern 'int\s+main\s*\(' -Path $f.FullName -Quiet
@@ -63,4 +63,23 @@ if ($DataCenterArch) {
         }
     }
 }
+# ----------------------------------------------------------
+# Build test executables from kernels/tests/
+# ----------------------------------------------------------
+$testRoot = Join-Path $PSScriptRoot '..\kernels\tests'
+$testFiles = Get-ChildItem -Path $testRoot -Filter '*.cu' -File -ErrorAction SilentlyContinue
+if ($testFiles) {
+    foreach ($f in $testFiles) {
+        $hasMain = Select-String -Pattern 'int\s+main\s*\(' -Path $f.FullName -Quiet
+        if ($hasMain) {
+            $outExe = Join-Path $outDir ("{0}.exe" -f $f.BaseName)
+            $libs = if ($cublasFiles -contains $f.BaseName) { '-lcublasLt -lcublas' } else { '' }
+            $cmd = "nvcc -arch=sm_120 -lineinfo -std=c++17 -DCCCL_IGNORE_DEPRECATED_CPP_DIALECT -Xcompiler `"/Zc:preprocessor`" -o `"$outExe`" `"$($f.FullName)`" -O3 --use_fast_math $libs"
+            Write-Host "[BUILD-TEST] $cmd"
+            cmd /c $cmd
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        }
+    }
+}
+
 Write-Host "[BUILD] Completed. Executables placed in $outDir"

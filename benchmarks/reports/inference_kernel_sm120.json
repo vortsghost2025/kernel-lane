@@ -1,0 +1,40 @@
+{
+  "name": "inference_kernel_sm120",
+  "created_at_utc": "2026-05-03T14:40:00Z",
+  "gpu": "NVIDIA GeForce RTX 5060",
+  "sm_count": 30,
+  "build_flags": "nvcc -arch=sm_120 -O3 --use_fast_math -std=c++17",
+  "results": {
+    "batch_embed_lookup": {
+      "batch": 32, "seq_len": 128, "vocab_size": 32000, "embed_dim": 768,
+      "latency_ms_per_iter": 0.031
+    },
+    "fused_layer_norm": {
+      "rows": 32768, "hidden_size": 768,
+      "latency_ms_per_iter": 0.632
+    },
+    "inference_wmma_matmul_small": {
+      "M": 32, "N": 768, "K": 768,
+      "latency_us_per_iter": 64.435,
+      "tflops": 0.59
+    },
+    "naive_matmul_1024": {
+      "M": 1024, "N": 1024, "K": 1024,
+      "latency_ms_per_iter": 1.699
+    },
+    "inference_wmma_matmul_1024": {
+      "M": 1024, "N": 1024, "K": 1024,
+      "latency_ms_per_iter": 0.369,
+      "tflops": 5.81,
+      "speedup_vs_naive": 4.6
+    }
+  },
+  "convergence": {
+    "claim": "Inference WMMA matmul at 1024³ achieves 5.81 TFLOPS (4.6× vs naive FP32 matmul) on RTX 5060",
+    "evidence": "benchmarks/reports/inference_kernel_sm120.json + kernels/bin/inference_kernel.exe",
+    "verified_by": "kernel",
+    "contradictions": [],
+    "status": "proven",
+    "label": "INFERENCE_WMMA_MATMUL_VERIFIED"
+  }
+}
