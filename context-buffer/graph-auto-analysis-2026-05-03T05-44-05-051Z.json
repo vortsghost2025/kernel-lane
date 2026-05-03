@@ -1,0 +1,88 @@
+{
+  "output_provenance": {
+    "agent": "codex-5.3",
+    "lane": "kernel",
+    "generated_at": "2026-05-03T05:44:05.051Z",
+    "session_id": "unknown"
+  },
+  "source": {
+    "graph_json_path": "S:\\kernel-lane\\evidence\\graph-snapshots\\graph-snapshot-2026-04-30T16-08-47-full.json",
+    "node_count": 215,
+    "edge_count": 44097,
+    "finding_count": 0,
+    "hash": "d097544641fdc410ac81d31bbdad95034f000d5ea1b411fca40c28f90f4010ab"
+  },
+  "summary": {
+    "conflicted": 4,
+    "blocked": 0,
+    "quarantined": 0,
+    "unverified": 186,
+    "verified": 25,
+    "resolved": 0,
+    "unknown": 0,
+    "contradiction_edges": 0
+  },
+  "findings_summary": null,
+  "focus_nodes": [
+    {
+      "id": "6a9bd95ba806a410",
+      "label": "THE SINGLE ENTRY POINT",
+      "status": "conflicted",
+      "weight": 10,
+      "execution_weight": 10,
+      "execution_weight_reason": "base_status",
+      "execution_weight_inputs": {
+        "status": "conflicted",
+        "meta": {},
+        "probe": {}
+      },
+      "execution_weight_generated_at": "2026-05-03T05:44:05.048Z"
+    },
+    {
+      "id": "d9ccbb98728d5f78",
+      "label": "COVENANT.md — Values (What We Believe)",
+      "status": "conflicted",
+      "weight": 10,
+      "execution_weight": 10,
+      "execution_weight_reason": "base_status",
+      "execution_weight_inputs": {
+        "status": "conflicted",
+        "meta": {},
+        "probe": {}
+      },
+      "execution_weight_generated_at": "2026-05-03T05:44:05.048Z"
+    },
+    {
+      "id": "7372a72fe280b3a3",
+      "label": "CAISC 2026 Draft Paper Review Report",
+      "status": "conflicted",
+      "weight": 10,
+      "execution_weight": 10,
+      "execution_weight_reason": "base_status",
+      "execution_weight_inputs": {
+        "status": "conflicted",
+        "meta": {},
+        "probe": {}
+      },
+      "execution_weight_generated_at": "2026-05-03T05:44:05.048Z"
+    },
+    {
+      "id": "dd9b2967fd3393db",
+      "label": "WE4FREE Publication Roadmap",
+      "status": "conflicted",
+      "weight": 10,
+      "execution_weight": 10,
+      "execution_weight_reason": "base_status",
+      "execution_weight_inputs": {
+        "status": "conflicted",
+        "meta": {},
+        "probe": {}
+      },
+      "execution_weight_generated_at": "2026-05-03T05:44:05.048Z"
+    }
+  ],
+  "next_actions": [
+    "Resolve one conflicted node before any new feature work.",
+    "Convert top unverified claims into test cards with evidence paths."
+  ]
+}
