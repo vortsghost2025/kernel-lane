@@ -136,7 +136,7 @@ function validateConvergenceGate(output) {
     errors.push(`Invalid status: ${output.status}. Must be: ${validStatuses.join(', ')}`);
   }
   
-  const validVerifiers = ['archivist', 'library', 'swarmmind', 'codex', 'self', 'user'];
+  const validVerifiers = ['archivist', 'library', 'swarmmind', 'kernel', 'codex', 'self', 'user'];
   if (output.verified_by && !validVerifiers.includes(output.verified_by)) {
     errors.push(`Invalid verified_by: ${output.verified_by}. Must be: ${validVerifiers.join(', ')}`);
   }
