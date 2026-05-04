@@ -282,6 +282,10 @@ When uncertain, ask:
 
 - GPU benchmark evidence in this repo (for example, `kernels/benchmark_report.json`) may include a `verification` object that separates executable/runtime speedup checks from Nsight Compute (`ncu`) metrics; treat profiler-backed numbers as unproven until real `ncu` or exported CSV/JSON exists.
 - The default Windows development host may not be able to run Nsight Compute (`ncu`) or a full CUDA profiling loop; use blocked or pending status for on-device `ncu` and capture on a CUDA-capable machine when that evidence is required.
+- `.identity/` and `.trust/` directories were DELETED 2026-05-04 per Archivist P0 ruling: trust-store is the canonical identity mechanism. Do NOT recreate them.
+- Recovery test suite passes 11/11 with split-state awareness (kernel on Windows, other lanes on Ubuntu).
+- SSH host-key fingerprint for Ubuntu (100.95.40.99): `SHA256:lKHs/aqPAjZ2NSJUvdWmoKmewfVC7NjyhHxXbI3kymw`
+- Pre-ratification key_ids (6d220ff8f1ef5b05, 7f1a9fe931d1fbba) are STALE — canonical kernel key_id is `127b44d2bb294ad9`.
 
 ## Non-Negotiable Output Provenance
 

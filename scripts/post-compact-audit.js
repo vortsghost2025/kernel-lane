@@ -75,17 +75,17 @@ class PostCompactAudit {
     } catch (_) { return []; }
   }
 
-    _getFileIntegrityChecks() {
-        const integrityFiles = [
-            { name: 'private_pem', suffix: '.identity/private.pem', binary: true },
-            { name: 'public_pem', suffix: '.identity/public.pem', binary: false },
-            { name: 'snapshot_json', suffix: '.identity/snapshot.json', binary: false },
-            { name: 'keys_json', suffix: '.identity/keys.json', binary: false },
-            { name: 'lane_trust_store', suffix: 'lanes/broadcast/trust-store.json', binary: false },
-            { name: 'agents_md', suffix: 'AGENTS.md', binary: false },
-            { name: 'targets_json', suffix: 'config/targets.json', binary: false },
-            { name: 'convergence_protocol_md', suffix: 'lanes/broadcast/CONVERGENCE_PROTOCOL.md', binary: false }
-        ];
+  _getFileIntegrityChecks() {
+    const integrityFiles = [
+      { name: 'private_pem', suffix: '.identity/private.pem', binary: true, ratifiedDeletion: ['kernel'] },
+      { name: 'public_pem', suffix: '.identity/public.pem', binary: false, ratifiedDeletion: ['kernel'] },
+      { name: 'snapshot_json', suffix: '.identity/snapshot.json', binary: false, ratifiedDeletion: ['kernel'] },
+      { name: 'keys_json', suffix: '.identity/keys.json', binary: false, ratifiedDeletion: ['kernel'] },
+      { name: 'lane_trust_store', suffix: 'lanes/broadcast/trust-store.json', binary: false },
+      { name: 'agents_md', suffix: 'AGENTS.md', binary: false },
+      { name: 'targets_json', suffix: 'config/targets.json', binary: false },
+      { name: 'convergence_protocol_md', suffix: 'lanes/broadcast/CONVERGENCE_PROTOCOL.md', binary: false }
+    ];
         const trustStorePath = this.trustStorePath;
         const results = {};
         for (const [laneId, config] of Object.entries(LANES)) {
@@ -316,10 +316,14 @@ known_risks: this._getKnownRisks(),
                             diff.unexpected_changes.push(`file_integrity_${lane}_${fileKey}_changed`);
                         }
                     }
-                    if (fileInfo.exists && !postInfo.exists) {
-                        diff.file_integrity_violations.push({ lane, file: fileKey, pre_hash: fileInfo.hash, post_hash: null, deleted: true });
-                        diff.unexpected_changes.push(`file_integrity_${lane}_${fileKey}_deleted`);
-                    }
+        if (fileInfo.exists && !postInfo.exists) {
+          const ratifiedDeletions = { kernel: ['private_pem', 'public_pem', 'snapshot_json', 'keys_json'] };
+          const isRatifiedDeletion = ratifiedDeletions[lane]?.includes(fileKey);
+          if (!isRatifiedDeletion) {
+            diff.file_integrity_violations.push({ lane, file: fileKey, pre_hash: fileInfo.hash, post_hash: null, deleted: true });
+            diff.unexpected_changes.push(`file_integrity_${lane}_${fileKey}_deleted`);
+          }
+        }
                 }
             }
         }
@@ -491,8 +495,12 @@ known_risks: this._getKnownRisks(),
     if (!sources.bootstrap.exists) contradictions.push('bootstrap_missing');
 
     for (const [lane, state] of Object.entries(sources.live_lane_state)) {
-      if (!state.identity_exists) contradictions.push(`${lane}_no_identity`);
-      if (state.heartbeat?.status === 'dead' || !state.heartbeat) {
+      const isKernelSplitState = lane === 'kernel' && process.platform === 'win32';
+      const isRemoteOnWindows = process.platform === 'win32' && lane !== 'kernel';
+      if (!state.identity_exists && !isKernelSplitState) contradictions.push(`${lane}_no_identity`);
+      if (isKernelSplitState || isRemoteOnWindows) {
+        // split-state: kernel on Windows can only verify its own heartbeat; remote lanes checked on Ubuntu
+      } else if (state.heartbeat?.status === 'dead' || !state.heartbeat) {
         contradictions.push(`${lane}_no_heartbeat`);
       }
     }

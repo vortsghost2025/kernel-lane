@@ -16,13 +16,13 @@ const LANES = {
     local: null,
     remote: "we4free@100.95.40.99:/home/we4free/agent/repos/self-organizing-library/lanes/library/inbox",
     type: "scp",
-    host_key: "SHA256:placeholder"
+    host_key: "SHA256:lKHs/aqPAjZ2NSJUvdWmoKmewfVC7NjyhHxXbI3kymw"
   },
   swarmmind: {
     local: null,
     remote: "we4free@100.95.40.99:/home/we4free/agent/repos/SwarmMind/lanes/swarmmind/inbox",
     type: "scp",
-    host_key: "SHA256:placeholder"
+    host_key: "SHA256:lKHs/aqPAjZ2NSJUvdWmoKmewfVC7NjyhHxXbI3kymw"
   }
 };
 
