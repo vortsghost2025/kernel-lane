@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@kilocode/plugin": "7.2.0"
+  },
+  "scripts": {
+    "test-weight": "node scripts/test-execution-weight.js",
+    "send:archivist": "node scripts/send-lane.js archivist",
+    "send:library": "node scripts/send-lane.js library",
+    "send:swarmmind": "node scripts/send-lane.js swarmmind",
+    "send:all": "node scripts/send-lane.js --all",
+    "prov:check": "node scripts/pre-handoff-provenance-check.js"
+  }
+}
