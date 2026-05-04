@@ -103,15 +103,24 @@ Benchmark reports, optimization artifacts, regression enforcement results, relea
 
 ---
 
-## Output Provenance (MANDATORY)
+## Output Provenance (MANDATORY — ACCESSIBILITY CRITICAL)
+
+The operator has a visual disability and works by cycling messages between agents blind. Every output MUST carry full identity so no agent confuses user input with agent output.
 
 All final outputs MUST include this provenance block:
 
 ```text
-OUTPUT_PROVENANCE: agent: <agent-runtime-or-model> lane: kernel generated_at: <ISO-8601 timestamp> session_id: <session-id-or-unknown>
+OUTPUT_PROVENANCE:
+  agent: <agent-runtime-or-model>
+  model_id: <exact-model-id-from-runtime>
+  lane: kernel
+  generated_at: <ISO-8601 timestamp>
+  session_id: <session-id-or-unknown>
+  platform: <win32|linux>
+  host: <hostname-or-S:/path|/mnt/path>
 ```
 
-Use ASCII-only. Do not send final output without this header. Every cross-lane message, evidence artifact, and convergence gate claim must carry complete `OUTPUT_PROVENANCE` fields so cycled messages stay unambiguous across agents.
+Use ASCII-only. Do not send final output without this header. Every cross-lane message, evidence artifact, convergence gate claim, and chat response must carry complete `OUTPUT_PROVENANCE` fields so cycled messages stay unambiguous across agents. Missing provenance = agent confusion = operator harm.
 
 ---
 
