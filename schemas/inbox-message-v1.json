@@ -353,26 +353,38 @@
         }
       }
     },
-    "canonical_paths": {
-      "type": "object",
-      "description": "v1.1: Canonical delivery paths. Senders MUST write to the target lane's canonical path, NOT their own local mirror.",
-      "properties": {
-        "archivist": {
-          "type": "string",
-          "default": "S:/Archivist-Agent/lanes/archivist/inbox/"
-        },
-        "library": {
-          "type": "string",
-          "default": "S:/self-organizing-library/lanes/library/inbox/"
-        },
-        "swarmmind": {
-          "type": "string",
-          "default": "S:/SwarmMind/lanes/swarmmind/inbox/"
-        },
-        "kernel": {
-          "type": "string",
-          "default": "S:/kernel-lane/lanes/kernel/inbox/"
+  "canonical_paths": {
+    "type": "object",
+    "description": "v1.4: Platform-aware canonical delivery paths. win32: S:/ paths. linux: /home/we4free/agent/repos/ paths. Senders MUST write to the target lane's canonical path, NOT their own local mirror.",
+    "properties": {
+      "archivist": {
+        "type": "object",
+        "properties": {
+          "win32": { "type": "string", "default": "S:/Archivist-Agent/lanes/archivist/inbox/" },
+          "linux": { "type": "string", "default": "/home/we4free/agent/repos/Archivist-Agent/lanes/archivist/inbox/" }
         }
+      },
+      "library": {
+        "type": "object",
+        "properties": {
+          "win32": { "type": "string", "default": "S:/self-organizing-library/lanes/library/inbox/" },
+          "linux": { "type": "string", "default": "/home/we4free/agent/repos/self-organizing-library/lanes/library/inbox/" }
+        }
+      },
+      "swarmmind": {
+        "type": "object",
+        "properties": {
+          "win32": { "type": "string", "default": "S:/SwarmMind/lanes/swarmmind/inbox/" },
+          "linux": { "type": "string", "default": "/home/we4free/agent/repos/SwarmMind/lanes/swarmmind/inbox/" }
+        }
+      },
+      "kernel": {
+        "type": "object",
+        "properties": {
+          "win32": { "type": "string", "default": "S:/kernel-lane/lanes/kernel/inbox/" },
+          "linux": { "type": "string", "default": "/home/we4free/agent/repos/kernel-lane/lanes/kernel/inbox/" }
+        }
+      }
       }
     },
     "delivery_verification": {
