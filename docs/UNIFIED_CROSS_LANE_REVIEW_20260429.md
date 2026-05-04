@@ -94,7 +94,7 @@
 
 ## 4. Consolidated Requests for Sean
 
-1. **Fix Library trust key mismatch** (5 min, P0) — local `cb3e57dd7818da3d` vs trust-store `b1eba056729bbe9a`
+1. ~~**Fix Library trust key mismatch**~~ RESOLVED 2026-05-04 — Library trust-store now `2eec06be0befc8d5`, `.trust/keys.json` reconciled.
 2. **Set up persistent heartbeat daemon** for all 4 lanes (PM2 or scheduled task)
 3. **Decide if Authority lane is real or deprecated** — 2 lanes asked for this
 4. **Clear CAISC 2026 submission timeline** — Archivist needs this for publication pipeline

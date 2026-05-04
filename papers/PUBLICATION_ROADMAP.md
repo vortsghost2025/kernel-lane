@@ -111,7 +111,7 @@ Paper C says stable behaviors emerge as attractors when constraints interact wit
 5. **Execution gate test**: 10/10 PASS across all 4 lanes
 6. **Artifact resolver test**: 8/8 PASS across all 4 lanes
 7. **Cross-lane consistency**: all green, 0 contradictions, trust store hash 58a8aad5aa6597fe
-8. **DER key_ids**: archivist=ee70b78105bc6189, kernel=b677eb87f6be83f9, library=ea2a75bab220adc2, swarmmind=addb0afb8ee5c2ed
+8. **DER key_ids**: archivist=506c2d0838b6862c, kernel=127b44d2bb294ad9, library=2eec06be0befc8d5, swarmmind=1450972ce0a225b7
 9. **Simulation validation**: 98+ tests, 12/12 adversarial probes, Phase 13 threshold proofs, Phase 23 paradox harmonization
 10. **PAPER_C**: Domain invariance as empirical fact — bridge paper complete
 
