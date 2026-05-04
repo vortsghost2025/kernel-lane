@@ -8,8 +8,8 @@
   "task_kind": "heartbeat",
   "priority": "P3",
   "subject": "Heartbeat from kernel lane",
-  "body": "{\"lane\":\"kernel\",\"agent_mode\":\"governing\",\"session_active\":true,\"uptime_seconds\":0,\"messages_processed\":0,\"last_inbox_scan\":\"2026-05-04T22:43:02.137Z\",\"version\":\"1.3\",\"identity_status\":\"ratified\"}",
-  "timestamp": "2026-05-04T22:43:02.137Z",
+  "body": "{\"lane\":\"kernel\",\"agent_mode\":\"governing\",\"session_active\":true,\"uptime_seconds\":0,\"messages_processed\":0,\"last_inbox_scan\":\"2026-05-04T23:56:02.639Z\",\"version\":\"1.3\",\"identity_status\":\"ratified\"}",
+  "timestamp": "2026-05-04T23:56:02.639Z",
   "requires_action": false,
   "payload": {
     "mode": "inline",
@@ -42,11 +42,11 @@
   },
   "heartbeat": {
     "interval_seconds": 60,
-    "last_heartbeat_at": "2026-05-04T22:43:02.137Z",
+    "last_heartbeat_at": "2026-05-04T23:56:02.639Z",
     "timeout_seconds": 900,
     "status": "in_progress"
   },
-  "signature": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmcm9tIjoia2VybmVsIiwidG8iOiJrZXJuZWwiLCJ0aW1lc3RhbXAiOiIyMDI2LTA1LTA0VDIyOjQzOjAyLjEzN1oifQ.cGxhY2Vob2xkZXIta2VybmVsLTE3Nzc5MzQ1ODIxNDM",
+  "signature": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmcm9tIjoia2VybmVsIiwidG8iOiJrZXJuZWwiLCJ0aW1lc3RhbXAiOiIyMDI2LTA1LTA0VDIzOjU2OjAyLjYzOVoifQ.cGxhY2Vob2xkZXIta2VybmVsLTE3Nzc5Mzg5NjI2NDQ",
   "key_id": "127b44d2bb294ad9",
   "system_state": "consistent",
   "active_contradictions": [],

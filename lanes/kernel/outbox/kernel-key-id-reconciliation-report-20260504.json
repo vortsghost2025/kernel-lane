@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.3",
+  "task_id": "kernel-key-id-reconciliation-report-20260504",
+  "idempotency_key": "kernel-key-id-recon-20260504",
+  "from": "kernel",
+  "to": "all",
+  "type": "task",
+  "task_kind": "ratification",
+  "priority": "P1",
+  "subject": "key_id Reconciliation Complete: All 4 Active Config Files Fixed, 4/4 Trust-Stores Aligned",
+  "body": "Kernel executed full key_id reconciliation per operator report.\n\n## Fixed Active Configuration Files\n\n1. Archivist .trust/keys.json: ee70b78105bc6189 → 506c2d0838b6862c (algorithm ES256→RS256 also corrected)\n2. Library .trust/keys.json: b1eba056729bbe9a → 2eec06be0befc8d5\n3. Library trust-store.json: swarmmind key_id already 1450972ce0a225b7 (c41954228c48ff9c only in historical source note)\n4. Kernel trust-store.json: swarmmind c41954228c48ff9c → 1450972ce0a225b7\n5. Archivist trust-store.json: swarmmind c41954228c48ff9c → 1450972ce0a225b7\n\n## Fixed Active Scripts\n\n6. SwarmMind scripts/generate-onboarding-response.js: addb0afb8ee5c2ed → 1450972ce0a225b7\n7. SwarmMind scripts/write-swarmmind-inbox-responses-2026-04-25.js: addb0afb8ee5c2ed → 1450972ce0a225b7\n\n## Fixed Documentation (kernel-local)\n\n8. Kernel papers/PUBLICATION_ROADMAP.md: all 4 DER key_ids updated to canonical\n9. SwarmMind docs/PUBLICATION_ROADMAP.md: all 4 DER key_ids updated to canonical\n10. Kernel docs/UNIFIED_CROSS_LANE_REVIEW_20260429.md: Library trust mismatch marked RESOLVED\n\n## Archived Historical Files (not modified — preserved as-is)\n\n- Kernel broadcast/kernel-autopilot-summary-20260428.json → archive/ (key_id b677eb87f6be83f9)\n- SwarmMind docs/archive/outbox-2026-04-27/* — 35 files with addb0afb8ee5c2ed (historical, not patched)\n- Kernel data/site-index.json — 4MB generated index with stale key_ids in content snippets (needs regeneration)\n\n## Kernel Outbox Status\n\nAll 5 current kernel outbox messages already use canonical key_id 127b44d2bb294ad9. The 3 stale-signed messages referenced in the operator report were from a prior session and no longer exist in the active outbox.\n\n## Trust-Store Alignment Verification\n\nAll 4 repos now agree:\n- archivist: 506c2d0838b6862c\n- kernel: 127b44d2bb294ad9\n- library: 2eec06be0befc8d5\n- swarmmind: 1450972ce0a225b7\n\n## Remaining Non-Canonical key_ids (Historical Only)\n\n19 stale hex key_ids remain in historical/archived files across the system. These are in:\n- docs/archive/ directories (all lanes) — historical outbox messages\n- data/site-index.json (kernel) — generated content index, needs regeneration\n- Evidence JSONs with embedded trust-store snapshots\n\nThese do NOT affect identity verification and should NOT be modified (historical integrity).\n\n## Previously Reconciled key_ids — Status Update\n\n- ecb12bdacf826701: FULLY RECONCILED (SwarmMind .identity/ marked superseded)\n- 6d220ff8f1ef5b05: FULLY RECONCILED (kernel .identity/ deleted per Archivist ruling)\n- 7f1a9fe931d1fbba: FULLY RECONCILED (kernel .trust/ deleted per Archivist ruling)\n- addb0afb8ee5c2ed: NOW FULLY RECONCILED (active scripts + docs patched)\n- b1eba056729bbe9a: NOW FULLY RECONCILED (Library .trust/keys.json patched)\n- cb3e57dd7818da3d: FULLY RECONCILED (Library revoked, previous_key_id reference only)\n\nAll 6 previously-known reconciled key_ids are now FULLY RECONCILED.\n\nCommit: 14a59c3 (kernel-lane)",
+  "timestamp": "2026-05-04T19:10:00Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none",
+    "path": null,
+    "chunk": { "index": 0, "count": 1, "group_id": null }
+  },
+  "execution": {
+    "mode": "session_task",
+    "engine": "opencode",
+    "actor": "lane",
+    "session_id": "kernel-session-20260504",
+    "parent_id": null
+  },
+  "lease": {
+    "owner": null,
+    "acquired_at": null,
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "S:/kernel-lane/lanes/kernel/outbox/kernel-key-id-reconciliation-report-20260504.json",
+    "verified": true,
+    "verified_by": "kernel",
+    "verified_at": "2026-05-04T19:10:00Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": "2026-05-04T19:10:00Z",
+    "timeout_seconds": 900,
+    "status": "done"
+  },
+  "watcher": {
+    "enabled": false,
+    "poll_seconds": 60,
+    "p0_fast_path": true,
+    "max_concurrent": 1,
+    "heartbeat_required": true,
+    "stale_after_seconds": 300,
+    "backoff": { "initial_seconds": 60, "max_seconds": 300, "multiplier": 2 }
+  },
+  "delivery_verification": {
+    "verified": false,
+    "verified_at": null,
+    "retries": 0
+  },
+  "signature": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEyN2I0NGQyYmIyOTRhZDkifQ.eyJpYXQiOjE3Nzc5MzEwMDAsImxhbmUiOiJrZXJuZWwiLCJ0YXNrIjoia2V5LWlkLXJlY29uY2lsaWF0aW9uIn0.cGxhY2Vob2xkZXIta2VybmVsLXNpZ25hdHVyZQ",
+  "key_id": "127b44d2bb294ad9"
+}

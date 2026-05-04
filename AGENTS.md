@@ -286,6 +286,7 @@ When uncertain, ask:
 - Recovery test suite passes 11/11 with split-state awareness (kernel on Windows, other lanes on Ubuntu).
 - SSH host-key fingerprint for Ubuntu (100.95.40.99): `SHA256:lKHs/aqPAjZ2NSJUvdWmoKmewfVC7NjyhHxXbI3kymw`
 - Pre-ratification key_ids (6d220ff8f1ef5b05, 7f1a9fe931d1fbba) are STALE — canonical kernel key_id is `127b44d2bb294ad9`.
+- opencode 1.14.33 installed on Ubuntu headless (100.95.40.99) — Node 20 via nvm, NVIDIA provider configured, 248 skills synced. Launch: `cd /home/we4free/agent/repos/<repo> && opencode`. API key in `.bashrc` as `NVIDIA_API_KEY`.
 
 ## Non-Negotiable Output Provenance
 
