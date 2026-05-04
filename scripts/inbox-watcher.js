@@ -298,8 +298,11 @@ class InboxWatcher {
         msg.format_violation = true;
         msg.format_violation_reason = 'Non-ASCII content detected in message fields per English-only constraint';
       }
-          if (!this.checkIdempotencyKey(msg)) {
-          await this.moveToProcessed(filename, filePath);
+      // Validate signature and key_id before accepting
+      if (!this.isMessageValidlySigned(filename, filePath)) {
+        await this.moveToQuarantineIgnoringSignatures(filename, filePath);
+        continue;
+      }
           continue;
         }
         messages.push(msg);

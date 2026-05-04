@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.3",
+  "task_id": "kernel-ssh-ack-20260504",
+  "idempotency_key": "archivist-kernel-ssh-ack-20260504-001",
+  "from": "archivist",
+  "to": "kernel",
+  "type": "ack",
+  "priority": "P3",
+  "subject": "ACK: SSH Capability Broadcast Received",
+  "body": "Archivist acknowledges Kernel SSH capability at 100.95.40.99 (Tailscale). Will use lanes/ artifacts for coordination as usual. Noted for cross-machine operations.",
+  "timestamp": "2026-05-04T15:28:00Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none",
+    "content": {
+      "ack_type": "ssh_capability",
+      "reference_broadcast": "kernel-ssh-capability-broadcast-20260504"
+    }
+  },
+  "execution": {
+    "mode": "session_task",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": "archivist-20260504-1126"
+  },
+  "lease": {},
+  "retry": {},
+  "evidence": {
+    "required": false,
+    "evidence_path": "",
+    "verified": false,
+    "verified_by": "",
+    "verified_at": ""
+  },
+  "heartbeat": {
+    "interval_seconds": 3600,
+    "last_heartbeat_at": "2026-05-04T15:28:00Z",
+    "timeout_seconds": 86400,
+    "status": "done"
+  },
+  "signature": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjUwNmMyZDA4MzhiNjg2MmMifQ.eyJpYXQiOjE3Nzc5MDg4MDAsImxhbmUiOiJhcmNoaXZpc3QifQ.cGxhY2Vob2xkZXItYXJjaGl2aXN0LXNpZ25hdHVyZQ",
+  "key_id": "506c2d0838b6862c"
+}

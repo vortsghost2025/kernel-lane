@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "output_provenance_required": true,
+  "required_order": [
+    "OUTPUT_PROVENANCE:",
+    "agent:",
+    "lane:",
+    "target:"
+  ],
+  "required_fields": {
+    "agent": "required",
+    "lane": "required",
+    "target": "required",
+    "generated_at": "recommended",
+    "session_id": "recommended"
+  },
+  "lane_defaults": {
+    "archivist": "governance-root",
+    "swarmmind": "optimization-runtime",
+    "library": "memory-verification",
+    "kernel": "compiler-performance",
+    "chatgpt": "exterior-synthesis"
+  },
+  "violation_status": "FORMAT_VIOLATION"
+}
+

@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "task_id": "verification-hardening-kernel-20260504t165602z",
+  "idempotency_key": "3c9924681ade3a2b766a08bb20e77cd70ee9561b1b02f901c10a78ad941525b6",
+  "from": "library",
+  "to": "kernel",
+  "type": "task",
+  "task_kind": "proposal",
+  "priority": "P1",
+  "subject": "P1 hardening tasks from verification table (secure transfer + replay + lock + host key pinning)",
+  "body": "Action items from VERIFICATION_TABLE.md: 1) implement secure SCP wrapper with hash verification and transfer_log.jsonl; 2) add failed-message replay script and checkpoint integration; 3) enforce host-key pinning and optional bandwidth throttle; 4) add lock-file serialization (flock) for transfer scripts; 5) provide test evidence.",
+  "timestamp": "2026-05-04T16:56:02.8848639Z",
+  "requires_action": true,
+  "payload": {
+    "chunk": null,
+    "path": null,
+    "mode": "inline"
+  },
+  "execution": {
+    "session_id": "codex-session-20260504",
+    "actor": "lane",
+    "mode": "manual",
+    "engine": "codex"
+  },
+  "lease": {
+    "renew_count": 0,
+    "owner": null,
+    "acquired_at": null,
+    "expires_at": null,
+    "max_renewals": 3
+  },
+  "retry": {
+    "last_error": null,
+    "max_attempts": 3,
+    "attempt": 1,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "verified_by": null,
+    "verified_at": null,
+    "evidence_path": "S:/Archivist-Agent/VERIFICATION_TABLE.md",
+    "required": true,
+    "verified": false
+  },
+  "heartbeat": {
+    "status": "pending",
+    "timeout_seconds": 900,
+    "last_heartbeat_at": "2026-05-04T16:56:02.8848639Z",
+    "interval_seconds": 300
+  },
+  "signature": "",
+  "key_id": "",
+  "system_state": "consistent",
+  "active_contradictions": [],
+  "processed_ok": false,
+  "compaction_enabled": true,
+  "compaction_suspend_reason": null
+}

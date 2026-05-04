@@ -61,6 +61,13 @@
       "gap_type": "required_signal_missing",
       "description": "The timestamp of last message routed to processed is not explicitly recorded in a singleton location. lane-worker summary includes timestamp but not last_completion_at specifically.",
       "evidence": "No dedicated last_completion_at field found in heartbeat or state outputs."
+    },
+    {
+      "id": "CEC-EXW-1",
+      "name": "Execution‑weight exposure",
+      "gap_type": "soft_rule_missing",
+      "description": "The executionWeight computed for graph nodes (via scripts/analyze-graph-json.js) is not emitted as a lane signal or included in heartbeat/state outputs, so other lanes cannot schedule based on these weighted priorities.",
+      "evidence": "scripts/analyze-graph-json.js uses executionWeight but no output path publishes the values to a shared signal."
     }
   ],
   "clause_conflicts": [],

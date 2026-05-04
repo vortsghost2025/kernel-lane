@@ -282,3 +282,25 @@ When uncertain, ask:
 
 - GPU benchmark evidence in this repo (for example, `kernels/benchmark_report.json`) may include a `verification` object that separates executable/runtime speedup checks from Nsight Compute (`ncu`) metrics; treat profiler-backed numbers as unproven until real `ncu` or exported CSV/JSON exists.
 - The default Windows development host may not be able to run Nsight Compute (`ncu`) or a full CUDA profiling loop; use blocked or pending status for on-device `ncu` and capture on a CUDA-capable machine when that evidence is required.
+
+## Non-Negotiable Output Provenance
+
+Every response, report, audit, handoff, generated plan, or user-facing message MUST begin with:
+
+OUTPUT_PROVENANCE:
+agent: <agent/model/tool identity>
+lane: <lane name>
+target: <current task/request/artifact>
+
+When available, include:
+
+generated_at: <ISO-8601 timestamp>
+session_id: <session or run id>
+
+This requirement exists for accessibility and multi-agent governance traceability. Do not omit it.
+
+Canonical contract files:
+- governance/OUTPUT_PROVENANCE_CONTRACT.md
+- governance/output-provenance.contract.json
+- scripts/output-provenance.js
+- scripts/verify-output-provenance.js

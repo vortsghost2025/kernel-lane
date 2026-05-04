@@ -1,0 +1,16 @@
+{
+  "name": "convergence-gate-daemon",
+  "version": "1.0.0",
+  "description": "Convergence gate daemon for Kernel lane - validates messages and enforces proven status before delivery",
+  "main": "convergence-gate-daemon.js",
+  "bin": {
+    "convergence-gate": "./convergence-gate-daemon.js"
+  },
+  "scripts": {
+    "start": "node convergence-gate-daemon.js --daemon --poll-seconds=60",
+    "start:once": "node convergence-gate-daemon.js",
+    "test": "node convergence-gate-daemon.js --lane=kernel --json"
+  },
+  "author": "Kernel Lane",
+  "license": "SEE LICENSE IN LICENSE"
+}
