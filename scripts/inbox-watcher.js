@@ -167,10 +167,14 @@ class InboxWatcher {
     this._identityHealed = false;
     try {
       const { healLaneIdentity } = require('./identity-self-healing');
-      const healResult = healLaneIdentity(this.config.laneName || 'archivist');
-      this._identityHealed = healResult.keysRegenerated || false;
-      if (healResult.keysRegenerated) {
-        console.log(`[watcher] IDENTITY_SELF_HEAL: keys regenerated keyId=${healResult.keyId}`);
+      const healResult = healLaneIdentity(this.config.laneName || 'kernel');
+      if (healResult.skipped) {
+        this._identityHealed = false;
+      } else {
+        this._identityHealed = healResult.keysRegenerated || false;
+        if (healResult.keysRegenerated) {
+          console.log(`[watcher] IDENTITY_SELF_HEAL: keys regenerated keyId=${healResult.keyId}`);
+        }
       }
     } catch (_) {}
 

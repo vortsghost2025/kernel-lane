@@ -40,10 +40,19 @@ class IdentitySelfHealing {
       passphraseSource: null,
       keyId: null,
       error: null,
+      skipped: false,
     };
 
     if (!this.identityDir) {
       result.error = 'NO_IDENTITY_DIR';
+      result.skipped = true;
+      this._log('INFO', `identity dir not configured for ${this.laneId} — trust-store is canonical, skipping self-heal`);
+      return result;
+    }
+
+    if (!fs.existsSync(this.identityDir)) {
+      result.skipped = true;
+      this._log('INFO', `.identity/ deleted per P0 ruling for ${this.laneId} — trust-store is canonical, skipping self-heal`);
       return result;
     }
 
