@@ -225,7 +225,19 @@ function getLaneNames() {
   return Object.keys(_discovery.registry.lanes);
 }
 
-const LANES = _discovery.registry.lanes;
+const LANES_RAW = _discovery.registry.lanes;
+
+const LANES = {};
+for (const [id, lane] of Object.entries(LANES_RAW)) {
+  LANES[id] = {
+    ...lane,
+    root: lane.local_path,
+    inbox: lane.mailboxes ? lane.mailboxes.inbox : undefined,
+    outbox: lane.mailboxes ? lane.mailboxes.outbox : undefined,
+    processed: lane.mailboxes ? lane.mailboxes.processed : undefined
+  };
+}
+
 const ROOTS = getRoots();
 
 module.exports = {
