@@ -193,13 +193,14 @@ function createSignedMessage(msg, laneId) {
   const keyId = deriveKeyId(publicPem);
   const from = msg.from || msg.from_lane || laneId;
   const to = msg.to || msg.to_lane || null;
+  const msgId = msg.id || msg.task_id || `msg-${Date.now()}`;
   const contentHash = 'sha256:' + crypto.createHash('sha256')
     .update(stableStringify({ body: msg.body || '', payload: msg.payload || {} }))
     .digest('hex');
 
   const header = { alg: 'RS256', typ: 'JWT', kid: keyId };
   const payload = {
-    id: msg.id || null,
+    id: msgId,
     task_id: msg.task_id || null,
     from,
     to,
@@ -216,6 +217,7 @@ function createSignedMessage(msg, laneId) {
 
   return {
     ...msg,
+    id: msgId,
     from,
     to,
     content_hash: contentHash,

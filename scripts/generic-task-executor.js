@@ -665,9 +665,11 @@ function createResponse(originalMsg, executionResult, lane) {
   const resultJson = JSON.stringify(executionResult.results || {});
   const contentHash = 'sha256:' + crypto.createHash('sha256').update(resultJson).digest('hex');
   const codeVersionHash = getCodeVersionHash(LANE_REGISTRY[lane].root);
+  const taskId = `response-${originalMsg.task_id || Date.now()}`;
   return {
     schema_version: '1.3',
-    task_id: `response-${originalMsg.task_id || Date.now()}`,
+    id: taskId,
+    task_id: taskId,
     idempotency_key: `resp-${Date.now()}-${(originalMsg.task_id || 'unknown').slice(0, 16)}`,
     from: lane,
     to: originalMsg.from || 'archivist',
@@ -680,7 +682,7 @@ function createResponse(originalMsg, executionResult, lane) {
     requires_action: false,
     payload: { mode: 'inline', compression: 'none' },
     execution: { mode: 'auto', engine: 'pipeline', actor: 'task-executor' },
-    lease: { owner: lane, acquired_at: nowIso() },
+    lease: { owner: lane, acquired_at: nowIso(), expires_at: new Date(Date.now() + 30000).toISOString(), renewal_count: 0, max_renewals: 3 },
     retry: { attempt: 1, max_attempts: 1 },
     evidence: { required: false, verified: true },
     evidence_exchange: {
