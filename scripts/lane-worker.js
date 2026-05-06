@@ -9,6 +9,7 @@ const { ArtifactResolver } = require('./artifact-resolver');
 const { ExecutionGate } = require('./execution-gate');
 const { evaluateVerificationDomain } = require('./verification-domain-gate');
 const { getCodeVersionHash } = require('./code-version-hash');
+const { getRoots } = require('./util/lane-discovery');
 
 const ACTIONABLE_TYPES = new Set(['task', 'escalation', 'request']);
 const NON_ASCII_PATTERN = /[^\x00-\x7F]/;
@@ -82,12 +83,7 @@ const LANE_HINTS = [
   { hint: 'swarmmind', lane: 'swarmmind' },
 ];
 
-const LANE_ROOTS = {
-  archivist: 'S:/Archivist-Agent',
-  library: 'S:/self-organizing-library',
-  kernel: 'S:/kernel-lane',
-  swarmmind: 'S:/SwarmMind',
-};
+const LANE_ROOTS = getRoots();
 
 function nowIso() {
   return new Date().toISOString();
