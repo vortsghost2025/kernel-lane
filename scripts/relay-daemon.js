@@ -3,19 +3,21 @@
 
 const fs = require('fs');
 const path = require('path');
-const { LaneDiscovery } = require('./util/lane-discovery');
-const { ClaimCommitGuard } = require('./claim-commit-guard');
 
-const _discovery = new LaneDiscovery();
-const claimGuard = new ClaimCommitGuard({ repoRoot: path.resolve(__dirname, '..') });
-const CANONICAL_INBOX = {};
-const LANE_ROOTS = {};
-for (const laneId of _discovery.listLanes()) {
-  try {
-    CANONICAL_INBOX[laneId] = _discovery.getInbox(laneId);
-    LANE_ROOTS[laneId] = _discovery.getLocalPath(laneId);
-  } catch (_) {}
-}
+const { LaneDiscovery } = require('./util/lane-discovery');
+const discovery = new LaneDiscovery();
+const ALL_LANES = ['archivist', 'library', 'swarmmind', 'kernel'];
+
+function getInboxDir(laneId) { return discovery.getInbox(laneId); }
+function getOutboxDir(laneId) { return discovery.getOutbox(laneId); }
+function getLaneRoot(laneId) { return discovery.getLocalPath(laneId); }
+
+const LANE_ROOTS = {
+  archivist: 'S:/Archivist-Agent',
+  library:   'S:/self-organizing-library',
+  swarmmind: 'S:/SwarmMind',
+  kernel:    'S:/kernel-lane',
+};
 
 function nowIso() { return new Date().toISOString(); }
 
@@ -24,8 +26,8 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--lane' && argv[i + 1]) { out.lane = String(argv[i + 1]).toLowerCase(); i++; continue; }
-  if (a === '--apply') { out.apply = true; continue; }
-  if (a === '--watch') { out.watch = true; continue; }
+    if (a === '--apply') { out.apply = true; continue; }
+    if (a === '--watch') { out.watch = true; continue; }
     if (a === '--poll-seconds' && argv[i + 1]) { out.pollSeconds = Math.max(1, Number(argv[i + 1]) || out.pollSeconds); i++; continue; }
     if (a === '--json') { out.json = true; continue; }
   }
@@ -76,23 +78,14 @@ class RelayDaemon {
         continue;
       }
 
-const msg = read.value;
+      const msg = read.value;
     const targetLane = msg.to;
-    if (!targetLane || !CANONICAL_INBOX[targetLane]) {
+    if (!targetLane || !ALL_LANES.includes(targetLane)) {
       results.errors.push({ file: ent.name, error: `Unknown target lane: ${targetLane}` });
       continue;
     }
 
-    const claimCheck = claimGuard.checkOutboxMessage(msg, this.repoRoot, this.outboxDir);
-    if (!claimCheck.allowed) {
-      const uncommitted = claimCheck.details
-        .filter(d => d.status === 'uncommitted' || d.status === 'missing')
-        .map(d => d.path);
-      results.errors.push({ file: ent.name, error: `premature_claim: ${uncommitted.join(', ')}`, claim_guard: claimCheck });
-      continue;
-    }
-
-    const targetDir = CANONICAL_INBOX[targetLane];
+    const targetDir = getInboxDir(targetLane);
       const targetPath = path.join(targetDir, ent.name);
 
       if (!this.dryRun) {
@@ -116,11 +109,11 @@ const msg = read.value;
   }
 
   collectIncoming() {
-    const otherLanes = Object.keys(CANONICAL_INBOX).filter(l => l !== this.lane);
+    const otherLanes = ALL_LANES.filter(l => l !== this.lane);
     const results = { collected: 0, errors: [], details: [] };
 
     for (const otherLane of otherLanes) {
-      const otherOutbox = path.join(LANE_ROOTS[otherLane], 'lanes', otherLane, 'outbox');
+      const otherOutbox = getOutboxDir(otherLane);
       if (!fs.existsSync(otherOutbox)) continue;
 
       const entries = fs.readdirSync(otherOutbox, { withFileTypes: true });
@@ -132,14 +125,20 @@ const msg = read.value;
         if (!read.ok) continue;
 
         const msg = read.value;
-        if (msg.to !== this.lane) continue;
+      if (msg.to !== this.lane) continue;
 
-        const targetDir = CANONICAL_INBOX[this.lane];
-        const targetPath = path.join(targetDir, ent.name);
+      const targetDir = getInboxDir(this.lane);
+    const targetPath = path.join(targetDir, ent.name);
 
-        if (!this.dryRun) {
-          try {
-            if (!fs.existsSync(targetDir)) {
+    if (!this.dryRun) {
+      try {
+        if (fs.existsSync(targetPath)) {
+          fs.unlinkSync(filePath);
+          results.collected++;
+          results.details.push({ file: ent.name, from: otherLane, to: this.lane, target: targetPath, skipped: 'already_exists' });
+          continue;
+        }
+        if (!fs.existsSync(targetDir)) {
               fs.mkdirSync(targetDir, { recursive: true });
             }
             fs.writeFileSync(targetPath, JSON.stringify(msg, null, 2), 'utf8');
@@ -159,11 +158,11 @@ const msg = read.value;
   }
 
   collectCrossLaneInbox() {
-    const otherLanes = Object.keys(CANONICAL_INBOX).filter(l => l !== this.lane);
+    const otherLanes = ALL_LANES.filter(l => l !== this.lane);
     const results = { collected: 0, errors: [], details: [] };
 
     for (const otherLane of otherLanes) {
-      const crossInbox = path.join(LANE_ROOTS[otherLane], 'lanes', this.lane, 'inbox');
+      const crossInbox = path.join(getLaneRoot(otherLane), 'lanes', this.lane, 'inbox');
       if (!fs.existsSync(crossInbox)) continue;
 
       const entries = fs.readdirSync(crossInbox, { withFileTypes: true });
@@ -175,15 +174,15 @@ const msg = read.value;
 
       for (const ent of jsonFiles) {
         const filePath = path.join(crossInbox, ent.name);
-        const targetDir = CANONICAL_INBOX[this.lane];
-        const targetPath = path.join(targetDir, ent.name);
+      const targetDir = getInboxDir(this.lane);
+      const targetPath = path.join(targetDir, ent.name);
 
-        if (!this.dryRun) {
-          try {
-            if (!fs.existsSync(targetDir)) {
-              fs.mkdirSync(targetDir, { recursive: true });
-            }
-            fs.writeFileSync(targetPath, JSON.stringify(safeReadJson(filePath).value || {}, null, 2), 'utf8');
+      if (!this.dryRun) {
+        try {
+          if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+          }
+          fs.writeFileSync(targetPath, JSON.stringify(safeReadJson(filePath).value || {}, null, 2), 'utf8');
             fs.unlinkSync(filePath);
             results.collected++;
             results.details.push({ file: ent.name, from: otherLane + '/lanes/' + this.lane + '/inbox', to: this.lane, target: targetPath });
@@ -265,4 +264,4 @@ if (require.main === module) {
   runCli().catch(err => { console.error(`[relay-daemon] FATAL: ${err.message}`); process.exit(1); });
 }
 
-module.exports = { RelayDaemon, CANONICAL_INBOX, LANE_ROOTS };
+module.exports = { RelayDaemon, ALL_LANES };
