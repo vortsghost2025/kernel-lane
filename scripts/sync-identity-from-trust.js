@@ -10,7 +10,13 @@ const LANES = {
 };
 
 function kid(pem) {
-  return crypto.createHash('sha256').update(pem.trim()).digest('hex').slice(0, 16);
+  try {
+    const key = crypto.createPublicKey(pem);
+    const spkiDer = key.export({ type: 'spki', format: 'der' });
+    return crypto.createHash('sha256').update(spkiDer).digest('hex').slice(0, 16);
+  } catch (e) {
+    return crypto.createHash('sha256').update(pem.trim()).digest('hex').slice(0, 16);
+  }
 }
 
 function loadTrust(tsPath, laneId) {
