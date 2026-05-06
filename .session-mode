@@ -1,0 +1,35 @@
+{
+  "mode": "governing",
+  "purpose": "optimization-and-benchmarking",
+  "can_write": true,
+  "heartbeat_required": true,
+  "lane_identity": {
+    "lane_id": "kernel",
+    "authority": 60,
+    "role": "optimization-and-benchmarking",
+    "position": 4,
+    "session_authority": false
+  },
+  "session_rules": {
+    "can_generate_session_id": false,
+    "must_read_before_start": [
+      "SESSION_REGISTRY.json",
+      ".session-mode"
+    ],
+    "self_verification_sequence": [
+      "1. Read .session-mode (this file)",
+      "2. Extract: lane_id, authority, role, position",
+      "3. Verify: I am Lane 4 with authority 60",
+      "4. Read SESSION_REGISTRY.json currentSession",
+      "5. Use currentSession.id as my session ID",
+      "6. Begin operation"
+    ]
+  },
+  "forbidden_actions": [
+    "Generate session ID",
+    "Modify currentSession",
+    "Override higher authority lanes",
+    "Infer identity from working directory"
+  ],
+  "notes": "Created during authority convergence 2026-05-05. Canonical values per SYSTEM_MAP v1.1."
+}
