@@ -195,7 +195,49 @@ if (require.main === module) {
   }
 }
 
-module.exports = { LaneDiscovery };
+const _discovery = new LaneDiscovery();
+
+function getRoots() {
+  const lanes = _discovery.registry.lanes;
+  const roots = {};
+  for (const [id, lane] of Object.entries(lanes)) {
+    roots[id] = lane.local_path;
+  }
+  return roots;
+}
+
+function sToLocal(winPath) {
+  if (!isWin32 && winPath) {
+    return winPath.replace(/^S:/, '/home/we4free/agent/repos').replace(/\\/g, '/');
+  }
+  return winPath;
+}
+
+function getAllLanes() {
+  return _discovery.registry.lanes;
+}
+
+function getLane(laneId) {
+  return _discovery.getLane(laneId);
+}
+
+function getLaneNames() {
+  return Object.keys(_discovery.registry.lanes);
+}
+
+const LANES = _discovery.registry.lanes;
+const ROOTS = getRoots();
+
+module.exports = {
+  LaneDiscovery,
+  getRoots,
+  sToLocal,
+  getAllLanes,
+  getLane,
+  getLaneNames,
+  LANES,
+  ROOTS
+};
 
 /**
  * ORIGIN NOTE: Adapted from S:/Archivist-Agent/.global/lane-discovery.js
