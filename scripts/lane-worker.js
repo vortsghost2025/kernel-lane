@@ -499,21 +499,12 @@ class LaneWorker {
       }
     }
 
-    // Scan action-required subfolder (tasks awaiting agent execution)
-    const arDir = this.config.queues.actionRequired;
-    if (fs.existsSync(arDir)) {
-      const entries = fs.readdirSync(arDir, { withFileTypes: true });
-      for (const ent of entries) {
-        if (!ent.isFile()) continue;
-        const lower = ent.name.toLowerCase();
-        if (!lower.endsWith('.json')) continue;
-        if (SKIP_FILENAMES.has(lower)) continue;
-        if (HEARTBEAT_PATTERN.test(lower)) continue;
-        files.push(path.join(arDir, ent.name));
-      }
-    }
+  // action-required/ is NOT scanned — it is the executor's domain.
+  // The lane-worker routes new tasks there; re-scanning would cause
+  // stale-foreign misrouting and duplicate .lane-worker suffix accumulation.
+  // See: NFM-025 (action-required is executor-owned, not watcher-owned).
 
-    return files.slice(0, this.maxFiles);
+  return files.slice(0, this.maxFiles);
   }
 
   decideRoute(msg, schemaResult, signatureResult) {

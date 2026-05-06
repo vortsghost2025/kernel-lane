@@ -4,24 +4,32 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const os = require('os');
 
 const { deriveKeyId } = require(path.join(__dirname, '..', '.global', 'deriveKeyId.js'));
 
-// LEASE + ATOMIC WRITE: Require kernel primitives for cross-lane mutation safety
-const KERNEL_ROOT = 'S:/kernel-lane';
+const isWin32 = process.platform === 'win32';
+const UBUNTU_ROOT = path.join(os.homedir(), 'agent', 'repos');
+function _resolve(winPath) {
+  if (isWin32) return winPath;
+  const m = winPath.match(/^S:\/(.+)$/);
+  return m ? path.join(UBUNTU_ROOT, m[1]) : winPath;
+}
+
+const KERNEL_ROOT = _resolve('S:/kernel-lane');
 const { atomicWriteWithLease } = require(path.join(KERNEL_ROOT, 'scripts', 'atomic-write-util'));
 const { guardWrite } = require(path.join(__dirname, 'outbox-write-guard'));
 
 const PASSFILE_CANDIDATES = [
   path.join(__dirname, '..', '.runtime', 'lane-passphrases.json'),
-  'S:/Archivist-Agent/.runtime/lane-passphrases.json'
+  _resolve('S:/Archivist-Agent/.runtime/lane-passphrases.json')
 ];
 
 const LANE_IDENTITY_DIRS = {
-  archivist: 'S:/Archivist-Agent/.identity',
-  library: 'S:/self-organizing-library/.identity',
-  swarmmind: 'S:/SwarmMind/.identity',
-  kernel: 'S:/kernel-lane/.identity',
+  archivist: _resolve('S:/Archivist-Agent/.identity'),
+  library: _resolve('S:/self-organizing-library/.identity'),
+  swarmmind: _resolve('S:/SwarmMind/.identity'),
+  kernel: _resolve('S:/kernel-lane/.identity'),
 };
 
 const DEFAULT_PAYLOAD = { mode: 'inline', compression: 'none' };
