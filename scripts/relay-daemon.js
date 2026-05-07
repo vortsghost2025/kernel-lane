@@ -18,11 +18,12 @@ for (const laneId of _discovery.listLanes()) {
 function nowIso() { return new Date().toISOString(); }
 
 function parseArgs(argv) {
-  const out = { lane: null, apply: false, pollSeconds: 20, json: false };
+  const out = { lane: null, apply: false, watch: false, pollSeconds: 20, json: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--lane' && argv[i + 1]) { out.lane = String(argv[i + 1]).toLowerCase(); i++; continue; }
-    if (a === '--apply') { out.apply = true; continue; }
+    if (a === '--watch') { out.watch = true; continue; }
+  if (a === '--apply') { out.apply = true; continue; }
     if (a === '--poll-seconds' && argv[i + 1]) { out.pollSeconds = Math.max(1, Number(argv[i + 1]) || out.pollSeconds); i++; continue; }
     if (a === '--json') { out.json = true; continue; }
   }
@@ -213,19 +214,38 @@ async function runCli() {
     dryRun: !args.apply,
   });
 
-  const result = daemon.runOnce();
-  if (args.json) {
-    console.log(JSON.stringify(result, null, 2));
+  if (args.watch) {
+    console.log(`[relay-daemon] lane=${lane} watching every ${args.pollSeconds}s`);
+    const tick = () => {
+      try {
+        const result = daemon.runOnce();
+        const out = result.outbound;
+        const inc = result.incoming;
+        const cx = result.cross_inbox;
+        if (out.delivered > 0 || inc.collected > 0 || cx.collected > 0) {
+          console.log(`[relay-daemon] lane=${lane} outbound: delivered=${out.delivered} incoming: collected=${inc.collected} cross_inbox: collected=${cx.collected}`);
+        }
+      } catch (err) {
+        console.error(`[relay-daemon] tick error: ${err.message}`);
+      }
+    };
+    tick();
+    setInterval(tick, args.pollSeconds * 1000);
   } else {
-    console.log(`[relay-daemon] lane=${result.lane} dry_run=${result.dry_run}`);
-    console.log(`  outbound: scanned=${result.outbound.scanned} delivered=${result.outbound.delivered}`);
-    if (result.outbound.errors.length > 0) {
-      for (const e of result.outbound.errors) console.log(`    ERROR: ${e.file}: ${e.error}`);
-    }
-    console.log(`  incoming: collected=${result.incoming.collected}`);
-    console.log(`  cross_inbox: collected=${result.cross_inbox.collected}`);
-    if (result.incoming.errors.length > 0 || result.cross_inbox.errors.length > 0) {
-      for (const e of [...result.incoming.errors, ...result.cross_inbox.errors]) console.log(`    ERROR: ${e.file}: ${e.error}`);
+    const result = daemon.runOnce();
+    if (args.json) {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      console.log(`[relay-daemon] lane=${result.lane} dry_run=${result.dry_run}`);
+      console.log(` outbound: scanned=${result.outbound.scanned} delivered=${result.outbound.delivered}`);
+      if (result.outbound.errors.length > 0) {
+        for (const e of result.outbound.errors) console.log(` ERROR: ${e.file}: ${e.error}`);
+      }
+      console.log(` incoming: collected=${result.incoming.collected}`);
+      console.log(` cross_inbox: collected=${result.cross_inbox.collected}`);
+      if (result.incoming.errors.length > 0 || result.cross_inbox.errors.length > 0) {
+        for (const e of [...result.incoming.errors, ...result.cross_inbox.errors]) console.log(` ERROR: ${e.file}: ${e.error}`);
+      }
     }
   }
 }

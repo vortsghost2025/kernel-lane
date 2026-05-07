@@ -1,0 +1,16 @@
+[Unit]
+Description=Kernel Relay Daemon — cross-lane outbox delivery
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/we4free/.nvm/versions/node/v20.20.2/bin/node /home/we4free/agent/repos/kernel-lane/scripts/relay-daemon.js --lane kernel --apply --watch --poll-seconds 20
+WorkingDirectory=/home/we4free/agent/repos/kernel-lane
+Restart=on-failure
+RestartSec=10
+Environment=NODE_ENV=production
+Environment=LANE_NAME=kernel
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+
+[Install]
+WantedBy=default.target
