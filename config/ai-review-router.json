@@ -1,0 +1,59 @@
+{
+  "tiers": {
+    "local": {
+      "name": "Local Ollama",
+      "cost": "$0 (your GPU)",
+      "base_url_env": "OLLAMA_BASE_URL",
+      "model_env": "OLLAMA_MODEL",
+      "default_model": "qwen2.5-coder:7b",
+      "default_base_url": "http://localhost:11434",
+      "max_tokens": 2048,
+      "timeout_ms": 60000
+    },
+    "strong": {
+      "name": "NVIDIA NIM Cloud",
+      "cost": "$0 (free beta)",
+      "base_url_env": "NVIDIA_NIM_BASE_URL",
+      "model_env": "NVIDIA_NIM_MODEL",
+      "api_key_env": "NVIDIA_NIM_API_KEY",
+      "default_model": "google/gemma-2-2b-it",
+      "default_base_url": "https://integrate.api.nvidia.com/v1",
+      "max_tokens": 1024,
+      "timeout_ms": 30000
+    },
+    "openrouter": {
+      "name": "OpenRouter Free Cloud",
+      "cost": "$0 (free tier)",
+      "base_url_env": "OPENROUTER_BASE_URL",
+      "model_env": "OPENROUTER_MODEL",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "default_model": "nvidia/nemotron-3-super-120b-a12b:free",
+      "default_base_url": "https://openrouter.ai/api/v1",
+      "fallback_model_env": "OPENROUTER_MODEL_FALLBACK",
+      "default_fallback_model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "max_tokens": 1024,
+      "timeout_ms": 30000
+    },
+    "final": {
+      "name": "Manual — Claude/GPT",
+      "cost": "paid (you decide)",
+      "note": "Print guidance for user to review manually. No API call made."
+    }
+  },
+  "escalation": {
+    "order": ["local", "strong", "openrouter", "final"],
+    "uncertainty_signals": [
+      "I'm not sure",
+      "I'm not certain",
+      "might be",
+      "could be",
+      "possibly",
+      "it depends",
+      "I cannot determine",
+      "unclear",
+      "ambiguous",
+      "I don't have enough"
+    ],
+    "min_signal_matches": 1
+  }
+}
