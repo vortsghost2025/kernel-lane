@@ -42,9 +42,43 @@ lanes/**/signature-*.jws
 lanes/*/outbox/unsigned/
 logs/quarantine-tracker.json
 .aider*
+<<<<<<< HEAD
 scripts/test-signed-message.js.tmp
 
 S:/
 
 # Environment secrets
 .env
+=======
+scripts/test-signed-message.js.tmp
+
+# Inbox/outbox are LOCAL-ONLY
+lanes/*/inbox/
+lanes/*/outbox/
+
+# Compact audit runtime state
+.compact-audit/
+
+# Lane runtime artifacts
+lanes/broadcast/system_state.json
+lanes/broadcast/journal/
+lanes/*/receipts/
+lanes/*/state/active-owner.json
+lanes/*/state/worker-audit.log
+lanes/*/state/traces/
+lanes/*/state/sovereignty-report-*.json
+lanes/*/reports/
+lanes/*/journal/
+lanes/*/inbox/heartbeat-*.json
+
+# Temp files
+*.local
+
+S:/
+>>>>>>> 7ee3fb1 ([LANE-4] chore: gitignore runtime lane artifacts, untrack inbox/outbox and operational state)
+
+# Compact audit runtime artifacts
+.compact-audit/
+COMPACT_CONTEXT_HANDOFF.md
+lanes/*/state/traces/
+lanes/*/state/worker-audit.log
