@@ -11,15 +11,41 @@
 const fs = require('fs');
 const path = require('path');
 
-const LANES = {
-  'Archivist': 'S:/Archivist-Agent',
-  'Kernel': 'S:/kernel-lane',
-  'Library': 'S:/self-organizing-library',
-  'SwarmMind': 'S:/SwarmMind'
+const { LaneDiscovery } = require('./util/lane-discovery');
+const _discovery = new LaneDiscovery();
+
+const LANE_ID_MAP = {
+  'Archivist': 'archivist',
+  'Kernel': 'kernel',
+  'Library': 'library',
+  'SwarmMind': 'swarmmind'
 };
+
+const LANES = {};
+for (const [pascalKey, laneId] of Object.entries(LANE_ID_MAP)) {
+  LANES[pascalKey] = _discovery.getLocalPath(laneId);
+}
 
 const CURRENT_LANE = 'Kernel';
 const CURRENT_ROOT = LANES[CURRENT_LANE];
+
+if (process.platform !== 'win32') {
+  for (const [name, p] of Object.entries(LANES)) {
+    if (/^[A-Za-z]:[\\/]/.test(p)) {
+      console.error(`[sovereignty] FATAL: Windows path leak on ${process.platform}: ${name}=${p}`);
+      process.exit(1);
+    }
+  }
+}
+
+if (process.platform !== 'win32') {
+  for (const [name, p] of Object.entries(LANES)) {
+    if (/^[A-Za-z]:[\\/]/.test(p)) {
+      console.error(`[sovereignty] FATAL: Windows path leak on ${process.platform}: ${name}=${p}`);
+      process.exit(1);
+    }
+  }
+}
 
 const ALLOWED_PATTERNS = [
   /^\.\.?\//,
