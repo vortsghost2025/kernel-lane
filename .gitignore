@@ -30,6 +30,11 @@ nul
 .identity/
 .runtime/
 
+# API keys (NEVER commit)
+.env
+.env.local
+.env.production
+
 # Signed message sidecars (JWS signatures stored separately)
 lanes/**/signature-*.jws
 
