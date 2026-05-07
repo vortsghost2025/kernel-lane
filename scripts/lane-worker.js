@@ -10,7 +10,6 @@ const { ExecutionGate } = require('./execution-gate');
 const { evaluateVerificationDomain } = require('./verification-domain-gate');
 const { getCodeVersionHash } = require('./code-version-hash');
 const { getRoots } = require('./util/lane-discovery');
-const nim = require('./nim-chat');
 
 const ACTIONABLE_TYPES = new Set(['task', 'escalation', 'request']);
 const NON_ASCII_PATTERN = /[^\x00-\x7F]/;
@@ -408,7 +407,6 @@ class LaneWorker {
       resolver: this.artifactResolver,
     });
 this.codeVersionHash = getCodeVersionHash(this.repoRoot);
-this.nim = nim.nimAvailable() ? nim : null;
 this.lastRun = null;
     this.sessionId = SESSION_ID;
     this.isOwner = false;
