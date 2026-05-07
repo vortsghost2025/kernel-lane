@@ -24,8 +24,8 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--lane' && argv[i + 1]) { out.lane = String(argv[i + 1]).toLowerCase(); i++; continue; }
-    if (a === '--watch') { out.watch = true; continue; }
   if (a === '--apply') { out.apply = true; continue; }
+  if (a === '--watch') { out.watch = true; continue; }
     if (a === '--poll-seconds' && argv[i + 1]) { out.pollSeconds = Math.max(1, Number(argv[i + 1]) || out.pollSeconds); i++; continue; }
     if (a === '--json') { out.json = true; continue; }
   }
