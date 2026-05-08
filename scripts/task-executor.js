@@ -6,6 +6,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
+const { ensureOutputProvenance, verifyOutputProvenance } = require(path.join(REPO_ROOT, 'scripts', 'output-provenance'));
 const LANE = 'swarmmind';
 const ACTION_REQUIRED_DIR = path.join(REPO_ROOT, 'lanes', LANE, 'inbox', 'action-required');
 const IN_PROGRESS_DIR = path.join(REPO_ROOT, 'lanes', LANE, 'inbox', 'in-progress');
@@ -73,6 +74,12 @@ function executeTask(msg) {
 }
 
 function createResponse(originalMsg, executionResult) {
+  const provBody = ensureOutputProvenance(executionResult.summary || 'Task completed.', {
+    agent: 'task-executor',
+    lane: LANE,
+    target: (originalMsg.subject || 'Task').slice(0, 80),
+    generated_at: nowIso(),
+  });
   return {
     schema_version: '1.3',
     task_id: `response-${originalMsg.task_id || Date.now()}`,
@@ -83,7 +90,7 @@ function createResponse(originalMsg, executionResult) {
     task_kind: executionResult.task_kind || 'ack',
     priority: originalMsg.priority || 'P2',
     subject: `Re: ${originalMsg.subject || 'Task'}`,
-    body: executionResult.summary || 'Task completed.',
+    body: provBody,
     timestamp: nowIso(),
     requires_action: false,
     payload: { mode: 'inline', compression: 'none' },
@@ -103,6 +110,19 @@ function createResponse(originalMsg, executionResult) {
 }
 
 function signAndDeliver(response) {
+  if (typeof response.body === 'string') {
+    var prov = verifyOutputProvenance(response.body);
+    if (!prov.ok) {
+      response.body = ensureOutputProvenance(response.body, {
+        agent: 'task-executor',
+        lane: LANE,
+        target: (response.subject || 'unknown').slice(0, 80),
+        generated_at: nowIso(),
+      });
+      response._provenance_auto_injected = true;
+      response._provenance_was_missing = prov.missing;
+    }
+  }
   try {
     const { createSignedMessage } = require(path.join(REPO_ROOT, 'scripts', 'create-signed-message.js'));
     const signed = createSignedMessage(response, LANE);

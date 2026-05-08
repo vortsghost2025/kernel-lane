@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Unified governance config for kernel-lane runtime. Read this file at session start. These rules are enforced by lane-worker daemons — violations get NACKed.",
+  "output_provenance": {
+    "required": true,
+    "fields": ["agent", "lane", "target"],
+    "recommended_fields": ["generated_at", "session_id", "platform", "host"],
+    "template": "OUTPUT_PROVENANCE:\nagent: <your-runtime-or-model>\nlane: kernel\ntarget: <what-youre-working-on>\ngenerated_at: <ISO-8601>\nsession_id: <your-session>",
+    "enforcement": "All outbound messages without OUTPUT_PROVENANCE in body are blocked by lane-worker with reason OUTPUT_PROVENANCE_MISSING. A NACK is sent back to the agent's inbox."
+  },
+  "lane_sovereignty": {
+    "rule": "No cross-lane require() — string literals allowed",
+    "enforcement": "Pre-commit hook sovereignty scanner blocks commits with cross-lane requires"
+  },
+  "message_protocol": {
+    "schema": "schemas/inbox-message-v1.json",
+    "version": "1.4",
+    "required_fields": ["id", "from", "to", "timestamp", "priority", "type", "task_kind", "body", "requires_action"],
+    "signature": "JWT RS256 required for automated messages, null acceptable for declarative/manual messages"
+  },
+  "packet_first_review": {
+    "for_graph": true,
+    "canonical_surface": [
+      "docs/AGENT_WEB_REVIEW_BRIEF.md",
+      "data/graph-analysis-packets.json",
+      "data/website-section-index.json",
+      "data/graph-packet-schema.json"
+    ],
+    "prohibited": "Do not inspect raw graph JSON unless escalation is justified and documented"
+  },
+  "claim_status_taxonomy": {
+    "verified_fact": "Backed by packet fields, route index, accepted artifacts, or build/typecheck/browser evidence",
+    "known_bug": "Reproduced defect with evidence from anomalies, UI, logs, or verification",
+    "proposed_fix": "Candidate remediation not yet implemented or not yet re-verified",
+    "fix_in_progress": "Change exists in code/runtime but not yet fully validated",
+    "accepted_fix": "Explicitly verified and accepted in existing trail"
+  },
+  "accepted_fix_criteria": [
+    "Fix is implemented in committed code",
+    "Fix passes typecheck AND build AND browser verification",
+    "Fix is recorded in packet claim_status.accepted_fixes with verified_at timestamp",
+    "Fix has cross-reference to original known_bug or anomaly",
+    "Screenshot evidence alone does NOT qualify"
+  ],
+  "runtimes": {
+    "primary": "opencode",
+    "secondary": "kilo",
+    "paused": "cursor",
+    "headless": "ubuntu-ssh",
+    "note": "Use opencode as primary agent interface. Kilo secondary. Cursor paused until runtime unification complete."
+  },
+  "daemons": {
+    "inbox_watcher": "Must be running continuously on all lane roots. Watches inbox dirs, enforces provenance, routes messages.",
+    "executor_watcher": "Must be running for autonomous task execution.",
+    "relay_daemon": "Must be running for cross-lane message relay.",
+    "autostart_windows": "scripts/windows-autostart.bat (Scheduled Task: AllLanesAutoStart)",
+    "autostart_ubuntu": "systemd user services in ~/.config/systemd/user/"
+  }
+}
