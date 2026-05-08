@@ -107,3 +107,8 @@ test-results/
 
 S:/
 JOURNAL_SESSION_ID
+
+# Hygiene/operator timestamped files (colon filenames break Windows)
+lanes/broadcast/hygiene/
+lanes/broadcast/operator_alert_*.json
+lanes/broadcast/quarantine/
