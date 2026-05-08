@@ -8,6 +8,9 @@
 
 **Every agent MUST use these paths. No variants allowed.**
 
+**No-guesswork message contract (schema + signing + send/log):**
+`S:/Archivist-Agent/docs/ops/LANE_MESSAGE_INDEX.md`
+
 ```javascript
 // Load this immediately:
 const { LaneDiscovery } = require('S:/Archivist-Agent/.global/lane-discovery.js');
