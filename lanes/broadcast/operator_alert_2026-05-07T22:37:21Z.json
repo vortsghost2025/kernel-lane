@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-05-07T22:37:21Z",
+  "alert": "Hygiene monitor detected issues",
+  "details": {
+    "timestamp": "2026-05-07T22:37:21Z",
+    "path_hygiene": {
+      "status": "PASS",
+      "classification": "PATH_NORMALIZATION_BUG",
+      "evidence": []
+    },
+    "secret_detection": {
+      "status": "PASS",
+      "classification": "SECRETS_IN_PROCESS_ARGS",
+      "evidence": []
+    },
+    "dirty_repos": {
+      "status": "FAIL",
+      "evidence": [
+        "Archivist-Agent [master] dirty_files=2"
+      ]
+    },
+    "failed_services": {
+      "status": "FAIL",
+      "evidence": [
+        "  UNIT LOAD ACTIVE SUB DESCRIPTION",
+        "0 loaded units listed."
+      ]
+    },
+    "queue_pressure": {
+      "status": "FAIL",
+      "evidence": [
+        "kernel-lane live_inbox=353 outbox=34"
+      ]
+    },
+    "stale_heartbeats": {
+      "status": "FAIL",
+      "evidence": [
+        "/home/we4free/agent/repos/SwarmMind/lanes/archivist/inbox/heartbeat-archivist.json",
+        "/home/we4free/agent/repos/kernel-lane/lanes/swarmmind/inbox/heartbeat-swarmmind.json",
+        "/home/we4free/agent/repos/kernel-lane/lanes/archivist/inbox/heartbeat-archivist.json",
+        "/home/we4free/agent/repos/self-organizing-library/lanes/archivist/inbox/heartbeat-archivist.json",
+        "/home/we4free/agent/repos/self-organizing-library/lanes/library/inbox/heartbeat-opencode-verification-pass-1-start.json"
+      ]
+    },
+    "severity": "FAIL",
+    "NO_AUTO_FIX": true
+  }
+}

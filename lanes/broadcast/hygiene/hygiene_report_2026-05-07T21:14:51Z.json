@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-05-07T21:14:51Z",
+  "path_hygiene": {
+    "status": "PASS",
+    "classification": "PATH_NORMALIZATION_BUG",
+    "evidence": []
+  },
+  "secret_detection": {
+    "status": "FAIL",
+    "classification": "SECRETS_IN_PROCESS_ARGS",
+    "evidence": [
+      "2611372 npm exec @morphllm/morphmcp --api-key sk-77JKe4LpeU3pEbDqorRVwj0G4LByYNMGrjqR_YRHThYhC35h",
+      "2618238 sh -c morph-mcp --api-key sk-77JKe4LpeU3pEbDqorRVwj0G4LByYNMGrjqR_YRHThYhC35h",
+      "2618242 node /home/we4free/.npm/_npx/9181b9af11706e5e/node_modules/.bin/morph-mcp --api-key sk-77JKe4LpeU3pEbDqorRVwj0G4LByYNMGrjqR_YRHThYhC35h"
+    ]
+  },
+  "dirty_repos": {
+    "status": "FAIL",
+    "evidence": [
+      "kernel-lane [main] dirty_files=9"
+    ]
+  },
+  "failed_services": {
+    "status": "FAIL",
+    "evidence": [
+      "  UNIT LOAD ACTIVE SUB DESCRIPTION",
+      "0 loaded units listed."
+    ]
+  },
+  "queue_pressure": {
+    "status": "FAIL",
+    "evidence": [
+      "kernel-lane live_inbox=353 outbox=34"
+    ]
+  },
+  "stale_heartbeats": {
+    "status": "FAIL",
+    "evidence": [
+      "/home/we4free/agent/repos/SwarmMind/lanes/archivist/inbox/heartbeat-archivist.json",
+      "/home/we4free/agent/repos/kernel-lane/lanes/swarmmind/inbox/heartbeat-swarmmind.json",
+      "/home/we4free/agent/repos/kernel-lane/lanes/archivist/inbox/heartbeat-archivist.json",
+      "/home/we4free/agent/repos/self-organizing-library/lanes/archivist/inbox/heartbeat-archivist.json",
+      "/home/we4free/agent/repos/self-organizing-library/lanes/library/inbox/heartbeat-opencode-verification-pass-1-start.json"
+    ]
+  },
+  "severity": "FAIL",
+  "NO_AUTO_FIX": true
+}

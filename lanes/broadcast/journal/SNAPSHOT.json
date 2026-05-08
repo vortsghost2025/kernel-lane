@@ -1,0 +1,87 @@
+{
+  "schema": "store-journal-snapshot-v2",
+  "generated_at": "2026-05-08T01:09:27.499Z",
+  "host": "we",
+  "date": "2026-05-08",
+  "lanes": {
+    "library": {
+      "total_entries": 2,
+      "in_progress": [],
+      "active_ownerships": [],
+      "files_changed_today": [],
+      "last_activity": {
+        "timestamp": "2026-05-08T00:59:58.364Z",
+        "event": "work_completed",
+        "agent": "smoke-test-ubuntu"
+      }
+    },
+    "archivist": {
+      "total_entries": 2,
+      "in_progress": [],
+      "active_ownerships": [],
+      "files_changed_today": [],
+      "last_activity": {
+        "timestamp": "2026-05-08T00:59:58.239Z",
+        "event": "work_completed",
+        "agent": "smoke-test-ubuntu"
+      }
+    },
+    "swarmmind": {
+      "total_entries": 2,
+      "in_progress": [],
+      "active_ownerships": [],
+      "files_changed_today": [],
+      "last_activity": {
+        "timestamp": "2026-05-08T00:59:58.488Z",
+        "event": "work_completed",
+        "agent": "smoke-test-ubuntu"
+      }
+    },
+    "kernel": {
+      "total_entries": 14,
+      "in_progress": [
+        {
+          "agent": "git-pre-commit",
+          "session_id": "git-1778201347",
+          "target": "[LANE-4] test: verify post-commit auto-journal hook",
+          "started_at": "2026-05-08T00:49:07.534Z"
+        },
+        {
+          "agent": "autonomous-executor-v1.0.0",
+          "session_id": "auto-125162",
+          "target": "autonomous-executor-kernel",
+          "started_at": "2026-05-08T01:03:23.253Z"
+        }
+      ],
+      "active_ownerships": [
+        {
+          "path": "lanes/kernel/inbox/action-required",
+          "owner": "autonomous-executor-v1.0.0",
+          "reason": "autonomous task execution"
+        }
+      ],
+      "files_changed_today": [
+        ".gitignore",
+        "scripts/setup-hooks.js",
+        "scripts/store-journal.js",
+        "scripts/autonomous-executor.js",
+        "scripts/blocked-remediator.js",
+        "scripts/contradiction-adjudicator.js",
+        "scripts/task-chain-engine.js",
+        "scripts/post-commit-hook.sh"
+      ],
+      "last_activity": {
+        "timestamp": "2026-05-08T01:09:27.467Z",
+        "event": "work_completed",
+        "agent": "git-post-commit"
+      }
+    },
+    "opencode": {
+      "total_entries": 0,
+      "in_progress": [],
+      "active_ownerships": [],
+      "files_changed_today": [],
+      "last_activity": null
+    }
+  }
+}

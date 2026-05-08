@@ -57,21 +57,21 @@ const crypto = require('crypto');
 let LaneDiscovery = null;
 let discovery = null;
 let LANE_ROOTS = {};
-
 let BROADCAST_DIR = null;
 
 try {
   LaneDiscovery = require('./util/lane-discovery').LaneDiscovery;
   discovery = new LaneDiscovery();
-  const lanes = discovery.listLanes ? discovery.listLanes() : Object.keys(discovery.registry.lanes);
-  for (const lane of lanes) {
+  var lanes = discovery.listLanes ? discovery.listLanes() : (discovery.getLaneNames ? discovery.getLaneNames() : Object.keys(discovery.registry.lanes));
+  for (var _i = 0; _i < lanes.length; _i++) {
+    var lane = lanes[_i];
     LANE_ROOTS[lane] = path.join(discovery.getLocalPath(lane), 'lanes', lane);
   }
   if (discovery.getBroadcastPath) {
     BROADCAST_DIR = discovery.getBroadcastPath();
   }
 } catch (e) {
-  const repoRoot = path.resolve(__dirname, '..');
+  var repoRoot = path.resolve(__dirname, '..');
   LANE_ROOTS = {
     library: path.join(repoRoot, 'lanes', 'library'),
     archivist: path.join(repoRoot, 'lanes', 'archivist'),
@@ -93,7 +93,10 @@ function repoRoot() {
 
 function journalDir(lane) {
   if (!KNOWN_LANES.includes(lane)) {
-    throw new Error(`Unknown lane: '${lane}'. Known: ${KNOWN_LANES.join(', ')}`);
+    throw new Error("Unknown lane: '" + lane + "'. Known: " + KNOWN_LANES.join(', '));
+  }
+  if (LANE_ROOTS[lane]) {
+    return path.join(LANE_ROOTS[lane], 'journal');
   }
   return path.join(repoRoot(), 'lanes', lane, 'journal');
 }
@@ -148,7 +151,7 @@ function readJournal(lane, dateStr) {
   if (LANE_ROOTS[lane]) {
     fp = path.join(LANE_ROOTS[lane], 'journal', `${dateStr}.jsonl`);
   } else {
-    fp = path.join(journalDir(lane), `${dateStr}.jsonl`);
+    fp = journalPath(lane, dateStr);
   }
   if (!fs.existsSync(fp)) return [];
   const lines = fs.readFileSync(fp, 'utf8').trim().split('\n');
@@ -179,7 +182,7 @@ function validateEntry(entry) {
     if (!entry[field]) errors.push(`Missing required field: ${field}`);
   }
   if (entry.event === 'work_completed' && !entry.handoff)
-    entry.handoff = { status: 'completed', auto: true };
+    errors.push("Event 'work_completed' requires 'handoff' field");
   if (entry.event === 'file_ownership_claimed' && !entry.active_ownership)
     errors.push("Event 'file_ownership_claimed' requires 'active_ownership' field");
   if (entry.lane && !KNOWN_LANES.includes(entry.lane))
@@ -619,46 +622,63 @@ function cmdActive(args) {
 // ---------------------------------------------------------------------------
 
 function cmdStatus(args) {
-  const hoursBack = parseInt(getArg(args, '--hours') || '24', 10);
-  const cutoff = new Date(Date.now() - hoursBack * 3600000).toISOString();
+  var dateStr = todayISO();
+  var hoursBack = parseInt(getArg(args, '--hours') || '24', 10);
+  var cutoff = new Date(Date.now() - hoursBack * 3600000).toISOString();
 
-  const datesToCheck = new Set();
-  const today = new Date();
-  datesToCheck.add(todayISO());
-  for (let h = 0; h < hoursBack; h += 24) {
-    const d = new Date(Date.now() - h * 3600000);
-    datesToCheck.add(d.toISOString().split('T')[0]);
+  var allLanes = {};
+  var datesNeeded = [];
+  for (var d = 0; d <= Math.ceil(hoursBack / 24); d++) {
+    var dt = new Date(Date.now() - d * 86400000);
+    datesNeeded.push(dt.toISOString().slice(0, 10));
   }
-
-  const allLanes = {};
-  for (const lane of KNOWN_LANES) {
-    allLanes[lane] = [];
-    for (const dateStr of datesToCheck) {
-      allLanes[lane].push(...readJournal(lane, dateStr));
+  for (var _ln = 0; _ln < KNOWN_LANES.length; _ln++) {
+    var ln = KNOWN_LANES[_ln];
+    allLanes[ln] = [];
+    for (var _d = 0; _d < datesNeeded.length; _d++) {
+      var dayEntries = readJournal(ln, datesNeeded[_d]);
+      for (var _de = 0; _de < dayEntries.length; _de++) {
+        allLanes[ln].push(dayEntries[_de]);
+      }
     }
   }
 
-  const dateStr = todayISO();
-
-  const status = {
+  var status = {
     generated_at: utcISO(),
     date: dateStr,
     hours_back: hoursBack,
     lanes: {}
   };
 
-  for (const [lane, entries] of Object.entries(allLanes)) {
-    const recent = entries.filter(e => e.timestamp >= cutoff);
-    const completedIds = new Set(recent.filter(e => e.event === 'work_completed').map(e => e.session_id));
-    const inProgress = recent.filter(e => e.event === 'work_started' && !completedIds.has(e.session_id));
-    const ownershipState = buildOwnershipState(recent, lane);
-    const activeOwners = Object.entries(ownershipState).filter(([, s]) => s.is_active).map(([key, s]) => ({ path: key, owner: s.owner_agent, reason: s.reason, expires_at: s.expires_at }));
-    const filesChanged = [...new Set(recent.flatMap(e => e.files_changed || []))];
-    const lastEntry = recent.length > 0 ? recent[recent.length - 1] : null;
+  for (var _lane2 = 0; _lane2 < KNOWN_LANES.length; _lane2++) {
+    var lane = KNOWN_LANES[_lane2];
+    var entries = allLanes[lane] || [];
+    var recent = entries.filter(function(e) { return e.timestamp >= cutoff; });
+    var completedIds = {};
+    for (var _r = 0; _r < recent.length; _r++) {
+      if (recent[_r].event === 'work_completed') completedIds[recent[_r].session_id] = true;
+    }
+    var inProgress = recent.filter(function(e) { return e.event === 'work_started' && !completedIds[e.session_id]; });
+    var ownershipState = buildOwnershipState(recent, lane);
+    var activeOwners = [];
+    for (var key in ownershipState) {
+      if (ownershipState[key].is_active) {
+        activeOwners.push({ path: key, owner: ownershipState[key].owner_agent, reason: ownershipState[key].reason, expires_at: ownershipState[key].expires_at });
+      }
+    }
+    var filesChanged = [];
+    var seen = {};
+    for (var _f = 0; _f < recent.length; _f++) {
+      var fc = recent[_f].files_changed || [];
+      for (var _fc = 0; _fc < fc.length; _fc++) {
+        if (!seen[fc[_fc]]) { seen[fc[_fc]] = true; filesChanged.push(fc[_fc]); }
+      }
+    }
+    var lastEntry = recent.length > 0 ? recent[recent.length - 1] : null;
 
     status.lanes[lane] = {
       entries_today: recent.length,
-      in_progress_sessions: inProgress.map(e => ({ agent: e.agent, session_id: e.session_id, target: e.target, started_at: e.timestamp })),
+      in_progress_sessions: inProgress.map(function(e) { return { agent: e.agent, session_id: e.session_id, target: e.target, started_at: e.timestamp }; }),
       active_ownerships: activeOwners,
       files_changed: filesChanged,
       last_activity: lastEntry ? lastEntry.timestamp : null,
@@ -669,8 +689,6 @@ function cmdStatus(args) {
 
   console.log(JSON.stringify(status, null, 2));
 }
-
-// ---------------------------------------------------------------------------
 // COMMAND: READ (v2 — read any lane's journal)
 // ---------------------------------------------------------------------------
 
@@ -729,6 +747,114 @@ function cmdSnapshot(args) {
 }
 
 // ---------------------------------------------------------------------------
+// COMMAND: AUTOFIX (v3 — orphan session completion + stale owner cleanup)
+// ---------------------------------------------------------------------------
+
+function cmdAutofix(args) {
+  var dryRun = !args.includes('--apply');
+  var orphanTTL = 2 * 3600000;
+  var ownerTTL = 4 * 3600000;
+  var report = { generated_at: utcISO(), host: hostname(), dry_run: dryRun, orphan_sessions: [], stale_owners: [], actions_taken: [] };
+
+  var dateStr = todayISO();
+  var allLanes = readAllLanesForDate(dateStr);
+  var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  var yesterdayLanes = readAllLanesForDate(yesterday);
+
+  for (var _lane = 0; _lane < KNOWN_LANES.length; _lane++) {
+    var lane = KNOWN_LANES[_lane];
+    var entries = (allLanes[lane] || []).concat(yesterdayLanes[lane] || []);
+    var completedIds = {};
+    var startedMap = {};
+    for (var _e = 0; _e < entries.length; _e++) {
+      var e = entries[_e];
+      if (e.event === 'work_completed') completedIds[e.session_id] = true;
+      if (e.event === 'work_started' && !startedMap[e.session_id]) startedMap[e.session_id] = e;
+    }
+
+    var sessionIds = Object.keys(startedMap);
+    for (var _s = 0; _s < sessionIds.length; _s++) {
+      var sid = sessionIds[_s];
+      if (completedIds[sid]) continue;
+      var startEntry = startedMap[sid];
+      var age = Date.now() - new Date(startEntry.timestamp).getTime();
+      if (age < orphanTTL) continue;
+      var isTestSession = (startEntry.session_id || '').indexOf('smoke-test') >= 0 ||
+                          (startEntry.session_id || '').indexOf('test-') >= 0 ||
+                          (startEntry.agent || '').indexOf('test') >= 0 ||
+                          (startEntry.agent || '').indexOf('smoke') >= 0;
+      var orphan = {
+        session_id: sid,
+        lane: lane,
+        agent: startEntry.agent,
+        target: startEntry.target,
+        started_at: startEntry.timestamp,
+        age_hours: (age / 3600000).toFixed(1),
+        is_test_session: isTestSession
+      };
+      orphan.proposed_completion = {
+        event: 'work_completed',
+        session_id: sid,
+        agent: startEntry.agent || 'unknown',
+        lane: lane,
+        target: startEntry.target || 'orphaned',
+        intent: 'auto-completed: orphaned session (TTL expired)',
+        handoff: { status: 'orphaned', auto_completed: true, original_started_at: startEntry.timestamp },
+        timestamp: utcISO()
+      };
+      report.orphan_sessions.push(orphan);
+
+      if (!dryRun) {
+        var entry = orphan.proposed_completion;
+        entry._journal_id = generateId();
+        entry.host = hostname();
+        entry.forbidden_paths_touched = false;
+        var jp = journalPath(lane, dateStr);
+        fs.appendFileSync(jp, JSON.stringify(entry) + '\n', 'utf8');
+        report.actions_taken.push('appended orphan completion: ' + sid + ' lane=' + lane);
+      }
+    }
+  }
+
+  var repoRt = repoRoot();
+  for (var _l2 = 0; _l2 < KNOWN_LANES.length; _l2++) {
+    var ln = KNOWN_LANES[_l2];
+    var ownerPath = path.join(LANE_ROOTS[ln] ? LANE_ROOTS[ln] : path.join(repoRt, 'lanes', ln), 'state', 'active-owner.json');
+    if (!fs.existsSync(ownerPath)) continue;
+    try {
+      var ownerData = JSON.parse(fs.readFileSync(ownerPath, 'utf8'));
+      var ownerAge = Date.now() - new Date(ownerData.claimed_at || ownerData.timestamp || 0).getTime();
+      var pidAlive = false;
+      if (ownerData.pid) {
+        try {
+          process.kill(ownerData.pid, 0);
+          pidAlive = true;
+        } catch (_) {
+          pidAlive = false;
+        }
+      }
+      var isStale = ownerAge > ownerTTL && !pidAlive;
+      report.stale_owners.push({
+        path: ownerPath,
+        lane: ln,
+        owner: ownerData.owner_agent || ownerData.agent,
+        pid: ownerData.pid,
+        pid_alive: pidAlive,
+        claimed_at: ownerData.claimed_at || ownerData.timestamp,
+        age_hours: (ownerAge / 3600000).toFixed(1),
+        is_stale: isStale
+      });
+      if (!dryRun && isStale) {
+        fs.unlinkSync(ownerPath);
+        report.actions_taken.push('deleted stale active-owner: ' + ownerPath + ' lane=' + ln);
+      }
+    } catch (__) {}
+  }
+
+  console.log(JSON.stringify(report, null, 2));
+}
+
+// ---------------------------------------------------------------------------
 // HELP
 // ---------------------------------------------------------------------------
 
@@ -780,12 +906,18 @@ READ (v2):
   node scripts/store-journal.js read --lane <lane> [--date YYYY-MM-DD] [--last N]
   Read a specific lane's journal entries.
 
-SNAPSHOT (v2):
+  SNAPSHOT (v2):
   node scripts/store-journal.js snapshot
   Writes lanes/broadcast/journal/SNAPSHOT.json with cross-lane state.
   Safe for other agents to read as handoff reference.
 
-POLICY (STORE_JOURNAL_POLICY_v2):
+  AUTOFIX (v3):
+  node scripts/store-journal.js autofix [--apply]
+  Detects orphaned sessions (work_started with no work_completed after 2h)
+  and stale active-owner.json files (dead PID + older than 4h).
+  Default: dry-run (report only). Add --apply to execute fixes.
+
+  POLICY (STORE_JOURNAL_POLICY_v2):
   1. Every agent session writes work_started.
   2. Every file-changing session writes work_completed.
   3. Every compact/restart writes compact_restore event.
@@ -817,6 +949,7 @@ if (require.main === module) {
     case 'status': cmdStatus(cmdArgs); break;
     case 'read': cmdRead(cmdArgs); break;
     case 'snapshot': cmdSnapshot(cmdArgs); break;
+    case 'autofix': cmdAutofix(cmdArgs); break;
     default:
       console.error(`ERROR: Unknown command '${cmd}'. Available: append, preflight, daily, active, help`);
       process.exit(1);
