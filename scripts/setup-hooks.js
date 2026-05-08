@@ -92,7 +92,7 @@ node "$REPO_ROOT/scripts/store-journal.js" append \\
 --target "$COMMIT_MSG" \\
 --intent "auto-journal from git post-commit hook" \\
 --files "$CHANGED_FILES" \\
---data "{\\\"commit_sha\\\":\\\"$COMMIT_SHA\\\",\\\"auto\\\":true}" \\
+--data "{\\\"commit_sha\\\":\\\"$COMMIT_SHA\\\",\\\"auto\\\":true,\\\"handoff\\\":{\\\"status\\\":\\\"completed\\\",\\\"auto\\\":true}}" \\
 2>/dev/null || true
 fi
 `;

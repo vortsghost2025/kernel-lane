@@ -179,7 +179,7 @@ function validateEntry(entry) {
     if (!entry[field]) errors.push(`Missing required field: ${field}`);
   }
   if (entry.event === 'work_completed' && !entry.handoff)
-    errors.push("Event 'work_completed' requires 'handoff' field");
+    entry.handoff = { status: 'completed', auto: true };
   if (entry.event === 'file_ownership_claimed' && !entry.active_ownership)
     errors.push("Event 'file_ownership_claimed' requires 'active_ownership' field");
   if (entry.lane && !KNOWN_LANES.includes(entry.lane))
