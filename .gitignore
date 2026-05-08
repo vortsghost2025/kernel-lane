@@ -44,8 +44,66 @@ logs/quarantine-tracker.json
 .aider*
 scripts/test-signed-message.js.tmp
 
-S:/
+# Identity keys (NEVER commit)
+keys.json
 
-# Environment secrets
-.env
+# Session memory (persists locally)
+.memory/
+.identity/*.pem
+
+# Sensitive
+sensitive/
+
+# Gate violations log
+gate-violations.jsonl
+
+# Heartbeat files (ephemeral)
+heartbeat-*.json
+
+# Runtime state churn (local-only operational state)
+lanes/broadcast/system_state.json
+
+# Inbox/outbox are LOCAL-ONLY
+lanes/*/inbox/
+lanes/*/outbox/
+
+# Compact audit runtime state
+.compact-audit/*.json
+.compact-audit/*.jsonl
+COMPACT_CONTEXT_HANDOFF.md
+
+# Lane runtime artifacts
+lanes/broadcast/last-recovery.json
+lanes/broadcast/operator_alert_*.json
+lanes/broadcast/hygiene/**
+lanes/broadcast/quarantine/**
+lanes/*/receipts/
+lanes/*/state/active-owner.json
+lanes/*/state/worker-audit.log
+lanes/*/state/traces/
+lanes/*/state/sovereignty-report-*.json
+lanes/*/reports/
+lanes/kernel/journal/
+lanes/archivist/journal/
+lanes/library/journal/
+lanes/swarmmind/journal/
+
+# Blocked-remediator reports (generated every cycle)
+context-buffer/blocked-remediation-report-*.json
+
+# Temp files
+*.local
+
+# Cursor IDE settings
+.cursor/settings.json
+
+# Node.js runtime (not a Node project)
+node_modules/
+package.json
+package-lock.json
+
+# Playwright test artifacts
+test-results/
+
+S:/
 JOURNAL_SESSION_ID
