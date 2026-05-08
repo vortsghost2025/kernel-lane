@@ -1,83 +1,67 @@
 #!/usr/bin/env node
-// ORIGIN: Archivist-Agent/.global/lane-discovery.js (adapted)
-// LAST_SYNC: 2026-05-02
-// LOCAL UTILITY: Sovereignty-compliant local copy. No cross-lane imports.
+/**
+ * LOCAL LANE DISCOVERY UTILITY
+ * ORIGIN: S:/Archivist-Agent/.global/lane-discovery.js
+ * LOCALIZED: Archivist (2026-05-02)
+ * UPDATED: 2026-05-06 — Platform-aware (Windows S:/ + Ubuntu)
+ * PURPOSE: Local implementation to avoid cross-boundary require() on .global/
+ *
+ * This is a sovereign copy that reads the lane registry directly
+ * instead of importing from .global/ which is an external boundary.
+ */
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const isWin32 = process.platform === 'win32';
-const UBUNTU_ROOT = '/home/we4free/agent/repos';
+const UBUNTU_ROOT = path.join(os.homedir(), 'agent', 'repos');
 
-function s(pathWin) {
-  if (isWin32) return pathWin;
-  const match = pathWin.match(/^S:\/(.+)$/);
-  if (!match) return pathWin;
+const REGISTRY_PATH = isWin32
+  ? 'S:/Archivist-Agent/.global/lane-registry.json'
+  : path.join(UBUNTU_ROOT, 'Archivist-Agent', '.global', 'lane-registry.json');
+
+function _resolvePath(winPath) {
+  if (isWin32) return winPath;
+  const match = winPath.match(/^S:\/(.+)$/);
+  if (!match) return winPath;
   return path.join(UBUNTU_ROOT, match[1]);
 }
 
-const LOCAL_REGISTRY = {
-  schema_version: '1.1',
-  registry_id: 'kernel-local-registry-001',
-  origin: 'localized-from-archivist-registry-20260502',
-  platform: process.platform,
-  lanes: {
-    archivist: {
-      lane_id: 'archivist',
-      role: 'coordinator',
-      local_path: s('S:/Archivist-Agent'),
-      repo: 'https://github.com/vortsghost2025/Archivist-Agent',
-      mailboxes: {
-        inbox: s('S:/Archivist-Agent/lanes/archivist/inbox'),
-        outbox: s('S:/Archivist-Agent/lanes/archivist/outbox'),
-        processed: s('S:/Archivist-Agent/lanes/archivist/inbox/processed')
-      }
-    },
-    kernel: {
-      lane_id: 'kernel',
-      role: 'execution',
-      local_path: s('S:/kernel-lane'),
-      repo: 'https://github.com/vortsghost2025/kernel-lane.git',
-      mailboxes: {
-        inbox: s('S:/kernel-lane/lanes/kernel/inbox'),
-        outbox: s('S:/kernel-lane/lanes/kernel/outbox'),
-        processed: s('S:/kernel-lane/lanes/kernel/inbox/processed')
-      }
-    },
-    swarmmind: {
-      lane_id: 'swarmmind',
-      role: 'optimization',
-      local_path: s('S:/SwarmMind'),
-      repo: 'https://github.com/vortsghost2025/SwarmMind',
-      forbidden_variants: [
-        s('S:/SwarmMind-Self-Optimizing-Multi-Agent-AI-System')
-      ],
-      mailboxes: {
-        inbox: s('S:/SwarmMind/lanes/swarmmind/inbox'),
-        outbox: s('S:/SwarmMind/lanes/swarmmind/outbox'),
-        processed: s('S:/SwarmMind/lanes/swarmmind/inbox/processed')
-      }
-    },
-    library: {
-      lane_id: 'library',
-      role: 'knowledge',
-      local_path: s('S:/self-organizing-library'),
-      repo: 'https://github.com/vortsghost2025/self-organizing-library',
-      mailboxes: {
-        inbox: s('S:/self-organizing-library/lanes/library/inbox'),
-        outbox: s('S:/self-organizing-library/lanes/library/outbox'),
-        processed: s('S:/self-organizing-library/lanes/library/inbox/processed')
+function _translateRegistry(registry) {
+  for (const lane of Object.values(registry.lanes)) {
+    lane.local_path = _resolvePath(lane.local_path);
+    if (lane.mailboxes) {
+      for (const [key, val] of Object.entries(lane.mailboxes)) {
+        lane.mailboxes[key] = _resolvePath(val);
       }
     }
-  },
-  broadcast: {
-    path: s('S:/Archivist-Agent/lanes/broadcast')
+    if (lane.broadcast_access) {
+      lane.broadcast_access = _resolvePath(lane.broadcast_access);
+    }
+    if (lane.forbidden_variants) {
+      lane.forbidden_variants = lane.forbidden_variants.map(_resolvePath);
+    }
   }
-};
+  if (registry.broadcast && registry.broadcast.path) {
+    registry.broadcast.path = _resolvePath(registry.broadcast.path);
+  }
+  return registry;
+}
 
 class LaneDiscovery {
   constructor() {
-    this.registry = LOCAL_REGISTRY;
+    this.registry = this.loadRegistry();
+  }
+
+  loadRegistry() {
+    try {
+      const data = fs.readFileSync(REGISTRY_PATH, 'utf8');
+      const raw = JSON.parse(data);
+      return isWin32 ? raw : _translateRegistry(raw);
+    } catch (e) {
+      throw new Error(`Failed to load lane registry from ${REGISTRY_PATH}: ${e.message}. Cannot proceed without registry.`);
+    }
   }
 
   getLane(laneId) {
@@ -89,37 +73,51 @@ class LaneDiscovery {
   }
 
   getInbox(laneId) {
-    return this.getLane(laneId).mailboxes.inbox;
+    const lane = this.getLane(laneId);
+    return lane.mailboxes.inbox;
   }
 
   getOutbox(laneId) {
-    return this.getLane(laneId).mailboxes.outbox;
+    const lane = this.getLane(laneId);
+    return lane.mailboxes.outbox;
   }
 
   getProcessed(laneId) {
-    return this.getLane(laneId).mailboxes.processed;
+    const lane = this.getLane(laneId);
+    return lane.mailboxes.processed;
   }
 
   getLocalPath(laneId) {
-    return this.getLane(laneId).local_path;
+    const lane = this.getLane(laneId);
+    return lane.local_path;
   }
 
   getRepo(laneId) {
-    return this.getLane(laneId).repo;
+    const lane = this.getLane(laneId);
+    return lane.repo;
   }
 
   validatePath(laneId, testPath) {
     const lane = this.getLane(laneId);
+
     if (lane.forbidden_variants) {
       for (const variant of lane.forbidden_variants) {
         if (testPath.toLowerCase().includes(variant.toLowerCase())) {
-          throw new Error(`PATH ERROR: '${testPath}' is a forbidden variant. Use canonical path: ${lane.local_path}`);
+          throw new Error(
+            `PATH ERROR: '${testPath}' is a forbidden variant. ` +
+            `Use canonical path: ${lane.local_path}`
+          );
         }
       }
     }
+
     if (!testPath.startsWith(lane.local_path)) {
-      throw new Error(`PATH MISMATCH: '${testPath}' does not match registered path for ${laneId}. Expected: ${lane.local_path}`);
+      throw new Error(
+        `PATH MISMATCH: '${testPath}' does not match registered path for ${laneId}. ` +
+        `Expected: ${lane.local_path}`
+      );
     }
+
     return lane.local_path;
   }
 
@@ -162,18 +160,34 @@ class LaneDiscovery {
 
 if (require.main === module) {
   const discovery = new LaneDiscovery();
+
   const command = process.argv[2];
   const lane = process.argv[3];
 
   switch (command) {
-    case 'inbox': console.log(discovery.getInbox(lane)); break;
-    case 'outbox': console.log(discovery.getOutbox(lane)); break;
-    case 'local': console.log(discovery.getLocalPath(lane)); break;
-    case 'repo': console.log(discovery.getRepo(lane)); break;
-    case 'list': console.log(discovery.listLanes().join('\n')); break;
+    case 'inbox':
+      console.log(discovery.getInbox(lane));
+      break;
+    case 'outbox':
+      console.log(discovery.getOutbox(lane));
+      break;
+    case 'local':
+      console.log(discovery.getLocalPath(lane));
+      break;
+    case 'repo':
+      console.log(discovery.getRepo(lane));
+      break;
+    case 'list':
+      console.log(discovery.listLanes().join('\n'));
+      break;
     case 'validate':
-      try { discovery.validatePath(lane, process.argv[4]); console.log('VALID'); }
-      catch (e) { console.error(e.message); process.exit(1); }
+      try {
+        discovery.validatePath(lane, process.argv[4]);
+        console.log('VALID');
+      } catch (e) {
+        console.error(e.message);
+        process.exit(1);
+      }
       break;
     default:
       console.log('Usage: node lane-discovery.js <command> [lane] [path]');
@@ -181,4 +195,65 @@ if (require.main === module) {
   }
 }
 
-module.exports = { LaneDiscovery };
+const _discovery = new LaneDiscovery();
+
+function getRoots() {
+  const lanes = _discovery.registry.lanes;
+  const roots = {};
+  for (const [id, lane] of Object.entries(lanes)) {
+    roots[id] = lane.local_path;
+  }
+  return roots;
+}
+
+function sToLocal(winPath) {
+  if (!isWin32 && winPath) {
+    return winPath.replace(/^S:/, '/home/we4free/agent/repos').replace(/\\/g, '/');
+  }
+  return winPath;
+}
+
+function getAllLanes() {
+  return _discovery.registry.lanes;
+}
+
+function getLane(laneId) {
+  return _discovery.getLane(laneId);
+}
+
+function getLaneNames() {
+  return Object.keys(_discovery.registry.lanes);
+}
+
+const LANES_RAW = _discovery.registry.lanes;
+
+const LANES = {};
+for (const [id, lane] of Object.entries(LANES_RAW)) {
+  LANES[id] = {
+    ...lane,
+    root: lane.local_path,
+    inbox: lane.mailboxes ? lane.mailboxes.inbox : undefined,
+    outbox: lane.mailboxes ? lane.mailboxes.outbox : undefined,
+    processed: lane.mailboxes ? lane.mailboxes.processed : undefined
+  };
+}
+
+const ROOTS = getRoots();
+
+module.exports = {
+  LaneDiscovery,
+  getRoots,
+  sToLocal,
+  getAllLanes,
+  getLane,
+  getLaneNames,
+  LANES,
+  ROOTS
+};
+
+/**
+ * ORIGIN NOTE: Adapted from S:/Archivist-Agent/.global/lane-discovery.js
+ * LOCAL COPY FOR ARCHIVIST LANE SOVEREIGNTY
+ * Reads the same registry but avoids cross-boundary require() on .global/
+ * Last sync: 2026-05-02
+ */

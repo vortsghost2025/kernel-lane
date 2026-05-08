@@ -1,0 +1,13 @@
+{
+  "name": "kernel-lane",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "watch": "node scripts/inbox-watcher.js",
+    "heartbeat": "node scripts/heartbeat.js",
+    "heartbeat:check": "node scripts/heartbeat.js --check",
+    "heartbeat:once": "node scripts/heartbeat.js --once",
+    "worker": "node scripts/lane-worker.js",
+    "validate": "node scripts/schema-validator.js"
+  }
+}
