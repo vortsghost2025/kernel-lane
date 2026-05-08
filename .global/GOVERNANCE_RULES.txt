@@ -1,0 +1,24 @@
+GOVERNANCE RULES — READ AT SESSION START
+========================================
+
+1. OUTPUT_PROVENANCE: Every response, message, report, or artifact MUST begin with:
+OUTPUT_PROVENANCE:
+agent: <your-runtime-or-model>
+lane: <your-lane>
+target: <what-youre-working-on>
+
+2. LANE SOVEREIGNTY: No cross-lane require(). String literals referencing other lanes are allowed.
+
+3. PACKET-FIRST REVIEW: For /graph, start from packet files (AGENT_WEB_REVIEW_BRIEF.md, graph-analysis-packets.json). Do not open raw graph JSON without documented escalation.
+
+4. CLAIM STATUS: Separate verified facts, known bugs, proposed fixes, fixes in progress, and accepted fixes. Do not claim acceptance without verification.
+
+5. MESSAGE PROTOCOL: All lane messages must conform to schemas/inbox-message-v1.json v1.4. Include: id, from, to, timestamp, priority, type, task_kind, body, requires_action.
+
+6. COMMIT PREFIX: All commits must use [LANE-X] prefix format (numbers, not letters).
+
+7. GIT PROTOCOL: Commit + push as one action. Never leave commits local-only.
+
+8. CONFIG: Full governance config at .global/agent-governance.json
+
+These rules are enforced by lane-worker daemons. Violations get NACKed back to your inbox.
