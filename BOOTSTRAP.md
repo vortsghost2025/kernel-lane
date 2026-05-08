@@ -10,6 +10,10 @@
 
 **No-guesswork message contract (schema + signing + send/log):**
 `S:/Archivist-Agent/docs/ops/LANE_MESSAGE_INDEX.md`
+**Protocol extensions (v1.4 — uncertainty + review + prior attempts):**
+- `UNCERTAINTY_PACKET_V1`: `schemas/uncertainty-packet-v1.json` — surfaces stalled/uncertain work
+- `REVIEW_ROUND_PROTOCOL_V1`: `schemas/review-round-protocol-v1.json` — iterative review loop
+- `PRIOR_ATTEMPTS_V1`: `schemas/prior-attempts-v1.json` — failed attempt records
 
 ```javascript
 // Load this immediately:
