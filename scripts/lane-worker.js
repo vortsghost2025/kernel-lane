@@ -12,6 +12,22 @@ const { getCodeVersionHash } = require('./code-version-hash');
 const { getRoots } = require('./util/lane-discovery');
 const { verifyOutputProvenance } = require('./output-provenance');
 
+function runStoreJournalAppend(laneRoot, lane, event, subject, taskId) {
+  var scriptPath = path.join(laneRoot, 'scripts', 'store-journal.js');
+  if (!fs.existsSync(scriptPath)) return;
+  try {
+    var execSync = require('child_process').execSync;
+    var agent = (process.env.AGENT_INSTANCE_ID || 'lane-worker');
+    var safeSubject = String(subject || 'unknown').replace(/"/g, '').slice(0, 80);
+    var safeTaskId = String(taskId || 'unknown').replace(/"/g, '').slice(0, 60);
+    execSync('node "' + scriptPath + '" append --lane ' + lane +
+      ' --event ' + event +
+      ' --agent "' + agent + '"' +
+      ' --subject "' + safeSubject + '"' +
+      ' --task_id "' + safeTaskId + '"', { cwd: laneRoot, timeout: 10000 });
+  } catch (e) {}
+}
+
 const ACTIONABLE_TYPES = new Set(['task', 'escalation', 'request']);
 const NON_ASCII_PATTERN = /[^\x00-\x7F]/;
 
@@ -113,14 +129,41 @@ function logAudit(sourcePath, targetPath, reason, workerId, sessionId, context =
   }
 }
 
+// NFM-020: NACK chain prevention.
+// Guard 1: never send NACK to yourself (senderLane === targetLane).
+// Guard 2: never send NACK for a message that is already a NACK (nack_reason present).
+// Guard 3: never send NACK for a message that carries exempt_from_nack flag.
+// Guard 4: rate-limit — at most one NACK per (sender, original_task_id) per 60s window.
+const NACK_RATE_LIMIT = new Map(); // key: `${senderLane}::${originalTaskId}`, value: last_nack_timestamp
+const NACK_COOLDOWN_MS = 60000;
+
 function sendNack(originalMsg, rejectionReason, rejectionDetail, targetLane, fromLane) {
   try {
     const senderLane = String(originalMsg.from || fromLane || 'unknown').toLowerCase();
     if (senderLane === String(targetLane || '').toLowerCase()) {
       return null;
     }
-    if (originalMsg.type === 'notification' && originalMsg.task_kind === 'status' && originalMsg.nack_reason) {
+    // Guard 2: original is already a NACK — break the chain
+    if (originalMsg.nack_reason) {
       return null;
+    }
+    // Guard 3: message carries anti-chain exemption
+    if (originalMsg.exempt_from_nack === true) {
+      return null;
+    }
+    // Guard 4: rate-limit NACKs per (sender, original task_id)
+    const rateKey = `${senderLane}::${originalMsg.task_id || 'unknown'}`;
+    const lastNack = NACK_RATE_LIMIT.get(rateKey);
+    const now = Date.now();
+    if (lastNack && (now - lastNack) < NACK_COOLDOWN_MS) {
+      return null;
+    }
+    NACK_RATE_LIMIT.set(rateKey, now);
+    // Clean stale rate-limit entries periodically
+    if (NACK_RATE_LIMIT.size > 500) {
+      for (const [k, t] of NACK_RATE_LIMIT) {
+        if (now - t > NACK_COOLDOWN_MS * 2) NACK_RATE_LIMIT.delete(k);
+      }
     }
     const senderRoot = LANE_ROOTS[senderLane];
     if (!senderRoot) {
@@ -154,6 +197,7 @@ function sendNack(originalMsg, rejectionReason, rejectionDetail, targetLane, fro
       nack_for_task_id: originalMsg.task_id || null,
       nack_reason: rejectionReason,
       nack_detail: rejectionDetail || null,
+      exempt_from_nack: true,  // NFM-020: prevent NACK chains — NACKs are terminal
     };
     const nackPath = path.join(senderInbox, `nack-${nackMsg.task_id}.json`);
     fs.writeFileSync(nackPath, JSON.stringify(nackMsg, null, 2), 'utf8');
@@ -407,8 +451,8 @@ class LaneWorker {
       dryRun: this.dryRun,
       resolver: this.artifactResolver,
     });
-this.codeVersionHash = getCodeVersionHash(this.repoRoot);
-this.lastRun = null;
+    this.codeVersionHash = getCodeVersionHash(this.repoRoot);
+    this.lastRun = null;
     this.sessionId = SESSION_ID;
     this.isOwner = false;
     if (!this.dryRun) {
@@ -513,7 +557,7 @@ this.lastRun = null;
     if (!signatureResult.valid) {
       return { queue: 'blocked', reason: 'SIGNATURE_INVALID', detail: signatureResult.reason || 'Signature validation failed' };
     }
-if (!isEnglishOnly(msg)) {
+    if (!isEnglishOnly(msg)) {
       return { queue: 'quarantine', reason: 'FORMAT_VIOLATION_NON_ASCII', detail: 'Message contains non-ASCII content. Re-request in English per governance constraint.' };
     }
 
@@ -524,7 +568,7 @@ if (!isEnglishOnly(msg)) {
       }
     }
 
-    // NFM-022 fix: skip hasUnresolvableEvidence for actionable tasks
+  // NFM-022 fix: skip hasUnresolvableEvidence for actionable tasks
   // A new task (requires_action=true) hasn't been executed yet, so
   // evidence.required=true with no artifact is expected, not a violation.
   if (!isActionable(msg) && cp.hasUnresolvableEvidence(msg)) {
@@ -588,117 +632,108 @@ if (!isEnglishOnly(msg)) {
 
   // Artifact resolution check: any message claiming completion proof MUST verify.
   // Fail-closed: if proof exists but cannot be verified, route to blocked.
+  // Legacy artifact paths bypass the verification domain gate and go directly
+  // to execution gate verification, since they lack the structured fields
+  // (evidence_exchange, timestamps) that the domain gate validates.
   if (gate.pass && cp.hasCompletionProof(msg)) {
-    const domain = evaluateVerificationDomain(msg, {
-      resolver: this.artifactResolver,
-      localCodeVersionHash: this.codeVersionHash,
-      repoRoot: this.repoRoot,
-    });
- if (!domain.domain_valid) {
- const isObservabilityFail = domain.observability && !domain.observability.valid;
- if (domain.phase === 'post_execution' && !isObservabilityFail) {
- return {
- queue: 'processed',
- reason: 'INVALID_DOMAIN_POST_EXECUTION',
- detail: domain.invalid_domain_reason,
- execution_verified: false,
- execution_would_verify: false,
- domain_gate_executed: true,
- verification_outcome: 'INVALID_DOMAIN',
- execution_preserved: true,
- domain_validation: domain,
- verification_path: ['domain_gate', 'execution_check', 'response_validation'],
- ownership,
- ownership_notes: ownershipNotes,
- };
- }
- return {
- queue: 'blocked',
- reason: isObservabilityFail ? 'ARTIFACT_NOT_OBSERVABLE' : 'INVALID_DOMAIN_PRE_EXECUTION',
- detail: domain.invalid_domain_reason,
- execution_verified: false,
- execution_would_verify: false,
- domain_gate_executed: true,
- verification_outcome: isObservabilityFail ? 'OBSERVABILITY_FAIL' : domain.verification_outcome,
- execution_preserved: false,
- domain_validation: domain,
- verification_path: ['domain_gate', 'execution_check', 'response_validation'],
- ownership,
- ownership_notes: ownershipNotes,
- };
- }
- const executionResult = this.executionGate.verify(msg);
- if (!executionResult.execution_verified) {
- return {
- queue: 'blocked',
- reason: 'EXECUTION_NOT_VERIFIED',
- detail: `Execution verification failed: type=${executionResult.verification_type} reason=${executionResult.reason} artifact_path=${executionResult.artifact_path || 'null'}`,
- execution_verified: false,
- execution_would_verify: executionResult.would_verify === true,
- domain_gate_executed: true,
- verification_outcome: 'FAIL',
- verification_path: ['domain_gate', 'execution_check', 'response_validation'],
- ownership,
- ownership_notes: ownershipNotes,
- };
- }
- }
- // Non-actionable messages claiming completion without verifiable artifact = blocked
- if (gate.pass && !isActionable(msg) && cp.hasCompletionProof(msg)) {
- const domain = evaluateVerificationDomain(msg, {
- resolver: this.artifactResolver,
- localCodeVersionHash: this.codeVersionHash,
- repoRoot: this.repoRoot,
- });
- if (!domain.domain_valid) {
- const isObservabilityFail = domain.observability && !domain.observability.valid;
- if (domain.phase === 'post_execution' && !isObservabilityFail) {
- return {
- queue: 'processed',
- reason: 'INVALID_DOMAIN_POST_EXECUTION',
- detail: domain.invalid_domain_reason,
- execution_verified: false,
- execution_would_verify: false,
- domain_gate_executed: true,
- verification_outcome: 'INVALID_DOMAIN',
- execution_preserved: true,
- domain_validation: domain,
- verification_path: ['domain_gate', 'execution_check', 'response_validation'],
- ownership,
- ownership_notes: ownershipNotes,
- };
- }
- return {
- queue: 'blocked',
- reason: isObservabilityFail ? 'ARTIFACT_NOT_OBSERVABLE' : 'INVALID_DOMAIN_PRE_EXECUTION',
- detail: domain.invalid_domain_reason,
- execution_verified: false,
- execution_would_verify: false,
- domain_gate_executed: true,
- verification_outcome: isObservabilityFail ? 'OBSERVABILITY_FAIL' : domain.verification_outcome,
- execution_preserved: false,
- domain_validation: domain,
- verification_path: ['domain_gate', 'execution_check', 'response_validation'],
- ownership,
- ownership_notes: ownershipNotes,
- };
- }
- const executionResult = this.executionGate.verify(msg);
+    const proofClassification = this.artifactResolver.classifyProof(msg);
+    const isLegacyPath = proofClassification.type === 'LEGACY_ARTIFACT_PATH';
+
+    if (!isLegacyPath) {
+      const domain = evaluateVerificationDomain(msg, {
+        resolver: this.artifactResolver,
+        localCodeVersionHash: this.codeVersionHash,
+        repoRoot: this.repoRoot,
+      });
+      if (!domain.domain_valid) {
+        // If the failure is due to observability (artifact not observable), allow execution verification to handle it.
+        if (domain.observability && !domain.observability.valid) {
+          // fall through to execution verification
+        } else {
+          // Fail-closed for other domain validation failures.
+          return {
+            queue: 'blocked',
+            reason: domain.phase === 'post_execution' ? 'INVALID_DOMAIN_POST_EXECUTION' : 'INVALID_DOMAIN_PRE_EXECUTION',
+            detail: domain.invalid_domain_reason,
+            execution_verified: false,
+            execution_would_verify: false,
+            domain_gate_executed: true,
+            verification_outcome: domain.verification_outcome || 'INVALID_DOMAIN',
+            execution_preserved: domain.phase === 'post_execution',
+            domain_validation: domain,
+            verification_path: ['domain_gate', 'execution_check', 'response_validation'],
+            ownership,
+            ownership_notes: ownershipNotes,
+          };
+        }
+      }
+    }
+    const executionResult = this.executionGate.verify(msg);
     if (!executionResult.execution_verified) {
       return {
         queue: 'blocked',
         reason: 'EXECUTION_NOT_VERIFIED',
-          detail: `Execution verification failed: type=${executionResult.verification_type} reason=${executionResult.reason} artifact_path=${executionResult.artifact_path || 'null'}`,
-          execution_verified: false,
-          execution_would_verify: executionResult.would_verify === true,
-          domain_gate_executed: true,
-          verification_outcome: 'FAIL',
-          verification_path: ['domain_gate', 'execution_check', 'response_validation'],
-          ownership,
-          ownership_notes: ownershipNotes,
-        };
+        detail: `Execution verification failed: type=${executionResult.verification_type} reason=${executionResult.reason} artifact_path=${executionResult.artifact_path || 'null'}`,
+        execution_verified: false,
+        execution_would_verify: executionResult.would_verify === true,
+        domain_gate_executed: !isLegacyPath,
+        verification_outcome: 'FAIL',
+        verification_path: isLegacyPath ? ['execution_check', 'response_validation'] : ['domain_gate', 'execution_check', 'response_validation'],
+        domain_validation: isLegacyPath ? null : undefined,
+        ownership,
+        ownership_notes: ownershipNotes,
+      };
+    }
+  }
+  // Non-actionable messages claiming completion without verifiable artifact = blocked
+  if (gate.pass && !isActionable(msg) && cp.hasCompletionProof(msg)) {
+    const proofClassification2 = this.artifactResolver.classifyProof(msg);
+    const isLegacyPath2 = proofClassification2.type === 'LEGACY_ARTIFACT_PATH';
+
+    if (!isLegacyPath2) {
+      const domain = evaluateVerificationDomain(msg, {
+        resolver: this.artifactResolver,
+        localCodeVersionHash: this.codeVersionHash,
+        repoRoot: this.repoRoot,
+      });
+      if (!domain.domain_valid) {
+        if (domain.observability && !domain.observability.valid) {
+          // fall through to execution verification
+        } else {
+          return {
+            queue: 'blocked',
+            reason: domain.phase === 'post_execution' ? 'INVALID_DOMAIN_POST_EXECUTION' : 'INVALID_DOMAIN_PRE_EXECUTION',
+            detail: domain.invalid_domain_reason,
+            execution_verified: false,
+            execution_would_verify: false,
+            domain_gate_executed: true,
+            verification_outcome: domain.verification_outcome || 'INVALID_DOMAIN',
+            execution_preserved: domain.phase === 'post_execution',
+            domain_validation: domain,
+            verification_path: ['domain_gate', 'execution_check', 'response_validation'],
+            ownership,
+            ownership_notes: ownershipNotes,
+          };
+        }
       }
     }
+    const executionResult = this.executionGate.verify(msg);
+    if (!executionResult.execution_verified) {
+      return {
+        queue: 'blocked',
+        reason: 'EXECUTION_NOT_VERIFIED',
+        detail: `Execution verification failed: type=${executionResult.verification_type} reason=${executionResult.reason} artifact_path=${executionResult.artifact_path || 'null'}`,
+        execution_verified: false,
+        execution_would_verify: executionResult.would_verify === true,
+        domain_gate_executed: !isLegacyPath2,
+        verification_outcome: 'FAIL',
+        verification_path: isLegacyPath2 ? ['execution_check', 'response_validation'] : ['domain_gate', 'execution_check', 'response_validation'],
+        domain_validation: isLegacyPath2 ? null : undefined,
+        ownership,
+        ownership_notes: ownershipNotes,
+      };
+    }
+  }
 
     return {
       queue: 'processed',
@@ -872,6 +907,11 @@ processFile(filePath) {
         lane: this.lane,
       });
       fs.unlinkSync(filePath);
+      var sjEvent = decision.queue === 'actionRequired' ? 'work_started' :
+                    decision.queue === 'processed' ? 'work_completed' :
+                    decision.queue === 'blocked' ? 'work_blocked' :
+                    decision.queue === 'quarantine' ? 'work_quarantined' : 'work_routed';
+      runStoreJournalAppend(this.repoRoot, this.lane, sjEvent, msg.subject || msg.task_id, msg.task_id);
       if (decision.queue === 'quarantine' || decision.queue === 'blocked') {
         sendNack(msg, decision.reason, decision.detail, this.lane, this.lane);
       }

@@ -8,6 +8,8 @@ const { LaneDiscovery } = require('./util/lane-discovery');
 const POLL_INTERVAL_MS = 20000;
 const DEFAULT_LANE = 'archivist';
 
+var _priorAttempts = [];
+
 function ensureDir(d) {
   try { fs.mkdirSync(d, { recursive: true }); } catch (e) { if (e.code !== 'EEXIST') throw e; }
 }
@@ -92,7 +94,44 @@ function executeTaskWithJournal(laneRoot, lane, msgFile) {
     return { ok: true, result: result };
   } catch (e) {
     appendStoreJournal(laneRoot, lane, 'work_failed', msg);
-    return { ok: false, error: 'Executor error: ' + e.message };
+
+    // v1.4: Build uncertainty packet for failed execution
+    var uncertaintyPacket = {
+      level: 'high',
+      type: ['execution_failure'],
+      why: 'Task execution failed: ' + e.message,
+      evidence_needed: ['executor_error_log', 'task_input_json'],
+      operator_decision_needed: false,
+      next_safe_check: new Date(Date.now() + 3600000).toISOString(),
+      detected_at: nowIso(),
+      detected_by: 'executor-watcher'
+    };
+
+    // v1.4: Record as prior attempt
+    var priorAttempt = {
+      attempt_id: 'exec-' + Date.now(),
+      actor: 'executor-watcher',
+      action: 'execute_task',
+      result: 'failed',
+      failed_because: e.message,
+      do_not_repeat: 'Retry without fixing the underlying error: ' + e.message.slice(0, 100),
+      useful_evidence: [(msg.task_id || 'unknown')],
+      timestamp: nowIso()
+    };
+    _priorAttempts.push(priorAttempt);
+
+    // Try to append uncertainty to store-journal
+    try {
+      var { execSync } = require('child_process');
+      var tmpPath = path.join(laneRoot, '.tmp-uncertainty-' + Date.now() + '.json');
+      fs.writeFileSync(tmpPath, JSON.stringify(uncertaintyPacket), 'utf8');
+      execSync('node "' + path.join(laneRoot, 'scripts', 'store-journal.js') + '" append --lane ' + lane +
+        ' --event uncertainty_detected --agent executor-watcher' +
+        ' --uncertainty "' + tmpPath.replace(/"/g, '') + '"', { cwd: laneRoot, timeout: 10000 });
+      try { fs.unlinkSync(tmpPath); } catch (_) {}
+    } catch (_) {}
+
+    return { ok: false, error: 'Executor error: ' + e.message, uncertainty: uncertaintyPacket, prior_attempt: priorAttempt };
   }
 }
 
@@ -115,7 +154,10 @@ function processLane(lane, discovery) {
     if (result.ok) {
       executed++;
     } else {
-      errors.push({ file: path.basename(arFiles[i]), error: result.error });
+      var errEntry = { file: path.basename(arFiles[i]), error: result.error };
+      if (result.uncertainty) errEntry.uncertainty = result.uncertainty;
+      if (result.prior_attempt) errEntry.prior_attempt = result.prior_attempt;
+      errors.push(errEntry);
       if (result.blocked) {
         var blockedDir = path.join(laneRoot, 'lanes', lane, 'inbox', 'blocked');
         ensureDir(blockedDir);
@@ -153,8 +195,13 @@ function watchLoop(discovery, lanes) {
           ' executed=' + results[i].executed +
           ' errors=' + results[i].errors.length);
         for (var j = 0; j < results[i].errors.length; j++) {
-          console.log('  ERROR: ' + results[i].errors[j].file + ': ' + results[i].errors[j].error);
+          var err = results[i].errors[j];
+          console.log(' ERROR: ' + err.file + ': ' + err.error);
+          if (err.uncertainty) {
+            console.log(' UNCERTAINTY: level=' + err.uncertainty.level + ' why=' + (err.uncertainty.why || '').slice(0, 80));
+          }
         }
+      }
       }
     }
     if (totalExecuted > 0 || totalErrors > 0) {

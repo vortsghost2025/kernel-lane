@@ -3,17 +3,21 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { spawnSync } = require('child_process');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const { ensureOutputProvenance, verifyOutputProvenance } = require(path.join(REPO_ROOT, 'scripts', 'output-provenance'));
-const LANE = 'swarmmind';
+const LANE = process.env.LANE_ID || 'archivist';
 const ACTION_REQUIRED_DIR = path.join(REPO_ROOT, 'lanes', LANE, 'inbox', 'action-required');
 const IN_PROGRESS_DIR = path.join(REPO_ROOT, 'lanes', LANE, 'inbox', 'in-progress');
 const PROCESSED_DIR = path.join(REPO_ROOT, 'lanes', LANE, 'inbox', 'processed');
 const OUTBOX_DIR = path.join(REPO_ROOT, 'lanes', LANE, 'outbox');
 
-const ARCHIVIST_INBOX = 'S:/Archivist-Agent/lanes/archivist/inbox/';
+const isWin32 = process.platform === 'win32';
+const UBUNTU_ROOT = require('path').join(require('os').homedir(), 'agent', 'repos');
+function _resolvePath(p) { if (isWin32) return p; const m = p.match(/^S:\/(.+)$/); return m ? path.join(UBUNTU_ROOT, m[1]) : p; }
+const ARCHIVIST_INBOX = _resolvePath('S:/Archivist-Agent/lanes/archivist/inbox/');
 
 function nowIso() { return new Date().toISOString(); }
 
@@ -74,6 +78,7 @@ function executeTask(msg) {
 }
 
 function createResponse(originalMsg, executionResult) {
+  const taskId = `response-${originalMsg.task_id || Date.now()}`;
   const provBody = ensureOutputProvenance(executionResult.summary || 'Task completed.', {
     agent: 'task-executor',
     lane: LANE,
@@ -82,7 +87,8 @@ function createResponse(originalMsg, executionResult) {
   });
   return {
     schema_version: '1.3',
-    task_id: `response-${originalMsg.task_id || Date.now()}`,
+    id: taskId,
+    task_id: taskId,
     idempotency_key: `resp-${Date.now()}-${(originalMsg.task_id || 'unknown').slice(0, 16)}`,
     from: LANE,
     to: originalMsg.from || 'archivist',
@@ -95,12 +101,12 @@ function createResponse(originalMsg, executionResult) {
     requires_action: false,
     payload: { mode: 'inline', compression: 'none' },
     execution: { mode: 'manual', engine: 'opencode', actor: 'lane' },
-    lease: { owner: LANE, acquired_at: nowIso() },
+    lease: { owner: LANE, acquired_at: nowIso(), expires_at: new Date(Date.now() + 30000).toISOString(), renewal_count: 0, max_renewals: 3 },
     retry: { attempt: 1, max_attempts: 1 },
-    evidence: { required: true, verified: true },
+    evidence: { required: false, verified: true },
     evidence_exchange: {
-      artifact_path: `lanes/${LANE}/inbox/processed/response-${originalMsg.task_id || Date.now()}.json`,
-      artifact_type: 'log',
+      artifact_path: null,
+      artifact_type: 'response',
       delivered_at: nowIso(),
     },
     heartbeat: { status: 'done', last_heartbeat_at: nowIso(), interval_seconds: 300, timeout_seconds: 900 },

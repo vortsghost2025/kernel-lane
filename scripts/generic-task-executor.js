@@ -239,6 +239,16 @@ function executeWriteTask(msg, lane) {
   if (forbidden.some(f => normalized.includes(f))) {
     return { task_kind: 'report', results: { error: `Write to governance/critical file blocked: ${targetPath}` }, summary: 'Error: write to protected file' };
   }
+
+  try {
+    const { isSharedScript, isSchemaFile } = require(path.join(root, 'scripts', 'edit-lease-manager.js'));
+    if (isSharedScript(targetPath) && lane !== 'archivist') {
+      return { task_kind: 'report', results: { error: `SHARED_SCRIPT_WRITE_BLOCKED: "${targetPath}" is a shared canonical script owned by archivist. Lane "${lane}" cannot write directly. Propose changes via convergence protocol (send proposal message to archivist inbox).` }, summary: 'Error: shared script write blocked — use convergence protocol' };
+    }
+    if (isSchemaFile(targetPath) && lane !== 'archivist') {
+      return { task_kind: 'report', results: { error: `SCHEMA_RATIFICATION_REQUIRED: "${targetPath}" is a schema/governance file. Changes require convergence protocol ratification. Send a proposal message to archivist inbox.` }, summary: 'Error: schema write blocked — ratification required' };
+    }
+  } catch (_) {}
   try {
     const lockCheck = acquireTruthCriticalLockIfNeeded(normalized, lane);
     if (!lockCheck.ok) {
@@ -666,7 +676,6 @@ function createResponse(originalMsg, executionResult, lane) {
   const resultJson = JSON.stringify(executionResult.results || {});
   const contentHash = 'sha256:' + crypto.createHash('sha256').update(resultJson).digest('hex');
   const codeVersionHash = getCodeVersionHash(LANE_REGISTRY[lane].root);
-  const taskId = `response-${originalMsg.task_id || Date.now()}`;
   const provBody = ensureOutputProvenance(executionResult.summary || 'Task completed.', {
     agent: 'generic-task-executor',
     lane: lane,
@@ -675,8 +684,7 @@ function createResponse(originalMsg, executionResult, lane) {
   });
   return {
     schema_version: '1.3',
-    id: taskId,
-    task_id: taskId,
+    task_id: `response-${originalMsg.task_id || Date.now()}`,
     idempotency_key: `resp-${Date.now()}-${(originalMsg.task_id || 'unknown').slice(0, 16)}`,
     from: lane,
     to: originalMsg.from || 'archivist',
@@ -689,7 +697,7 @@ function createResponse(originalMsg, executionResult, lane) {
     requires_action: false,
     payload: { mode: 'inline', compression: 'none' },
     execution: { mode: 'auto', engine: 'pipeline', actor: 'task-executor' },
-    lease: { owner: lane, acquired_at: nowIso(), expires_at: new Date(Date.now() + 30000).toISOString(), renewal_count: 0, max_renewals: 3 },
+    lease: { owner: lane, acquired_at: nowIso() },
     retry: { attempt: 1, max_attempts: 1 },
     evidence: { required: false, verified: true },
     evidence_exchange: {
@@ -718,7 +726,7 @@ function signAndDeliver(response, lane) {
       response._provenance_was_missing = prov.missing;
     }
   }
-  const root = LANE_REGISTRY[lane].root;
+  var root = LANE_REGISTRY[lane].root;
   const outboxDir = path.join(root, 'lanes', lane, 'outbox');
   ensureDir(outboxDir);
 

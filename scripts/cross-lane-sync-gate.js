@@ -4,19 +4,30 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const os = require('os');
+
+const isWin32 = process.platform === 'win32';
+const UBUNTU_ROOT = path.join(os.homedir(), 'agent', 'repos');
+
+function _resolvePath(winPath) {
+  if (isWin32) return winPath;
+  const match = winPath.match(/^S:\/(.+)$/);
+  if (!match) return winPath;
+  return path.join(UBUNTU_ROOT, match[1]);
+}
 
 const LANE_ROOTS = {
-  archivist: 'S:/Archivist-Agent',
-  kernel: 'S:/kernel-lane',
-  library: 'S:/self-organizing-library',
-  swarmmind: 'S:/SwarmMind'
+  archivist: _resolvePath('S:/Archivist-Agent'),
+  kernel: _resolvePath('S:/kernel-lane'),
+  library: _resolvePath('S:/self-organizing-library'),
+  swarmmind: _resolvePath('S:/SwarmMind')
 };
 
 const TRUST_STORE_PATHS = [
-  'S:/Archivist-Agent/lanes/broadcast/trust-store.json',
-  'S:/kernel-lane/lanes/broadcast/trust-store.json',
-  'S:/self-organizing-library/lanes/broadcast/trust-store.json',
-  'S:/SwarmMind/lanes/broadcast/trust-store.json'
+  _resolvePath('S:/Archivist-Agent/lanes/broadcast/trust-store.json'),
+  _resolvePath('S:/kernel-lane/lanes/broadcast/trust-store.json'),
+  _resolvePath('S:/self-organizing-library/lanes/broadcast/trust-store.json'),
+  _resolvePath('S:/SwarmMind/lanes/broadcast/trust-store.json')
 ];
 
 function findTrustStore() {

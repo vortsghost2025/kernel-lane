@@ -5,19 +5,33 @@ const fs = require('fs');
 const path = require('path');
 
 const { LaneDiscovery } = require('./util/lane-discovery');
+const { ClaimCommitGuard } = require('./claim-commit-guard');
 const discovery = new LaneDiscovery();
+
+function runStoreJournalAppend(laneRoot, lane, event, subject, taskId) {
+  var scriptPath = path.join(laneRoot, 'scripts', 'store-journal.js');
+  if (!fs.existsSync(scriptPath)) return;
+  try {
+    var execSync = require('child_process').execSync;
+    var agent = (process.env.AGENT_INSTANCE_ID || 'relay-daemon');
+    var safeSubject = String(subject || 'unknown').replace(/"/g, '').slice(0, 80);
+    var safeTaskId = String(taskId || 'unknown').replace(/"/g, '').slice(0, 60);
+    execSync('node "' + scriptPath + '" append --lane ' + lane +
+      ' --event ' + event +
+      ' --agent "' + agent + '"' +
+      ' --subject "' + safeSubject + '"' +
+      ' --task_id "' + safeTaskId + '"', { cwd: laneRoot, timeout: 10000 });
+  } catch (e) {}
+}
 const ALL_LANES = ['archivist', 'library', 'swarmmind', 'kernel'];
+const claimGuard = new ClaimCommitGuard({ repoRoot: path.resolve(__dirname, '..') });
 
 function getInboxDir(laneId) { return discovery.getInbox(laneId); }
 function getOutboxDir(laneId) { return discovery.getOutbox(laneId); }
 function getLaneRoot(laneId) { return discovery.getLocalPath(laneId); }
 
-const LANE_ROOTS = {
-  archivist: 'S:/Archivist-Agent',
-  library:   'S:/self-organizing-library',
-  swarmmind: 'S:/SwarmMind',
-  kernel:    'S:/kernel-lane',
-};
+const LANE_ROOTS = {};
+ALL_LANES.forEach(laneId => { LANE_ROOTS[laneId] = discovery.getLocalPath(laneId); });
 
 function nowIso() { return new Date().toISOString(); }
 
@@ -78,12 +92,21 @@ class RelayDaemon {
         continue;
       }
 
-      const msg = read.value;
-    const targetLane = msg.to;
-    if (!targetLane || !ALL_LANES.includes(targetLane)) {
-      results.errors.push({ file: ent.name, error: `Unknown target lane: ${targetLane}` });
-      continue;
-    }
+        const msg = read.value;
+        const targetLane = msg.to;
+        if (!targetLane || !ALL_LANES.includes(targetLane)) {
+          results.errors.push({ file: ent.name, error: `Unknown target lane: ${targetLane}` });
+          continue;
+        }
+
+        const claimCheck = claimGuard.checkOutboxMessage(msg, this.repoRoot, this.outboxDir);
+        if (!claimCheck.allowed) {
+          const uncommitted = claimCheck.details
+            .filter(d => d.status === 'uncommitted' || d.status === 'missing')
+            .map(d => d.path);
+          results.errors.push({ file: ent.name, error: `premature_claim: ${uncommitted.join(', ')}`, claim_guard: claimCheck });
+          continue;
+        }
 
     const targetDir = getInboxDir(targetLane);
       const targetPath = path.join(targetDir, ent.name);
@@ -97,6 +120,7 @@ class RelayDaemon {
           fs.unlinkSync(filePath);
           results.delivered++;
           results.details.push({ file: ent.name, from: this.lane, to: targetLane, target: targetPath });
+          runStoreJournalAppend(this.repoRoot, this.lane, 'message_delivered', msg.subject || msg.task_id, msg.task_id);
         } catch (err) {
           results.errors.push({ file: ent.name, error: err.message });
         }

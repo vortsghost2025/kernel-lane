@@ -63,6 +63,54 @@ const REMEDIATION_RULES = [
     description: 'CONTRADICTS edge — must not auto-resolve per playbook'
   },
   {
+    name: 'unsigned-placeholder-signature',
+    match: function(filename, content) {
+      try {
+        var msg = JSON.parse(content);
+        var sig = String(msg.signature || '');
+        return sig.indexOf('placeholder-') !== -1 || sig.indexOf('placeholder') !== -1;
+      } catch (e) {}
+      return false;
+    },
+    action: 'archive',
+    description: 'Unsigned placeholder-signature message — cannot verify authenticity'
+  },
+  {
+    name: 'legacy-schema-artifact',
+    match: function(filename, content) {
+      try {
+        var msg = JSON.parse(content);
+        var ver = String(msg.schema_version || '1.3');
+        var parts = ver.split('.');
+        if (parts.length >= 2) {
+          var major = parseInt(parts[0], 10) || 1;
+          var minor = parseInt(parts[1], 10) || 0;
+          if (major < 1 || (major === 1 && minor < 3)) return true;
+        }
+      } catch (e) {}
+      return false;
+    },
+    action: 'archive',
+    description: 'Legacy schema version (<1.3) artifact — auto-archive to prevent processing errors'
+  },
+  {
+    name: 'missing-artifact-path',
+    match: function(filename, content) {
+      try {
+        var msg = JSON.parse(content);
+        if (msg.requires_action === true) {
+          var evidence = msg.evidence || {};
+          if (!evidence.artifact_path || evidence.artifact_path === null) {
+            return true;
+          }
+        }
+      } catch (e) {}
+      return false;
+    },
+    action: 'archive',
+    description: 'Requires-action message with null artifact_path — cannot complete, archive for manual review'
+  },
+  {
     name: 'stale-default',
     match: function() { return true; },
     action: 'archive',
@@ -169,6 +217,7 @@ function remediate(laneRoot, options) {
     dry_run: DRY_RUN,
     before: { blocked: 0, quarantine: 0 },
     after: { blocked: 0, quarantine: 0, archived: 0, expired: 0, deduplicated: 0, skipped_contradicts: 0 },
+    report_cleanup: null,
     actions: []
   };
 
@@ -250,27 +299,66 @@ function remediate(laneRoot, options) {
   return report;
 }
 
-function main() {
-  var repoRoot = path.resolve(__dirname, '..');
-  var laneRoot = repoRoot;
+function cleanupOldReports(repoRoot, maxAgeHours) {
+  if (typeof maxAgeHours === 'undefined') maxAgeHours = 168; // 7 days default
+  var reportDir = path.join(repoRoot, 'context-buffer');
+  if (!fs.existsSync(reportDir)) return { cleaned: 0, kept: 0 };
 
+  var now = Date.now();
+  var cleaned = 0;
+  var kept = 0;
   try {
-    var getRoots = require('./util/lane-discovery').getRoots;
-    var roots = getRoots();
-    if (roots[LANE_ARG]) laneRoot = roots[LANE_ARG];
+    var files = fs.readdirSync(reportDir).filter(function(f) {
+      return f.startsWith('blocked-remediation-report-') && f.endsWith('.json');
+    });
+    for (var i = 0; i < files.length; i++) {
+      var fullPath = path.join(reportDir, files[i]);
+      try {
+        var stat = fs.statSync(fullPath);
+        var ageHours = (now - stat.mtimeMs) / (1000 * 60 * 60);
+        if (ageHours >= maxAgeHours) {
+          if (!DRY_RUN) {
+            fs.unlinkSync(fullPath);
+          }
+          cleaned++;
+        } else {
+          kept++;
+        }
+      } catch (e) {}
+    }
   } catch (e) {}
 
-  var report = remediate(laneRoot, { lane: LANE_ARG });
+  return { cleaned: cleaned, kept: kept, max_age_hours: maxAgeHours };
+}
 
-  console.log(JSON.stringify(report, null, 2));
+function main() {
+   var repoRoot = path.resolve(__dirname, '..');
+   var laneDiscoveryPath = path.join(repoRoot, '.global', 'lane-discovery.js');
+   var laneRoot = repoRoot;
 
-  if (!DRY_RUN) {
-    var reportDir = path.join(repoRoot, 'context-buffer');
-    ensureDir(reportDir);
-    var reportPath = path.join(reportDir, 'blocked-remediation-report-' + new Date().toISOString().replace(/[:.]/g, '-') + '.json');
-    fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
-    console.error('[blocked-remediator] Report written to: ' + reportPath);
-  }
+   if (fs.existsSync(laneDiscoveryPath)) {
+     try {
+       var LaneDiscovery = require(laneDiscoveryPath).LaneDiscovery;
+       var discovery = new LaneDiscovery();
+       laneRoot = discovery.getLocalPath(LANE_ARG) || repoRoot;
+     } catch (e) {}
+   }
+
+   var report = remediate(laneRoot, { lane: LANE_ARG });
+
+   console.log(JSON.stringify(report, null, 2));
+
+   if (!DRY_RUN) {
+     // Cleanup old remediation reports (default: older than 7 days)
+     var cleanupResult = cleanupOldReports(repoRoot);
+     report.report_cleanup = cleanupResult;
+
+     var reportDir = path.join(repoRoot, 'context-buffer');
+     ensureDir(reportDir);
+     var reportPath = path.join(reportDir, 'blocked-remediation-report-' + new Date().toISOString().replace(/[:.]/g, '-') + '.json');
+     fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
+     console.error('[blocked-remediator] Report written to: ' + reportPath);
+   }
 }
 
 main();

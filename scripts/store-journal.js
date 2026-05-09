@@ -189,6 +189,35 @@ function validateEntry(entry) {
     errors.push(`Invalid lane: '${entry.lane}'`);
   if (entry.timestamp && isNaN(Date.parse(entry.timestamp)))
     errors.push(`Invalid timestamp: '${entry.timestamp}'`);
+
+	// v1.4 protocol extension validation (non-blocking warnings)
+	var sv = null;
+	try { sv = require('./schema-validator'); } catch (_) { /* schema-validator not available */ }
+	if (sv && entry.uncertainty) {
+		try {
+			var r = sv.validateUncertaintyPacket(entry.uncertainty);
+			if (!r.valid) {
+				for (var _ue = 0; _ue < r.errors.length; _ue++) errors.push('uncertainty: ' + r.errors[_ue]);
+			}
+		} catch (_) { /* skip */ }
+	}
+	if (sv && entry.review) {
+		try {
+			var r2 = sv.validateReviewRound(entry.review);
+			if (!r2.valid) {
+				for (var _re = 0; _re < r2.errors.length; _re++) errors.push('review: ' + r2.errors[_re]);
+			}
+		} catch (_) { /* skip */ }
+	}
+	if (sv && entry.prior_attempts) {
+		try {
+			var r3 = sv.validatePriorAttempts(entry.prior_attempts);
+			if (!r3.valid) {
+				for (var _pe = 0; _pe < r3.errors.length; _pe++) errors.push('prior_attempts: ' + r3.errors[_pe]);
+			}
+		} catch (_) { /* skip */ }
+	}
+
   return errors;
 }
 
@@ -306,6 +335,24 @@ function cmdAppend(args) {
   }
 
   if (entry.forbidden_paths_touched === undefined) entry.forbidden_paths_touched = false;
+
+const uncertaintyArg = getArg(args, '--uncertainty');
+if (uncertaintyArg && !entry.uncertainty) {
+  try { entry.uncertainty = JSON.parse(uncertaintyArg); }
+  catch (e) { console.error('ERROR: Invalid --uncertainty JSON: ' + e.message); process.exit(1); }
+}
+
+const reviewArg = getArg(args, '--review');
+if (reviewArg && !entry.review) {
+  try { entry.review = JSON.parse(reviewArg); }
+  catch (e) { console.error('ERROR: Invalid --review JSON: ' + e.message); process.exit(1); }
+}
+
+const priorAttemptsArg = getArg(args, '--prior-attempts');
+if (priorAttemptsArg && !entry.prior_attempts) {
+  try { entry.prior_attempts = JSON.parse(priorAttemptsArg); }
+  catch (e) { console.error('ERROR: Invalid --prior-attempts JSON: ' + e.message); process.exit(1); }
+}
 
   const errors = validateEntry(entry);
   if (errors.length > 0) {
@@ -530,6 +577,34 @@ function cmdDaily(args) {
         md += `- **Tests:** ${fail > 0 ? '❌' : '✅'} ${pass} pass, ${fail} fail\n`;
       }
 
+      // v1.4: Surface uncertainty and review state
+      const uncertaintyEntries = sessionEntries.filter(e => e.uncertainty);
+      if (uncertaintyEntries.length > 0) {
+        const highUncertainty = uncertaintyEntries.filter(e => e.uncertainty.level === 'high');
+        const operatorNeeded = uncertaintyEntries.filter(e => e.uncertainty.operator_decision_needed);
+        md += `- **Uncertainty:** ${uncertaintyEntries.length} item(s)`;
+        if (highUncertainty.length > 0) md += ` — ⚠️ ${highUncertainty.length} HIGH`;
+        if (operatorNeeded.length > 0) md += ` — 👤 ${operatorNeeded.length} NEEDS OPERATOR`;
+        md += `\n`;
+        for (const ue of uncertaintyEntries) {
+          const u = ue.uncertainty;
+          md += `  - [${u.level}] ${u.why}`;
+          if (u.operator_decision_needed) md += ' **(OPERATOR DECISION NEEDED)**';
+          md += `\n`;
+        }
+      }
+
+      const reviewEntries = sessionEntries.filter(e => e.review);
+      if (reviewEntries.length > 0) {
+        const lastReview = reviewEntries[reviewEntries.length - 1].review;
+        md += `- **Review:** round ${lastReview.round}/${lastReview.max_rounds} — ${lastReview.status}\n`;
+        if (lastReview.feedback && lastReview.feedback.length > 0) {
+          for (const fb of lastReview.feedback) {
+            md += `  - Issue: ${fb.issue} → Fix: ${fb.required_fix}\n`;
+          }
+        }
+      }
+
       md += `\n| Timestamp | Event | Details |\n|-----------|-------|--------|\n`;
       for (const entry of sessionEntries) {
         md += `| ${entry.timestamp} | ${entry.event} | ${entry.files_changed ? 'Changed: ' + entry.files_changed.length + ' file(s)' : ''} |\n`;
@@ -676,15 +751,33 @@ function cmdStatus(args) {
     }
     var lastEntry = recent.length > 0 ? recent[recent.length - 1] : null;
 
-    status.lanes[lane] = {
-      entries_today: recent.length,
-      in_progress_sessions: inProgress.map(function(e) { return { agent: e.agent, session_id: e.session_id, target: e.target, started_at: e.timestamp }; }),
-      active_ownerships: activeOwners,
-      files_changed: filesChanged,
-      last_activity: lastEntry ? lastEntry.timestamp : null,
-      last_event: lastEntry ? lastEntry.event : null,
-      last_agent: lastEntry ? lastEntry.agent : null
+  status.lanes[lane] = {
+  entries_today: recent.length,
+  in_progress_sessions: inProgress.map(function(e) { return { agent: e.agent, session_id: e.session_id, target: e.target, started_at: e.timestamp }; }),
+  active_ownerships: activeOwners,
+  files_changed: filesChanged,
+  last_activity: lastEntry ? lastEntry.timestamp : null,
+  last_event: lastEntry ? lastEntry.event : null,
+  last_agent: lastEntry ? lastEntry.agent : null,
+  uncertainty_summary: (function() {
+    var items = recent.filter(function(e) { return e.uncertainty; });
+    if (items.length === 0) return null;
+    var high = items.filter(function(e) { return e.uncertainty.level === 'high'; });
+    var operatorNeeded = items.filter(function(e) { return e.uncertainty.operator_decision_needed; });
+    return {
+      total: items.length,
+      high: high.length,
+      operator_decision_needed: operatorNeeded.length,
+      latest: high.length > 0 ? high[high.length - 1].uncertainty : (items.length > 0 ? items[items.length - 1].uncertainty : null)
     };
+  })(),
+  review_summary: (function() {
+    var items = recent.filter(function(e) { return e.review; });
+    if (items.length === 0) return null;
+    var last = items[items.length - 1].review;
+    return { round: last.round, max_rounds: last.max_rounds, status: last.status };
+  })()
+  };
   }
 
   console.log(JSON.stringify(status, null, 2));
@@ -730,13 +823,31 @@ function cmdSnapshot(args) {
     const filesChanged = [...new Set(entries.flatMap(e => e.files_changed || []))];
     const lastEntry = entries.length > 0 ? entries[entries.length - 1] : null;
 
-    snapshot.lanes[lane] = {
-      total_entries: entries.length,
-      in_progress: inProgress.map(e => ({ agent: e.agent, session_id: e.session_id, target: e.target, started_at: e.timestamp })),
-      active_ownerships: activeOwners,
-      files_changed_today: filesChanged,
-      last_activity: lastEntry ? { timestamp: lastEntry.timestamp, event: lastEntry.event, agent: lastEntry.agent } : null
-    };
+snapshot.lanes[lane] = {
+total_entries: entries.length,
+in_progress: inProgress.map(e => ({ agent: e.agent, session_id: e.session_id, target: e.target, started_at: e.timestamp })),
+active_ownerships: activeOwners,
+files_changed_today: filesChanged,
+last_activity: lastEntry ? { timestamp: lastEntry.timestamp, event: lastEntry.event, agent: lastEntry.agent } : null,
+uncertainty_summary: (function() {
+  var items = entries.filter(e => e.uncertainty);
+  if (items.length === 0) return null;
+  var high = items.filter(e => e.uncertainty.level === 'high');
+  var operatorNeeded = items.filter(e => e.uncertainty.operator_decision_needed);
+  return {
+  total: items.length,
+  high: high.length,
+  operator_decision_needed: operatorNeeded.length,
+  latest: high.length > 0 ? high[high.length - 1].uncertainty : (items.length > 0 ? items[items.length - 1].uncertainty : null)
+  };
+})(),
+review_summary: (function() {
+  var items = entries.filter(e => e.review);
+  if (items.length === 0) return null;
+  var last = items[items.length - 1].review;
+  return { round: last.round, max_rounds: last.max_rounds, status: last.status };
+})()
+};
   }
 
   const dir = broadcastJournalDir();
