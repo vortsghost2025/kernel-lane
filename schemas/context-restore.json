@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://archivist.dev/schemas/context-restore.json",
+  "title": "Context Restore Packet",
+  "description": "Packet for restoring context after compact",
+  "type": "object",
+  "required": ["$schema", "version", "timestamp", "context_lost", "restore_payload", "authority"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://archivist.dev/schemas/context-restore.json"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "context_lost": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of tokens lost in compact"
+    },
+    "restore_payload": {
+      "type": "object",
+      "properties": {
+        "governance_constraints": {
+          "type": "object"
+        },
+        "active_checkpoints": {
+          "type": "array"
+        },
+        "drift_baseline": {
+          "type": "object"
+        },
+        "session_context": {
+          "type": "object"
+        },
+        "working_context_resume": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of items agent was working on"
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "required": ["fields_authoritative", "fields_advisory"],
+      "properties": {
+        "fields_authoritative": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "fields_advisory": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}
