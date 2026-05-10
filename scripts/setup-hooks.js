@@ -2,8 +2,20 @@ const fs = require('fs');
 const path = require('path');
 
 const preCommitContent = `#!/bin/sh
-# Pre-commit hook: sovereignty + schema + lint + typecheck + journal preflight + work_started
+# Pre-commit hook: NTFS filename check + sovereignty + schema + lint + typecheck + journal preflight + work_started
 # Installed by scripts/setup-hooks.js
+
+NTFS_ILLEGAL='[:<>"|?*]'
+bad_files=$(git diff --cached --name-only --diff-filter=ACMR | grep -e "$NTFS_ILLEGAL")
+if [ -n "$bad_files" ]; then
+  echo "ERROR: Commit rejected — filenames contain Windows-NTFS-illegal characters:" >&2
+  echo "$bad_files" >&2
+  echo "" >&2
+  echo 'NTFS forbids: : < > " | ? *' >&2
+  echo "Rename these files or remove them from the commit." >&2
+  exit 1
+fi
+echo "[pre-commit] NTFS filename check passed"
 
 echo "[pre-commit] Running sovereignty scan..."
 REPO_ROOT=$(git rev-parse --show-toplevel)
@@ -38,11 +50,12 @@ self-organizing-library) LANE=library ;;
 swarmmind*) LANE=swarmmind ;;
 *) LANE=unknown ;;
 esac
-node "$REPO_ROOT/scripts/store-journal.js" preflight --lane "$LANE" --paths "$STAGED_FILES" 2>/dev/null || {
-echo "[pre-commit] WARNING: store-journal preflight found active ownership conflict"
-echo "[pre-commit] Run: node scripts/store-journal.js active --lane $LANE"
-echo "[pre-commit] Continuing anyway (preflight is advisory)"
-}
+  node "$REPO_ROOT/scripts/store-journal.js" preflight --lane "$LANE" --paths "$STAGED_FILES" 2>/dev/null
+  if [ $? -ne 0 ]; then
+    echo "[pre-commit] WARNING: store-journal preflight found active ownership conflict"
+    echo "[pre-commit] Run: node scripts/store-journal.js active --lane $LANE"
+    echo "[pre-commit] Continuing anyway - preflight is advisory"
+  fi
 node "$REPO_ROOT/scripts/store-journal.js" append \\
 --lane "$LANE" \\
 --event work_started \\
@@ -107,7 +120,7 @@ if (!fs.existsSync(hookDir)) {
 const preCommitPath = path.join(hookDir, 'pre-commit');
 fs.writeFileSync(preCommitPath, preCommitContent);
 fs.chmodSync(preCommitPath, 0o755);
-console.log('Pre-commit hook installed: .git/hooks/pre-commit (sovereignty + journal preflight)');
+console.log('Pre-commit hook installed: .git/hooks/pre-commit (NTFS + sovereignty + journal preflight)');
 
 const postCommitPath = path.join(hookDir, 'post-commit');
 fs.writeFileSync(postCommitPath, postCommitContent);
