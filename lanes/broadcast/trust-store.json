@@ -28,10 +28,10 @@
   },
   "kernel": {
     "lane_id": "kernel",
-    "key_id": "d475d23aeed6c7b8",
-    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuHNU4PbR8i+qdcxw1BZO\nvsnZRFtkr7zA0RvlzmyNvArAtAd7P/IG208v0J9i1l3Cn872HDLoyFjAd0wcj6TH\nURXebE7Ka+cuTgSU5aYPjBOjAi+NeEUf3SyhuleESc0T/7IfpLyDXVaQFa9KbqOo\nsmjtqL2vuWrrcG/i6fcoKHjOO5RWXx1jt42eXizwIaB1k/5s65cQWOpgGbxMh8eW\naU4YTT/tBAkeEnbea0dTpIRdKmUQgVD+36MaGl/fMquD+p/fOfyuTK6/TPNlb0+U\n7ILIkPXsqT6inPtbMv+eRC2F6IpKujW0O/ZmHNGPBXPKK+DwruPP+I1E6afSn8Sn\nqwIDAQAB\n-----END PUBLIC KEY-----",
+    "key_id": "4ac54d4100323c71",
+    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkX8AvxiM/PhnI1HaejXj\nJ9eHH6V0NL62mXxv17EKdWBO3kESlSwOpgYPqyewzExY9HYnIBfDMHhLuN1+yIp/\npFLsjp99kutsP7LppshsjtnLRyeQ1TtGgKNWBn/wOfUXImj8yrHFAL1mt7RGChZA\nLjxlJdjfpSB17+u3Corz+3ZFvGsURHvcUnlAEZp2bKsaluP4mstQL3JqD5f5cBMI\nmnG+tJHyvMvgZVGClLvZzZg0AWFpYpnGpt25pj7SXjbZPbUTe1/Ll2waBvQaooYA\nyBzkaU8JbDFAVUugdJp7+sCUhCZed7nhR83DL+GbLqA+zHQ0iVoFqWpcCkZpZVm1\nhQIDAQAB\n-----END PUBLIC KEY-----",
     "algorithm": "RS256",
-    "registered_at": "2026-05-06T00:44:26.725Z",
+    "registered_at": "2026-05-10T19:25:00Z",
     "expires_at": null,
     "revoked_at": null
   },
@@ -61,9 +61,9 @@
       },
       "kernel": {
         "previous_key_id": "d475d23aeed6c7b8",
-        "current_key_id": "d475d23aeed6c7b8",
-        "reason": "Ubuntu key pair installed on Windows, .identity/ directory created",
-        "rotated_at": "2026-05-05"
+        "current_key_id": "4ac54d4100323c71",
+        "reason": "Private key unavailable from Ubuntu headless; fresh RSA keypair generated on Windows (following Library precedent)",
+        "rotated_at": "2026-05-10"
       }
     }
   }
