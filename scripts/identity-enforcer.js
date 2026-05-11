@@ -91,20 +91,20 @@ class IdentityEnforcer {
   }
 
   _getPublicKey(laneId) {
-    const entry = this.trustStore?.keys?.[laneId];
+    const entry = this.trustStore && this.trustStore.keys && this.trustStore.keys[laneId];
     if (!entry) return null;
     if (entry.revoked_at) return null;
     return entry.public_key_pem;
   }
 
   _getPublicKeyByKeyId(keyId) {
-    for (const [laneId, entry] of Object.entries(this.trustStore?.keys || {})) {
+    for (const [laneId, entry] of Object.entries((this.trustStore && this.trustStore.keys) || {})) {
       if (entry.key_id === keyId && !entry.revoked_at) {
         return { publicKey: entry.public_key_pem, laneId, archived: false };
       }
     }
-    const archived = this.trustStore?.archived_keys?.[keyId];
-    if (archived?.public_key_pem) {
+    const archived = this.trustStore && this.trustStore.archived_keys && this.trustStore.archived_keys[keyId];
+    if (archived && archived.public_key_pem) {
       return { publicKey: archived.public_key_pem, laneId: archived.lane_id, archived: true };
     }
     return null;
@@ -263,7 +263,7 @@ class IdentityEnforcer {
       authenticated,
       unsigned,
       rejected,
-      trust_store_lanes: Object.keys(this.trustStore?.keys || {}).length,
+      trust_store_lanes: Object.keys((this.trustStore && this.trustStore.keys) || {}).length,
       enforcement_mode: this.enforcementMode
     };
   }

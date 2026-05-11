@@ -80,7 +80,7 @@ class IdentitySelfHealing {
         result.keyId = healed.keyId;
         result.keysPresent = true;
       } else {
-        result.error = healed?.error || 'REGENERATION_FAILED';
+        result.error = (healed && healed.error) || 'REGENERATION_FAILED';
       }
     }
 

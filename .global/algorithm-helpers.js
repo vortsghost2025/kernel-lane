@@ -82,7 +82,7 @@ function isPassphraseRequired(privateKeyPem) {
 }
 
 function getAlgorithmForLane(trustStore, laneId) {
-	const entry = trustStore?.[laneId] || trustStore?.keys?.[laneId];
+	const entry = (trustStore && trustStore[laneId]) || (trustStore && trustStore.keys && trustStore.keys[laneId]);
 	if (!entry) {
 		return ALG_RSA;
 	}
