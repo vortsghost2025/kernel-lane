@@ -17,3 +17,6 @@ jobs:
       - run: node scripts/test-ci-signing.js
         env:
           LANE_ROOT: ${{ github.workspace }}
+      - run: node scripts/trust-store-mutation-guard.js
+        env:
+          LANE_ROOT: ${{ github.workspace }}
