@@ -16,6 +16,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const { atomicWriteWithLease } = require('./atomic-write-util');
+const { loadPrivateKey: loadPrivateKeyHelper, getAlgorithmParams, sign: algoSign, isPassphraseRequired } = require(path.join(__dirname, '..', '.global', 'algorithm-helpers.js'));
 
 const ROOT = path.join(__dirname, '..');
 const IDENTITY_DIR = path.join(ROOT, '.identity');
@@ -41,25 +42,22 @@ function base64UrlEncode(data) {
 
 function getPassphrase() {
   const passphrase = process.env.LANE_KEY_PASSPHRASE;
-  if (!passphrase) {
-    throw new Error('LANE_KEY_PASSPHRASE environment variable not set');
+  const privatePem = fs.existsSync(PRIVATE_KEY_PATH) ? fs.readFileSync(PRIVATE_KEY_PATH, 'utf8') : '';
+  if (!passphrase && isPassphraseRequired(privatePem)) {
+    throw new Error('LANE_KEY_PASSPHRASE environment variable not set (required for encrypted RSA key)');
   }
-  return passphrase;
+  return passphrase || null;
 }
 
-function loadPrivateKey(passphrase) {
+function loadPrivateKeyLocal(passphrase) {
   if (!fs.existsSync(PRIVATE_KEY_PATH)) {
     throw new Error('Private key not found at ' + PRIVATE_KEY_PATH);
   }
-  const encryptedKey = fs.readFileSync(PRIVATE_KEY_PATH, 'utf8');
+  const privateKeyPem = fs.readFileSync(PRIVATE_KEY_PATH, 'utf8');
   try {
-    return crypto.createPrivateKey({
-      key: encryptedKey,
-      passphrase: passphrase,
-      format: 'pem'
-    });
+    return loadPrivateKeyHelper(privateKeyPem, passphrase);
   } catch (e) {
-    throw new Error('Failed to decrypt private key: ' + e.message);
+    throw new Error('Failed to load private key: ' + e.message);
   }
 }
 
@@ -87,7 +85,8 @@ async function signSnapshot() {
   console.log('  Lane:', snapshot.identity?.lane);
 
   const passphrase = getPassphrase();
-  const privateKey = loadPrivateKey(passphrase);
+  const privateKey = loadPrivateKeyLocal(passphrase);
+  const algoParams = getAlgorithmParams(privateKey);
   console.log('\nPrivate key loaded and decrypted');
 
   const keyId = getKeyIdFromTrustStore();
@@ -95,12 +94,12 @@ async function signSnapshot() {
 
   if (snapshot.identity?.key_id && snapshot.identity.key_id !== keyId) {
     console.error('WARNING: snapshot.key_id mismatch with trust store');
-    console.error('  Snapshot:', snapshot.identity.key_id);
-    console.error('  Trust store:', keyId);
+    console.error(' Snapshot:', snapshot.identity.key_id);
+    console.error(' Trust store:', keyId);
   }
 
   const header = {
-    alg: 'RS256',
+    alg: algoParams.alg,
     typ: 'JWS',
     kid: keyId
   };
@@ -109,7 +108,7 @@ async function signSnapshot() {
   const payloadB64 = base64UrlEncode(stableStringify(snapshot));
   const signingInput = `${headerB64}.${payloadB64}`;
 
-  const signature = crypto.sign('RSA-SHA256', Buffer.from(signingInput), privateKey);
+  const signature = algoSign(algoParams.signAlg, Buffer.from(signingInput), privateKey);
   const signatureB64 = base64UrlEncode(signature);
 
   const jws = `${headerB64}.${payloadB64}.${signatureB64}`;

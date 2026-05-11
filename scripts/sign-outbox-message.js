@@ -5,7 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const { deriveKeyId } = require(path.join(__dirname, '..', 'src', 'attestation', 'deriveKeyId.js'));
+const { deriveKeyId } = require(path.join(__dirname, '..', '.global', 'deriveKeyId.js'));
+const { loadPrivateKey, getAlgorithmParams, sign: algoSign, isPassphraseRequired, SUPPORTED_ALGORITHMS } = require(path.join(__dirname, '..', '.global', 'algorithm-helpers.js'));
 
 const PASSFILE_CANDIDATES = [
   path.join(__dirname, '..', '.runtime', 'lane-passphrases.json'),
@@ -89,27 +90,24 @@ function loadKeyMaterial(identityDir, lane, passphrase) {
 
   let privateKey;
   try {
-    privateKey = crypto.createPrivateKey({
-      key: privatePem,
-      format: 'pem',
-      passphrase
-    });
+    privateKey = loadPrivateKey(privatePem, passphrase);
   } catch (err) {
     throw new Error(`PRIVATE_KEY_DECRYPT_FAILED for lane ${lane}: ${err.message}`);
   }
 
+  const algoParams = getAlgorithmParams(privateKey);
   const keyId = deriveKeyId(publicPem);
-  return { privateKey, keyId };
+  return { privateKey, keyId, algoParams };
 }
 
-function signInboxShape(msg, lane, privateKey, keyId) {
+function signInboxShape(msg, lane, privateKey, keyId, algoParams) {
   const from = msg.from || msg.from_lane || lane;
   const to = msg.to || msg.to_lane || null;
   const contentHash = 'sha256:' + crypto.createHash('sha256')
     .update(stableStringify({ body: msg.body || '', payload: msg.payload || {} }))
     .digest('hex');
 
-  const header = { alg: 'RS256', typ: 'JWT', kid: keyId };
+  const header = { alg: algoParams.alg, typ: 'JWT', kid: keyId };
   const payload = {
     id: msg.id || null,
     task_id: msg.task_id || null,
@@ -123,7 +121,7 @@ function signInboxShape(msg, lane, privateKey, keyId) {
   };
 
   const signingInput = `${base64UrlEncode(JSON.stringify(header))}.${base64UrlEncode(stableStringify(payload))}`;
-  const signature = crypto.sign('RSA-SHA256', Buffer.from(signingInput), privateKey);
+  const signature = algoSign(algoParams.signAlg, Buffer.from(signingInput), privateKey);
   const jws = `${signingInput}.${base64UrlEncode(signature)}`;
 
   return {
@@ -132,7 +130,7 @@ function signInboxShape(msg, lane, privateKey, keyId) {
     to,
     content_hash: contentHash,
     signature: jws,
-    signature_alg: 'RS256',
+    signature_alg: algoParams.alg,
     key_id: keyId
   };
 }
@@ -157,13 +155,14 @@ function signMessageFile(messagePath, lane, force) {
   }
 
   const passphrase = resolvePassphrase(effectiveLane);
-  if (!passphrase) {
+  const identityDir = LANE_IDENTITY_DIRS[effectiveLane] || path.join(__dirname, '..', '.identity');
+  const privatePem = fs.existsSync(path.join(identityDir, 'private.pem'))
+    ? fs.readFileSync(path.join(identityDir, 'private.pem'), 'utf8') : '';
+  if (!passphrase && isPassphraseRequired(privatePem)) {
     throw new Error(`PASSPHRASE_MISSING: no passphrase found for lane ${effectiveLane}`);
   }
-
-  const identityDir = LANE_IDENTITY_DIRS[effectiveLane] || path.join(__dirname, '..', '.identity');
-  const { privateKey, keyId } = loadKeyMaterial(identityDir, effectiveLane, passphrase);
-  const signed = signInboxShape(msg, effectiveLane, privateKey, keyId);
+  const { privateKey, keyId, algoParams } = loadKeyMaterial(identityDir, effectiveLane, passphrase);
+  const signed = signInboxShape(msg, effectiveLane, privateKey, keyId, algoParams);
 
   fs.writeFileSync(absolutePath, JSON.stringify(signed, null, 2) + '\n', 'utf8');
   console.log(`[sign-outbox] Signed ${absolutePath} with key_id=${keyId}`);

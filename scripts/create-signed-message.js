@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const os = require('os');
 
 const { deriveKeyId } = require(path.join(__dirname, '..', '.global', 'deriveKeyId.js'));
+const { loadPrivateKey, getAlgorithmParams, sign: algoSign, isPassphraseRequired } = require(path.join(__dirname, '..', '.global', 'algorithm-helpers.js'));
 
 const isWin32 = process.platform === 'win32';
 const UBUNTU_ROOT = path.join(os.homedir(), 'agent', 'repos');
@@ -182,14 +183,15 @@ function createSignedMessage(msg, laneId) {
   let privateKey;
   try {
     if (passphrase) {
-      privateKey = crypto.createPrivateKey({ key: privatePem, format: 'pem', passphrase });
+      privateKey = loadPrivateKey(privatePem, passphrase);
     } else {
-      privateKey = crypto.createPrivateKey({ key: privatePem, format: 'pem' });
+      privateKey = loadPrivateKey(privatePem, null);
     }
   } catch (e) {
     throw new Error(`PRIVATE_KEY_LOAD_FAILED for ${laneId}: ${e.message}`);
   }
 
+  const algoParams = getAlgorithmParams(privateKey);
   const keyId = deriveKeyId(publicPem);
   const from = msg.from || msg.from_lane || laneId;
   const to = msg.to || msg.to_lane || null;
@@ -198,7 +200,7 @@ function createSignedMessage(msg, laneId) {
     .update(stableStringify({ body: msg.body || '', payload: msg.payload || {} }))
     .digest('hex');
 
-  const header = { alg: 'RS256', typ: 'JWT', kid: keyId };
+  const header = { alg: algoParams.alg, typ: 'JWT', kid: keyId };
   const payload = {
     id: msgId,
     task_id: msg.task_id || null,
@@ -212,7 +214,7 @@ function createSignedMessage(msg, laneId) {
   };
 
   const signingInput = `${base64UrlEncode(JSON.stringify(header))}.${base64UrlEncode(stableStringify(payload))}`;
-  const signature = crypto.sign('RSA-SHA256', Buffer.from(signingInput), privateKey);
+  const signature = algoSign(algoParams.signAlg, Buffer.from(signingInput), privateKey);
   const jws = `${signingInput}.${base64UrlEncode(signature)}`;
 
   return {
@@ -222,7 +224,7 @@ function createSignedMessage(msg, laneId) {
     to,
     content_hash: contentHash,
     signature: jws,
-    signature_alg: 'RS256',
+    signature_alg: algoParams.alg,
     key_id: keyId,
     session_identity: {
       session_id: SESSION_ID,
