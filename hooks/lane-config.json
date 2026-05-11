@@ -1,0 +1,26 @@
+{
+  "archivist": {
+    "gate2": true,
+    "canonicalScriptGuard": true,
+    "ntfsCheck": false,
+    "journal": false
+  },
+  "kernel": {
+    "gate2": true,
+    "canonicalScriptGuard": false,
+    "ntfsCheck": true,
+    "journal": true
+  },
+  "swarmmind": {
+    "gate2": false,
+    "canonicalScriptGuard": false,
+    "ntfsCheck": false,
+    "journal": false
+  },
+  "library": {
+    "gate2": true,
+    "canonicalScriptGuard": false,
+    "ntfsCheck": false,
+    "journal": false
+  }
+}
