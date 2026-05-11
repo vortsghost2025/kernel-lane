@@ -53,7 +53,7 @@ class IdentityEnforcer {
       if (parsed.keys && typeof parsed.keys === 'object') {
         this.trustStore = parsed;
       } else {
-        this.trustStore = { keys: {}, version: '1.0' };
+        this.trustStore = { keys: {}, version: '1.0', archived_keys: parsed.archived_keys || {}, rotation_policy: parsed.rotation_policy || null, key_lineage: parsed.key_lineage || null };
         for (const [laneId, entry] of Object.entries(parsed)) {
           if (entry && entry.public_key_pem && entry.lane_id) {
             this.trustStore.keys[laneId] = entry;
