@@ -397,17 +397,18 @@
     },
     "signature": {
       "type": "string",
-      "description": "v1.2: JWS compact signature (RS256). All outbound messages MUST be signed.",
+      "description": "v1.2: JWS compact signature. All outbound messages MUST be signed. EdDSA (Ed25519) preferred; RS256 legacy.",
       "minLength": 1,
       "pattern": "^eyJ[A-Za-z0-9_-]+\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$"
     },
     "signature_alg": {
       "type": "string",
-      "description": "v1.2: Signature algorithm. Must be RS256.",
+      "description": "v1.2: Signature algorithm. EdDSA preferred (Ed25519). RS256 legacy.",
       "enum": [
-        "RS256"
+        "RS256",
+        "EdDSA"
       ],
-      "default": "RS256"
+      "default": "EdDSA"
     },
   "key_id": {
     "type": "string",
