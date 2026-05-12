@@ -13,7 +13,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const LANE_ROOT = 'S:/kernel-lane';
+const LANE_ROOT = path.join(__dirname, '..');
 const LANE_NAME = 'Kernel';
 const SCHEMA_DIR = path.join(LANE_ROOT, 'schemas');
 const INBOX_MESSAGE_SCHEMA = 'inbox-message-v1.json';
