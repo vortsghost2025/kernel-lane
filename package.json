@@ -7,7 +7,11 @@
     "heartbeat": "node scripts/heartbeat.js",
     "heartbeat:check": "node scripts/heartbeat.js --check",
     "heartbeat:once": "node scripts/heartbeat.js --once",
-    "worker": "node scripts/lane-worker.js",
+    "worker": "node scripts/lane-worker.js --apply",
+    "executor": "node scripts/generic-task-executor.js kernel --apply --watch --poll-seconds=30",
+    "executor:once": "node scripts/generic-task-executor.js kernel --apply",
+    "relay": "node scripts/relay-daemon.js --apply --watch --poll-seconds=20",
+    "all": "node scripts/inbox-watcher.js & node scripts/lane-worker.js --apply & node scripts/generic-task-executor.js kernel --apply --watch --poll-seconds=30",
     "validate": "node scripts/schema-validator.js"
   }
 }
