@@ -32,6 +32,8 @@ class Heartbeat {
     this.messagesProcessed = 0;
     this._timer = null;
     this._shuttingDown = false;
+    this._sessionId = process.env.LANE_SESSION_ID || `sess_${Date.now().toString(36)}_${process.pid}`;
+    this._claimedAt = new Date().toISOString();
   }
 
   start() {
@@ -64,6 +66,31 @@ class Heartbeat {
       return `heartbeat-${laneName}-observer.json`;
     }
     return `heartbeat-${laneName}.json`;
+  }
+
+  _renewActiveOwner() {
+    const stateDir = path.join(REPO_ROOT, 'lanes', this.config.laneName, 'state');
+    const lockPath = path.join(stateDir, 'active-owner.json');
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + this.config.staleAfterSeconds * 1000);
+    const owner = {
+      session_id: this._sessionId,
+      lane: this.config.laneName,
+      claimed_at: this._claimedAt,
+      renewed_at: now.toISOString(),
+      expires_at: expiresAt.toISOString(),
+      pid: process.pid,
+      origin_runtime: process.env.LANE_ORIGIN_RUNTIME || 'kilo',
+      origin_workspace: process.cwd(),
+    };
+    try {
+      if (!fs.existsSync(stateDir)) {
+        fs.mkdirSync(stateDir, { recursive: true });
+      }
+      fs.writeFileSync(lockPath, JSON.stringify(owner, null, 2) + '\n', 'utf8');
+    } catch (err) {
+      console.error('Failed to renew active-owner.json:', err.message);
+    }
   }
 
   _writeSystemState(systemState, activeContradictions, processedOk) {
@@ -190,7 +217,7 @@ class Heartbeat {
     compaction_suspend_reason: activeContradictions.length > 0 ? 'Active contradictions present' : null
   };
 
-  // Attempt real RS256 signing; emit unsigned diagnostic if keys are missing
+  // Attempt real signing; emit unsigned diagnostic if keys are missing
   let message;
   try {
     message = createSignedMessage(baseMessage, this.config.laneName);
@@ -229,6 +256,10 @@ class Heartbeat {
       fs.writeFileSync(filePath, JSON.stringify(message, null, 2) + '\n', 'utf8');
     } catch (err) {
       console.error('Failed to write heartbeat:', err.message);
+    }
+
+    if (!this._shuttingDown || this.config.agentMode !== 'observer') {
+      this._renewActiveOwner();
     }
   }
 
