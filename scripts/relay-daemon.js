@@ -6,6 +6,7 @@ const path = require('path');
 
 const { LaneDiscovery } = require('./util/lane-discovery');
 const { ClaimCommitGuard } = require('./claim-commit-guard');
+const { ContradictionAdjudicator } = require('./contradiction-adjudicator');
 const discovery = new LaneDiscovery();
 
 function runStoreJournalAppend(laneRoot, lane, event, subject, taskId) {
@@ -72,6 +73,9 @@ class RelayDaemon {
     this.dryRun = options.dryRun !== undefined ? !!options.dryRun : true;
     this.outboxDir = path.join(this.repoRoot, 'lanes', this.lane, 'outbox');
     this.deliveredDir = path.join(this.outboxDir, 'delivered');
+    this.tickCount = 0;
+    this.adjudicatorInterval = options.adjudicatorInterval || 50;
+    this.adjudicatorLogDir = path.join(this.repoRoot, 'logs');
   }
 
   deliverOutbox() {
@@ -223,17 +227,40 @@ class RelayDaemon {
   }
 
   runOnce() {
+    this.tickCount++;
     const outbound = this.deliverOutbox();
     const incoming = this.collectIncoming();
     const crossInbox = this.collectCrossLaneInbox();
 
+    let adjudication = null;
+    if (this.tickCount % this.adjudicatorInterval === 0) {
+      try {
+        const adjudicator = new ContradictionAdjudicator({
+          repoRoot: this.repoRoot,
+          dryRun: this.dryRun,
+        });
+        adjudication = adjudicator.run();
+        if (!this.dryRun && adjudication) {
+          if (!fs.existsSync(this.adjudicatorLogDir)) {
+            fs.mkdirSync(this.adjudicatorLogDir, { recursive: true });
+          }
+          const logPath = path.join(this.adjudicatorLogDir, 'contradiction-adjudicator.json');
+          fs.writeFileSync(logPath, JSON.stringify(adjudication, null, 2), 'utf8');
+        }
+      } catch (err) {
+        adjudication = { error: err.message };
+      }
+    }
+
     return {
       lane: this.lane,
       dry_run: this.dryRun,
+      tick: this.tickCount,
       timestamp: nowIso(),
       outbound,
       incoming,
       cross_inbox: crossInbox,
+      adjudication,
     };
   }
 }
@@ -257,7 +284,12 @@ async function runCli() {
         const inc = result.incoming;
         const cx = result.cross_inbox;
         if (out.delivered > 0 || inc.collected > 0 || cx.collected > 0) {
-          console.log(`[relay-daemon] lane=${lane} outbound: delivered=${out.delivered} incoming: collected=${inc.collected} cross_inbox: collected=${cx.collected}`);
+          console.log(`[relay-daemon] lane=${lane} tick=${result.tick} outbound: delivered=${out.delivered} incoming: collected=${inc.collected} cross_inbox: collected=${cx.collected}`);
+        }
+        if (result.adjudication) {
+          const adj = result.adjudication;
+          const stats = adj.stats || {};
+          console.log(`[relay-daemon] adjudication: edges=${stats.total_edges || 0} contradicts=${stats.contradicts_edges || 0} adjudicated=${stats.adjudicated || 0}${adj.error ? ' ERROR=' + adj.error : ''}`);
         }
       } catch (err) {
         console.error(`[relay-daemon] tick error: ${err.message}`);
@@ -287,5 +319,11 @@ async function runCli() {
 if (require.main === module) {
   runCli().catch(err => { console.error(`[relay-daemon] FATAL: ${err.message}`); process.exit(1); });
 }
+
+// TaskChainEngine is NOT embedded in relay-daemon because it is a full inbox
+// processor that competes with lane-worker's own processing. Run it as a
+// standalone CLI from runner-v3.sh or a systemd timer instead:
+// node scripts/task-chain-engine.js --lane <lane> --apply
+// node scripts/task-chain-engine.js --lane kernel --apply --max-chain-depth 5
 
 module.exports = { RelayDaemon, ALL_LANES };
