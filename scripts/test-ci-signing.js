@@ -5,7 +5,7 @@ var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
 
-var LANE_ROOT = process.env.LANE_ROOT || process.cwd();
+var LANE_ROOT = process.env.LANE_ROOT || path.resolve(__dirname, '..');
 
 var TRUST_STORE_PATH = path.join(LANE_ROOT, 'lanes/broadcast/trust-store.json');
 
