@@ -7,19 +7,35 @@ const crypto = require('crypto');
 const { getAllBroadcastTrustStorePaths, getLaneRoots, computeKeyIdFromPem } = require('./canonical-trust-resolver');
 const { deriveKeyId } = require(path.join(__dirname, '..', '.global', 'deriveKeyId.js'));
 const { loadPrivateKey: loadPrivateKeyHelper, getAlgorithmParams, sign: algoSign, isPassphraseRequired, generateKeyPair, SUPPORTED_ALGORITHMS, getAlgorithmForLane } = require(path.join(__dirname, '..', '.global', 'algorithm-helpers.js'));
-const PASSFILE_SEARCH = [
-  'S:/Archivist-Agent/.runtime/lane-passphrases.json',
-  'S:/self-organizing-library/.runtime/lane-passphrases.json',
-  'S:/SwarmMind/.runtime/lane-passphrases.json',
-  'S:/kernel-lane/.runtime/lane-passphrases.json',
-];
+const IS_WIN32 = process.platform === 'win32';
 
-const LANE_IDENTITY_DIRS = {
-  archivist: 'S:/Archivist-Agent/.identity',
-  library: 'S:/self-organizing-library/.identity',
-  swarmmind: 'S:/SwarmMind/.identity',
-  kernel: 'S:/kernel-lane/.identity',
-};
+const PASSFILE_SEARCH = IS_WIN32
+  ? [
+      'S:/Archivist-Agent/.runtime/lane-passphrases.json',
+      'S:/self-organizing-library/.runtime/lane-passphrases.json',
+      'S:/SwarmMind/.runtime/lane-passphrases.json',
+      'S:/kernel-lane/.runtime/lane-passphrases.json',
+    ]
+  : [
+      '/home/we4free/agent/repos/Archivist-Agent/.runtime/lane-passphrases.json',
+      '/home/we4free/agent/repos/self-organizing-library/.runtime/lane-passphrases.json',
+      '/home/we4free/agent/repos/SwarmMind/.runtime/lane-passphrases.json',
+      '/home/we4free/agent/repos/kernel-lane/.runtime/lane-passphrases.json',
+    ];
+
+const LANE_IDENTITY_DIRS = IS_WIN32
+  ? {
+      archivist: 'S:/Archivist-Agent/.identity',
+      library: 'S:/self-organizing-library/.identity',
+      swarmmind: 'S:/SwarmMind/.identity',
+      kernel: 'S:/kernel-lane/.identity',
+    }
+  : {
+      archivist: '/home/we4free/agent/repos/Archivist-Agent/.identity',
+      library: '/home/we4free/agent/repos/self-organizing-library/.identity',
+      swarmmind: '/home/we4free/agent/repos/SwarmMind/.identity',
+      kernel: '/home/we4free/agent/repos/kernel-lane/.identity',
+    };
 
 class IdentitySelfHealing {
   constructor(options = {}) {
