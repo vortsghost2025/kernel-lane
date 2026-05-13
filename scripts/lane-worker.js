@@ -102,6 +102,20 @@ const LANE_HINTS = [
 
 const LANE_ROOTS = getRoots();
 
+let _createSignedMessage = null;
+function getCreateSignedMessage() {
+  if (!_createSignedMessage) {
+    try {
+      const mod = require(path.join(__dirname, 'create-signed-message'));
+      _createSignedMessage = mod.createSignedMessage;
+    } catch (e) {
+      process.stderr.write(`[lane-worker] WARN: create-signed-message unavailable: ${e.message}\n`);
+      _createSignedMessage = false;
+    }
+  }
+  return _createSignedMessage || null;
+}
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -174,33 +188,43 @@ function sendNack(originalMsg, rejectionReason, rejectionDetail, targetLane, fro
     if (!fs.existsSync(senderInbox)) {
       fs.mkdirSync(senderInbox, { recursive: true });
     }
-    const nackMsg = {
-      schema_version: '1.3',
-      task_id: `nack-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      idempotency_key: `nack-${originalMsg.task_id || 'unknown'}-${Date.now()}`,
-      from: String(targetLane || 'unknown').toLowerCase(),
-      to: senderLane,
-      type: 'notification',
-      task_kind: 'status',
-      priority: 'P2',
-      subject: `NACK: message rejected at ${targetLane}`,
-      body: `Your message (task_id=${originalMsg.task_id || 'unknown'}, type=${originalMsg.type || 'unknown'}) was rejected.\nReason: ${rejectionReason}\nDetail: ${rejectionDetail || 'none'}\nOriginal subject: ${originalMsg.subject || 'unknown'}`,
-      timestamp: nowIso(),
-      requires_action: false,
-      payload: { mode: 'inline', compression: 'none' },
-      execution: { mode: 'manual', engine: 'kilo', actor: 'lane' },
-      lease: { owner: null, acquired_at: null },
-      retry: { attempt: 1, max_attempts: 1 },
-      evidence: { required: false, verified: false },
-      evidence_exchange: {},
-      heartbeat: { status: 'done', last_heartbeat_at: nowIso() },
-      nack_for_task_id: originalMsg.task_id || null,
-      nack_reason: rejectionReason,
-      nack_detail: rejectionDetail || null,
-      exempt_from_nack: true,  // NFM-020: prevent NACK chains — NACKs are terminal
-    };
-    const nackPath = path.join(senderInbox, `nack-${nackMsg.task_id}.json`);
-    fs.writeFileSync(nackPath, JSON.stringify(nackMsg, null, 2), 'utf8');
+  const nackMsg = {
+    schema_version: '1.3',
+    task_id: `nack-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    idempotency_key: `nack-${originalMsg.task_id || 'unknown'}-${Date.now()}`,
+    from: String(targetLane || 'unknown').toLowerCase(),
+    to: senderLane,
+    type: 'notification',
+    task_kind: 'status',
+    priority: 'P2',
+    subject: `NACK: message rejected at ${targetLane}`,
+    body: `Your message (task_id=${originalMsg.task_id || 'unknown'}, type=${originalMsg.type || 'unknown'}) was rejected.\nReason: ${rejectionReason}\nDetail: ${rejectionDetail || 'none'}\nOriginal subject: ${originalMsg.subject || 'unknown'}`,
+    timestamp: nowIso(),
+    requires_action: false,
+    payload: { mode: 'inline', compression: 'none' },
+    execution: { mode: 'manual', engine: 'kilo', actor: 'lane' },
+    lease: { owner: null, acquired_at: null },
+    retry: { attempt: 1, max_attempts: 1 },
+    evidence: { required: false, verified: false },
+    evidence_exchange: {},
+    heartbeat: { status: 'done', last_heartbeat_at: nowIso() },
+    nack_for_task_id: originalMsg.task_id || null,
+    nack_reason: rejectionReason,
+    nack_detail: rejectionDetail || null,
+    exempt_from_nack: true,
+  };
+  const signFn = getCreateSignedMessage();
+  const nackLane = String(targetLane || 'unknown').toLowerCase();
+  let finalMsg = nackMsg;
+  if (signFn) {
+    try {
+      finalMsg = signFn(nackMsg, nackLane);
+    } catch (e) {
+      process.stderr.write(`[lane-worker] NACK signing failed for ${nackLane}: ${e.message}, writing unsigned\n`);
+    }
+  }
+  const nackPath = path.join(senderInbox, `nack-${nackMsg.task_id}.json`);
+  fs.writeFileSync(nackPath, JSON.stringify(finalMsg, null, 2), 'utf8');
     return nackPath;
   } catch (err) {
     process.stderr.write(`[lane-worker] NACK delivery failed: ${err.message}\n`);
@@ -561,12 +585,13 @@ class LaneWorker {
       return { queue: 'quarantine', reason: 'FORMAT_VIOLATION_NON_ASCII', detail: 'Message contains non-ASCII content. Re-request in English per governance constraint.' };
     }
 
-    if (typeof msg.body === 'string') {
-      var prov = verifyOutputProvenance(msg.body);
-      if (!prov.ok) {
-        return { queue: 'blocked', reason: 'OUTPUT_PROVENANCE_MISSING', detail: 'body lacks OUTPUT_PROVENANCE header. Missing: ' + prov.missing.join(', ') + '. All agent output must include OUTPUT_PROVENANCE:, agent:, lane:, target:.' };
-      }
+  const OUTPUT_PROV_EXEMPT_TYPES = new Set(['task', 'escalation', 'request']);
+  if (typeof msg.body === 'string' && !OUTPUT_PROV_EXEMPT_TYPES.has(String(msg.type || '').toLowerCase()) && !isActionable(msg) && cp.hasCompletionProof(msg)) {
+    var prov = verifyOutputProvenance(msg.body);
+    if (!prov.ok) {
+      return { queue: 'blocked', reason: 'OUTPUT_PROVENANCE_MISSING', detail: 'body lacks OUTPUT_PROVENANCE header. Missing: ' + prov.missing.join(', ') + '. All agent output must include OUTPUT_PROVENANCE:, agent:, lane:, target:.' };
     }
+  }
 
   // NFM-022 fix: skip hasUnresolvableEvidence for actionable tasks
   // A new task (requires_action=true) hasn't been executed yet, so
