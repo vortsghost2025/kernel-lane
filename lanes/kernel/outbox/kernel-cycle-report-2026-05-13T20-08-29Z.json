@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.3",
+  "task_id": "kernel-cycle-report-2026-05-13T20-08-29Z",
+  "idempotency_key": "kernel-cycle-2026-05-13T20-08-29Z",
+  "from": "kernel",
+  "to": "kernel",
+  "type": "status",
+  "task_kind": "report",
+  "priority": "P3",
+  "subject": "Kernel cycle: created missing canonical-trust-resolver.js, fixed identity-self-healing.js platform paths, resolved blocked inbox item",
+  "body": "OUTPUT_PROVENANCE:\nagent: kilo/z-ai/glm-5.1\nmodel_id: nvidia/z-ai/glm-5.1\nlane: kernel\ntarget: canonical-trust-resolver-fix-2026-05-13T20-08-29Z\ngenerated_at: 2026-05-13T20:08:29Z\nsession_id: kernel-cycle-2026-05-13T20-08-29Z\nplatform: linux\nhost: /home/we4free/agent/repos/kernel-lane\n\n## Kernel Lane Cycle Report\n\n### Role: DEBUG_VERIFY_GUARDRAILS\n\n### Task Chosen\nFix broken identity-self-healing.js script: missing canonical-trust-resolver.js dependency + hardcoded Windows paths on Linux host.\n\n### State Summary\n- Active Blocker: None\n- Inbox: action-required=0, in-progress=0, blocked=0 (moved resolved item to processed), quarantine=7\n- Working Tree: Clean (auto-commit picked up changes)\n- Active Chains: None\n- Lane Health: System consistent, 0 contradictions\n\n### Actions Taken\n1. Created scripts/canonical-trust-resolver.js — implements getAllBroadcastTrustStorePaths, getLaneRoots, computeKeyIdFromPem with platform-aware path resolution (Linux + Windows).\n2. Fixed scripts/identity-self-healing.js — replaced hardcoded S:/ paths with platform-conditional (IS_WIN32) path sets for both PASSFILE_SEARCH and LANE_IDENTITY_DIRS.\n3. Moved lanes/kernel/inbox/blocked/kernel-key-id-mismatch-20260513.json to processed/ — key_id mismatch was already resolved in prior cycle (snapshot.json key_id 2effb49ea02dff5b matches trust-store).\n4. All changes committed and pushed via auto-commit housekeeping cycles 20260513-195116 and 20260513-195525.\n\n### Commands Run\n1. git status / git log — clean tree, remote up to date\n2. Read inbox, state, broadcast files — no P0/P1 items, no active blocker\n3. node scripts/recovery-test-suite.js — 10/10 PASS\n4. node scripts/sovereignty-enforcer.js — ALL LANES SOVEREIGN\n5. node scripts/cross-lane-sync-gate.js — overall_ok: true\n6. node scripts/identity-self-healing.js kernel — keysPresent=true, keyId=2effb49ea02dff5b (was failing with MODULE_NOT_FOUND before fix)\n7. Verified key_id alignment: trust-store=2effb49ea02dff5b, snapshot=2effb49ea02dff5b — MATCH\n\n### Test Results\n- Recovery test suite: 10/10 PASS\n- Sovereignty enforcer: ALL LANES SOVEREIGN\n- Cross-lane sync gate: overall_ok=true\n- Identity self-healing: WORKING (was broken)\n\n### Sovereignty Status\n- 0 violations across 4 lanes\n\n### Blockers\n- None\n\n### Next Recommended Task\n- Health observation cycle unless new inbox items arrive\n- Consider fixing sign-and-write.js which also has hardcoded Windows .global path (S:/kernel-lane/.global/deriveKeyId.js)",
+  "timestamp": "2026-05-13T20:08:29Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none",
+    "path": null,
+    "chunk": {
+      "index": 0,
+      "count": 1,
+      "group_id": null
+    }
+  },
+  "execution": {
+    "mode": "session_task",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": "kernel-cycle-2026-05-13T20-08-29Z",
+    "parent_id": null
+  },
+  "lease": {
+    "owner": null,
+    "acquired_at": null,
+    "expires_at": null,
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "scripts/canonical-trust-resolver.js",
+    "verified": true,
+    "verified_by": "self",
+    "verified_at": "2026-05-13T20:08:29Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": "2026-05-13T20:08:29Z",
+    "timeout_seconds": 900,
+    "status": "done"
+  },
+  "convergence_gate": {
+    "claim": "Created missing canonical-trust-resolver.js module and fixed identity-self-healing.js platform paths; both changes verified by running the previously-broken script successfully.",
+    "evidence": "scripts/canonical-trust-resolver.js",
+    "verified_by": "self",
+    "contradictions": [],
+    "status": "proven"
+  },
+  "OUTPUT_PROVENANCE": {
+    "agent": "kilo/z-ai/glm-5.1",
+    "model_id": "nvidia/z-ai/glm-5.1",
+    "lane": "kernel",
+    "target": "canonical-trust-resolver-fix-2026-05-13T20-08-29Z",
+    "generated_at": "2026-05-13T20:08:29Z",
+    "session_id": "kernel-cycle-2026-05-13T20-08-29Z",
+    "platform": "linux",
+    "host": "/home/we4free/agent/repos/kernel-lane"
+  },
+  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjJlZmZiNDllYTAyZGZmNWIifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6NDgxMTQ2NGUwZDU3NjY3MmFjYzUwNjhlNWUyMGUxYzY3MDJiZWU1ZTgwNWJkOTU0MDA1NTdhMTljYzA1NmI3OSIsImV4cCI6MTc3ODc4OTY2MCwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3ODcwMzI2MCwiaWQiOiJrZXJuZWwtY3ljbGUtcmVwb3J0LTIwMjYtMDUtMTNUMjAtMDgtMjlaIiwibGFuZSI6Imtlcm5lbCIsInByaW9yaXR5IjoiUDMiLCJ0YXNrX2lkIjoia2VybmVsLWN5Y2xlLXJlcG9ydC0yMDI2LTA1LTEzVDIwLTA4LTI5WiIsInRvIjoia2VybmVsIn0.JInMA-HIn6PGJLwOOl5ADVnbm2160cXTpNW8gJHzxuVu6bcUoPaLaY2_GgFgK6_FVZC1_nTJJGad2XhvKXIiCA",
+  "signature_alg": "EdDSA",
+  "key_id": "2effb49ea02dff5b",
+  "content_hash": "sha256:4811464e0d576672acc5068e5e20e1c6702bee5e805bd95400557a19cc056b79"
+}
