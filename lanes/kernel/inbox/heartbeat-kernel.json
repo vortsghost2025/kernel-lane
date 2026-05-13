@@ -8,8 +8,8 @@
   "task_kind": "heartbeat",
   "priority": "P3",
   "subject": "Heartbeat from kernel lane",
-  "body": "{\"lane\":\"kernel\",\"agent_mode\":\"governing\",\"session_active\":true,\"uptime_seconds\":112666,\"messages_processed\":0,\"last_inbox_scan\":\"2026-05-13T21:11:18.866Z\",\"version\":\"1.3\",\"identity_status\":\"ratified\"}",
-  "timestamp": "2026-05-13T21:11:18.866Z",
+  "body": "{\"lane\":\"kernel\",\"agent_mode\":\"governing\",\"session_active\":true,\"uptime_seconds\":112906,\"messages_processed\":0,\"last_inbox_scan\":\"2026-05-13T21:15:19.106Z\",\"version\":\"1.3\",\"identity_status\":\"ratified\"}",
+  "timestamp": "2026-05-13T21:15:19.106Z",
   "requires_action": false,
   "payload": {
     "mode": "inline",
@@ -42,7 +42,7 @@
   },
   "heartbeat": {
     "interval_seconds": 60,
-    "last_heartbeat_at": "2026-05-13T21:11:18.866Z",
+    "last_heartbeat_at": "2026-05-13T21:15:19.106Z",
     "timeout_seconds": 900,
     "status": "in_progress"
   },
@@ -52,8 +52,8 @@
   "compaction_enabled": true,
   "compaction_suspend_reason": null,
   "id": "heartbeat-kernel",
-  "content_hash": "sha256:9e25c8320bc7ec68dbdee885cd2fd1814f53947da75bd9155bd980cb7e3bfe4e",
-  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjJlZmZiNDllYTAyZGZmNWIifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6OWUyNWM4MzIwYmM3ZWM2OGRiZGVlODg1Y2QyZmQxODE0ZjUzOTQ3ZGE3NWJkOTE1NWJkOTgwY2I3ZTNiZmU0ZSIsImV4cCI6MTc3ODc5MzA3OCwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3ODcwNjY3OCwiaWQiOiJoZWFydGJlYXQta2VybmVsIiwibGFuZSI6Imtlcm5lbCIsInByaW9yaXR5IjoiUDMiLCJ0YXNrX2lkIjoiaGVhcnRiZWF0LWtlcm5lbCIsInRvIjoia2VybmVsIn0.4_fplRZmQH8CrFqjVN2cmkVuYLBYVHNZETDAHYUhpJGrIdggYMD_vsceVgFRx9gF_BQXLlIYY0Dk586b5eIqAw",
+  "content_hash": "sha256:7c060bde451ae0a178df431bf894e855ade50659fcf2881a89113c8b78fb907e",
+  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjJlZmZiNDllYTAyZGZmNWIifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6N2MwNjBiZGU0NTFhZTBhMTc4ZGY0MzFiZjg5NGU4NTVhZGU1MDY1OWZjZjI4ODFhODkxMTNjOGI3OGZiOTA3ZSIsImV4cCI6MTc3ODc5MzMxOSwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3ODcwNjkxOSwiaWQiOiJoZWFydGJlYXQta2VybmVsIiwibGFuZSI6Imtlcm5lbCIsInByaW9yaXR5IjoiUDMiLCJ0YXNrX2lkIjoiaGVhcnRiZWF0LWtlcm5lbCIsInRvIjoia2VybmVsIn0.pYWVQXygBJs6CnLc6QLEQq6k9i_ZFUAqHUvzjDvHwIpXQSOZ_D9us8Reb371wf4djk008AQ90Z2ofQP_LJ_YAA",
   "signature_alg": "EdDSA",
   "key_id": "2effb49ea02dff5b",
   "session_identity": {
