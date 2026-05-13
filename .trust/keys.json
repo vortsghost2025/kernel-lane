@@ -1,7 +1,7 @@
 {
   "lane_id": "kernel",
-  "key_id": "4ac54d4100323c71",
-  "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkX8AvxiM/PhnI1HaejXj\nJ9eHH6V0NL62mXxv17EKdWBO3kESlSwOpgYPqyewzExY9HYnIBfDMHhLuN1+yIp/\npFLsjp99kutsP7LppshsjtnLRyeQ1TtGgKNWBn/wOfUXImj8yrHFAL1mt7RGChZA\nLjxlJdjfpSB17+u3Corz+3ZFvGsURHvcUnlAEZp2bKsaluP4mstQL3JqD5f5cBMI\nmnG+tJHyvMvgZVGClLvZzZg0AWFpYpnGpt25pj7SXjbZPbUTe1/Ll2waBvQaooYA\nyBzkaU8JbDFAVUugdJp7+sCUhCZed7nhR83DL+GbLqA+zHQ0iVoFqWpcCkZpZVm1\nhQIDAQAB\n-----END PUBLIC KEY-----\n",
-  "algorithm": "RS256",
-  "note": "Fresh RSA 2048 keypair generated on Windows 2026-05-10. Supersedes Ubuntu-headless key d475d23aeed6c7b8 (private key unavailable on this machine)."
+  "key_id": "2effb49ea02dff5b",
+  "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEADf1gv/zNKaVskjPiIdzoyL6OBrmJRH+HHzSoRTjFEi8=\n-----END PUBLIC KEY-----\n",
+  "algorithm": "EdDSA",
+  "note": "Ed25519 key post-rotation 2026-05-11. Aligned with trust-store.json canonical key_id 2effb49ea02dff5b. Previous RSA key 4ac54d4100323c71 archived in trust-store."
 }

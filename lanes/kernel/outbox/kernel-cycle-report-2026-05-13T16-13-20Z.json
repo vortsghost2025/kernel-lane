@@ -83,7 +83,7 @@
   },
   "id": "kernel-cycle-report-2026-05-13T16-13-20Z",
   "content_hash": "sha256:9da9dddf40553261e1899c2c780ce27c545ef8cabdaa713640b3daa371e205d6",
-  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjJlZmZiNDllYTAyZGZmNWIifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6OWRhOWRkZGY0MDU1MzI2MWUxODk5YzJjNzgwY2UyN2M1NDVlZjhjYWJkYWE3MTM2NDBiM2RhYTM3MWUyMDVkNiIsImV4cCI6MTc3ODc3NTM3NiwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3ODY4ODk3NiwiaWQiOiJrZXJuZWwtY3ljbGUtcmVwb3J0LTIwMjYtMDUtMTNUMTYtMTMtMjBaIiwibGFuZSI6Imtlcm5lbCIsInByaW9yaXR5IjoiUDMiLCJ0YXNrX2lkIjoia2VybmVsLWN5Y2xlLXJlcG9ydC0yMDI2LTA1LTEzVDE2LTEzLTIwWiIsInRvIjoia2VybmVsIn0.89eZv6zII6N5X-RiditaGwHZoRUn1Gagv0EjvQjQ-xU6G_Nvi6ACTKJGaqd6BkaX3kTWkh_w3IPJOqZKfFWBAg",
+  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjJlZmZiNDllYTAyZGZmNWIifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6OWRhOWRkZGY0MDU1MzI2MWUxODk5YzJjNzgwY2UyN2M1NDVlZjhjYWJkYWE3MTM2NDBiM2RhYTM3MWUyMDVkNiIsImV4cCI6MTc3ODc4NDUwMiwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3ODY5ODEwMiwiaWQiOiJrZXJuZWwtY3ljbGUtcmVwb3J0LTIwMjYtMDUtMTNUMTYtMTMtMjBaIiwibGFuZSI6Imtlcm5lbCIsInByaW9yaXR5IjoiUDMiLCJ0YXNrX2lkIjoia2VybmVsLWN5Y2xlLXJlcG9ydC0yMDI2LTA1LTEzVDE2LTEzLTIwWiIsInRvIjoia2VybmVsIn0.1aNl4RmI7p_ZwmgY5Pq7fGQUYqSUxoJz6WRVtP-1yCt17VbTySr5H2igsVXhleSzFnPTZ2BZmau6f9ujUIPDCQ",
   "signature_alg": "EdDSA",
   "key_id": "2effb49ea02dff5b",
   "session_identity": {
@@ -91,5 +91,6 @@
     "session_epoch_started_at": "2026-05-13T16:16:16.906Z",
     "origin_runtime": "opencode",
     "origin_workspace": "/home/we4free/agent/repos/kernel-lane"
-  }
+  },
+  "signature_ref": "kernel-cycle-report-2026-05-13T16-13-20Z.jws"
 }
