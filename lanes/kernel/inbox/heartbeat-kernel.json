@@ -8,8 +8,8 @@
   "task_kind": "heartbeat",
   "priority": "P3",
   "subject": "Heartbeat from kernel lane",
-  "body": "{\"lane\":\"kernel\",\"agent_mode\":\"governing\",\"session_active\":true,\"uptime_seconds\":58615,\"messages_processed\":0,\"last_inbox_scan\":\"2026-05-13T06:10:27.734Z\",\"version\":\"1.3\",\"identity_status\":\"ratified\"}",
-  "timestamp": "2026-05-13T06:10:27.734Z",
+  "body": "{\"lane\":\"kernel\",\"agent_mode\":\"governing\",\"session_active\":true,\"uptime_seconds\":0,\"messages_processed\":0,\"last_inbox_scan\":\"2026-05-13T06:15:02.128Z\",\"version\":\"1.3\",\"identity_status\":\"ratified\"}",
+  "timestamp": "2026-05-13T06:15:02.128Z",
   "requires_action": false,
   "payload": {
     "mode": "inline",
@@ -42,7 +42,7 @@
   },
   "heartbeat": {
     "interval_seconds": 60,
-    "last_heartbeat_at": "2026-05-13T06:10:27.734Z",
+    "last_heartbeat_at": "2026-05-13T06:15:02.128Z",
     "timeout_seconds": 900,
     "status": "in_progress"
   },
@@ -52,15 +52,15 @@
   "compaction_enabled": true,
   "compaction_suspend_reason": null,
   "id": "heartbeat-kernel",
-  "content_hash": "sha256:27b88bbb67845b6312b93a6fbabc809b06af1164caa3cc30690fa5215ef2b59c",
-  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjJlZmZiNDllYTAyZGZmNWIifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MjdiODhiYmI2Nzg0NWI2MzEyYjkzYTZmYmFiYzgwOWIwNmFmMTE2NGNhYTNjYzMwNjkwZmE1MjE1ZWYyYjU5YyIsImV4cCI6MTc3ODczOTAyNywiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3ODY1MjYyNywiaWQiOiJoZWFydGJlYXQta2VybmVsIiwibGFuZSI6Imtlcm5lbCIsInByaW9yaXR5IjoiUDMiLCJ0YXNrX2lkIjoiaGVhcnRiZWF0LWtlcm5lbCIsInRvIjoia2VybmVsIn0.1h1WrFnbItU9lNgz-F0pPtU6RoJVwCKUh-FwgG8E4q2UwIbyNFEW_SRhypp9yDw-c_84yZDjpLwcv17a4HfLAQ",
+  "content_hash": "sha256:130b4d63643ecd0da5a99722a69cd92a92a427ae29d3800fedb559d0e86877d7",
+  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjJlZmZiNDllYTAyZGZmNWIifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MTMwYjRkNjM2NDNlY2QwZGE1YTk5NzIyYTY5Y2Q5MmE5MmE0MjdhZTI5ZDM4MDBmZWRiNTU5ZDBlODY4NzdkNyIsImV4cCI6MTc3ODczOTMwMiwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3ODY1MjkwMiwiaWQiOiJoZWFydGJlYXQta2VybmVsIiwibGFuZSI6Imtlcm5lbCIsInByaW9yaXR5IjoiUDMiLCJ0YXNrX2lkIjoiaGVhcnRiZWF0LWtlcm5lbCIsInRvIjoia2VybmVsIn0.g_MXlJb5ws6JS5iVKSMaDPury1UNCaNSqoWyVNz5tzZcTZ3aYgGWB1IKhX_jeI0-U_PmXBSzuPICp-igP-CVDg",
   "signature_alg": "EdDSA",
   "key_id": "2effb49ea02dff5b",
   "session_identity": {
-    "session_id": "sess-1778594012203-cca88f44",
-    "session_epoch_started_at": "2026-05-12T13:53:32.204Z",
+    "session_id": "sess-1778652902113-14b687bc",
+    "session_epoch_started_at": "2026-05-13T06:15:02.114Z",
     "origin_runtime": "opencode",
-    "origin_workspace": "/home/we4free/agent/repos/kernel-lane"
+    "origin_workspace": "/home/we4free"
   },
   "identity_status": "ratified"
 }
