@@ -42,7 +42,7 @@
     "last_heartbeat_at": "2026-05-07T18:25:00Z",
     "status": "active"
   },
-  "signature": "eyJ1bmludmVyaWZpZWQifQ.eyJmcm9tIjoiYXJjaGl2aXN0IiwidGFza19pZCI6Imtlcm5lbC1oYi1maXgtMjAyNjA1MDcifQ.unsigned",
+  "signature": "REF:2026-05-07T18-25_archivist_kernel-hb-fix.lane-worker-2026-05-07T21-24-03-476Z.jws",
   "signature_alg": "RS256",
   "key_id": "506c2d0838b6862c",
   "execution_verified": false,
@@ -82,5 +82,6 @@
       "generated_at": "2026-05-07T21:24:03.476Z",
       "session_id": "sess_movu7ge4_2503778"
     }
-  }
+  },
+  "signature_ref": "2026-05-07T18-25_archivist_kernel-hb-fix.lane-worker-2026-05-07T21-24-03-476Z.jws"
 }

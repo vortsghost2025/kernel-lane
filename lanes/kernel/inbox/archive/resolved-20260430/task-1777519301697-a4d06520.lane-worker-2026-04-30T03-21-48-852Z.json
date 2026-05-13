@@ -44,7 +44,7 @@
     "timeout_seconds": 3600
   },
   "content_hash": "sha256:f4acc3d5937a11f96557f60232638631368e38e97ba0a612a27cf09b6b977abe",
-  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6ZjRhY2MzZDU5MzdhMTFmOTY1NTdmNjAyMzI2Mzg2MzEzNjhlMzhlOTdiYTBhNjEyYTI3Y2YwOWI2Yjk3N2FiZSIsImV4cCI6MTc3NzYwNTcwMSwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzUxOTMwMSwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6InRhc2stMTc3NzUxOTMwMTY5Ny1hNGQwNjUyMCIsInRvIjoia2VybmVsIn0.Pp6VEPDIIXn_SuDnjL88nfqorqYhTlHZuzZykHIqSmpwJUFhW2rd6DEt3KXvhE9Jk4-hoF__WlPefJ3NL9tX1k1LcTRIIL51hZ3iCYbBVersvYcrx8fzoRv5xRQ9neppwuJGsSVbL8e1gjibRfuHZVV7_tQNcgDqEHcGS1ghm-W0A8wTCxXowo0Os99a15yOL2JDNY-Csmk4TT4l6mjmoSpR8yyI55tlZ3kwMiaAGPE5OHege3W4CDhVNyE6O2OJBpyYP1iGT_DZGpfBCCxItcUeeXpq2Qao_R71fHykRIRIS3VWgAdORyT5uLeWc-Hgp5U_AXA6iEhDSxmKKBYbqw",
+  "signature": "REF:task-1777519301697-a4d06520.lane-worker-2026-04-30T03-21-48-852Z.jws",
   "signature_alg": "RS256",
   "key_id": "65ae05b2a9e749cb",
   "session_identity": {
@@ -93,5 +93,6 @@
       "generated_at": "2026-04-30T03:21:48.853Z",
       "session_id": "sess_mokx3okq_64076"
     }
-  }
+  },
+  "signature_ref": "task-1777519301697-a4d06520.lane-worker-2026-04-30T03-21-48-852Z.jws"
 }

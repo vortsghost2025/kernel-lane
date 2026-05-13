@@ -44,7 +44,7 @@
     "timeout_seconds": 900
   },
   "content_hash": "sha256:2900756544f1a9d5f666231869345727feb7461e93e59aacc913e1fdce95fbbb",
-  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MjkwMDc1NjU0NGYxYTlkNWY2NjYyMzE4NjkzNDU3MjdmZWI3NDYxZTkzZTU5YWFjYzkxM2UxZmRjZTk1ZmJiYiIsImV4cCI6MTc3NzQ4Nzk0OSwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzQwMTU0OSwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6ImFjay1yZXBhaXIta2VybmVsLXN5c3RlbS1jb2RlLXJldmlldy0yMDI2MDQyOC0xNzc3NDAxNTQ5MTUzLWZmZTM3MyIsInRvIjoia2VybmVsIn0.iU4fXp1rKBhBnE3qgvRsJXxMrwlfxXJuxFb1t-tU4PY-FmHNzs4BHjo1k295gMwH4e6qy0I00GZCGtR8JGM4lqrolvAiSlCDL3lnhczwDHMAHNHciHL7k6McQAv9WH6kRAmww_MYc0umMlM6mUJP2CVyEJmwMHL2xCcPej0omOMS456oD4gWj7umFqdhAN09od7Qb7_m9iFC8mDmH7F7KLpSCQ1ajd9_gJt1zqOpTW9WHQ5plq_xJ0ENGYPmIYQ2uhjKE8W5PDvzvessAxP4EC-ltVrXRs_1E1iSKsqItiUHeIxrvkVg5fEuUJCk3bYrawMIrLs_PIUVjqu4sOZxdw",
+  "signature": "REF:ack-repair-kernel-system-code-review-20260428-1777401549153-ffe373.jws",
   "signature_alg": "RS256",
   "key_id": "65ae05b2a9e749cb",
   "session_identity": {
@@ -87,5 +87,6 @@
       "origin_runtime": "opencode",
       "origin_workspace": "S:\\kernel-lane"
     }
-  }
+  },
+  "signature_ref": "ack-repair-kernel-system-code-review-20260428-1777401549153-ffe373.jws"
 }

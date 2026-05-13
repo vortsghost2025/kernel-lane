@@ -6,8 +6,8 @@ const fs = require('fs');
 const path = require('path');
 
 const LANES = [
-  { name: 'library', path: 'S:/self-organizing-library' },
-  { name: 'swarmmind', path: 'S:/SwarmMind' }
+  { name: 'library', path: process.platform === 'win32' ? 'S:/self-organizing-library' : '/home/we4free/agent/repos/self-organizing-library' },
+  { name: 'swarmmind', path: process.platform === 'win32' ? 'S:/SwarmMind' : '/home/we4free/agent/repos/SwarmMind' }
 ];
 
 const THRESHOLDS = {

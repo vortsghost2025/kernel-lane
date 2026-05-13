@@ -15,7 +15,11 @@
     "mode": "inline",
     "compression": "none",
     "path": null,
-    "chunk": { "index": 0, "count": 1, "group_id": null }
+    "chunk": {
+      "index": 0,
+      "count": 1,
+      "group_id": null
+    }
   },
   "execution": {
     "mode": "session_task",
@@ -57,13 +61,18 @@
     "max_concurrent": 1,
     "heartbeat_required": true,
     "stale_after_seconds": 300,
-    "backoff": { "initial_seconds": 60, "max_seconds": 300, "multiplier": 2 }
+    "backoff": {
+      "initial_seconds": 60,
+      "max_seconds": 300,
+      "multiplier": 2
+    }
   },
   "delivery_verification": {
     "verified": false,
     "verified_at": null,
     "retries": 0
   },
-  "signature": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEyN2I0NGQyYmIyOTRhZDkifQ.eyJpYXQiOjE3Nzc5MzEwMDAsImxhbmUiOiJrZXJuZWwiLCJ0YXNrIjoia2V5LWlkLXJlY29uY2lsaWF0aW9uIn0.cGxhY2Vob2xkZXIta2VybmVsLXNpZ25hdHVyZQ",
-  "key_id": "127b44d2bb294ad9"
+  "signature": "REF:kernel-key-id-reconciliation-report-20260504.jws",
+  "key_id": "127b44d2bb294ad9",
+  "signature_ref": "kernel-key-id-reconciliation-report-20260504.jws"
 }

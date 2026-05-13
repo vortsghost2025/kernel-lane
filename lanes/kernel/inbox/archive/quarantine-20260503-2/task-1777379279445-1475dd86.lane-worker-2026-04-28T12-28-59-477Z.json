@@ -44,7 +44,7 @@
     "timeout_seconds": 3600
   },
   "content_hash": "sha256:8265510ab6987cb2a17e7625660feac253c61454cbb91fe941492ae56cc61d99",
-  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6ODI2NTUxMGFiNjk4N2NiMmExN2U3NjI1NjYwZmVhYzI1M2M2MTQ1NGNiYjkxZmU5NDE0OTJhZTU2Y2M2MWQ5OSIsImV4cCI6MTc3NzQ2NTY3OSwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzM3OTI3OSwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6InRhc2stMTc3NzM3OTI3OTQ0NS0xNDc1ZGQ4NiIsInRvIjoia2VybmVsIn0.XkCpPKZHj45-2EJL2N-JzF34mcQxgR5CILl_LFhRh9RAzP61HHmCX7Bg1ZxZgoggra7ywAKY9WQ0-m3zGOzJ0pfnAfSwiz2jhx0QT74V2QNjsac-XyT9PEnQCdLYYpbyHM6ErRCl_efZIC3fB0636WHHXl75w0RU2JP8SYe6HnrIHWkpy3FptXYhOVMPiQ5bz9N4JvP1O_2UUc1noCp3NdocpZzCOkhW_r7szZ5O8xZTvau5ui4PCWjLu7HCYe7ZzeWkPsubdo37yYoAyFWEPWR3a0AHAeyWh-TWumdJ9XZW-808KS8jeFyOu9HV5ZjVCPfgBu0RuEtojBgtlLJpww",
+  "signature": "REF:task-1777379279445-1475dd86.lane-worker-2026-04-28T12-28-59-477Z.jws",
   "signature_alg": "RS256",
   "key_id": "65ae05b2a9e749cb",
   "session_identity": {
@@ -87,5 +87,6 @@
       "origin_runtime": "opencode",
       "origin_workspace": "S:\\kernel-lane"
     }
-  }
+  },
+  "signature_ref": "task-1777379279445-1475dd86.lane-worker-2026-04-28T12-28-59-477Z.jws"
 }

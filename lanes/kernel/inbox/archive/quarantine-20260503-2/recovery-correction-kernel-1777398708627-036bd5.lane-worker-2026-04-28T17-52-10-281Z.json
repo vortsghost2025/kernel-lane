@@ -44,7 +44,7 @@
     "timeout_seconds": 900
   },
   "content_hash": "sha256:bbbac690a465d1ca664f7ab8b60a7b85cb47c085223bb0557b5a19a04efa71e2",
-  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6YmJiYWM2OTBhNDY1ZDFjYTY2NGY3YWI4YjYwYTdiODVjYjQ3YzA4NTIyM2JiMDU1N2I1YTE5YTA0ZWZhNzFlMiIsImV4cCI6MTc3NzQ4NTEwOCwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzM5ODcwOCwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6InJlY292ZXJ5LWNvcnJlY3Rpb24ta2VybmVsLTE3NzczOTg3MDg2MjctMDM2YmQ1IiwidG8iOiJrZXJuZWwifQ.KPFvy93UHvoH_DCE_vIiMNm7zDX230tGlyEldN5mJzjjeDRTalGY3CkrcOVW25so8JzCIhttDB0l31mTwXtX6HOCXxg1tXASsW1dAa0BlFCh26nrtv2jov6GfThJgYBmWc3x_rWDsXleV7vNLqpSdZvvIZ7JZ2UhNT5Ws1gvyC_EgW2oqeVYjAj_3MRLF-4loVIq_qnVEtUIbqDDQiVzxntoiOjRVrOR7hdF0LWWpfJ0uTjTBLVXXnZ4pyQjzvyRRBf8PhwTVZ5xDT4mrYbZ-nFJxvJ8ngp2JMThadPlbrlLFss5Zr-EBrVb84ay5BZNP_vzfW8956jifoVwV58HyA",
+  "signature": "REF:recovery-correction-kernel-1777398708627-036bd5.lane-worker-2026-04-28T17-52-10-281Z.jws",
   "signature_alg": "RS256",
   "key_id": "65ae05b2a9e749cb",
   "session_identity": {
@@ -87,5 +87,6 @@
       "origin_runtime": "opencode",
       "origin_workspace": "S:\\kernel-lane"
     }
-  }
+  },
+  "signature_ref": "recovery-correction-kernel-1777398708627-036bd5.lane-worker-2026-04-28T17-52-10-281Z.jws"
 }

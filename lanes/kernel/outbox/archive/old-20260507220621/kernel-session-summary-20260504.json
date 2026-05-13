@@ -15,7 +15,7 @@
   "timestamp": "2026-05-04T13:54:25Z",
   "key_id": "127b44d2bb294ad9",
   "idempotency_key": "kernel-summary-20260504",
-  "signature": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJrZXJuZWwiLCJpc3MiOiJrZXJuZWwtbGFuZSIsInRhc2tfaWQiOiJrZXJuZWwtc2Vzc2lvbi1zdW1tYXJ5LTIwMjYwNTA0In0.ratified",
+  "signature": "REF:kernel-session-summary-20260504.jws",
   "subject": "Kernel Lane: Session Summary + Hardening Complete + Cross-Lane Suggestions",
   "schema_version": "1.3",
   "to": "all",
@@ -48,5 +48,6 @@
   },
   "type": "task",
   "requires_action": false,
-  "task_kind": "report"
+  "task_kind": "report",
+  "signature_ref": "kernel-session-summary-20260504.jws"
 }

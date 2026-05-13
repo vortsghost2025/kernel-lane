@@ -44,7 +44,7 @@
     "timeout_seconds": 900
   },
   "content_hash": "sha256:57cf928ae2dfbce7d39f320b0bc6e51e7377ff7d8f676cf371d18fb91d4c1c84",
-  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6NTdjZjkyOGFlMmRmYmNlN2QzOWYzMjBiMGJjNmU1MWU3Mzc3ZmY3ZDhmNjc2Y2YzNzFkMThmYjkxZDRjMWM4NCIsImV4cCI6MTc3NzQ4MTI1NSwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzM5NDg1NSwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAyIiwidGFza19pZCI6ImxhbmUtYXV0b3BpbG90LXN1bW1hcnkta2VybmVsLTE3NzczOTQ4NTUyMTEtMzdjYjY4IiwidG8iOiJrZXJuZWwifQ.X37DkamJA2x2YDAfG_-ailpp6T9bCkJjHYDmO0QmMj3RZO-vP0lXyD70e2-qbi3FBR4RAnJSbq_7m0wFyLGPet-g5YaIt07XDEOEl2KJlLHheh_QNvxQa5CjKcu8WHHSlqHOld0kmDpdgvojDgbQJzm-e-NlH50cLQIY1u_rWIgZGwq4BCG6AIMx2w4XeQw6ieSotoS1TL6V3ITF_vRvrxDBlSbWEYsWXhPzOmDy7IuYajriM0SH9DLdNr21Py3HrKniPUOURyMswe25ixJwCTUZtPthmiijSUGdNDVEFddCoaNCbsZZ6uwal46OUgAY8yjeZkEidjF2-K4q0siMeA",
+  "signature": "REF:lane-autopilot-summary-kernel-1777394855211-37cb68.lane-worker-2026-04-28T16-48-26-430Z.jws",
   "signature_alg": "RS256",
   "key_id": "65ae05b2a9e749cb",
   "session_identity": {
@@ -87,5 +87,6 @@
       "origin_runtime": "opencode",
       "origin_workspace": "S:\\kernel-lane"
     }
-  }
+  },
+  "signature_ref": "lane-autopilot-summary-kernel-1777394855211-37cb68.lane-worker-2026-04-28T16-48-26-430Z.jws"
 }

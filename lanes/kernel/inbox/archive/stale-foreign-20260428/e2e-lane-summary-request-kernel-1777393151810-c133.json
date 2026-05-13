@@ -44,7 +44,7 @@
     "timeout_seconds": 900
   },
   "content_hash": "sha256:e460b377b5f8564d46cab359826df6ab7d0c265d825eb960d12c574b48ef3516",
-  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6ZTQ2MGIzNzdiNWY4NTY0ZDQ2Y2FiMzU5ODI2ZGY2YWI3ZDBjMjY1ZDgyNWViOTYwZDEyYzU3NGI0OGVmMzUxNiIsImV4cCI6MTc3NzQ3OTU1MSwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzM5MzE1MSwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6ImUyZS1sYW5lLXN1bW1hcnktcmVxdWVzdC1rZXJuZWwtMTc3NzM5MzE1MTgxMC1jMTMzIiwidG8iOiJrZXJuZWwifQ.MON7Il0tSQf7fldHojtke6Urx0f_GE_61bUE4k4LpzSllQP4mWDNasxyjD7pYNgglLTKy65RBw0uB-Aw8ARiJKWRWQVVxhuZJjw7DvMojuV08Htn0vgP3Ar2lNGZyEvL8gu0m1dza3LmySKTV2gEyhnoOoFgMl0SwlEZ3vM89V-Yl3HryGy7B25TxB6Jt7kIxV0sqQlcT52LxEUntcZ5XnC530RJpKa_Ie30-YXFH3C8fuEkHyKCPTrhbSFY5aHBqAFU6ex65vmNxqlexGLuXBqqVeKrqkPhHk5GffwSRHGqWzNaTvy-zJSJzcQKQLHnWgWGwZlf5-mLuTvuvKOzeQ",
+  "signature": "REF:e2e-lane-summary-request-kernel-1777393151810-c133.jws",
   "signature_alg": "RS256",
   "key_id": "65ae05b2a9e749cb",
   "session_identity": {
@@ -87,5 +87,6 @@
       "origin_runtime": "opencode",
       "origin_workspace": "S:\\kernel-lane"
     }
-  }
+  },
+  "signature_ref": "e2e-lane-summary-request-kernel-1777393151810-c133.jws"
 }

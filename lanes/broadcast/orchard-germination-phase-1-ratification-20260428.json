@@ -70,7 +70,7 @@
     "status": "converged"
   },
   "content_hash": "sha256:b83632fdae093a728e05d789716d223c9bf55b797b45eaee8f0049b371087689",
-  "signature": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjY1YWUwNWIyYTllNzQ5Y2IifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6YjgzNjMyZmRhZTA5M2E3MjhlMDVkNzg5NzE2ZDIyM2M5YmY1NWI3OTdiNDVlYWVlOGYwMDQ5YjM3MTA4NzY4OSIsImV4cCI6MTc3NzQ3MDUwNCwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3NzM4NDEwNCwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6ImV2b2x1dGlvbi1vcmNoYXJkLXBoYXNlLTEtcmF0aWZpY2F0aW9uIiwidG8iOiJicm9hZGNhc3QifQ.dez0D-8sY6L0spJ1LQBa_axMoo3okdQEemEFbWrE1Q0VYbIA_K7nKC_aszG2t-3DdZkmMj4OYInVYAKP4pmux-cxPI0rSNHlsTPJOlIVeQKHSSAYEuioSNzn50JYrHDXZZKjN7sHoCTzt7hRxcXS_5bXnzrOfMSql7jmGboRMf4H3P9cfGRReswkuG_WlpqHJ9WMOkxfZV4NcxLReUR1ORNQ7latgLX15FSlNpy5hew1tBQHMNSJdv5t0g_neofaZ-vVflqyV3yS2NM95qKXe9gO9xoKmh90k_emcCe__u5h-v8juwngQbZ0F0ik4EaCzLcsJ6sI4MsvWnpda0hnlQ",
+  "signature": "REF:orchard-germination-phase-1-ratification-20260428.jws",
   "signature_alg": "RS256",
   "key_id": "65ae05b2a9e749cb",
   "session_identity": {
@@ -78,5 +78,6 @@
     "session_epoch_started_at": "2026-04-28T13:48:24.903Z",
     "origin_runtime": "opencode",
     "origin_workspace": "S:\\Archivist-Agent"
-  }
+  },
+  "signature_ref": "orchard-germination-phase-1-ratification-20260428.jws"
 }
