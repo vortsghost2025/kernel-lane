@@ -1,7 +1,75 @@
+# GitGuardian configuration — kernel-lane
+# Suppresses false positives from lane protocol artifacts.
+# All EdDSA/JWS signatures, PEM public keys, hex idempotency keys,
+# and governance schemas are protocol artifacts, NOT secrets.
+
 version: 2
+
+# ── Lane relay messages ────────────────────────────────────────────────
+# Cross-lane messages (inbox/outbox) contain EdDSA JWT signatures
+# as part of the lane relay protocol (JWS RS256 / EdDSA).
+# These are NOT secrets — they are verifiable message signatures
+# embedded intentionally for authentication.
 paths-ignore:
-  -  lanes/*/inbox/*.json
-  - lanes/*/outbox/*.json
-  - lanes/broadcast/**/*.json
-  - lanes/kernel/state/*.json
-  - lanes/kernel/journal/*.json
+  - "lanes/*/inbox/**/*.json"
+  - "lanes/*/outbox/**/*.json"
+  - "lanes/broadcast/**/*.json"
+
+# ── Lane state files ───────────────────────────────────────────────────
+# State files contain hex task IDs, active-owner records, and
+# sovereignty reports with embedded signatures.
+  - "lanes/*/state/*.json"
+  - "lanes/archivist/state/*.json"
+  - "lanes/library/state/*.json"
+  - "lanes/swarmmind/state/*.json"
+  - "lanes/kernel/state/*.json"
+
+# ── Trust store (public keys only) ─────────────────────────────────────
+# trust-store.json contains Ed25519/RSA PUBLIC keys for all 4 lanes.
+# These are verification keys, NOT private keys. GitGuardian flags
+# the PEM blocks but they are all public keys.
+  - "lanes/broadcast/trust-store.json"
+
+# ── Global config ──────────────────────────────────────────────────────
+# agent-governance.json contains runtime assignments and enforcement
+# specs with hex identifiers that trigger detectors.
+  - ".global/agent-governance.json"
+
+# ── Trust directory ────────────────────────────────────────────────────
+# .trust/keys.json contains public key metadata and fingerprints.
+  - ".trust/keys.json"
+
+# ── Guard seals ────────────────────────────────────────────────────────
+# Seal files contain content hashes for integrity verification,
+# not secrets.
+  - ".guard-seals/*.json"
+
+# ── Evidence / graph snapshots ─────────────────────────────────────────
+# Evidence files contain analysis reports with hex identifiers,
+# key fingerprints, and protocol references.
+  - "evidence/**/*.json"
+
+# ── Governance documents ───────────────────────────────────────────────
+# Governance JSON files contain JWS signatures, key fingerprints,
+# and hex-encoded identifiers that trigger detectors.
+  - "governance/**/*.json"
+
+# ── Schemas ────────────────────────────────────────────────────────────
+# Schema files contain example JWT/JWS structures for documentation.
+  - "schemas/**/*.json"
+
+# ── Reports ────────────────────────────────────────────────────────────
+# Trust consistency reports contain hex key IDs and fingerprints.
+  - "reports/**/*.json"
+
+# ── Kernel cycle reports ───────────────────────────────────────────────
+# Cycle reports auto-generated every ~5 min contain hex task IDs.
+  - "kernel/evidence/**/*.json"
+
+# ── Logs ───────────────────────────────────────────────────────────────
+# Audit logs may reference file paths that look like hex secrets.
+  - "logs/*.json"
+
+# ── Heartbeat files ────────────────────────────────────────────────────
+# Heartbeats contain hex idempotency keys that trigger detectors.
+  - "lanes/*/inbox/heartbeat-*.json"

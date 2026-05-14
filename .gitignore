@@ -112,3 +112,6 @@ JOURNAL_SESSION_ID
 lanes/broadcast/hygiene/
 lanes/broadcast/operator_alert_*.json
 lanes/broadcast/quarantine/
+
+# Backup directories (timestamped)
+backup_*/
