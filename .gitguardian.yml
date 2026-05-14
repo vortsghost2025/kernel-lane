@@ -1,12 +1,7 @@
-# GitGuardian configuration
-# Suppress false positives from lane-to-lane message authentication JWTs
-# These are EdDSA-signed internal message tokens, not external secrets.
-# See: docs/ops/LANE_MESSAGE_INDEX.md
-
+version: 2
 paths-ignore:
-  - "lanes/**/*.json"
-  - ".env.example"
-  - "**/state/*.json"
-  - "**/journal/*.jsonl"
-  - "**/inbox/**"
-  - "**/outbox/**"
+  -  lanes/*/inbox/*.json
+  - lanes/*/outbox/*.json
+  - lanes/broadcast/**/*.json
+  - lanes/kernel/state/*.json
+  - lanes/kernel/journal/*.json
