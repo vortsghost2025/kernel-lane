@@ -4,9 +4,9 @@
 # See: docs/ops/LANE_MESSAGE_INDEX.md
 
 paths-ignore:
-  - 'lanes/**/*.json'
-  - '.env.example'
-  - '**/state/*.json'
-  - '**/journal/*.jsonl'
-  - '**/inbox/**'
-  - '**/outbox/**'
+  - "lanes/**/*.json"
+  - ".env.example"
+  - "**/state/*.json"
+  - "**/journal/*.jsonl"
+  - "**/inbox/**"
+  - "**/outbox/**"
