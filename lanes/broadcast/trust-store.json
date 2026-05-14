@@ -10,10 +10,10 @@
   },
   "library": {
     "lane_id": "library",
-    "key_id": "42e853d4ec37955d",
-    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAw9w42sDe8qPJ1LKRsFcQ+2/ptA/N+grOA3TGz+xQPpU=\n-----END PUBLIC KEY-----",
-    "algorithm": "EdDSA",
-    "registered_at": "2026-05-11T04:43:13.806Z",
+    "key_id": "4c04aa9176b68810",
+    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6fGepJezFqv3WPhKY0AR\nGgjiedbmLF0fZG5xVADoUZ5bA3n13QkgVN8ownF3ZuO7bBnndRsCLDcffGEytdVM\n+mXiDUyQEwGIU9YIQq2cwP0lzfnePxmb/9Gw9HhAHNbbAzF9Zz5PnSUx+EOv51q3\nSz9yIXFDOKZnMTLJtcD6nL2LUj52Olm/kKeYWYJKk8jITUgJOGgAkLl02OtU6Ta0\nt0X6UelSRRhpSYo3aUchDhLJyJ9WfQsWoV1NXHk3+H1rED9AfFfXN+KRJWA2O4JD\n0tyKpnBYa6YSRe943mqJdjfEKgBRTmziPCmS4NI+Q8Fe8ESo16R6OzwOZiWArSEC\nZwIDAQAB\n-----END PUBLIC KEY-----",
+    "algorithm": "RS256",
+    "registered_at": "2026-05-14T22:05:00Z",
     "expires_at": null,
     "revoked_at": null
   },
@@ -47,12 +47,12 @@
         "reason": "Ed25519 migration (Option D). Previous RSA key archived.",
         "rotated_at": "2026-05-11"
       },
-      "library": {
-        "previous_key_id": "a5a5f5c2edbee56a",
-        "current_key_id": "42e853d4ec37955d",
-        "reason": "Ed25519 migration (Option D). Previous RSA key archived.",
-        "rotated_at": "2026-05-11"
-      },
+    "library": {
+      "previous_key_id": "a5a5f5c2edbee56a",
+      "current_key_id": "4c04aa9176b68810",
+      "reason": "Key rotation after private key leak (commit 19c109d3). Ed25519 identity key also rotated. New RSA-2048 signing key for cross-lane messages.",
+      "rotated_at": "2026-05-14"
+    },
       "swarmmind": {
         "previous_key_id": "ec467e7103736c28",
         "current_key_id": "c707d41a7bb96d96",
@@ -98,21 +98,31 @@
       "archived_reason": "ed25519-migration",
       "superseded_by": "c707d41a7bb96d96"
     },
-    "a5a5f5c2edbee56a": {
-      "lane_id": "library",
-      "key_id": "a5a5f5c2edbee56a",
-      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkuJ5L9o+h9s2AZfo1g9u\nnsw2Rbw7rCdqGyITNkA/yRsthzcgP/OYQWickU+XBy+bXudRiHYA/HzttAmB6SxK\n/ap/XHHWc36F/XN5qvYTgeS7FSlwkE8dxUL0zFCHtyjkKsZb3v/SJB0gbF630dKR\ns3vx2uiCa7jsgD0nZy4fF47BZlOnkN8v3ltJS1cHfKsSl4CL73VGC7yeSxn1ToQV\n2mQ1vgV8E1m5URQ9T2c87XKIn70JyvDtMKIklj3dhnsP3UBFNtN46fgdHHLBfPOy\nQF4KW0w/jTcpgQvJTcoUg9PidFw0/xHEwMfK/C+i1F5NS8vPGpP8rpwh5x8b4lsn\nTwIDAQAB\n-----END PUBLIC KEY-----",
-      "algorithm": "RS256",
-      "registered_at": "2026-05-06T00:44:26.725Z",
-      "archived_at": "2026-05-11T04:43:13.806Z",
-      "archived_reason": "ed25519-migration",
-      "superseded_by": "42e853d4ec37955d"
-    }
+  "a5a5f5c2edbee56a": {
+    "lane_id": "library",
+    "key_id": "a5a5f5c2edbee56a",
+    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkuJ5L9o+h9s2AZfo1g9u\nnsw2Rbw7rCdqGyITNkA/yRsthzcgP/OYQWickU+XBy+bXudRiHYA/HzttAmB6SxK\n/ap/XHHWc36F/XN5qvYTgeS7FSlwkE8dxUL0zFCHtyjkKsZb3v/SJB0gbF630dKR\ns3vx2uiCa7jsgD0nZy4fF47BZlOnkN8v3ltJS1cHfKsSl4CL73VGC7yeSxn1ToQV\n2mQ1vgV8E1m5URQ9T2c87XKIn70JyvDtMKIklj3dhnsP3UBFNtN46fgdHHLBfPOy\nQF4KW0w/jTcpgQvJTcoUg9PidFw0/xHEwMfK/C+i1F5NS8vPGpP8rpwh5x8b4lsn\nTwIDAQAB\n-----END PUBLIC KEY-----",
+    "algorithm": "RS256",
+    "registered_at": "2026-05-06T00:44:26.725Z",
+    "archived_at": "2026-05-11T04:43:13.806Z",
+    "archived_reason": "ed25519-migration",
+    "superseded_by": "4c04aa9176b68810"
+  },
+  "42e853d4ec37955d": {
+    "lane_id": "library",
+    "key_id": "42e853d4ec37955d",
+    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAw9w42sDe8qPJ1LKRsFcQ+2/ptA/N+grOA3TGz+xQPpU=\n-----END PUBLIC KEY-----",
+    "algorithm": "EdDSA",
+    "registered_at": "2026-05-11T04:43:13.806Z",
+    "archived_at": "2026-05-14T22:05:00Z",
+    "archived_reason": "key-compromise-rotation",
+    "superseded_by": "4c04aa9176b68810"
+  }
   },
   "rotation_policy": {
     "rotation_days": 90,
     "warning_days": 14,
     "grace_days": 7,
-    "last_rotated": "2026-05-11"
+    "last_rotated": "2026-05-14"
   }
 }
