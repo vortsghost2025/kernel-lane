@@ -8,7 +8,7 @@ const { execSync } = require('child_process');
 const { syncAndGuard } = require('./sync-canonical-scripts');
 const { LaneDiscovery } = require('./util/lane-discovery');
 
-const AUDIT_VERSION = '3.0.0';
+const AUDIT_VERSION = '4.0.0';
 const LEDGER_PATH = process.env.AUTONOMY_LEDGER || path.join(__dirname, '..', 'context-buffer', 'autonomy-ledger.jsonl');
 const ROLLUP_PATH = process.env.AUTONOMY_ROLLUP || path.join(__dirname, '..', 'context-buffer', 'headless-autonomy-rollup.json');
 const CANONICAL_REGISTRY = path.join(__dirname, 'CANONICAL_SCRIPT_REGISTRY.json');
@@ -17,6 +17,10 @@ const RECOMMENDATION_TYPES = [
   'OPERATOR_PING_SEEN', 'P0_STALE_TASK', 'TOPOLOGY_ANOMALY',
   'DEPENDENCY_SYNC_REQUIRED', 'CONVERGENCE_REVIEW_DUE', 'CRASH_LOOP_DETECTED'
 ];
+const REC_LIFECYCLE_STATES = ['NEW', 'ONGOING_MONITORED', 'ESCALATED', 'RESOLVED', 'SUPPRESSED'];
+const REC_DISPOSITIONS = ['ACCEPT', 'REJECT', 'DEFER', 'QUARANTINE', null];
+const REC_LEDGER_PATH = process.env.REC_LEDGER || path.join(__dirname, '..', 'context-buffer', 'recommendation-ledger.jsonl');
+const DEDUPE_SUPPRESS_CYCLES = 6;
 
 const SERVICED_LANES = ['archivist', 'kernel', 'swarmmind', 'library'];
 const VIRTUAL_LANES = ['authority'];
@@ -697,6 +701,201 @@ function emitCognitionHandoff(recommendations, cycleId) {
   return { delivered: true, path: filePath, packet_id: packet.task_id, trigger_count: cogRecs.length };
 }
 
+// === 10. RECOMMENDATION LIFECYCLE LEDGER ===
+function buildDedupeKey(rec) {
+  const laneKey = (rec.affected_lanes || []).sort().join('+');
+  const reasonClass = rec.recommendation_type;
+  return `${reasonClass}:${laneKey}`;
+}
+
+function getRecLedgerPath() {
+  return process.env.REC_LEDGER || path.join(__dirname, '..', 'context-buffer', 'recommendation-ledger.jsonl');
+}
+
+function loadRecommendationLedger() {
+  const ledgerPath = getRecLedgerPath();
+  if (!fs.existsSync(ledgerPath)) return [];
+  const lines = fs.readFileSync(ledgerPath, 'utf8').split('\n').filter(Boolean);
+  const entries = [];
+  for (const line of lines) {
+    try { entries.push(JSON.parse(line)); } catch (_) { /* skip malformed */ }
+  }
+  return entries;
+}
+
+function writeRecommendationLedger(entries) {
+  const ledgerPath = getRecLedgerPath();
+  const dir = path.dirname(ledgerPath);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(ledgerPath, entries.map(e => JSON.stringify(e)).join('\n') + '\n', 'utf8');
+}
+
+function updateRecommendationLedger(newPackets, cycleId) {
+  const existing = loadRecommendationLedger();
+  const now = nowIso();
+  const existingByKey = {};
+  for (const e of existing) { existingByKey[e.dedupe_key] = e; }
+
+  const results = { new_count: 0, ongoing_count: 0, escalated_count: 0, suppressed_count: 0, resolved_count: 0 };
+  const activeKeys = new Set();
+
+  for (const packet of newPackets) {
+    if (packet.recommendation_type === 'NO_ACTION') continue;
+    const key = buildDedupeKey(packet);
+    activeKeys.add(key);
+    const prev = existingByKey[key];
+
+    if (!prev) {
+      const entry = {
+        recommendation_id: packet.id,
+        dedupe_key: key,
+        recommendation_type: packet.recommendation_type,
+        first_seen_at: now,
+        last_seen_at: now,
+        occurrence_count: 1,
+        current_state: 'NEW',
+        severity: packet.severity,
+        affected_lanes: packet.affected_lanes,
+        reason: packet.reason,
+        cycles_since_first: 0,
+        cycles_since_last_escalation: 0,
+        disposition: null,
+        disposition_at: null,
+        resolution_evidence_refs: [],
+        false_positive: null,
+        cognition_handoff_emitted: true
+      };
+      existing.push(entry);
+      existingByKey[key] = entry;
+      results.new_count++;
+    } else {
+      prev.occurrence_count++;
+      prev.last_seen_at = now;
+      prev.cycles_since_first++;
+      prev.cycles_since_last_escalation++;
+
+      const severityEscalated = ['P0', 'P1', 'P2', 'P3'].indexOf(packet.severity) < ['P0', 'P1', 'P2', 'P3'].indexOf(prev.severity);
+      const scopeExpanded = packet.affected_lanes.length > prev.affected_lanes.length;
+
+      if (severityEscalated || scopeExpanded) {
+        prev.current_state = 'ESCALATED';
+        prev.severity = packet.severity;
+        prev.affected_lanes = packet.affected_lanes;
+        prev.cycles_since_last_escalation = 0;
+        prev.cognition_handoff_emitted = true;
+        results.escalated_count++;
+      } else if (prev.cycles_since_first >= DEDUPE_SUPPRESS_CYCLES && prev.disposition !== 'ACCEPT') {
+        prev.current_state = 'ONGOING_MONITORED';
+        prev.cognition_handoff_emitted = false;
+        results.ongoing_count++;
+      } else {
+        prev.current_state = 'ONGOING_MONITORED';
+        if (prev.occurrence_count <= 2) {
+          prev.cognition_handoff_emitted = true;
+        } else {
+          prev.cognition_handoff_emitted = false;
+          results.suppressed_count++;
+        }
+        results.ongoing_count++;
+      }
+    }
+  }
+
+  for (const entry of existing) {
+    if (!activeKeys.has(entry.dedupe_key) && entry.current_state !== 'RESOLVED') {
+      entry.current_state = 'RESOLVED';
+      entry.resolved_at = now;
+      results.resolved_count++;
+    }
+  }
+
+  writeRecommendationLedger(existing);
+  return { ...results, total_active: existing.filter(e => e.current_state !== 'RESOLVED').length };
+}
+
+// === 11. DISPOSITION CAPTURE ===
+function recordDisposition(dedupeKey, disposition, evidenceRefs, isFalsePositive) {
+  const existing = loadRecommendationLedger();
+  const entry = existing.find(e => e.dedupe_key === dedupeKey);
+  if (!entry) return { error: 'not_found' };
+
+  entry.disposition = disposition;
+  entry.disposition_at = nowIso();
+  if (evidenceRefs) entry.resolution_evidence_refs = evidenceRefs;
+  if (isFalsePositive !== undefined) entry.false_positive = isFalsePositive;
+  if (disposition === 'REJECT') entry.false_positive = true;
+
+  writeRecommendationLedger(existing);
+  return { updated: true, dedupe_key: dedupeKey, disposition };
+}
+
+// === 12. ROLLUP ENHANCEMENTS ===
+function buildEnhancedRollup(ledgerPath, recLedgerPath, windowHours) {
+  windowHours = windowHours || 24;
+  const cutoff = Date.now() - (windowHours * 3600000);
+
+  const base = buildRollup(ledgerPath, windowHours);
+
+  const recEntries = loadRecommendationLedger();
+  const activeRecs = recEntries.filter(e => e.current_state !== 'RESOLVED');
+  const newRecs = recEntries.filter(e => {
+    const t = new Date(e.first_seen_at).getTime();
+    return t >= cutoff;
+  });
+  const resolvedRecs = recEntries.filter(e => e.current_state === 'RESOLVED' && e.resolved_at && new Date(e.resolved_at).getTime() >= cutoff);
+  const acceptedRecs = recEntries.filter(e => e.disposition === 'ACCEPT');
+  const rejectedRecs = recEntries.filter(e => e.disposition === 'REJECT' || e.false_positive === true);
+  const suppressedRecs = recEntries.filter(e => e.cognition_handoff_emitted === false && e.occurrence_count > 1);
+  const totalAdjudicated = acceptedRecs.length + rejectedRecs.length;
+
+  base.recommendation_metrics = {
+    new_24h: newRecs.length,
+    resolved_24h: resolvedRecs.length,
+    active_unresolved: activeRecs.length,
+    total_suppressed: suppressedRecs.length,
+    recommendation_precision: totalAdjudicated > 0 ? Math.round(acceptedRecs.length / totalAdjudicated * 100) : null,
+    false_positive_rate: totalAdjudicated > 0 ? Math.round(rejectedRecs.length / totalAdjudicated * 100) : null,
+    operator_attention_required: activeRecs.filter(e => e.requires_operator_attention || e.severity === 'P0').length,
+    archivist_action_yield: totalAdjudicated > 0 ? Math.round(acceptedRecs.length / totalAdjudicated * 100) : null,
+    top_unresolved: activeRecs.slice(0, 5).map(e => ({ type: e.recommendation_type, lanes: e.affected_lanes, state: e.current_state, count: e.occurrence_count }))
+  };
+
+  base.verdict = buildVerdict(base);
+
+  const dir = path.dirname(ROLLUP_PATH);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(ROLLUP_PATH, JSON.stringify(base, null, 2), 'utf8');
+
+  return base;
+}
+
+function buildVerdict(rollup) {
+  const rm = rollup.recommendation_metrics || {};
+  const cogPct = rollup.cognition_needed_pct || 0;
+  const topoPct = rollup.topology_stability_pct || 0;
+  const bcastRate = rollup.broadcast_proof_pass_rate;
+
+  if (rm.active_unresolved > 0 && rm.active_unresolved <= 2 && cogPct < 30) {
+    return 'Substrate stable — minor issues monitored, no cognition pressure';
+  }
+  if (cogPct > 60 && rm.recommendation_precision !== null && rm.recommendation_precision < 50) {
+    return 'Noisy — many cognition requests but low yield, calibration needed';
+  }
+  if (rm.active_unresolved === 0 && topoPct >= 95) {
+    return 'Substrate stable — all invariants green, autonomous operation normal';
+  }
+  if (bcastRate !== null && bcastRate < 50) {
+    return 'Degraded — broadcast reliability below threshold, investigate';
+  }
+  if (rm.operator_attention_required > 0) {
+    return 'Attention required — P0 or operator-targeted issues unresolved';
+  }
+  if (cogPct > 40) {
+    return 'Under pressure — cognition frequently requested, review escalation policy';
+  }
+  return 'Substrate operational — monitoring continues';
+}
+
 // === MAIN AUDIT ===
 function runFullAudit(opts) {
   opts = opts || {};
@@ -740,8 +939,22 @@ function runFullAudit(opts) {
 
   const cycleId = entry.ts.replace(/[.:]/g, '-');
   auditResults.recommendation_packets = buildRecommendationPackets(auditResults, cycleId);
-  auditResults.rollup = buildRollup(LEDGER_PATH, 24);
-  auditResults.cognition_handoff = emitCognitionHandoff(auditResults.recommendation_packets, cycleId);
+
+  // Recommendation lifecycle: dedupe + suppress before handoff
+  const recLedgerResult = updateRecommendationLedger(auditResults.recommendation_packets, cycleId);
+  auditResults.rec_ledger_summary = recLedgerResult;
+
+  // Only emit cognition handoff for packets that weren't suppressed
+  const unsuppressedRecs = auditResults.recommendation_packets.filter(p => {
+    if (p.recommendation_type === 'NO_ACTION') return false;
+    const key = buildDedupeKey(p);
+    const recEntries = loadRecommendationLedger();
+    const entry = recEntries.find(e => e.dedupe_key === key);
+    return entry && entry.cognition_handoff_emitted;
+  });
+  auditResults.cognition_handoff = emitCognitionHandoff(unsuppressedRecs, cycleId);
+
+  auditResults.rollup = buildEnhancedRollup(LEDGER_PATH, getRecLedgerPath(), 24);
 
   if (!opts.quiet) {
     if (opts.json) {
@@ -817,7 +1030,10 @@ Ledger: ${LEDGER_PATH}`);
 module.exports = {
   runFullAudit, checkCanonicalDrift, checkServiceTopology,
   checkAgentActivationNeeded, testBroadcastDelivery, checkExecutorDependencies,
-  buildRecommendationPackets, buildRollup, emitCognitionHandoff,
+  buildRecommendationPackets, buildRollup, buildEnhancedRollup,
+  emitCognitionHandoff, buildDedupeKey, updateRecommendationLedger,
+  recordDisposition, loadRecommendationLedger, getRecLedgerPath,
   SERVICED_LANES, VIRTUAL_LANES, REQUIRED_EXECUTOR_FILES,
-  RECOMMENDATION_TYPES, AUDIT_VERSION
+  RECOMMENDATION_TYPES, REC_LIFECYCLE_STATES, REC_DISPOSITIONS,
+  REC_LEDGER_PATH, DEDUPE_SUPPRESS_CYCLES, AUDIT_VERSION
 };
