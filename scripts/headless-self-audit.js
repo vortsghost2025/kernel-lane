@@ -829,6 +829,22 @@ function recordDisposition(dedupeKey, disposition, evidenceRefs, isFalsePositive
   return { updated: true, dedupe_key: dedupeKey, disposition };
 }
 
+// === 12.5 LEDGER POST-DEDUPE PATCH ===
+function patchLedgerCognitionHandoff(entryTs, handoffEmitted, recSummary) {
+  const lines = fs.readFileSync(LEDGER_PATH, 'utf8').split('\n').filter(Boolean);
+  const lastIdx = lines.length - 1;
+  if (lastIdx < 0) return;
+  try {
+    const entry = JSON.parse(lines[lastIdx]);
+    if (entry.ts === entryTs) {
+      entry.cognition_handoff_emitted = handoffEmitted;
+      entry.rec_ledger_summary = recSummary;
+      lines[lastIdx] = JSON.stringify(entry);
+      fs.writeFileSync(LEDGER_PATH, lines.join('\n') + '\n', 'utf8');
+    }
+  } catch (_) { /* non-fatal */ }
+}
+
 // === 12. ROLLUP ENHANCEMENTS ===
 function buildEnhancedRollup(ledgerPath, recLedgerPath, windowHours) {
   windowHours = windowHours || 24;
@@ -935,26 +951,28 @@ function runFullAudit(opts) {
     ? 'All invariants OK. Substrate healthy, no agent cognition needed.'
     : issues.join('; ') + '.';
 
-  const entry = appendLedgerEntry(auditResults);
+const entry = appendLedgerEntry(auditResults);
 
-  const cycleId = entry.ts.replace(/[.:]/g, '-');
-  auditResults.recommendation_packets = buildRecommendationPackets(auditResults, cycleId);
+const cycleId = entry.ts.replace(/[.:]/g, '-');
+auditResults.recommendation_packets = buildRecommendationPackets(auditResults, cycleId);
 
-  // Recommendation lifecycle: dedupe + suppress before handoff
-  const recLedgerResult = updateRecommendationLedger(auditResults.recommendation_packets, cycleId);
-  auditResults.rec_ledger_summary = recLedgerResult;
+const recLedgerResult = updateRecommendationLedger(auditResults.recommendation_packets, cycleId);
+auditResults.rec_ledger_summary = recLedgerResult;
 
-  // Only emit cognition handoff for packets that weren't suppressed
-  const unsuppressedRecs = auditResults.recommendation_packets.filter(p => {
-    if (p.recommendation_type === 'NO_ACTION') return false;
-    const key = buildDedupeKey(p);
-    const recEntries = loadRecommendationLedger();
-    const entry = recEntries.find(e => e.dedupe_key === key);
-    return entry && entry.cognition_handoff_emitted;
-  });
-  auditResults.cognition_handoff = emitCognitionHandoff(unsuppressedRecs, cycleId);
+const unsuppressedRecs = auditResults.recommendation_packets.filter(p => {
+  if (p.recommendation_type === 'NO_ACTION') return false;
+  const key = buildDedupeKey(p);
+  const recEntries = loadRecommendationLedger();
+  const entry = recEntries.find(e => e.dedupe_key === key);
+  return entry && entry.cognition_handoff_emitted;
+});
+auditResults.cognition_handoff = emitCognitionHandoff(unsuppressedRecs, cycleId);
 
-  auditResults.rollup = buildEnhancedRollup(LEDGER_PATH, getRecLedgerPath(), 24);
+// Patch ledger entry with post-dedupe cognition handoff state
+const cognitionActuallyEmitted = !!(auditResults.cognition_handoff && auditResults.cognition_handoff.delivered);
+patchLedgerCognitionHandoff(entry.ts, cognitionActuallyEmitted, recLedgerResult);
+
+auditResults.rollup = buildEnhancedRollup(LEDGER_PATH, getRecLedgerPath(), 24);
 
   if (!opts.quiet) {
     if (opts.json) {
