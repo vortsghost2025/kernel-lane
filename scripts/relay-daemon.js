@@ -96,40 +96,58 @@ class RelayDaemon {
         continue;
       }
 
-        const msg = read.value;
-        const targetLane = msg.to;
-        if (!targetLane || !ALL_LANES.includes(targetLane)) {
-          results.errors.push({ file: ent.name, error: `Unknown target lane: ${targetLane}` });
-          continue;
-        }
-
-        const claimCheck = claimGuard.checkOutboxMessage(msg, this.repoRoot, this.outboxDir);
-        if (!claimCheck.allowed) {
-          const uncommitted = claimCheck.details
-            .filter(d => d.status === 'uncommitted' || d.status === 'missing')
-            .map(d => d.path);
-          results.errors.push({ file: ent.name, error: `premature_claim: ${uncommitted.join(', ')}`, claim_guard: claimCheck });
-          continue;
-        }
-
-    const targetDir = getInboxDir(targetLane);
-      const targetPath = path.join(targetDir, ent.name);
-
-      if (!this.dryRun) {
-        try {
-          if (!fs.existsSync(targetDir)) {
-            fs.mkdirSync(targetDir, { recursive: true });
-          }
-          fs.writeFileSync(targetPath, JSON.stringify(msg, null, 2), 'utf8');
-          fs.unlinkSync(filePath);
-          results.delivered++;
-          results.details.push({ file: ent.name, from: this.lane, to: targetLane, target: targetPath });
-          runStoreJournalAppend(this.repoRoot, this.lane, 'message_delivered', msg.subject || msg.task_id, msg.task_id);
-        } catch (err) {
-          results.errors.push({ file: ent.name, error: err.message });
-        }
+    const msg = read.value;
+      let targetLanes;
+      if (msg.to === 'all' || msg.to === 'broadcast') {
+        targetLanes = ALL_LANES.filter(l => l !== this.lane);
+      } else if (msg.to && ALL_LANES.includes(msg.to)) {
+        targetLanes = [msg.to];
       } else {
-        results.details.push({ file: ent.name, from: this.lane, to: targetLane, target: targetPath, dry_run: true });
+        results.errors.push({ file: ent.name, error: `Unknown target lane: ${msg.to}` });
+        continue;
+      }
+
+      const claimCheck = claimGuard.checkOutboxMessage(msg, this.repoRoot, this.outboxDir);
+      if (!claimCheck.allowed) {
+        const uncommitted = claimCheck.details
+          .filter(d => d.status === 'uncommitted' || d.status === 'missing')
+          .map(d => d.path);
+        results.errors.push({ file: ent.name, error: `premature_claim: ${uncommitted.join(', ')}`, claim_guard: claimCheck });
+        continue;
+      }
+
+      let allDelivered = true;
+      for (const targetLane of targetLanes) {
+        const targetDir = getInboxDir(targetLane);
+        const targetPath = path.join(targetDir, ent.name);
+
+        if (!this.dryRun) {
+          try {
+            if (!fs.existsSync(targetDir)) {
+              fs.mkdirSync(targetDir, { recursive: true });
+            }
+            fs.writeFileSync(targetPath, JSON.stringify(msg, null, 2), 'utf8');
+            results.delivered++;
+            results.details.push({ file: ent.name, from: this.lane, to: targetLane, target: targetPath });
+            runStoreJournalAppend(this.repoRoot, this.lane, 'message_delivered', msg.subject || msg.task_id, msg.task_id);
+          } catch (err) {
+            results.errors.push({ file: ent.name, error: `${targetLane}: ${err.message}` });
+            allDelivered = false;
+          }
+        } else {
+          results.details.push({ file: ent.name, from: this.lane, to: targetLane, target: targetPath, dry_run: true });
+        }
+      }
+
+      if (!this.dryRun && allDelivered) {
+        try {
+          const deliveredDir = path.join(this.outboxDir, 'delivered');
+          if (!fs.existsSync(deliveredDir)) fs.mkdirSync(deliveredDir, { recursive: true });
+          const archivePath = path.join(deliveredDir, ent.name);
+          fs.renameSync(filePath, archivePath);
+        } catch (err) {
+          fs.unlinkSync(filePath);
+        }
       }
     }
 
@@ -283,14 +301,14 @@ async function runCli() {
         const out = result.outbound;
         const inc = result.incoming;
         const cx = result.cross_inbox;
-        if (out.delivered > 0 || inc.collected > 0 || cx.collected > 0) {
-          console.log(`[relay-daemon] lane=${lane} tick=${result.tick} outbound: delivered=${out.delivered} incoming: collected=${inc.collected} cross_inbox: collected=${cx.collected}`);
-        }
-        if (result.adjudication) {
-          const adj = result.adjudication;
-          const stats = adj.stats || {};
-          console.log(`[relay-daemon] adjudication: edges=${stats.total_edges || 0} contradicts=${stats.contradicts_edges || 0} adjudicated=${stats.adjudicated || 0}${adj.error ? ' ERROR=' + adj.error : ''}`);
-        }
+          if (out.delivered > 0 || inc.collected > 0 || cx.collected > 0) {
+            console.log(`[relay-daemon] lane=${lane} tick=${result.tick} outbound: delivered=${out.delivered} incoming: collected=${inc.collected} cross_inbox: collected=${cx.collected}`);
+          }
+          if (result.adjudication) {
+            const adj = result.adjudication;
+            const stats = adj.stats || {};
+            console.log(`[relay-daemon] adjudication: edges=${stats.total_edges || 0} contradicts=${stats.contradicts_edges || 0} adjudicated=${stats.adjudicated || 0}${adj.error ? ' ERROR=' + adj.error : ''}`);
+          }
       } catch (err) {
         console.error(`[relay-daemon] tick error: ${err.message}`);
       }
@@ -323,7 +341,7 @@ if (require.main === module) {
 // TaskChainEngine is NOT embedded in relay-daemon because it is a full inbox
 // processor that competes with lane-worker's own processing. Run it as a
 // standalone CLI from runner-v3.sh or a systemd timer instead:
-// node scripts/task-chain-engine.js --lane <lane> --apply
-// node scripts/task-chain-engine.js --lane kernel --apply --max-chain-depth 5
+//   node scripts/task-chain-engine.js --lane <lane> --apply
+//   node scripts/task-chain-engine.js --lane archivist --apply --max-chain-depth 5
 
 module.exports = { RelayDaemon, ALL_LANES };

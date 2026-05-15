@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 'use strict';
 
+require('./node-version-guard').check();
+
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { spawnSync } = require('child_process');
 const _ld = require('./util/lane-discovery');
+const { sanitizeFilename } = require('./util/sanitize-filename');
 
-const AUTONOMOUS_VERSION = '1.1.0';
+const AUTONOMOUS_VERSION = '1.2.0';
 const POLL_INTERVAL_MS = 15000;
 const REMEDIATOR_INTERVAL_MS = 600000;
 const STALE_AR_MS = 3600000;
@@ -32,6 +35,7 @@ function resolveRepoRoot(lane) {
 }
 
 function nowIso() { return new Date().toISOString(); }
+function nowSafeIso() { return sanitizeFilename(nowIso()); }
 function ensureDir(d) { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); }
 
 function safeReadJson(p) {

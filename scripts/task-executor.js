@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+require('./node-version-guard').check();
+
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
@@ -8,7 +10,25 @@ const { spawnSync } = require('child_process');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const { ensureOutputProvenance, verifyOutputProvenance } = require(path.join(REPO_ROOT, 'scripts', 'output-provenance'));
-const LANE = process.env.LANE_ID || 'archivist';
+
+const REPO_DIR_TO_LANE = {
+  'Archivist-Agent': 'archivist',
+  'kernel-lane': 'kernel',
+  'SwarmMind': 'swarmmind',
+  'self-organizing-library': 'library',
+};
+
+function detectLaneFromRepo() {
+  const dirName = path.basename(REPO_ROOT);
+  if (REPO_DIR_TO_LANE[dirName]) return REPO_DIR_TO_LANE[dirName];
+  const lower = dirName.toLowerCase();
+  if (lower.includes('swarm')) return 'swarmmind';
+  if (lower.includes('kernel')) return 'kernel';
+  if (lower.includes('library') || lower.includes('self-organizing')) return 'library';
+  return 'archivist';
+}
+
+const LANE = process.env.LANE_ID || detectLaneFromRepo();
 const ACTION_REQUIRED_DIR = path.join(REPO_ROOT, 'lanes', LANE, 'inbox', 'action-required');
 const IN_PROGRESS_DIR = path.join(REPO_ROOT, 'lanes', LANE, 'inbox', 'in-progress');
 const PROCESSED_DIR = path.join(REPO_ROOT, 'lanes', LANE, 'inbox', 'processed');

@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "canonical_source": "archivist",
+  "description": "Scripts that MUST be identical across all 4 lanes. Archivist owns the canonical copy. Other lanes sync from it.",
+  "shared_scripts": [
+    "lane-worker.js",
+    "task-executor.js",
+    "generic-task-executor.js",
+    "relay-daemon.js",
+    "heartbeat.js",
+    "output-provenance.js",
+    "autonomous-executor.js",
+    "blocked-remediator.js",
+    "store-journal.js",
+    "executor-watcher.js",
+    "post-compact-audit.js",
+    "headless-self-audit.js",
+    "node-version-guard.js",
+    "sync-canonical-scripts.js"
+  ],
+  "shared_schemas": [
+    "schemas/inbox-message-v1.json",
+    "schemas/context-restore.json"
+  ],
+  "shared_util_modules": [
+    "scripts/util/lane-discovery.js",
+    "scripts/util/atomic-write.js",
+    "scripts/util/sanitize-filename.js"
+  ],
+  "sync_rules": {
+    "direction": "archivist -> kernel, swarmmind, library",
+    "method": "copy_from_canonical",
+    "pre_sync_check": "sha256 must match canonical or sync is required",
+    "post_sync_check": "regression guard runs known-fix validation",
+    "auto_sync": false,
+    "requires_confirmation": true
+  },
+  "regression_guards": {
+    "no_hardcoded_S_paths": "reject any line matching /^[A-Za-z]:[\\\\\\/]/ in .js files",
+    "no_duplicate_requires": "reject if same module appears twice in require() list",
+    "no_unconditional_console_log": "reject console.log in production gateways (signAndDeliver, decideRoute, createResponse) unless gated by env var",
+    "provenance_enforcement_present": "lane-worker.js must contain verifyOutputProvenance in decideRoute",
+    "output_provenance_functions_exist": "output-provenance.js must export both ensureOutputProvenance and verifyOutputProvenance"
+  },
+  "autonomous_executor_restriction": {
+    "shared_scripts_readonly": true,
+    "description": "Autonomous executors MUST NOT modify shared scripts. Only a coordinated cross-lane session (started by operator or governance ratification) may modify canonical copies.",
+    "enforcement": "pre-commit hook checks CANONICAL_SCRIPT_REGISTRY.json before allowing commits to shared scripts"
+  }
+}

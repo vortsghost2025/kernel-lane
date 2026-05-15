@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { sanitizeFilename } = require('./util/sanitize-filename');
 
 const STALE_THRESHOLD_HOURS = 24;
 const DRY_RUN = !process.argv.includes('--apply');
@@ -355,7 +356,7 @@ function main() {
 
      var reportDir = path.join(repoRoot, 'context-buffer');
      ensureDir(reportDir);
-     var reportPath = path.join(reportDir, 'blocked-remediation-report-' + new Date().toISOString().replace(/[:.]/g, '-') + '.json');
+     var reportPath = path.join(reportDir, 'blocked-remediation-report-' + sanitizeFilename(new Date().toISOString()) + '.json');
      fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
      console.error('[blocked-remediator] Report written to: ' + reportPath);
    }

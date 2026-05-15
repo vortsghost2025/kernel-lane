@@ -30,7 +30,7 @@ class PostCompactAudit {
   constructor(options = {}) {
     this.auditDir = options.auditDir || path.join(_archivistRoot, '.compact-audit');
     this.trustStorePath = options.trustStorePath || path.join(_archivistRoot, 'lanes', 'broadcast', 'trust-store.json');
-    this.constraintsPath = options.constraintsPath || path.join(_archivistRoot, '..', 'Archivist-Agent', 'constitutional_constraints.yaml');
+    this.constraintsPath = options.constraintsPath || path.join(_archivistRoot, 'constitutional_constraints.yaml');
     this.bootstrapPath = options.bootstrapPath || path.join(_archivistRoot, 'BOOTSTRAP.md');
     this.governancePath = options.governancePath || path.join(_archivistRoot, 'GOVERNANCE.md');
     this.handoffPath = options.handoffPath || path.join(_archivistRoot, 'COMPACT_CONTEXT_HANDOFF.md');

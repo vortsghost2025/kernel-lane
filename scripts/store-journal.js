@@ -296,11 +296,15 @@ function cmdAppend(args) {
     process.exit(1);
   }
   const event = args[eventIdx + 1];
-  const validEvents = [
-    'work_started', 'work_completed', 'file_ownership_claimed',
-    'file_ownership_released', 'test_result', 'compact_restore',
-    'sudo_action', 'provider_call', 'quarantine_event', 'handoff'
-  ];
+const validEvents = [
+  'work_started', 'work_completed', 'work_quarantined',
+  'file_ownership_claimed', 'file_ownership_released',
+  'test_result', 'compact_restore', 'sudo_action',
+  'provider_call', 'quarantine_event', 'handoff',
+  'message_delivered', 'message_sent', 'heartbeat',
+  'adjudication', 'blocker_set', 'blocker_cleared',
+  'governance_check', 'convergence_sync'
+];
   if (!validEvents.includes(event)) {
     console.error(`ERROR: Invalid event '${event}'`);
     process.exit(1);
