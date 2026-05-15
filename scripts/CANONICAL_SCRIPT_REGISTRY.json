@@ -16,7 +16,8 @@
     "post-compact-audit.js",
     "headless-self-audit.js",
     "node-version-guard.js",
-    "sync-canonical-scripts.js"
+    "sync-canonical-scripts.js",
+    "test-headless-self-audit.js"
   ],
   "shared_schemas": [
     "schemas/inbox-message-v1.json",

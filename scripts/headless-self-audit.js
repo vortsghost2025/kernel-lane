@@ -8,9 +8,15 @@ const { execSync } = require('child_process');
 const { syncAndGuard } = require('./sync-canonical-scripts');
 const { LaneDiscovery } = require('./util/lane-discovery');
 
-const AUDIT_VERSION = '2.0.0';
+const AUDIT_VERSION = '3.0.0';
 const LEDGER_PATH = process.env.AUTONOMY_LEDGER || path.join(__dirname, '..', 'context-buffer', 'autonomy-ledger.jsonl');
+const ROLLUP_PATH = process.env.AUTONOMY_ROLLUP || path.join(__dirname, '..', 'context-buffer', 'headless-autonomy-rollup.json');
 const CANONICAL_REGISTRY = path.join(__dirname, 'CANONICAL_SCRIPT_REGISTRY.json');
+const RECOMMENDATION_TYPES = [
+  'NO_ACTION', 'REVIEW_DRIFT', 'SPAWN_AGENT_RECOMMENDED',
+  'OPERATOR_PING_SEEN', 'P0_STALE_TASK', 'TOPOLOGY_ANOMALY',
+  'DEPENDENCY_SYNC_REQUIRED', 'CONVERGENCE_REVIEW_DUE', 'CRASH_LOOP_DETECTED'
+];
 
 const SERVICED_LANES = ['archivist', 'kernel', 'swarmmind', 'library'];
 const VIRTUAL_LANES = ['authority'];
@@ -521,6 +527,176 @@ function appendLedgerEntry(auditResults) {
   return entry;
 }
 
+// === 7. HEADLESS RECOMMENDATION PACKET ===
+function buildRecommendationPackets(auditResults, cycleId) {
+  const packets = [];
+  const ts = nowIso();
+
+  if (auditResults.agent_activation.length === 0) {
+    packets.push({
+      id: `rec-${cycleId}-000`,
+      generated_at: ts,
+      source_cycle_id: cycleId,
+      severity: 'INFO',
+      recommendation_type: 'NO_ACTION',
+      reason: 'All invariants OK, no cognition needed',
+      evidence_refs: [`autonomy-ledger.jsonl:${cycleId}`],
+      affected_lanes: [],
+      requires_agent_cognition: false,
+      requires_operator_attention: false,
+      next_safe_action: 'None — continue autonomous operation',
+      confidence: 1.0
+    });
+    return packets;
+  }
+
+  let idx = 1;
+  for (const rec of auditResults.agent_activation) {
+    const typeMap = {
+      'canonical_drift': rec.trigger === 'convergence_review' ? 'CONVERGENCE_REVIEW_DUE' : 'REVIEW_DRIFT',
+      'crash_loop': 'CRASH_LOOP_DETECTED',
+      'service_topology_violation': 'TOPOLOGY_ANOMALY',
+      'stale_task': 'P0_STALE_TASK',
+      'blocker': 'SPAWN_AGENT_RECOMMENDED',
+      'operator_handoff': 'OPERATOR_PING_SEEN'
+    };
+    const recType = typeMap[rec.trigger] || 'NO_ACTION';
+    const needsCognition = ['P0', 'P1'].includes(rec.priority);
+    const needsOperator = rec.trigger === 'operator_handoff' || rec.trigger === 'blocker';
+
+    packets.push({
+      id: `rec-${cycleId}-${String(idx).padStart(3, '0')}`,
+      generated_at: ts,
+      source_cycle_id: cycleId,
+      severity: rec.priority,
+      recommendation_type: recType,
+      reason: rec.description,
+      evidence_refs: [`autonomy-ledger.jsonl:${cycleId}`, `headless-self-audit.js:${rec.trigger}`],
+      affected_lanes: extractAffectedLanes(rec.description),
+      requires_agent_cognition: needsCognition,
+      requires_operator_attention: needsOperator,
+      next_safe_action: rec.action,
+      confidence: rec.priority === 'P0' ? 0.95 : rec.priority === 'P1' ? 0.8 : 0.6
+    });
+    idx++;
+  }
+
+  return packets;
+}
+
+function extractAffectedLanes(description) {
+  const lanes = [];
+  for (const lane of [...SERVICED_LANES, ...VIRTUAL_LANES]) {
+    if (description.includes(lane)) lanes.push(lane);
+  }
+  return lanes.length > 0 ? lanes : ['all'];
+}
+
+// === 8. AUTONOMY LEDGER ROLLUP ===
+function buildRollup(ledgerPath, windowHours) {
+  windowHours = windowHours || 24;
+  const cutoff = Date.now() - (windowHours * 3600000);
+
+  if (!fs.existsSync(ledgerPath)) {
+    return { error: 'ledger not found', window_hours: windowHours };
+  }
+
+  const lines = fs.readFileSync(ledgerPath, 'utf8').split('\n').filter(Boolean);
+  const recent = [];
+
+  for (const line of lines) {
+    try {
+      const entry = JSON.parse(line);
+      const entryTime = new Date(entry.ts).getTime();
+      if (entryTime >= cutoff) recent.push(entry);
+    } catch (_) { /* skip malformed */ }
+  }
+
+  if (recent.length === 0) {
+    return { window_hours: windowHours, cycle_count: 0, status: 'no_data' };
+  }
+
+  const topoOk = recent.filter(e => e.topology && e.topology.ok).length;
+  const driftIncidents = recent.filter(e => e.drift && e.drift.status !== 'NO_DRIFT').length;
+  const bcastPass = recent.filter(e => e.bcast && e.bcast.passed === true).length;
+  const bcastTotal = recent.filter(e => e.bcast && e.bcast.passed !== null).length;
+  const depsOk = recent.filter(e => e.deps && e.deps.ok).length;
+  const cogNeeded = recent.filter(e => e.cognition === true).length;
+
+  const recTypeCounts = {};
+  for (const e of recent) {
+    for (const r of (e.recommendations || [])) {
+      recTypeCounts[r] = (recTypeCounts[r] || 0) + 1;
+    }
+  }
+  const topRecTypes = Object.entries(recTypeCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([type, count]) => ({ type, count }));
+
+  const lastEntry = recent[recent.length - 1];
+  const status = cogNeeded > recent.length * 0.5
+    ? 'Degraded — cognition frequently needed'
+    : topoOk < recent.length * 0.8
+    ? 'Unstable — topology anomalies frequent'
+    : driftIncidents > recent.length * 0.5
+    ? 'Drifty — canonical sync frequently required'
+    : 'Healthy — substrate autonomous and stable';
+
+  const rollup = {
+    generated_at: nowIso(),
+    window_hours: windowHours,
+    cycle_count: recent.length,
+    topology_stability_pct: recent.length > 0 ? Math.round(topoOk / recent.length * 100) : 0,
+    drift_incidents: driftIncidents,
+    broadcast_proof_pass_rate: bcastTotal > 0 ? Math.round(bcastPass / bcastTotal * 100) : null,
+    dependency_validation_pass_rate: recent.length > 0 ? Math.round(depsOk / recent.length * 100) : 0,
+    cognition_needed_count: cogNeeded,
+    cognition_needed_pct: recent.length > 0 ? Math.round(cogNeeded / recent.length * 100) : 0,
+    top_recommendation_types: topRecTypes,
+    last_cycle_summary: lastEntry ? lastEntry.summary : null,
+    substrate_status: status
+  };
+
+  const dir = path.dirname(ROLLUP_PATH);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(ROLLUP_PATH, JSON.stringify(rollup, null, 2), 'utf8');
+
+  return rollup;
+}
+
+// === 9. COGNITION HANDOFF PACKET ===
+function emitCognitionHandoff(recommendations, cycleId) {
+  const cogRecs = recommendations.filter(r => r.requires_agent_cognition);
+  if (cogRecs.length === 0) return null;
+
+  const ts = nowIso().replace(/[+:]/g, '-');
+  const packet = {
+    schema_version: '1.3',
+    task_id: `headless-cognition-recommendation-${cycleId}`,
+    from: 'headless-self-audit',
+    to: 'archivist',
+    timestamp: nowIso(),
+    priority: cogRecs.some(r => r.severity === 'P0') ? 'P0' : 'P1',
+    type: 'recommendation',
+    subject: `Substrate cognition needed: ${cogRecs.length} trigger(s)`,
+    body: `The headless self-audit layer recommends attaching agent cognition. Triggers: ${cogRecs.map(r => r.recommendation_type).join(', ')}. Details: ${cogRecs.map(r => r.reason).join('; ')}`,
+    requires_action: true,
+    audit_cycle_id: cycleId,
+    recommendation_packets: cogRecs,
+    _source: 'headless-self-audit.js',
+    _auto_generated: true
+  };
+
+  const inboxDir = path.join(LANE_ROOTS.archivist, 'lanes', 'archivist', 'inbox');
+  if (!fs.existsSync(inboxDir)) fs.mkdirSync(inboxDir, { recursive: true });
+
+  const filePath = path.join(inboxDir, `headless-cognition-recommendation-${ts}.json`);
+  fs.writeFileSync(filePath, JSON.stringify(packet, null, 2), 'utf8');
+
+  return { delivered: true, path: filePath, packet_id: packet.task_id, trigger_count: cogRecs.length };
+}
+
 // === MAIN AUDIT ===
 function runFullAudit(opts) {
   opts = opts || {};
@@ -561,6 +737,11 @@ function runFullAudit(opts) {
     : issues.join('; ') + '.';
 
   const entry = appendLedgerEntry(auditResults);
+
+  const cycleId = entry.ts.replace(/[.:]/g, '-');
+  auditResults.recommendation_packets = buildRecommendationPackets(auditResults, cycleId);
+  auditResults.rollup = buildRollup(LEDGER_PATH, 24);
+  auditResults.cognition_handoff = emitCognitionHandoff(auditResults.recommendation_packets, cycleId);
 
   if (!opts.quiet) {
     if (opts.json) {
@@ -636,5 +817,7 @@ Ledger: ${LEDGER_PATH}`);
 module.exports = {
   runFullAudit, checkCanonicalDrift, checkServiceTopology,
   checkAgentActivationNeeded, testBroadcastDelivery, checkExecutorDependencies,
-  SERVICED_LANES, VIRTUAL_LANES, REQUIRED_EXECUTOR_FILES, AUDIT_VERSION
+  buildRecommendationPackets, buildRollup, emitCognitionHandoff,
+  SERVICED_LANES, VIRTUAL_LANES, REQUIRED_EXECUTOR_FILES,
+  RECOMMENDATION_TYPES, AUDIT_VERSION
 };
