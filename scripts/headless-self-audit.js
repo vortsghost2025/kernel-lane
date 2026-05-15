@@ -626,6 +626,8 @@ function buildRollup(ledgerPath, windowHours) {
   const bcastTotal = recent.filter(e => e.bcast && e.bcast.passed !== null).length;
   const depsOk = recent.filter(e => e.deps && e.deps.ok).length;
   const cogNeeded = recent.filter(e => e.cognition === true).length;
+const cogHandoffEmitted = recent.filter(e => e.cognition_handoff_emitted === true).length;
+const cogHandoffSuppressed = recent.filter(e => e.cognition === true && e.cognition_handoff_emitted === false).length;
 
   const recTypeCounts = {};
   for (const e of recent) {
@@ -655,8 +657,12 @@ function buildRollup(ledgerPath, windowHours) {
     drift_incidents: driftIncidents,
     broadcast_proof_pass_rate: bcastTotal > 0 ? Math.round(bcastPass / bcastTotal * 100) : null,
     dependency_validation_pass_rate: recent.length > 0 ? Math.round(depsOk / recent.length * 100) : 0,
-    cognition_needed_count: cogNeeded,
-    cognition_needed_pct: recent.length > 0 ? Math.round(cogNeeded / recent.length * 100) : 0,
+  cognition_needed_count: cogNeeded,
+  cognition_needed_pct: recent.length > 0 ? Math.round(cogNeeded / recent.length * 100) : 0,
+  cognition_handoff_emitted_count: cogHandoffEmitted,
+  cognition_handoff_emitted_pct: recent.length > 0 ? Math.round(cogHandoffEmitted / recent.length * 100) : 0,
+  cognition_handoff_suppressed_count: cogHandoffSuppressed,
+  cognition_handoff_suppressed_pct: recent.length > 0 ? Math.round(cogHandoffSuppressed / recent.length * 100) : 0,
     top_recommendation_types: topRecTypes,
     last_cycle_summary: lastEntry ? lastEntry.summary : null,
     substrate_status: status
@@ -888,13 +894,14 @@ function buildEnhancedRollup(ledgerPath, recLedgerPath, windowHours) {
 function buildVerdict(rollup) {
   const rm = rollup.recommendation_metrics || {};
   const cogPct = rollup.cognition_needed_pct || 0;
+  const cogEmitPct = rollup.cognition_handoff_emitted_pct || 0;
   const topoPct = rollup.topology_stability_pct || 0;
   const bcastRate = rollup.broadcast_proof_pass_rate;
 
-  if (rm.active_unresolved > 0 && rm.active_unresolved <= 2 && cogPct < 30) {
+  if (rm.active_unresolved > 0 && rm.active_unresolved <= 2 && cogEmitPct < 30) {
     return 'Substrate stable — minor issues monitored, no cognition pressure';
   }
-  if (cogPct > 60 && rm.recommendation_precision !== null && rm.recommendation_precision < 50) {
+  if (cogEmitPct > 60 && rm.recommendation_precision !== null && rm.recommendation_precision < 50) {
     return 'Noisy — many cognition requests but low yield, calibration needed';
   }
   if (rm.active_unresolved === 0 && topoPct >= 95) {
@@ -906,8 +913,11 @@ function buildVerdict(rollup) {
   if (rm.operator_attention_required > 0) {
     return 'Attention required — P0 or operator-targeted issues unresolved';
   }
-  if (cogPct > 40) {
+  if (cogEmitPct > 40) {
     return 'Under pressure — cognition frequently requested, review escalation policy';
+  }
+  if (cogPct > 50 && cogEmitPct < 10) {
+    return 'Conditions detected but suppression effective — substrate managing autonomously';
   }
   return 'Substrate operational — monitoring continues';
 }
