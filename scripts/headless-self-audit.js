@@ -779,6 +779,16 @@ function updateRecommendationLedger(newPackets, cycleId) {
       prev.last_seen_at = now;
       prev.cycles_since_first++;
       prev.cycles_since_last_escalation++;
+      if (prev.current_state === 'RESOLVED') {
+        prev.current_state = 'NEW';
+        delete prev.resolved_at;
+        prev.cognition_handoff_emitted = true;
+        prev.disposition = null;
+        prev.disposition_at = null;
+        prev.false_positive = null;
+        results.new_count++;
+        continue;
+      }
 
       const severityEscalated = ['P0', 'P1', 'P2', 'P3'].indexOf(packet.severity) < ['P0', 'P1', 'P2', 'P3'].indexOf(prev.severity);
       const scopeExpanded = packet.affected_lanes.length > prev.affected_lanes.length;

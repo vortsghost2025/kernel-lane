@@ -262,6 +262,52 @@ test('enhanced rollup includes recommendation_metrics', () => {
   assert(rollup.verdict.length > 0);
 });
 
+// === 11. Re-activation data integrity ===
+console.log('\n11. Re-activation data integrity');
+test('RESOLVED entry re-activated clears resolved_at and resets state to NEW', () => {
+  const testLedger = '/tmp/test-rec-ledger-reactivation.jsonl';
+  if (fs.existsSync(testLedger)) fs.unlinkSync(testLedger);
+  process.env.REC_LEDGER = testLedger;
+  const dir = path.dirname(testLedger);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  // Write a RESOLVED entry
+  fs.writeFileSync(testLedger, JSON.stringify({
+    recommendation_id: 'rec-test-react',
+    dedupe_key: 'CRASH_LOOP_DETECTED:swarmmind',
+    recommendation_type: 'CRASH_LOOP_DETECTED',
+    first_seen_at: '2026-05-15T05:00:00Z',
+    last_seen_at: '2026-05-15T05:30:00Z',
+    occurrence_count: 2,
+    current_state: 'RESOLVED',
+    severity: 'P0',
+    affected_lanes: ['swarmmind'],
+    reason: 'test crash',
+    cycles_since_first: 5,
+    cycles_since_last_escalation: 0,
+    disposition: null,
+    disposition_at: null,
+    resolution_evidence_refs: [],
+    false_positive: null,
+    cognition_handoff_emitted: false,
+    resolved_at: '2026-05-15T05:30:00Z'
+  }) + '\n', 'utf8');
+  // Re-introduce the same condition
+  const packets = [{
+    id: 'rec-react-001', recommendation_type: 'CRASH_LOOP_DETECTED',
+    severity: 'P0', affected_lanes: ['swarmmind'], reason: 'test crash recurred',
+    requires_agent_cognition: true
+  }];
+  const result = updateRecommendationLedger(packets, 'test-react-cycle');
+  assert.strictEqual(result.new_count, 1);
+  const entries = loadRecommendationLedger();
+  const entry = entries.find(e => e.dedupe_key === 'CRASH_LOOP_DETECTED:swarmmind');
+  assert.strictEqual(entry.current_state, 'NEW');
+  assert.strictEqual(entry.resolved_at, undefined);
+  assert.strictEqual(entry.cognition_handoff_emitted, true);
+  delete process.env.REC_LEDGER;
+  if (fs.existsSync(testLedger)) fs.unlinkSync(testLedger);
+});
+
 // === Summary ===
 console.log(`\n=== Results: ${pass} passed, ${fail} failed ===\n`);
 process.exit(fail > 0 ? 1 : 0);
