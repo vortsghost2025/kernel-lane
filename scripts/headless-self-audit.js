@@ -8,7 +8,9 @@ const { execSync } = require('child_process');
 const { syncAndGuard } = require('./sync-canonical-scripts');
 const { LaneDiscovery } = require('./util/lane-discovery');
 
-const AUDIT_VERSION = '4.0.0';
+let localInference = null;
+try { localInference = require('./local-inference'); } catch (e) { if (process.env.DEBUG_LOCAL_INFERENCE) console.error('[AUDIT] local-inference load failed:', e.message); }
+const AUDIT_VERSION = '5.0.0';
 const LEDGER_PATH = process.env.AUTONOMY_LEDGER || path.join(__dirname, '..', 'context-buffer', 'autonomy-ledger.jsonl');
 const ROLLUP_PATH = process.env.AUTONOMY_ROLLUP || path.join(__dirname, '..', 'context-buffer', 'headless-autonomy-rollup.json');
 const CANONICAL_REGISTRY = path.join(__dirname, 'CANONICAL_SCRIPT_REGISTRY.json');
@@ -901,6 +903,43 @@ function buildEnhancedRollup(ledgerPath, recLedgerPath, windowHours) {
   return base;
 }
 
+async function summarizeJournalWithLocalModel(rollup) {
+  if (!localInference) return null;
+  try {
+    const available = await localInference.isAvailable();
+    if (!available) return null;
+  } catch (_) { return null; }
+
+  const lines = [];
+  if (rollup.cycle_count !== undefined) lines.push(`Cycles(24h): ${rollup.cycle_count}`);
+  if (rollup.topology_stability_pct !== undefined) lines.push(`Topology: ${rollup.topology_stability_pct}%`);
+  if (rollup.cognition_needed_pct !== undefined) lines.push(`Cognition needed: ${rollup.cognition_needed_pct}%`);
+  if (rollup.cognition_handoff_emitted_pct !== undefined) lines.push(`Cognition emitted: ${rollup.cognition_handoff_emitted_pct}%`);
+  if (rollup.broadcast_proof_pass_rate !== undefined) lines.push(`Broadcast: ${rollup.broadcast_proof_pass_rate}%`);
+  if (rollup.dependency_validation_pass_rate !== undefined) lines.push(`Deps: ${rollup.dependency_validation_pass_rate}%`);
+  if (rollup.drift_incidents !== undefined) lines.push(`Drift incidents: ${rollup.drift_incidents}`);
+  const rm = rollup.recommendation_metrics || {};
+  if (rm.active_unresolved !== undefined) lines.push(`Active unresolved: ${rm.active_unresolved}`);
+  if (rm.new_24h !== undefined) lines.push(`New recs(24h): ${rm.new_24h}`);
+  if (rm.resolved_24h !== undefined) lines.push(`Resolved(24h): ${rm.resolved_24h}`);
+  if (rm.total_suppressed !== undefined) lines.push(`Suppressed: ${rm.total_suppressed}`);
+  if (rollup.substrate_status) lines.push(`Status: ${rollup.substrate_status}`);
+  if (rollup.verdict) lines.push(`Verdict: ${rollup.verdict}`);
+
+  if (lines.length === 0) return null;
+
+  const prompt = `Given this 24h headless autonomy rollup, provide a 1-2 sentence operational summary for the operator.\n${lines.join('\n')}`;
+  try {
+    const result = await localInference.callLocalModel(prompt, {
+      maxTokens: 80,
+      temperature: 0.2,
+      system: 'You summarize autonomous infrastructure status in 1-2 concise sentences. Focus on what matters for the operator.',
+      timeoutMs: 120000,
+    });
+    return result.content || null;
+  } catch (_) { return null; }
+}
+
 function buildVerdict(rollup) {
   const rm = rollup.recommendation_metrics || {};
   const cogPct = rollup.cognition_needed_pct || 0;
@@ -933,7 +972,7 @@ function buildVerdict(rollup) {
 }
 
 // === MAIN AUDIT ===
-function runFullAudit(opts) {
+async function runFullAudit(opts) {
   opts = opts || {};
 
   const serviceTopology = checkServiceTopology();
@@ -994,6 +1033,16 @@ patchLedgerCognitionHandoff(entry.ts, cognitionActuallyEmitted, recLedgerResult)
 
 auditResults.rollup = buildEnhancedRollup(LEDGER_PATH, getRecLedgerPath(), 24);
 
+  auditResults.ai_summary = await summarizeJournalWithLocalModel(auditResults.rollup);
+  if (auditResults.ai_summary) {
+    auditResults.rollup.ai_summary = auditResults.ai_summary;
+    try { fs.writeFileSync(ROLLUP_PATH, JSON.stringify(auditResults.rollup, null, 2), 'utf8'); } catch (_) {}
+  }
+
+  if (auditResults.ai_summary) {
+    entry.ai_summary = auditResults.ai_summary;
+  }
+
   if (!opts.quiet) {
     if (opts.json) {
       console.log(JSON.stringify(entry));
@@ -1030,12 +1079,13 @@ Options:
   --help                  Show this help
 
 Components:
-  1. Canonical Drift Sentinel     — detects NO_DRIFT / EXPECTED / UNEXPECTED / SYNC_REQUIRED
-  2. Service Topology Guard       — asserts 4×(worker+relay+heartbeat+executor) + 2 system = 18
-  3. Autonomy Ledger              — compact JSONL cycle records for Pulse/CatchMeUp
-  4. Agent-Activation Policy      — advisory: when to recommend attaching model cognition
-  5. Broadcast Delivery Proof     — verifies to=all fan-out delivery to all lanes
-  6. Dependency Validation        — ensures executor utility files exist on all lanes
+  1. Canonical Drift Sentinel — detects NO_DRIFT / EXPECTED / UNEXPECTED / SYNC_REQUIRED
+  2. Service Topology Guard — asserts 4×(worker+relay+heartbeat+executor) + 2 system = 18
+  3. Autonomy Ledger — compact JSONL cycle records for Pulse/CatchMeUp
+  4. Agent-Activation Policy — advisory: when to recommend attaching model cognition
+  5. Broadcast Delivery Proof — verifies to=all fan-out delivery to all lanes
+  6. Dependency Validation — ensures executor utility files exist on all lanes
+  7. AI Journal Summary — Ollama-powered 1-2 sentence rollup summary (graceful fallback)
 
 Drift classification:
   NO_DRIFT                       — all targets match canonical
@@ -1048,19 +1098,24 @@ Ledger: ${LEDGER_PATH}`);
   }
 
   if (opts.once || (!opts.watch && !process.stdin.isTTY)) {
-    const result = runFullAudit(opts);
-    if (!opts.json && !opts.quiet) {
-      console.log(`\n[AUDIT] ${result.summary}`);
-    }
-    process.exit(result.cognition ? 1 : 0);
-  }
-
-  if (opts.watch) {
+    runFullAudit(opts).then(result => {
+      if (!opts.json && !opts.quiet) {
+        console.log(`\n[AUDIT] ${result.summary}`);
+      }
+      process.exit(result.cognition ? 1 : 0);
+    }).catch(err => {
+      console.error('[AUDIT] Fatal:', err.message);
+      process.exit(2);
+    });
+  } else if (opts.watch) {
     console.log(`[AUDIT] v${AUDIT_VERSION} watching (60s interval)...`);
-    runFullAudit(opts);
-    setInterval(() => {
-      const result = runFullAudit({ ...opts, quiet: true });
+    runFullAudit(opts).then(result => {
       console.log(`[AUDIT] ${result.ts} ${result.summary}`);
+    }).catch(() => {});
+    setInterval(() => {
+      runFullAudit({ ...opts, quiet: true }).then(result => {
+        console.log(`[AUDIT] ${result.ts} ${result.summary}`);
+      }).catch(() => {});
     }, 60000);
   }
 }

@@ -479,6 +479,7 @@ class LaneWorker {
     this.lastRun = null;
     this.sessionId = SESSION_ID;
     this.isOwner = false;
+    this.journalContext = this._readJournalContext();
     if (!this.dryRun) {
       const existing = getActiveOwner(this.repoRoot);
       if (!existing || existing.session_id === SESSION_ID || (Date.now() - new Date(existing.claimed_at).getTime()) > 900000) {
@@ -487,6 +488,28 @@ class LaneWorker {
       }
     } else {
       this.isOwner = true;
+    }
+  }
+
+  _readJournalContext() {
+    try {
+      var scriptPath = path.join(this.repoRoot, 'scripts', 'store-journal.js');
+      if (!fs.existsSync(scriptPath)) return null;
+      var execSync = require('child_process').execSync;
+      var output = execSync('node "' + scriptPath + '" status --hours 4', {
+        cwd: this.repoRoot,
+        timeout: 10000,
+        encoding: 'utf8',
+      });
+      var status = JSON.parse(output);
+      var myLane = status.lanes && status.lanes[this.lane];
+      if (myLane) {
+        console.log('[lane-worker] Journal context loaded: ' + myLane.entries_today + ' entries, ' +
+          myLane.in_progress_sessions.length + ' in-progress, last=' + (myLane.last_event || 'none'));
+      }
+      return status;
+    } catch (_) {
+      return null;
     }
   }
 
