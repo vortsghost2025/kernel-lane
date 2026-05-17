@@ -36,7 +36,7 @@ function loadEnvFromDotenv() {
 
 loadEnvFromDotenv();
 
-const TAILSCALE_IP = '100.95.40.99';
+const TAILSCALE_IP = '100.95.92.117';
 
 function getBaseUrl() {
   const raw = process.env.OLLAMA_BASE_URL || `http://${TAILSCALE_IP}:11434`;

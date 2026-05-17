@@ -6,7 +6,7 @@
       "base_url_env": "OLLAMA_BASE_URL",
       "model_env": "OLLAMA_MODEL",
       "default_model": "qwen2.5-coder:7b",
-      "default_base_url": "http://localhost:11434",
+      "default_base_url": "http://100.95.92.117:11434",
       "max_tokens": 2048,
       "timeout_ms": 60000
     },
