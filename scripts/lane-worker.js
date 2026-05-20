@@ -26,10 +26,7 @@ function runStoreJournalAppend(laneRoot, lane, event, subject, taskId) {
       ' --subject "' + safeSubject + '"' +
       ' --task_id "' + safeTaskId + '"', { cwd: laneRoot, timeout: 10000 });
   } catch (e) {}
-}
-
-const ACTIONABLE_TYPES = new Set(['task', 'escalation', 'request']);
-const NON_ASCII_PATTERN = /[^\x00-\x7F]/;
+  }
 
 // NFM-019 fix: Unicode-to-ASCII normalization map for common typographic characters
 // Policy: lane messages must be ASCII-only. Agents naturally produce Unicode punctuation
@@ -354,13 +351,14 @@ function isActionable(msg) {
   );
 }
 
+const NON_ASCII_PATTERN = /[^\x20-\x7E]/;
+
 function isEnglishOnly(msg) {
   if (!msg || typeof msg !== 'object') return true;
   const textFields = ['subject', 'body', 'type', 'from', 'to'];
   for (const field of textFields) {
     let val = msg[field];
     if (typeof val === 'string') {
-      // NFM-019 fix: normalize common Unicode punctuation to ASCII before check
       val = normalizeToAscii(val);
       if (NON_ASCII_PATTERN.test(val)) {
         return false;
@@ -513,6 +511,30 @@ class LaneWorker {
     }
   }
 
+  _checkJournalOverlap(msg) {
+    if (!this.journalContext || !msg.task_id) return null;
+    var myLane = this.journalContext.lanes && this.journalContext.lanes[this.lane];
+    if (!myLane) return null;
+    var hint = { task_id: msg.task_id, lane: this.lane };
+    var inProgress = myLane.in_progress_sessions || [];
+    var matchingSession = inProgress.find(function(s) { return s.task_id === msg.task_id; });
+    if (matchingSession) {
+      hint.status = 'in_progress';
+      hint.session_id = matchingSession.session_id;
+      return hint;
+    }
+    var recentEvents = myLane.recent_events || [];
+    var completed = recentEvents.find(function(e) {
+      return e.task_id === msg.task_id && (e.event_type === 'work_completed' || e.event_type === 'task_resolved');
+    });
+    if (completed) {
+      hint.status = 'already_completed';
+      hint.completed_event = completed.event_type;
+      return hint;
+    }
+    return null;
+  }
+
   _loadSchemaValidator() {
     try {
       const mod = require(path.join(this.repoRoot, 'src', 'lane', 'SchemaValidator'));
@@ -609,18 +631,43 @@ class LaneWorker {
     if (confidence === null || typeof confidence !== 'number' || confidence < 1 || confidence > 10 || !Number.isInteger(confidence)) {
       return { queue: 'quarantine', reason: 'CONFIDENCE_REQUIRED', detail: 'Assessment must include confidence rating as integer between 1-10' };
     }
-    if (confidence < 7) {
-      const investigation = msg && typeof msg === 'object' ? msg.investigation : null;
-      if (!investigation || typeof investigation !== 'string' || investigation.trim() === '') {
-        return { queue: 'blocked', reason: 'LOW_CONFIDENCE_NO_INVESTIGATION', detail: 'Assessment with confidence < 7 requires investigation evidence' };
-      }
+  if (confidence < 7) {
+    const investigation = msg && typeof msg === 'object' ? msg.investigation : null;
+    if (!investigation || typeof investigation !== 'string' || investigation.trim() === '') {
+      return { queue: 'blocked', reason: 'LOW_CONFIDENCE_NO_INVESTIGATION', detail: 'Assessment with confidence < 7 requires investigation evidence' };
     }
-    if (!isEnglishOnly(msg)) {
+  }
+  // CONFIDENCE_DERIVATION_CONTRACT enforcement (graduated: flag, don't block yet)
+  // High confidence (>=7) without derivation is performative confidence — a governance violation.
+  // Per S:/.global/CONFIDENCE_DERIVATION_CONTRACT.md Rule 1: confidence MUST include
+  // what measured, how measured, what produced, how mapped. Missing = PROHIBITED.
+  // Graduated phase: attach PERFORMATIVE_CONFIDENCE flag to metadata, log to cps_log.
+  if (confidence >= 7) {
+    const derivation = msg && typeof msg === 'object' ? msg.confidence_derivation : null;
+    if (!derivation || typeof derivation !== 'object' || Array.isArray(derivation)) {
+      if (!msg._governance_flags) msg._governance_flags = [];
+      msg._governance_flags.push('PERFORMATIVE_CONFIDENCE');
+      const cpsEntry = {
+        timestamp: new Date().toISOString(),
+        event: 'PERFORMATIVE_CONFIDENCE',
+        agent: msg.from || 'unknown',
+        task_id: msg.task_id || 'unknown',
+        confidence: confidence,
+        has_derivation: false,
+        detail: 'confidence >= 7 without confidence_derivation object — performative confidence per CONFIDENCE_DERIVATION_CONTRACT Rule 1',
+      };
+      try {
+        const cpsPath = path.join(this.laneRoot || path.resolve(__dirname, '..'), 'context-buffer', 'cps_log.jsonl');
+        fs.appendFileSync(cpsPath, JSON.stringify(cpsEntry) + '\n');
+      } catch (_) {}
+    }
+  }
+  if (!isEnglishOnly(msg)) {
       return { queue: 'quarantine', reason: 'FORMAT_VIOLATION_NON_ASCII', detail: 'Message contains non-ASCII content. Re-request in English per governance constraint.' };
     }
 
   const OUTPUT_PROV_EXEMPT_TYPES = new Set(['task', 'escalation', 'request']);
-  if (typeof msg.body === 'string' && !OUTPUT_PROV_EXEMPT_TYPES.has(String(msg.type || '').toLowerCase()) && !isActionable(msg) && cp.hasCompletionProof(msg)) {
+  if (typeof msg.body === 'string' && !OUTPUT_PROV_EXEMPT_TYPES.has(String(msg.type || '').toLowerCase()) && !isActionable(msg)) {
     var prov = verifyOutputProvenance(msg.body);
     if (!prov.ok) {
       return { queue: 'blocked', reason: 'OUTPUT_PROVENANCE_MISSING', detail: 'body lacks OUTPUT_PROVENANCE header. Missing: ' + prov.missing.join(', ') + '. All agent output must include OUTPUT_PROVENANCE:, agent:, lane:, target:.' };
@@ -745,7 +792,7 @@ class LaneWorker {
     }
   }
   // Non-actionable messages claiming completion without verifiable artifact = blocked
-  if (gate.pass && !isActionable(msg) && cp.hasCompletionProof(msg)) {
+  if (gate.pass && !isActionable(msg)) {
     const proofClassification2 = this.artifactResolver.classifyProof(msg);
     const isLegacyPath2 = proofClassification2.type === 'LEGACY_ARTIFACT_PATH';
 
@@ -929,7 +976,9 @@ processFile(filePath) {
       }
     }
   }
-  const decision = this.decideRoute(msg, schemaResult, signatureResult);
+    const journalHint = this._checkJournalOverlap(msg);
+    const decision = this.decideRoute(msg, schemaResult, signatureResult);
+    if (journalHint) decision.journal_awareness = journalHint;
     const targetDir = this.config.queues[decision.queue];
     const targetPath = uniquePath(path.join(targetDir, filename));
 
@@ -1102,7 +1151,17 @@ async function runCli() {
     return;
   }
 
-  while (true) {
+  let shuttingDown = false;
+  process.on("SIGTERM", () => {
+    console.log("[lane-worker] SIGTERM received, shutting down gracefully");
+    shuttingDown = true;
+  });
+  process.on("SIGINT", () => {
+    console.log("[lane-worker] SIGINT received, shutting down gracefully");
+    shuttingDown = true;
+  });
+
+  while (!shuttingDown) {
     const summary = worker.processOnce();
     if (args.json) {
       console.log(JSON.stringify(summary, null, 2));
@@ -1134,4 +1193,5 @@ module.exports = {
   hasFakeProof: cp.hasFakeProof,
   hasUnresolvableEvidence: cp.hasUnresolvableEvidence,
 };
+
 

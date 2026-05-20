@@ -314,7 +314,17 @@ async function runCli() {
       }
     };
     tick();
-    setInterval(tick, args.pollSeconds * 1000);
+    const tickInterval = setInterval(tick, args.pollSeconds * 1000);
+    process.on("SIGTERM", () => {
+      console.log("[relay-daemon] SIGTERM received, shutting down");
+      clearInterval(tickInterval);
+      process.exit(0);
+    });
+    process.on("SIGINT", () => {
+      console.log("[relay-daemon] SIGINT received, shutting down");
+      clearInterval(tickInterval);
+      process.exit(0);
+    });
   } else {
     const result = daemon.runOnce();
     if (args.json) {
