@@ -56,13 +56,44 @@ function signOutboxMessage(msg, laneId) {
   }
 }
 
+let _verifier = null;
+function getVerifier() {
+  if (_verifier === null) {
+    try {
+      const { Verifier } = require(path.join(__dirname, '..', 'src', 'attestation', 'Verifier'));
+      const trustStorePath = process.env.ATTESTATION_TRUST_STORE || path.join(__dirname, '..', 'lanes', 'broadcast', 'trust-store.json');
+      _verifier = new Verifier({ trustStorePath });
+      process.stderr.write(`[relay-daemon] Verifier initialized (trust-store: ${trustStorePath})
+`);
+    } catch (e) {
+      process.stderr.write(`[relay-daemon] WARN: Verifier unavailable, falling back to presence-only: ${e.message}
+`);
+      _verifier = false;
+    }
+  }
+  return _verifier || null;
+}
+
 /**
- * Validate that an incoming message has a valid signature structure.
- * Does NOT verify crypto — just checks structural presence.
- * Returns { ok: true } or { ok: false, reason: string }.
+ * Validate incoming message signature with full cryptographic verification.
+ * Falls back to presence-only check if Verifier is unavailable.
+ * Returns { ok: true, mode: string } or { ok: false, reason: string }.
  */
 function validateIncomingSignature(msg) {
-  if (msg.signature || msg.jws) return { ok: true };
+  const verifier = getVerifier();
+  if (verifier) {
+    try {
+      const result = verifier.verifyQueueItem(msg);
+      if (result.valid) {
+        return { ok: true, mode: 'JWS_VERIFIED' };
+      }
+      return { ok: false, reason: result.reason || result.error || 'SIGNATURE_INVALID' };
+    } catch (e) {
+      process.stderr.write(`[relay-daemon] WARN: Verifier exception, falling back to presence-only: ${e.message}
+`);
+    }
+  }
+  if (msg.signature || msg.jws) return { ok: true, mode: 'PRESENCE_ONLY' };
   return { ok: false, reason: 'MISSING_SIGNATURE' };
 }
 
