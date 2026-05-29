@@ -280,16 +280,27 @@ class RelayDaemon {
       const targetPath = path.join(targetDir, ent.name);
 
         if (!this.dryRun) {
-          try {
-            if (!fs.existsSync(targetDir)) {
-              fs.mkdirSync(targetDir, { recursive: true });
-            }
-            const crossMsg = safeReadJson(filePath).value || {};
-            const signedMsg = signInboxMessage(crossMsg, this.lane);
-            fs.writeFileSync(targetPath, JSON.stringify(signedMsg, null, 2), 'utf8');
-            fs.unlinkSync(filePath);
-            results.collected++;
-            results.details.push({ file: ent.name, from: otherLane + '/lanes/' + this.lane + '/inbox', to: this.lane, target: targetPath, signed: !!signedMsg.signature });
+        try {
+          if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+          }
+          const crossMsg = safeReadJson(filePath).value || {};
+          // Fail-closed: reject unsigned cross-lane messages
+          const sigCheck = validateIncomingSignature(crossMsg);
+          if (!sigCheck.ok) {
+            process.stderr.write(`[relay-daemon] REJECT: unsigned cross-inbox message from ${otherLane}: ${ent.name} (${sigCheck.reason})\n`);
+            try { fs.unlinkSync(filePath); } catch (_) {}
+            results.errors.push({ file: ent.name, error: `rejected_unsigned: ${sigCheck.reason}` });
+            continue;
+          }
+          if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+          }
+          // Write message as-is (already signed by sender) — do NOT re-sign
+          fs.writeFileSync(targetPath, JSON.stringify(crossMsg, null, 2), 'utf8');
+          fs.unlinkSync(filePath);
+          results.collected++;
+          results.details.push({ file: ent.name, from: otherLane + '/lanes/' + this.lane + '/inbox', to: this.lane, target: targetPath, signed: !!(crossMsg.signature || crossMsg.jws) });
           } catch (err) {
             results.errors.push({ file: ent.name, error: err.message });
           }
