@@ -27,6 +27,31 @@ function runStoreJournalAppend(laneRoot, lane, event, subject, taskId) {
 const ALL_LANES = ['archivist', 'library', 'swarmmind', 'kernel'];
 const claimGuard = new ClaimCommitGuard({ repoRoot: path.resolve(__dirname, '..') });
 
+let _createSignedMessage = null;
+function getCreateSignedMessage() {
+  if (_createSignedMessage === null) {
+    try {
+      const mod = require(path.join(__dirname, 'create-signed-message'));
+      _createSignedMessage = mod.createSignedMessage || false;
+    } catch (e) {
+      process.stderr.write(`[relay-daemon] WARN: create-signed-message unavailable: ${e.message}\n`);
+      _createSignedMessage = false;
+    }
+  }
+  return _createSignedMessage || null;
+}
+
+function signInboxMessage(msg, laneId) {
+  const signFn = getCreateSignedMessage();
+  if (!signFn) return msg;
+  try {
+    return signFn(msg, laneId);
+  } catch (e) {
+    process.stderr.write(`[relay-daemon] signing failed for lane=${laneId}: ${e.message}, writing unsigned\n`);
+    return msg;
+  }
+}
+
 function getInboxDir(laneId) { return discovery.getInbox(laneId); }
 function getOutboxDir(laneId) { return discovery.getOutbox(laneId); }
 function getLaneRoot(laneId) { return discovery.getLocalPath(laneId); }
@@ -184,13 +209,14 @@ class RelayDaemon {
           results.details.push({ file: ent.name, from: otherLane, to: this.lane, target: targetPath, skipped: 'already_exists' });
           continue;
         }
-        if (!fs.existsSync(targetDir)) {
-              fs.mkdirSync(targetDir, { recursive: true });
-            }
-            fs.writeFileSync(targetPath, JSON.stringify(msg, null, 2), 'utf8');
-            fs.unlinkSync(filePath);
-            results.collected++;
-            results.details.push({ file: ent.name, from: otherLane, to: this.lane, target: targetPath });
+          if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+          }
+          const signedMsg = signInboxMessage(msg, this.lane);
+          fs.writeFileSync(targetPath, JSON.stringify(signedMsg, null, 2), 'utf8');
+          fs.unlinkSync(filePath);
+          results.collected++;
+          results.details.push({ file: ent.name, from: otherLane, to: this.lane, target: targetPath, signed: !!signedMsg.signature });
           } catch (err) {
             results.errors.push({ file: ent.name, error: err.message });
           }
@@ -223,15 +249,17 @@ class RelayDaemon {
       const targetDir = getInboxDir(this.lane);
       const targetPath = path.join(targetDir, ent.name);
 
-      if (!this.dryRun) {
-        try {
-          if (!fs.existsSync(targetDir)) {
-            fs.mkdirSync(targetDir, { recursive: true });
-          }
-          fs.writeFileSync(targetPath, JSON.stringify(safeReadJson(filePath).value || {}, null, 2), 'utf8');
+        if (!this.dryRun) {
+          try {
+            if (!fs.existsSync(targetDir)) {
+              fs.mkdirSync(targetDir, { recursive: true });
+            }
+            const crossMsg = safeReadJson(filePath).value || {};
+            const signedMsg = signInboxMessage(crossMsg, this.lane);
+            fs.writeFileSync(targetPath, JSON.stringify(signedMsg, null, 2), 'utf8');
             fs.unlinkSync(filePath);
             results.collected++;
-            results.details.push({ file: ent.name, from: otherLane + '/lanes/' + this.lane + '/inbox', to: this.lane, target: targetPath });
+            results.details.push({ file: ent.name, from: otherLane + '/lanes/' + this.lane + '/inbox', to: this.lane, target: targetPath, signed: !!signedMsg.signature });
           } catch (err) {
             results.errors.push({ file: ent.name, error: err.message });
           }
