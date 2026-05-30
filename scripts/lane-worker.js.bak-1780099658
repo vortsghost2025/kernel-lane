@@ -57,7 +57,6 @@ function normalizeToAscii(str) {
 
 const SKIP_FILENAMES = new Set(['heartbeat.json', 'watcher.log', 'watcher.pid', 'readme.md']);
 const HEARTBEAT_PATTERN = /^heartbeat-.+\.json$/i;
-const ACTIONABLE_TYPES = new Set(['task', 'escalation', 'request']);
 
 const SESSION_ID = process.env.LANE_SESSION_ID || `sess_${Date.now().toString(36)}_${process.pid}`;
 const SESSION_EPOCH = new Date().toISOString();
@@ -674,7 +673,7 @@ class LaneWorker {
       return { queue: 'quarantine', reason: 'FORMAT_VIOLATION_NON_ASCII', detail: 'Message contains non-ASCII content. Re-request in English per governance constraint.' };
     }
 
-  const OUTPUT_PROV_EXEMPT_TYPES = new Set(['task', 'escalation', 'request', 'notification', 'heartbeat', 'status']);
+  const OUTPUT_PROV_EXEMPT_TYPES = new Set(['task', 'escalation', 'request']);
   if (typeof msg.body === 'string' && !OUTPUT_PROV_EXEMPT_TYPES.has(String(msg.type || '').toLowerCase()) && !isActionable(msg)) {
     var prov = verifyOutputProvenance(msg.body);
     if (!prov.ok) {
@@ -800,7 +799,7 @@ class LaneWorker {
     }
   }
   // Non-actionable messages claiming completion without verifiable artifact = blocked
-  if (gate.pass && !isActionable(msg) && !cp.isTerminalInformational(msg)) {
+  if (gate.pass && !isActionable(msg)) {
     const proofClassification2 = this.artifactResolver.classifyProof(msg);
     const isLegacyPath2 = proofClassification2.type === 'LEGACY_ARTIFACT_PATH';
 
