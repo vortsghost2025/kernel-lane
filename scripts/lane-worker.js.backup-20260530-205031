@@ -6,7 +6,6 @@ const path = require('path');
 
 const cp = require('./completion-proof');
 const { ArtifactResolver } = require('./artifact-resolver');
-const { lockFile, unlockFile } = require("../../../../scripts/lockboard/lockManager");
 const { ExecutionGate } = require('./execution-gate');
 const { evaluateVerificationDomain } = require('./verification-domain-gate');
 const { getCodeVersionHash } = require('./code-version-hash');
