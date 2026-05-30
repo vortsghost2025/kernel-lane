@@ -670,27 +670,6 @@ class LaneWorker {
         } catch (_) {}
       }
     }
-// CONFIDENCE_DERIVATION_CONTRACT: Flag performative confidence (≥7 without derivation)
-if (msg.confidence !== undefined && msg.confidence >= 7) {
-    const derivation = msg.confidence_derivation;
-    if (!derivation || typeof derivation !== 'object' || !derivation.measured || !derivation.how_measured) {
-        if (!msg._governance_flags) msg._governance_flags = [];
-        msg._governance_flags.push('PERFORMATIVE_CONFIDENCE');
-        const cpsEntry = {
-            timestamp: new Date().toISOString(),
-            event: 'PERFORMATIVE_CONFIDENCE',
-            agent: msg.from || 'unknown',
-            task_id: msg.task_id || 'unknown',
-            confidence: msg.confidence,
-        };
-        const cpsPath = path.join(repoRoot, 'context-buffer', 'cps_log.jsonl');
-        try {
-            fs.appendFileSync(cpsPath, JSON.stringify(cpsEntry) + '\n');
-        } catch (e) {
-            process.stderr.write(`[lane-worker] CPS log failed: ${e.message}\n`);
-        }
-    }
-}
   if (!isEnglishOnly(msg)) {
       return { queue: 'quarantine', reason: 'FORMAT_VIOLATION_NON_ASCII', detail: 'Message contains non-ASCII content. Re-request in English per governance constraint.' };
     }

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.3",
+  "task_id": "test-confidence-no-derivation",
+  "from": "swarmmind",
+  "to": "kernel",
+  "type": "task",
+  "priority": "P1",
+  "subject": "Test confidence_derivation missing",
+  "body": "Confidence 8 without derivation should be flagged",
+  "timestamp": "2026-05-30T19:25:00Z",
+  "confidence": 8,
+  "evidence": {"required": false}
+}
