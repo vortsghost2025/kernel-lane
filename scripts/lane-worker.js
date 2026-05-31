@@ -1117,6 +1117,49 @@ _routeRaw(filePath, queueKey, meta) {
 
     this.lastRun = summary;
     return summary;
+    // EVENT LOGGING FUNCTION
+    // Logs every received message to an append-only event log for event sourcing
+    logEvent(msg) {
+      try {
+        const eventLogDir = path.join(this.laneRoot, 'lanes', this.lane, 'inbox', 'event_log');
+        const eventLogFile = path.join(eventLogDir, 'events.log');
+        const fs = require('fs');
+        // Ensure the event log directory exists
+        if (!fs.existsSync(eventLogDir)) {
+          fs.mkdirSync(eventLogDir, { recursive: true });
+        }
+        // Generate a simple event ID: timestamp + random string
+        const eventId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const event = {
+          event_id: eventId,
+          event_timestamp: new Date().toISOString(),
+          lane: this.lane,
+          event_type: 'message_received',
+          message: msg, // the original message
+          processing_metadata: {
+            received_at: new Date().toISOString(),
+            processed_by: `${this.lane}-worker-${process.pid}`, // approximate
+            routing_result: {
+              queue: 'unknown',
+              reason: 'event_logged_at_receipt',
+              detail: 'Logged at message receipt, before routing',
+              schema_valid: null,
+              signature_valid: null,
+              english_only: null,
+              _lane_worker: null
+            }
+          }
+        };
+        // Append the event as a single line JSON
+        fs.appendFileSync(eventLogFile, JSON.stringify(event) + '
+');
+      } catch (err) {
+        // If we fail to log the event, we don't want to break the message processing.
+        // Just log the error to stderr and continue.
+        process.stderr.write(`[lane-worker] Failed to log event: ${err.message}
+`);
+      }
+    }
   }
 }
 
