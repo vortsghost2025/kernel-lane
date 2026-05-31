@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-05-31T06:41:28.926Z",
+  "lastRun": {
+    "lane": "kernel",
+    "repo_root": "/home/we4free/agent/repos/kernel-lane",
+    "dry_run": false,
+    "scanned": 0,
+    "routed": {
+      "action_required": 0,
+      "in_progress": 0,
+      "processed": 0,
+      "blocked": 0,
+      "quarantine": 0
+    },
+    "execution_verified_count": 0,
+    "execution_failed_count": 0,
+    "liveness": {
+      "tasks_completed_last_5min": 0,
+      "alert": true,
+      "alert_reason": "ZERO_COMPLETIONS_WHILE_SYSTEM_ACTIVE",
+      "checked_at": "2026-05-31T06:41:28.926Z"
+    },
+    "manual_cadence": false,
+    "enforce_ownership": false,
+    "ownership_enforcement_enabled": false,
+    "ownership_warnings": 0,
+    "routes": [],
+    "timestamp": "2026-05-31T06:41:28.926Z"
+  }
+}
