@@ -1134,6 +1134,7 @@ _routeRaw(filePath, queueKey, meta) {
     };
 
     this.lastRun = summary;
+    this.writeSnapshot();
     return summary;
   }
   logResourceMetrics() {
@@ -1157,8 +1158,34 @@ _routeRaw(filePath, queueKey, meta) {
         },
       };
       fs.appendFileSync(metricsFile, JSON.stringify(entry) + '\n', 'utf8');
+          // Alerting: check thresholds
+          const cpuUsageMs = cpu.user + cpu.system;
+          const cpuThresholdMs = 80000; // 80ms as example threshold (adjust as needed)
+          const memThresholdBytes = 100 * 1024 * 1024; // 100 MB
+          if (cpuUsageMs > cpuThresholdMs || mem.rss > memThresholdBytes) {
+            const alertLine = `${new Date().toISOString()},lane=${this.lane},pid=${process.pid},cpu=${cpuUsageMs}µs,mem=${mem.rss}bytes`;
+            const alertDir = path.join(this.repoRoot, 'lanes', this.lane, 'state');
+            if (!fs.existsSync(alertDir)) fs.mkdirSync(alertDir, { recursive: true });
+            const alertFile = path.join(alertDir, 'alerts.log');
+            fs.appendFileSync(alertFile, alertLine + '\n', 'utf8');
+          }
     } catch (err) {
       process.stderr.write(`[lane-worker] Resource metrics logging failed: ${err.message}\n`);
+    }
+  }
+
+  writeSnapshot() {
+    try {
+      const snapshotDir = path.join(this.repoRoot, 'lanes', this.lane, 'state', 'snapshots');
+      if (!fs.existsSync(snapshotDir)) fs.mkdirSync(snapshotDir, { recursive: true });
+      const snapshotFile = path.join(snapshotDir, 'latest.json');
+      const snapshot = {
+        timestamp: nowIso(),
+        lastRun: this.lastRun,
+      };
+      fs.writeFileSync(snapshotFile, JSON.stringify(snapshot, null, 2), 'utf8');
+    } catch (err) {
+      process.stderr.write(`[lane-worker] Snapshot write failed: ${err.message}\n`);
     }
   }
 }
