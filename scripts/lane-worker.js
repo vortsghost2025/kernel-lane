@@ -468,6 +468,8 @@ class LaneWorker {
     this.artifactResolver = options.artifactResolver || new ArtifactResolver({
       dryRun: this.dryRun,
       configPath: path.join(this.repoRoot, 'config', 'allowed_roots.json'),
+    this.latestMetrics = null;
+    if (!this.dryRun) this.startMetricsServer();
     });
     this.executionGate = options.executionGate || new ExecutionGate({
       lane: this.lane,
@@ -1157,6 +1159,7 @@ _routeRaw(filePath, queueKey, meta) {
           arrayBuffers: mem.arrayBuffers,
         },
       };
+      this.latestMetrics = entry;
       fs.appendFileSync(metricsFile, JSON.stringify(entry) + '\n', 'utf8');
           // Alerting: check thresholds
           const cpuUsageMs = cpu.user + cpu.system;
@@ -1233,6 +1236,35 @@ _routeRaw(filePath, queueKey, meta) {
       fs.writeFileSync(snapshotFile, JSON.stringify(snapshot, null, 2), 'utf8');
     } catch (err) {
       process.stderr.write(`[lane-worker] Snapshot write failed: ${err.message}\n`);
+    }
+  }
+
+  startMetricsServer() {
+    try {
+      const http = require('http');
+      // Compute a port based on lane name to avoid conflicts
+      let portHash = 0;
+      for (let i = 0; i < this.lane.length; i++) {
+        portHash += this.lane.charCodeAt(i);
+      }
+      const port = 3000 + (portHash % 1000);
+      const server = http.createServer((req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        if (this.latestMetrics) {
+          res.end(JSON.stringify(this.latestMetrics));
+        } else {
+          res.end(JSON.stringify({ error: 'No metrics available yet' }));
+        }
+      });
+      server.listen(port, () => {
+        console.log(`[lane-worker] Metrics server listening on port ${port}`);
+      });
+      server.on('error', (err) => {
+        console.error(`[lane-worker] Metrics server error: ${err.message}`);
+      });
+    } catch (err) {
+      console.error(`[lane-worker] Failed to start metrics server: ${err.message}`);
     }
   }
 }
