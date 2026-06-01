@@ -39,9 +39,9 @@ class AdaptiveCpuAlerts {
         this._state = JSON.parse(fs.readFileSync(this.statePath, 'utf8'));
         if (!this._state.samples) this._state.samples = [];
         if (!this._state.alertCooldowns) this._state.alertCooldowns = {};
-        if (!this._state.consecutiveHighCpu) this._state.consecutiveHighCpu = 0;
-        if (!this._state.consecutiveCriticalCpu) this._state.consecutiveCriticalCpu = 0;
-        if (!this._state.consecutiveEmergencyCpu) this._state.consecutiveEmergencyCpu = 0;
+    if (this._state.consecutiveHighCpu === undefined) this._state.consecutiveHighCpu = 0;
+    if (this._state.consecutiveCriticalCpu === undefined) this._state.consecutiveCriticalCpu = 0;
+    if (this._state.consecutiveEmergencyCpu === undefined) this._state.consecutiveEmergencyCpu = 0;
         return;
       }
     } catch (e) {
@@ -97,12 +97,13 @@ class AdaptiveCpuAlerts {
   _getAdaptiveThresholds() {
     const baseline = this._computeBaseline();
     if (!baseline) {
-      return {
-        warningPct: this.config.static_floor_pct,
-        criticalPct: this.config.static_floor_pct * 5,
-        mode: 'static',
-        baseline: null,
-      };
+    return {
+      warningPct: this.config.static_floor_pct,
+      criticalPct: this.config.static_floor_pct * 5,
+      emergencyPct: this.config.emergency_hard_ceiling_pct,
+      mode: 'static',
+      baseline: null,
+    };
     }
 
     const adaptiveWarn = Math.max(
@@ -159,9 +160,10 @@ class AdaptiveCpuAlerts {
     this._prevWallMs = now;
     this._prevCpu = cpuTotalUsec;
 
-    const thresholds = this._getAdaptiveThresholds();
-    const result = this._checkThresholds(cpuPct, memRss, thresholds);
+  const thresholds = this._getAdaptiveThresholds();
+  const result = this._checkThresholds(cpuPct, memRss, thresholds);
 
+  if (cpuPct < thresholds.warningPct) {
     this._state.samples.push({
       timestamp: new Date().toISOString(),
       cpuPct: Math.round(cpuPct * 1000) / 1000,
@@ -169,6 +171,7 @@ class AdaptiveCpuAlerts {
       cpuTotalUsec,
       wallSeconds: Math.round(wallSeconds * 10) / 10,
     });
+  }
 
     const maxSamples = this.config.baseline_window_samples * 2;
     if (this._state.samples.length > maxSamples) {

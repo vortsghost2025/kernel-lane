@@ -11,6 +11,7 @@ const { evaluateVerificationDomain } = require('./verification-domain-gate');
 const { getCodeVersionHash } = require('./code-version-hash');
 const { getRoots } = require('./util/lane-discovery');
 const { verifyOutputProvenance } = require('./output-provenance');
+const { AdaptiveCpuAlerts } = require('./adaptive-cpu-alerts');
 
 function runStoreJournalAppend(laneRoot, lane, event, subject, taskId) {
   var scriptPath = path.join(laneRoot, 'scripts', 'store-journal.js');
@@ -470,6 +471,11 @@ class LaneWorker {
       configPath: path.join(this.repoRoot, 'config', 'allowed_roots.json'),
     });
     this.latestMetrics = null;
+    this.adaptiveAlerts = new AdaptiveCpuAlerts({
+      lane: this.lane,
+      stateDir: path.join(this.repoRoot, 'lanes', this.lane, 'state'),
+      config: this._loadAdaptiveAlertConfig(),
+    });
     if (!this.dryRun) this.startMetricsServer();
     this.executionGate = options.executionGate || new ExecutionGate({
       lane: this.lane,
@@ -490,6 +496,21 @@ class LaneWorker {
     } else {
       this.isOwner = true;
     }
+  }
+
+  _readJournalContext() {
+
+  _loadAdaptiveAlertConfig() {
+    try {
+      const configPath = path.join(this.repoRoot, 'config', 'adaptive-alerts.json');
+      if (fs.existsSync(configPath)) {
+        const raw = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        return Object.assign({}, AdaptiveCpuAlerts.DEFAULT_CONFIG, raw);
+      }
+    } catch (e) {
+      process.stderr.write(`[lane-worker] Failed to load adaptive alert config: ${e.message}\n`);
+    }
+    return {};
   }
 
   _readJournalContext() {

@@ -103,13 +103,14 @@ test('sustained extreme CPU triggers critical', (tmpDir) => {
     alert.evaluate(cpu, 50 * 1024 * 1024, WALL);
   }
   const extremeDelta = 55 * WALL * 1_000_000 / 100;
-  let lastResult;
+  let results = [];
   for (let i = 0; i < 10; i++) {
     cpu += extremeDelta;
-    lastResult = alert.evaluate(cpu, 50 * 1024 * 1024, WALL);
+    results.push(alert.evaluate(cpu, 50 * 1024 * 1024, WALL));
   }
-  assert.strictEqual(lastResult.shouldAlert, true, 'Sustained extreme CPU should alert');
-  assert.strictEqual(lastResult.severity, 'CRITICAL', `Should be CRITICAL, got ${lastResult.severity}`);
+  const firedAlert = results.find(r => r.shouldAlert && r.severity === 'CRITICAL');
+  assert(firedAlert, 'Sustained extreme CPU should trigger CRITICAL alert');
+  assert.strictEqual(firedAlert.severity, 'CRITICAL');
 });
 
 test('emergency hard ceiling triggers immediately', (tmpDir) => {
@@ -121,15 +122,14 @@ test('emergency hard ceiling triggers immediately', (tmpDir) => {
     alert.evaluate(cpu, 50 * 1024 * 1024, WALL);
   }
   const emergencyDelta = 85 * WALL * 1_000_000 / 100;
-  let lastResult;
+  let results = [];
   for (let i = 0; i < 3; i++) {
     cpu += emergencyDelta;
-    lastResult = alert.evaluate(cpu, 50 * 1024 * 1024, WALL);
+    results.push(alert.evaluate(cpu, 50 * 1024 * 1024, WALL));
   }
-  assert.strictEqual(lastResult.shouldAlert, true, 'Emergency CPU should alert');
-  assert.strictEqual(lastResult.severity, 'CRITICAL', 'Emergency should be CRITICAL');
-  const hasEmergency = lastResult.alerts.some(a => a.thresholdType === 'emergency_hard_ceiling');
-  assert.strictEqual(hasEmergency, true, 'Should include emergency threshold type');
+  const firedAlert = results.find(r => r.shouldAlert && r.alerts.some(a => a.thresholdType === 'emergency_hard_ceiling'));
+  assert(firedAlert, 'Emergency CPU should trigger CRITICAL emergency alert');
+  assert.strictEqual(firedAlert.severity, 'CRITICAL', 'Emergency should be CRITICAL');
 });
 
 test('cooldown suppresses alert storm', (tmpDir) => {
@@ -219,12 +219,14 @@ test('escalate flag set on CRITICAL alerts', (tmpDir) => {
     alert.evaluate(cpu, 50 * 1024 * 1024, WALL);
   }
   const extremeDelta = 55 * WALL * 1_000_000 / 100;
-  let lastResult;
+  let results = [];
   for (let i = 0; i < 10; i++) {
     cpu += extremeDelta;
-    lastResult = alert.evaluate(cpu, 50 * 1024 * 1024, WALL);
+    results.push(alert.evaluate(cpu, 50 * 1024 * 1024, WALL));
   }
-  assert.strictEqual(lastResult.escalate, true, 'CRITICAL should set escalate=true');
+  const criticalResult = results.find(r => r.shouldAlert && r.severity === 'CRITICAL');
+  assert(criticalResult, 'Should have a CRITICAL alert result');
+  assert.strictEqual(criticalResult.escalate, true, 'CRITICAL should set escalate=true');
 });
 
 test('disabled config produces no alerts', (tmpDir) => {
@@ -246,18 +248,24 @@ test('state persists across instances', (tmpDir) => {
 
 test('consecutive counters reset on normal CPU', (tmpDir) => {
   const alert = makeAlert('kernel', tmpDir);
-  const highDelta = 50 * WALL * 1_000_000 / 100;
+  const normalDelta = 2.5 * WALL * 1_000_000 / 100;
   let cpu = 0;
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 10; i++) {
+    cpu += normalDelta;
+    alert.evaluate(cpu, 50 * 1024 * 1024, WALL);
+  }
+  const highDelta = 10 * WALL * 1_000_000 / 100;
+  for (let i = 0; i < 2; i++) {
     cpu += highDelta;
     alert.evaluate(cpu, 50 * 1024 * 1024, WALL);
   }
-  assert(alert._state.consecutiveHighCpu > 0, 'Should have high consecutive count');
+  assert.strictEqual(alert._state.consecutiveHighCpu, 2, 'Should have warning consecutive count of 2');
 
-  const normalDelta = 2.5 * WALL * 1_000_000 / 100;
   cpu += normalDelta;
   alert.evaluate(cpu, 50 * 1024 * 1024, WALL);
-  assert.strictEqual(alert._state.consecutiveHighCpu, 0, 'Consecutive should reset on normal CPU');
+  assert.strictEqual(alert._state.consecutiveHighCpu, 0, 'Warning consecutive should reset on normal CPU');
+  assert.strictEqual(alert._state.consecutiveCriticalCpu, 0, 'Critical consecutive should reset on normal CPU');
+  assert.strictEqual(alert._state.consecutiveEmergencyCpu, 0, 'Emergency consecutive should reset on normal CPU');
 });
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed, ${passed + failed} total ===`);
