@@ -149,10 +149,15 @@ class AdaptiveCpuAlerts {
       deltaCpuUsec = Math.max(0, cpuTotalUsec - this._prevCpu);
       wallSeconds = _wallSecondsOverride != null
         ? _wallSecondsOverride
-        : Math.max(this.config.sample_window_seconds, (now - this._prevWallMs) / 1000);
+        : (now - this._prevWallMs) / 1000;
     } else {
+      this._state.consecutiveHighCpu = 0;
+      this._state.consecutiveCriticalCpu = 0;
+      this._state.consecutiveEmergencyCpu = 0;
       deltaCpuUsec = cpuTotalUsec;
-      wallSeconds = this.config.sample_window_seconds;
+      wallSeconds = _wallSecondsOverride != null
+        ? _wallSecondsOverride
+        : Math.max(this.config.sample_window_seconds, process.uptime());
     }
 
     const cpuPct = this._normalizeCpuPct(deltaCpuUsec, wallSeconds);
