@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "sample_window_seconds": 60,
+  "baseline_window_samples": 240,
+  "min_baseline_samples": 30,
+  "static_floor_pct": 5.0,
+  "warning_multiplier_p95": 2.5,
+  "critical_multiplier_p95": 5.0,
+  "warning_consecutive_samples": 3,
+  "critical_consecutive_samples": 5,
+  "warning_cooldown_seconds": 1800,
+  "critical_cooldown_seconds": 600,
+  "emergency_hard_ceiling_pct": 80.0,
+  "emergency_consecutive_samples": 2,
+  "mem_threshold_bytes": 104857600,
+  "mem_cooldown_seconds": 1800
+}
