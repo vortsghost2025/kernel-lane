@@ -498,8 +498,6 @@ class LaneWorker {
     }
   }
 
-  _readJournalContext() {
-
   _loadAdaptiveAlertConfig() {
     try {
       const configPath = path.join(this.repoRoot, 'config', 'adaptive-alerts.json');
@@ -1181,66 +1179,64 @@ _routeRaw(filePath, queueKey, meta) {
         },
       };
       this.latestMetrics = entry;
-      this.latestMetrics = entry;
       fs.appendFileSync(metricsFile, JSON.stringify(entry) + '\n', 'utf8');
-          // Alerting: check thresholds
-          const cpuUsageMs = cpu.user + cpu.system;
-          const cpuThresholdMs = 80000; // 80ms as example threshold (adjust as needed)
-          const memThresholdBytes = 100 * 1024 * 1024; // 100 MB
-          if (cpuUsageMs > cpuThresholdMs || mem.rss > memThresholdBytes) {
-            const alertLine = `${new Date().toISOString()},lane=${this.lane},pid=${process.pid},cpu=${cpuUsageMs}µs,mem=${mem.rss}bytes`;
-            const alertDir = path.join(this.repoRoot, 'lanes', this.lane, 'state');
-            if (!fs.existsSync(alertDir)) fs.mkdirSync(alertDir, { recursive: true });
-            const alertFile = path.join(alertDir, 'alerts.log');
-            fs.appendFileSync(alertFile, alertLine + '\n', 'utf8');
-          }
-            // Send notification to Archivist lane as P0 alert
+
+      const cpuTotalUsec = cpu.user + cpu.system;
+      const alertResult = this.adaptiveAlerts.evaluate(cpuTotalUsec, mem.rss);
+      if (alertResult && alertResult.shouldAlert) {
+        const alertDir = path.join(this.repoRoot, 'lanes', this.lane, 'state');
+        if (!fs.existsSync(alertDir)) fs.mkdirSync(alertDir, { recursive: true });
+        const alertFile = path.join(alertDir, 'alerts.log');
+        const alertLine = `${new Date().toISOString()},lane=${this.lane},pid=${process.pid},cpu_pct=${alertResult.cpuPct.toFixed(1)},severity=${alertResult.severity},alerts=${alertResult.alerts.map(a => a.thresholdType).join(',')}`;
+        fs.appendFileSync(alertFile, alertLine + '\n', 'utf8');
+
+        try {
+          const alertMsg = {
+            schema_version: '1.3',
+            task_id: `alert-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+            idempotency_key: `alert-${this.lane}-${Date.now()}`,
+            from: this.lane,
+            to: 'archivist',
+            type: 'notification',
+            task_kind: 'alert',
+            priority: alertResult.escalate ? 'P0' : 'P1',
+            subject: `Resource Alert: ${this.lane} ${alertResult.severity} cpu=${alertResult.cpuPct.toFixed(1)}%`,
+            body: alertResult.alerts.map(a => a.message).join('; '),
+            timestamp: nowIso(),
+            requires_action: alertResult.escalate,
+            payload: { mode: 'inline', compression: 'none' },
+            execution: { mode: 'manual', engine: 'kilo', actor: 'lane' },
+            lease: { owner: null, acquired_at: null },
+            retry: { attempt: 1, max_attempts: 3 },
+            evidence: { required: false, verified: false },
+            heartbeat: { status: 'pending', last_heartbeat_at: nowIso(), interval_seconds: 300, timeout_seconds: 900 },
+            watcher: { enabled: false, poll_seconds: 60, p0_fast_path: true, max_concurrent: 1, heartbeat_required: true, stale_after_seconds: 300, backoff: { initial_seconds: 60, max_seconds: 300, multiplier: 2 } },
+            delivery_verification: { verified: false, verified_at: null, retries: 0 }
+          };
+          const signFn = getCreateSignedMessage();
+          let finalMsg = alertMsg;
+          if (signFn) {
             try {
-              const alertMsg = {
-                schema_version: '1.3',
-                task_id: `alert-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
-                idempotency_key: `alert-${this.lane}-${Date.now()}`,
-                from: this.lane,
-                to: 'archivist',
-                type: 'notification',
-                task_kind: 'alert',
-                priority: 'P0',
-                subject: `Resource Alert: ${this.lane}`,
-                body: `Resource usage exceeded thresholds: cpu=${cpuUsageMs}µs (threshold ${cpuThresholdMs}µs), mem=${mem.rss}bytes (threshold ${memThresholdBytes}bytes).`,
-                timestamp: nowIso(),
-                requires_action: true,
-                payload: { mode: 'inline', compression: 'none' },
-                execution: { mode: 'manual', engine: 'kilo', actor: 'lane' },
-                lease: { owner: null, acquired_at: null },
-                retry: { attempt: 1, max_attempts: 3 },
-                evidence: { required: false, verified: false },
-                heartbeat: { status: 'pending', last_heartbeat_at: nowIso(), interval_seconds: 300, timeout_seconds: 900 },
-                watcher: { enabled: false, poll_seconds: 60, p0_fast_path: true, max_concurrent: 1, heartbeat_required: true, stale_after_seconds: 300, backoff: { initial_seconds: 60, max_seconds: 300, multiplier: 2 } },
-                delivery_verification: { verified: false, verified_at: null, retries: 0 }
-              };
-              const signFn = getCreateSignedMessage();
-              let finalMsg = alertMsg;
-              if (signFn) {
-                try {
-                  finalMsg = signFn(alertMsg, 'archivist');
-                } catch (e) {
-                  process.stderr.write(`[lane-worker] Alert signing failed: ${e.message}\n`);
-                }
-              }
-              const archivistRoot = LANE_ROOTS['archivist'];
-              if (archivistRoot) {
-                const archivistInbox = path.join(archivistRoot, 'lanes', 'archivist', 'inbox');
-                if (!fs.existsSync(archivistInbox)) {
-                  fs.mkdirSync(archivistInbox, { recursive: true });
-                }
-                const alertPath = path.join(archivistInbox, `alert-${finalMsg.task_id}.json`);
-                fs.writeFileSync(alertPath, JSON.stringify(finalMsg, null, 2), 'utf8');
-              } else {
-                process.stderr.write(`[lane-worker] Could not determine archivist root for alert notification\n`);
-              }
-            } catch (notifyErr) {
-              process.stderr.write(`[lane-worker] Failed to send resource alert notification: ${notifyErr.message}\n`);
+              finalMsg = signFn(alertMsg, 'archivist');
+            } catch (e) {
+              process.stderr.write(`[lane-worker] Alert signing failed: ${e.message}\n`);
             }
+          }
+          const archivistRoot = LANE_ROOTS['archivist'];
+          if (archivistRoot) {
+            const archivistInbox = path.join(archivistRoot, 'lanes', 'archivist', 'inbox');
+            if (!fs.existsSync(archivistInbox)) {
+              fs.mkdirSync(archivistInbox, { recursive: true });
+            }
+            const alertPath = path.join(archivistInbox, `alert-${finalMsg.task_id}.json`);
+            fs.writeFileSync(alertPath, JSON.stringify(finalMsg, null, 2), 'utf8');
+          } else {
+            process.stderr.write(`[lane-worker] Could not determine archivist root for alert notification\n`);
+          }
+        } catch (notifyErr) {
+          process.stderr.write(`[lane-worker] Failed to send resource alert notification: ${notifyErr.message}\n`);
+        }
+      }
     } catch (err) {
       process.stderr.write(`[lane-worker] Resource metrics logging failed: ${err.message}\n`);
     }
