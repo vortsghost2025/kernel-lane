@@ -1,1693 +1,6 @@
 {
   "samples": [
     {
-      "timestamp": "2026-06-02T07:36:04.013Z",
-      "cpuPct": 0.025,
-      "cpuDeltaUsec": 5059,
-      "cpuTotalUsec": 28787067,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:36:24.020Z",
-      "cpuPct": 0.023,
-      "cpuDeltaUsec": 4631,
-      "cpuTotalUsec": 28791698,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:36:44.046Z",
-      "cpuPct": 0.04,
-      "cpuDeltaUsec": 8074,
-      "cpuTotalUsec": 28799772,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:37:04.061Z",
-      "cpuPct": 0.034,
-      "cpuDeltaUsec": 6761,
-      "cpuTotalUsec": 28806533,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:37:24.065Z",
-      "cpuPct": 0.021,
-      "cpuDeltaUsec": 4117,
-      "cpuTotalUsec": 28810650,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:37:44.085Z",
-      "cpuPct": 0.018,
-      "cpuDeltaUsec": 3519,
-      "cpuTotalUsec": 28814169,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:38:04.097Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4864,
-      "cpuTotalUsec": 28819033,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:38:24.101Z",
-      "cpuPct": 0.019,
-      "cpuDeltaUsec": 3721,
-      "cpuTotalUsec": 28822754,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:38:44.123Z",
-      "cpuPct": 0.023,
-      "cpuDeltaUsec": 4524,
-      "cpuTotalUsec": 28827278,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:39:04.139Z",
-      "cpuPct": 0.044,
-      "cpuDeltaUsec": 8866,
-      "cpuTotalUsec": 28836144,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:39:24.146Z",
-      "cpuPct": 0.032,
-      "cpuDeltaUsec": 6391,
-      "cpuTotalUsec": 28842535,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:39:44.170Z",
-      "cpuPct": 0.027,
-      "cpuDeltaUsec": 5423,
-      "cpuTotalUsec": 28847958,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:40:04.183Z",
-      "cpuPct": 0.028,
-      "cpuDeltaUsec": 5578,
-      "cpuTotalUsec": 28853536,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:40:24.191Z",
-      "cpuPct": 0.03,
-      "cpuDeltaUsec": 6007,
-      "cpuTotalUsec": 28859543,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:40:44.214Z",
-      "cpuPct": 0.047,
-      "cpuDeltaUsec": 9361,
-      "cpuTotalUsec": 28868904,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:41:04.228Z",
-      "cpuPct": 0.029,
-      "cpuDeltaUsec": 5789,
-      "cpuTotalUsec": 28874693,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:41:24.234Z",
-      "cpuPct": 0.035,
-      "cpuDeltaUsec": 7087,
-      "cpuTotalUsec": 28881780,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:41:44.258Z",
-      "cpuPct": 0.032,
-      "cpuDeltaUsec": 6423,
-      "cpuTotalUsec": 28888203,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:42:04.273Z",
-      "cpuPct": 0.031,
-      "cpuDeltaUsec": 6138,
-      "cpuTotalUsec": 28894341,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:42:24.286Z",
-      "cpuPct": 0.047,
-      "cpuDeltaUsec": 9411,
-      "cpuTotalUsec": 28903752,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:42:44.309Z",
-      "cpuPct": 0.057,
-      "cpuDeltaUsec": 11494,
-      "cpuTotalUsec": 28915246,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:43:04.323Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4829,
-      "cpuTotalUsec": 28920075,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:43:24.329Z",
-      "cpuPct": 0.038,
-      "cpuDeltaUsec": 7600,
-      "cpuTotalUsec": 28927675,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:43:44.349Z",
-      "cpuPct": 0.018,
-      "cpuDeltaUsec": 3564,
-      "cpuTotalUsec": 28931239,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:44:04.365Z",
-      "cpuPct": 0.029,
-      "cpuDeltaUsec": 5848,
-      "cpuTotalUsec": 28937087,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:44:24.372Z",
-      "cpuPct": 0.048,
-      "cpuDeltaUsec": 9597,
-      "cpuTotalUsec": 28946684,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:44:44.395Z",
-      "cpuPct": 0.018,
-      "cpuDeltaUsec": 3596,
-      "cpuTotalUsec": 28950280,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:45:04.409Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4368,
-      "cpuTotalUsec": 28954648,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:45:24.416Z",
-      "cpuPct": 0.026,
-      "cpuDeltaUsec": 5143,
-      "cpuTotalUsec": 28959791,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:45:44.427Z",
-      "cpuPct": 0.031,
-      "cpuDeltaUsec": 6239,
-      "cpuTotalUsec": 28966030,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:46:04.443Z",
-      "cpuPct": 0.03,
-      "cpuDeltaUsec": 6051,
-      "cpuTotalUsec": 28972081,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:46:24.450Z",
-      "cpuPct": 0.031,
-      "cpuDeltaUsec": 6302,
-      "cpuTotalUsec": 28978383,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:46:44.474Z",
-      "cpuPct": 0.043,
-      "cpuDeltaUsec": 8609,
-      "cpuTotalUsec": 28986992,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:47:04.485Z",
-      "cpuPct": 0.023,
-      "cpuDeltaUsec": 4630,
-      "cpuTotalUsec": 28991622,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:47:24.491Z",
-      "cpuPct": 0.023,
-      "cpuDeltaUsec": 4587,
-      "cpuTotalUsec": 28996209,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:47:44.516Z",
-      "cpuPct": 0.039,
-      "cpuDeltaUsec": 7883,
-      "cpuTotalUsec": 29004092,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:48:04.529Z",
-      "cpuPct": 0.016,
-      "cpuDeltaUsec": 3129,
-      "cpuTotalUsec": 29007221,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:48:24.537Z",
-      "cpuPct": 0.03,
-      "cpuDeltaUsec": 5975,
-      "cpuTotalUsec": 29013196,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:48:44.563Z",
-      "cpuPct": 0.034,
-      "cpuDeltaUsec": 6781,
-      "cpuTotalUsec": 29019977,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:49:04.579Z",
-      "cpuPct": 0.033,
-      "cpuDeltaUsec": 6649,
-      "cpuTotalUsec": 29026626,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:49:24.587Z",
-      "cpuPct": 0.045,
-      "cpuDeltaUsec": 8941,
-      "cpuTotalUsec": 29035567,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:49:44.608Z",
-      "cpuPct": 0.026,
-      "cpuDeltaUsec": 5154,
-      "cpuTotalUsec": 29040721,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:50:04.622Z",
-      "cpuPct": 0.018,
-      "cpuDeltaUsec": 3670,
-      "cpuTotalUsec": 29044391,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:50:24.627Z",
-      "cpuPct": 0.018,
-      "cpuDeltaUsec": 3645,
-      "cpuTotalUsec": 29048036,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:50:44.650Z",
-      "cpuPct": 0.023,
-      "cpuDeltaUsec": 4518,
-      "cpuTotalUsec": 29052554,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:51:04.667Z",
-      "cpuPct": 0.031,
-      "cpuDeltaUsec": 6143,
-      "cpuTotalUsec": 29058697,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:51:24.674Z",
-      "cpuPct": 0.032,
-      "cpuDeltaUsec": 6477,
-      "cpuTotalUsec": 29065174,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:51:44.696Z",
-      "cpuPct": 0.031,
-      "cpuDeltaUsec": 6154,
-      "cpuTotalUsec": 29071328,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:52:04.709Z",
-      "cpuPct": 0.017,
-      "cpuDeltaUsec": 3427,
-      "cpuTotalUsec": 29074755,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:52:24.716Z",
-      "cpuPct": 0.025,
-      "cpuDeltaUsec": 5089,
-      "cpuTotalUsec": 29079844,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:52:44.740Z",
-      "cpuPct": 0.029,
-      "cpuDeltaUsec": 5838,
-      "cpuTotalUsec": 29085682,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:53:04.756Z",
-      "cpuPct": 0.016,
-      "cpuDeltaUsec": 3209,
-      "cpuTotalUsec": 29088891,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:53:24.762Z",
-      "cpuPct": 0.031,
-      "cpuDeltaUsec": 6169,
-      "cpuTotalUsec": 29095060,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:53:44.785Z",
-      "cpuPct": 0.02,
-      "cpuDeltaUsec": 4016,
-      "cpuTotalUsec": 29099076,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:54:04.798Z",
-      "cpuPct": 0.019,
-      "cpuDeltaUsec": 3728,
-      "cpuTotalUsec": 29102804,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:54:24.802Z",
-      "cpuPct": 0.023,
-      "cpuDeltaUsec": 4653,
-      "cpuTotalUsec": 29107457,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:54:44.825Z",
-      "cpuPct": 0.013,
-      "cpuDeltaUsec": 2616,
-      "cpuTotalUsec": 29110073,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:55:04.837Z",
-      "cpuPct": 0.02,
-      "cpuDeltaUsec": 3994,
-      "cpuTotalUsec": 29114067,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:55:24.842Z",
-      "cpuPct": 0.02,
-      "cpuDeltaUsec": 3919,
-      "cpuTotalUsec": 29117986,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:55:44.867Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4471,
-      "cpuTotalUsec": 29122457,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:56:04.882Z",
-      "cpuPct": 0.035,
-      "cpuDeltaUsec": 7008,
-      "cpuTotalUsec": 29129465,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:56:24.889Z",
-      "cpuPct": 0.027,
-      "cpuDeltaUsec": 5430,
-      "cpuTotalUsec": 29134895,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:56:44.913Z",
-      "cpuPct": 0.029,
-      "cpuDeltaUsec": 5736,
-      "cpuTotalUsec": 29140631,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:57:04.928Z",
-      "cpuPct": 0.02,
-      "cpuDeltaUsec": 3961,
-      "cpuTotalUsec": 29144592,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:57:24.938Z",
-      "cpuPct": 0.029,
-      "cpuDeltaUsec": 5832,
-      "cpuTotalUsec": 29150424,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:57:44.965Z",
-      "cpuPct": 0.055,
-      "cpuDeltaUsec": 11067,
-      "cpuTotalUsec": 29161491,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:58:04.981Z",
-      "cpuPct": 0.034,
-      "cpuDeltaUsec": 6892,
-      "cpuTotalUsec": 29168383,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:58:24.985Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4395,
-      "cpuTotalUsec": 29172778,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:58:45.006Z",
-      "cpuPct": 0.019,
-      "cpuDeltaUsec": 3898,
-      "cpuTotalUsec": 29176676,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:59:05.021Z",
-      "cpuPct": 0.031,
-      "cpuDeltaUsec": 6131,
-      "cpuTotalUsec": 29182807,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:59:25.031Z",
-      "cpuPct": 0.03,
-      "cpuDeltaUsec": 6023,
-      "cpuTotalUsec": 29188830,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T07:59:45.057Z",
-      "cpuPct": 0.043,
-      "cpuDeltaUsec": 8676,
-      "cpuTotalUsec": 29197506,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:00:05.070Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4739,
-      "cpuTotalUsec": 29202245,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:00:25.075Z",
-      "cpuPct": 0.027,
-      "cpuDeltaUsec": 5311,
-      "cpuTotalUsec": 29207556,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:00:45.096Z",
-      "cpuPct": 0.014,
-      "cpuDeltaUsec": 2748,
-      "cpuTotalUsec": 29210304,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:01:05.111Z",
-      "cpuPct": 0.023,
-      "cpuDeltaUsec": 4678,
-      "cpuTotalUsec": 29214982,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:01:25.118Z",
-      "cpuPct": 0.031,
-      "cpuDeltaUsec": 6185,
-      "cpuTotalUsec": 29221167,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:01:45.139Z",
-      "cpuPct": 0.037,
-      "cpuDeltaUsec": 7501,
-      "cpuTotalUsec": 29228668,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:02:05.156Z",
-      "cpuPct": 0.031,
-      "cpuDeltaUsec": 6301,
-      "cpuTotalUsec": 29234969,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:02:25.160Z",
-      "cpuPct": 0.038,
-      "cpuDeltaUsec": 7575,
-      "cpuTotalUsec": 29242544,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:02:45.183Z",
-      "cpuPct": 0.019,
-      "cpuDeltaUsec": 3713,
-      "cpuTotalUsec": 29246257,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:03:05.197Z",
-      "cpuPct": 0.037,
-      "cpuDeltaUsec": 7340,
-      "cpuTotalUsec": 29253597,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:03:25.205Z",
-      "cpuPct": 0.028,
-      "cpuDeltaUsec": 5584,
-      "cpuTotalUsec": 29259181,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:03:45.231Z",
-      "cpuPct": 0.046,
-      "cpuDeltaUsec": 9204,
-      "cpuTotalUsec": 29268385,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:04:05.247Z",
-      "cpuPct": 0.037,
-      "cpuDeltaUsec": 7398,
-      "cpuTotalUsec": 29275783,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:04:25.256Z",
-      "cpuPct": 0.05,
-      "cpuDeltaUsec": 9918,
-      "cpuTotalUsec": 29285701,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:04:45.283Z",
-      "cpuPct": 0.042,
-      "cpuDeltaUsec": 8318,
-      "cpuTotalUsec": 29294019,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:05:05.297Z",
-      "cpuPct": 0.05,
-      "cpuDeltaUsec": 10040,
-      "cpuTotalUsec": 29304059,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:05:25.305Z",
-      "cpuPct": 0.04,
-      "cpuDeltaUsec": 8093,
-      "cpuTotalUsec": 29312152,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:05:45.330Z",
-      "cpuPct": 0.042,
-      "cpuDeltaUsec": 8375,
-      "cpuTotalUsec": 29320527,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:06:05.345Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4407,
-      "cpuTotalUsec": 29324934,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:06:25.350Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4427,
-      "cpuTotalUsec": 29329361,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:06:45.373Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4418,
-      "cpuTotalUsec": 29333779,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:07:05.385Z",
-      "cpuPct": 0.021,
-      "cpuDeltaUsec": 4144,
-      "cpuTotalUsec": 29337923,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:07:25.388Z",
-      "cpuPct": 0.019,
-      "cpuDeltaUsec": 3735,
-      "cpuTotalUsec": 29341658,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:07:45.409Z",
-      "cpuPct": 0.02,
-      "cpuDeltaUsec": 3977,
-      "cpuTotalUsec": 29345635,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:08:05.422Z",
-      "cpuPct": 0.02,
-      "cpuDeltaUsec": 4102,
-      "cpuTotalUsec": 29349737,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:08:25.429Z",
-      "cpuPct": 0.032,
-      "cpuDeltaUsec": 6493,
-      "cpuTotalUsec": 29356230,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:08:45.453Z",
-      "cpuPct": 0.021,
-      "cpuDeltaUsec": 4198,
-      "cpuTotalUsec": 29360428,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:09:05.464Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4415,
-      "cpuTotalUsec": 29364843,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:09:25.469Z",
-      "cpuPct": 0.016,
-      "cpuDeltaUsec": 3226,
-      "cpuTotalUsec": 29368069,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:09:45.489Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4399,
-      "cpuTotalUsec": 29372468,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:10:05.501Z",
-      "cpuPct": 0.016,
-      "cpuDeltaUsec": 3267,
-      "cpuTotalUsec": 29375735,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:10:25.506Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4370,
-      "cpuTotalUsec": 29380105,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:10:45.530Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4319,
-      "cpuTotalUsec": 29384424,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:11:05.544Z",
-      "cpuPct": 0.02,
-      "cpuDeltaUsec": 3974,
-      "cpuTotalUsec": 29388398,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:11:25.549Z",
-      "cpuPct": 0.016,
-      "cpuDeltaUsec": 3187,
-      "cpuTotalUsec": 29391585,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:11:45.569Z",
-      "cpuPct": 0.02,
-      "cpuDeltaUsec": 4074,
-      "cpuTotalUsec": 29395659,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:12:05.585Z",
-      "cpuPct": 0.019,
-      "cpuDeltaUsec": 3789,
-      "cpuTotalUsec": 29399448,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:12:25.590Z",
-      "cpuPct": 0.018,
-      "cpuDeltaUsec": 3557,
-      "cpuTotalUsec": 29403005,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:12:45.612Z",
-      "cpuPct": 0.013,
-      "cpuDeltaUsec": 2692,
-      "cpuTotalUsec": 29405697,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:13:05.626Z",
-      "cpuPct": 0.021,
-      "cpuDeltaUsec": 4226,
-      "cpuTotalUsec": 29409923,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:13:25.630Z",
-      "cpuPct": 0.017,
-      "cpuDeltaUsec": 3408,
-      "cpuTotalUsec": 29413331,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:13:45.652Z",
-      "cpuPct": 0.018,
-      "cpuDeltaUsec": 3648,
-      "cpuTotalUsec": 29416979,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:14:05.664Z",
-      "cpuPct": 0.015,
-      "cpuDeltaUsec": 3024,
-      "cpuTotalUsec": 29420003,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:14:25.668Z",
-      "cpuPct": 0.02,
-      "cpuDeltaUsec": 3941,
-      "cpuTotalUsec": 29423944,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:14:45.688Z",
-      "cpuPct": 0.014,
-      "cpuDeltaUsec": 2703,
-      "cpuTotalUsec": 29426647,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:15:05.701Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4417,
-      "cpuTotalUsec": 29431064,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:15:25.708Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4477,
-      "cpuTotalUsec": 29435541,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:15:45.731Z",
-      "cpuPct": 0.026,
-      "cpuDeltaUsec": 5217,
-      "cpuTotalUsec": 29440758,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:16:05.745Z",
-      "cpuPct": 0.016,
-      "cpuDeltaUsec": 3157,
-      "cpuTotalUsec": 29443915,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:16:25.751Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4378,
-      "cpuTotalUsec": 29448293,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:16:45.773Z",
-      "cpuPct": 0.015,
-      "cpuDeltaUsec": 3034,
-      "cpuTotalUsec": 29451327,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:17:05.788Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4396,
-      "cpuTotalUsec": 29455723,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:17:25.793Z",
-      "cpuPct": 0.016,
-      "cpuDeltaUsec": 3201,
-      "cpuTotalUsec": 29458924,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:17:45.817Z",
-      "cpuPct": 0.026,
-      "cpuDeltaUsec": 5152,
-      "cpuTotalUsec": 29464076,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:18:05.832Z",
-      "cpuPct": 0.018,
-      "cpuDeltaUsec": 3669,
-      "cpuTotalUsec": 29467745,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:18:25.840Z",
-      "cpuPct": 0.029,
-      "cpuDeltaUsec": 5786,
-      "cpuTotalUsec": 29473531,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:18:45.861Z",
-      "cpuPct": 0.031,
-      "cpuDeltaUsec": 6179,
-      "cpuTotalUsec": 29479710,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:19:05.874Z",
-      "cpuPct": 0.025,
-      "cpuDeltaUsec": 4969,
-      "cpuTotalUsec": 29484679,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:19:25.885Z",
-      "cpuPct": 0.037,
-      "cpuDeltaUsec": 7369,
-      "cpuTotalUsec": 29492048,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:19:45.909Z",
-      "cpuPct": 0.048,
-      "cpuDeltaUsec": 9703,
-      "cpuTotalUsec": 29501751,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:20:05.925Z",
-      "cpuPct": 0.023,
-      "cpuDeltaUsec": 4601,
-      "cpuTotalUsec": 29506352,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:20:25.936Z",
-      "cpuPct": 0.037,
-      "cpuDeltaUsec": 7420,
-      "cpuTotalUsec": 29513772,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:20:45.956Z",
-      "cpuPct": 0.041,
-      "cpuDeltaUsec": 8140,
-      "cpuTotalUsec": 29521912,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:21:05.970Z",
-      "cpuPct": 0.025,
-      "cpuDeltaUsec": 4960,
-      "cpuTotalUsec": 29526872,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:21:25.983Z",
-      "cpuPct": 0.036,
-      "cpuDeltaUsec": 7275,
-      "cpuTotalUsec": 29534147,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:21:46.010Z",
-      "cpuPct": 0.066,
-      "cpuDeltaUsec": 13297,
-      "cpuTotalUsec": 29547444,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:22:06.024Z",
-      "cpuPct": 0.025,
-      "cpuDeltaUsec": 5060,
-      "cpuTotalUsec": 29552504,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:22:26.030Z",
-      "cpuPct": 0.025,
-      "cpuDeltaUsec": 4966,
-      "cpuTotalUsec": 29557470,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:22:46.053Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4760,
-      "cpuTotalUsec": 29562230,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:23:06.068Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4314,
-      "cpuTotalUsec": 29566544,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:23:26.072Z",
-      "cpuPct": 0.015,
-      "cpuDeltaUsec": 3059,
-      "cpuTotalUsec": 29569603,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:23:46.093Z",
-      "cpuPct": 0.021,
-      "cpuDeltaUsec": 4111,
-      "cpuTotalUsec": 29573714,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:24:06.107Z",
-      "cpuPct": 0.018,
-      "cpuDeltaUsec": 3550,
-      "cpuTotalUsec": 29577264,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:24:26.114Z",
-      "cpuPct": 0.021,
-      "cpuDeltaUsec": 4290,
-      "cpuTotalUsec": 29581554,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:24:46.137Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4850,
-      "cpuTotalUsec": 29586404,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:25:06.152Z",
-      "cpuPct": 0.026,
-      "cpuDeltaUsec": 5200,
-      "cpuTotalUsec": 29591604,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:25:26.157Z",
-      "cpuPct": 0.017,
-      "cpuDeltaUsec": 3350,
-      "cpuTotalUsec": 29594954,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:25:46.181Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4802,
-      "cpuTotalUsec": 29599756,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:26:06.197Z",
-      "cpuPct": 0.023,
-      "cpuDeltaUsec": 4588,
-      "cpuTotalUsec": 29604344,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:26:26.205Z",
-      "cpuPct": 0.027,
-      "cpuDeltaUsec": 5337,
-      "cpuTotalUsec": 29609681,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:26:46.226Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4733,
-      "cpuTotalUsec": 29614414,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:27:06.241Z",
-      "cpuPct": 0.031,
-      "cpuDeltaUsec": 6256,
-      "cpuTotalUsec": 29620670,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:27:26.250Z",
-      "cpuPct": 0.026,
-      "cpuDeltaUsec": 5105,
-      "cpuTotalUsec": 29625775,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:27:46.273Z",
-      "cpuPct": 0.046,
-      "cpuDeltaUsec": 9301,
-      "cpuTotalUsec": 29635076,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:28:06.289Z",
-      "cpuPct": 0.023,
-      "cpuDeltaUsec": 4540,
-      "cpuTotalUsec": 29639616,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:28:26.299Z",
-      "cpuPct": 0.03,
-      "cpuDeltaUsec": 6095,
-      "cpuTotalUsec": 29645711,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:28:46.325Z",
-      "cpuPct": 0.06,
-      "cpuDeltaUsec": 11978,
-      "cpuTotalUsec": 29657689,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:29:06.343Z",
-      "cpuPct": 0.026,
-      "cpuDeltaUsec": 5222,
-      "cpuTotalUsec": 29662911,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:29:26.352Z",
-      "cpuPct": 0.042,
-      "cpuDeltaUsec": 8351,
-      "cpuTotalUsec": 29671262,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:29:46.376Z",
-      "cpuPct": 0.031,
-      "cpuDeltaUsec": 6176,
-      "cpuTotalUsec": 29677438,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:30:06.391Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4716,
-      "cpuTotalUsec": 29682154,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:30:26.402Z",
-      "cpuPct": 0.039,
-      "cpuDeltaUsec": 7813,
-      "cpuTotalUsec": 29689967,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:30:46.426Z",
-      "cpuPct": 0.043,
-      "cpuDeltaUsec": 8642,
-      "cpuTotalUsec": 29698609,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:31:06.442Z",
-      "cpuPct": 0.016,
-      "cpuDeltaUsec": 3178,
-      "cpuTotalUsec": 29701787,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:31:26.450Z",
-      "cpuPct": 0.032,
-      "cpuDeltaUsec": 6452,
-      "cpuTotalUsec": 29708239,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:31:46.474Z",
-      "cpuPct": 0.031,
-      "cpuDeltaUsec": 6297,
-      "cpuTotalUsec": 29714536,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:32:06.490Z",
-      "cpuPct": 0.025,
-      "cpuDeltaUsec": 4937,
-      "cpuTotalUsec": 29719473,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:32:26.497Z",
-      "cpuPct": 0.023,
-      "cpuDeltaUsec": 4635,
-      "cpuTotalUsec": 29724108,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:32:46.517Z",
-      "cpuPct": 0.016,
-      "cpuDeltaUsec": 3198,
-      "cpuTotalUsec": 29727306,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:33:06.534Z",
-      "cpuPct": 0.025,
-      "cpuDeltaUsec": 5042,
-      "cpuTotalUsec": 29732348,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:33:26.542Z",
-      "cpuPct": 0.027,
-      "cpuDeltaUsec": 5390,
-      "cpuTotalUsec": 29737738,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:33:46.565Z",
-      "cpuPct": 0.023,
-      "cpuDeltaUsec": 4620,
-      "cpuTotalUsec": 29742358,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:34:06.581Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4889,
-      "cpuTotalUsec": 29747247,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:34:26.585Z",
-      "cpuPct": 0.017,
-      "cpuDeltaUsec": 3426,
-      "cpuTotalUsec": 29750673,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:34:46.609Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4834,
-      "cpuTotalUsec": 29755507,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:35:06.623Z",
-      "cpuPct": 0.019,
-      "cpuDeltaUsec": 3787,
-      "cpuTotalUsec": 29759294,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:35:26.630Z",
-      "cpuPct": 0.035,
-      "cpuDeltaUsec": 7098,
-      "cpuTotalUsec": 29766392,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:35:46.653Z",
-      "cpuPct": 0.021,
-      "cpuDeltaUsec": 4297,
-      "cpuTotalUsec": 29770689,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:36:06.666Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4849,
-      "cpuTotalUsec": 29775538,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:36:26.673Z",
-      "cpuPct": 0.03,
-      "cpuDeltaUsec": 5931,
-      "cpuTotalUsec": 29781469,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:36:46.693Z",
-      "cpuPct": 0.018,
-      "cpuDeltaUsec": 3521,
-      "cpuTotalUsec": 29784990,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:37:06.708Z",
-      "cpuPct": 0.026,
-      "cpuDeltaUsec": 5223,
-      "cpuTotalUsec": 29790213,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:37:26.714Z",
-      "cpuPct": 0.018,
-      "cpuDeltaUsec": 3554,
-      "cpuTotalUsec": 29793767,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:37:46.737Z",
-      "cpuPct": 0.025,
-      "cpuDeltaUsec": 5070,
-      "cpuTotalUsec": 29798837,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:38:06.749Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4807,
-      "cpuTotalUsec": 29803644,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:38:26.756Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4791,
-      "cpuTotalUsec": 29808435,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:38:46.781Z",
-      "cpuPct": 0.042,
-      "cpuDeltaUsec": 8430,
-      "cpuTotalUsec": 29816865,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:39:06.803Z",
-      "cpuPct": 0.026,
-      "cpuDeltaUsec": 5281,
-      "cpuTotalUsec": 29822146,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:39:26.815Z",
-      "cpuPct": 0.057,
-      "cpuDeltaUsec": 11502,
-      "cpuTotalUsec": 29833648,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:39:46.841Z",
-      "cpuPct": 0.06,
-      "cpuDeltaUsec": 11994,
-      "cpuTotalUsec": 29845642,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:40:06.849Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4451,
-      "cpuTotalUsec": 29850093,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:40:26.854Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4825,
-      "cpuTotalUsec": 29854918,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:40:46.879Z",
-      "cpuPct": 0.025,
-      "cpuDeltaUsec": 5055,
-      "cpuTotalUsec": 29859973,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:41:06.894Z",
-      "cpuPct": 0.034,
-      "cpuDeltaUsec": 6901,
-      "cpuTotalUsec": 29866874,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:41:26.902Z",
-      "cpuPct": 0.035,
-      "cpuDeltaUsec": 6957,
-      "cpuTotalUsec": 29873831,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:41:46.927Z",
-      "cpuPct": 0.026,
-      "cpuDeltaUsec": 5302,
-      "cpuTotalUsec": 29879133,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:42:06.941Z",
-      "cpuPct": 0.029,
-      "cpuDeltaUsec": 5709,
-      "cpuTotalUsec": 29884842,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:42:26.946Z",
-      "cpuPct": 0.016,
-      "cpuDeltaUsec": 3256,
-      "cpuTotalUsec": 29888098,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:42:46.954Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4378,
-      "cpuTotalUsec": 29892476,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:43:06.970Z",
-      "cpuPct": 0.03,
-      "cpuDeltaUsec": 6044,
-      "cpuTotalUsec": 29898520,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:43:26.978Z",
-      "cpuPct": 0.028,
-      "cpuDeltaUsec": 5540,
-      "cpuTotalUsec": 29904060,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:43:47.008Z",
-      "cpuPct": 0.05,
-      "cpuDeltaUsec": 9938,
-      "cpuTotalUsec": 29913998,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:44:07.027Z",
-      "cpuPct": 0.035,
-      "cpuDeltaUsec": 7098,
-      "cpuTotalUsec": 29921096,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:44:27.037Z",
-      "cpuPct": 0.04,
-      "cpuDeltaUsec": 7991,
-      "cpuTotalUsec": 29929087,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:44:47.062Z",
-      "cpuPct": 0.055,
-      "cpuDeltaUsec": 10919,
-      "cpuTotalUsec": 29940006,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:45:07.077Z",
-      "cpuPct": 0.023,
-      "cpuDeltaUsec": 4595,
-      "cpuTotalUsec": 29944601,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:45:27.086Z",
-      "cpuPct": 0.036,
-      "cpuDeltaUsec": 7197,
-      "cpuTotalUsec": 29951798,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:45:47.110Z",
-      "cpuPct": 0.026,
-      "cpuDeltaUsec": 5243,
-      "cpuTotalUsec": 29957041,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:46:07.127Z",
-      "cpuPct": 0.032,
-      "cpuDeltaUsec": 6328,
-      "cpuTotalUsec": 29963369,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:46:27.139Z",
-      "cpuPct": 0.046,
-      "cpuDeltaUsec": 9159,
-      "cpuTotalUsec": 29972528,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:46:47.162Z",
-      "cpuPct": 0.035,
-      "cpuDeltaUsec": 6991,
-      "cpuTotalUsec": 29979519,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:47:07.177Z",
-      "cpuPct": 0.027,
-      "cpuDeltaUsec": 5452,
-      "cpuTotalUsec": 29984971,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:47:27.181Z",
-      "cpuPct": 0.02,
-      "cpuDeltaUsec": 4009,
-      "cpuTotalUsec": 29988980,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:47:47.204Z",
-      "cpuPct": 0.016,
-      "cpuDeltaUsec": 3118,
-      "cpuTotalUsec": 29992098,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:48:07.216Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4317,
-      "cpuTotalUsec": 29996415,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:48:27.223Z",
-      "cpuPct": 0.027,
-      "cpuDeltaUsec": 5475,
-      "cpuTotalUsec": 30001890,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:48:47.247Z",
-      "cpuPct": 0.029,
-      "cpuDeltaUsec": 5861,
-      "cpuTotalUsec": 30007751,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:49:07.261Z",
-      "cpuPct": 0.033,
-      "cpuDeltaUsec": 6678,
-      "cpuTotalUsec": 30014429,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:49:27.272Z",
-      "cpuPct": 0.034,
-      "cpuDeltaUsec": 6759,
-      "cpuTotalUsec": 30021188,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:49:47.295Z",
-      "cpuPct": 0.033,
-      "cpuDeltaUsec": 6659,
-      "cpuTotalUsec": 30027847,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:50:07.305Z",
-      "cpuPct": 0.03,
-      "cpuDeltaUsec": 5961,
-      "cpuTotalUsec": 30033808,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:50:27.312Z",
-      "cpuPct": 0.028,
-      "cpuDeltaUsec": 5613,
-      "cpuTotalUsec": 30039421,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:50:47.338Z",
-      "cpuPct": 0.04,
-      "cpuDeltaUsec": 8101,
-      "cpuTotalUsec": 30047522,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:51:07.356Z",
-      "cpuPct": 0.038,
-      "cpuDeltaUsec": 7562,
-      "cpuTotalUsec": 30055084,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:51:27.372Z",
-      "cpuPct": 0.044,
-      "cpuDeltaUsec": 8904,
-      "cpuTotalUsec": 30063988,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:51:47.400Z",
-      "cpuPct": 0.08,
-      "cpuDeltaUsec": 16076,
-      "cpuTotalUsec": 30080064,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:52:07.418Z",
-      "cpuPct": 0.041,
-      "cpuDeltaUsec": 8211,
-      "cpuTotalUsec": 30088275,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:52:27.429Z",
-      "cpuPct": 0.022,
-      "cpuDeltaUsec": 4393,
-      "cpuTotalUsec": 30092668,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:52:47.454Z",
-      "cpuPct": 0.042,
-      "cpuDeltaUsec": 8428,
-      "cpuTotalUsec": 30101096,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:53:07.472Z",
-      "cpuPct": 0.03,
-      "cpuDeltaUsec": 5948,
-      "cpuTotalUsec": 30107044,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:53:27.478Z",
-      "cpuPct": 0.018,
-      "cpuDeltaUsec": 3603,
-      "cpuTotalUsec": 30110647,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:53:47.502Z",
-      "cpuPct": 0.025,
-      "cpuDeltaUsec": 5029,
-      "cpuTotalUsec": 30115676,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:54:07.517Z",
-      "cpuPct": 0.033,
-      "cpuDeltaUsec": 6560,
-      "cpuTotalUsec": 30122236,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:54:27.526Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4734,
-      "cpuTotalUsec": 30126970,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:54:47.549Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4895,
-      "cpuTotalUsec": 30131865,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:55:07.565Z",
-      "cpuPct": 0.03,
-      "cpuDeltaUsec": 6082,
-      "cpuTotalUsec": 30137947,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:55:27.573Z",
-      "cpuPct": 0.03,
-      "cpuDeltaUsec": 6036,
-      "cpuTotalUsec": 30143983,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:55:47.593Z",
-      "cpuPct": 0.02,
-      "cpuDeltaUsec": 3937,
-      "cpuTotalUsec": 30147920,
-      "wallSeconds": 20
-    },
-    {
-      "timestamp": "2026-06-02T08:56:07.609Z",
-      "cpuPct": 0.024,
-      "cpuDeltaUsec": 4772,
-      "cpuTotalUsec": 30152692,
-      "wallSeconds": 20
-    },
-    {
       "timestamp": "2026-06-02T08:56:27.613Z",
       "cpuPct": 0.019,
       "cpuDeltaUsec": 3712,
@@ -3267,6 +1580,643 @@
       "cpuPct": 0.026,
       "cpuDeltaUsec": 5211,
       "cpuTotalUsec": 31385675,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:11:51.057Z",
+      "cpuPct": 0.023,
+      "cpuDeltaUsec": 4661,
+      "cpuTotalUsec": 31390336,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:12:11.073Z",
+      "cpuPct": 0.024,
+      "cpuDeltaUsec": 4752,
+      "cpuTotalUsec": 31395088,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:12:31.081Z",
+      "cpuPct": 0.024,
+      "cpuDeltaUsec": 4738,
+      "cpuTotalUsec": 31399826,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:12:51.105Z",
+      "cpuPct": 0.021,
+      "cpuDeltaUsec": 4288,
+      "cpuTotalUsec": 31404114,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:13:11.121Z",
+      "cpuPct": 0.024,
+      "cpuDeltaUsec": 4868,
+      "cpuTotalUsec": 31408982,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:13:31.128Z",
+      "cpuPct": 0.024,
+      "cpuDeltaUsec": 4800,
+      "cpuTotalUsec": 31413782,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:13:51.133Z",
+      "cpuPct": 0.021,
+      "cpuDeltaUsec": 4186,
+      "cpuTotalUsec": 31417968,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:14:11.153Z",
+      "cpuPct": 0.019,
+      "cpuDeltaUsec": 3734,
+      "cpuTotalUsec": 31421702,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:14:31.162Z",
+      "cpuPct": 0.029,
+      "cpuDeltaUsec": 5769,
+      "cpuTotalUsec": 31427471,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:14:51.174Z",
+      "cpuPct": 0.023,
+      "cpuDeltaUsec": 4652,
+      "cpuTotalUsec": 31432123,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:15:11.191Z",
+      "cpuPct": 0.019,
+      "cpuDeltaUsec": 3850,
+      "cpuTotalUsec": 31435973,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:15:31.201Z",
+      "cpuPct": 0.032,
+      "cpuDeltaUsec": 6321,
+      "cpuTotalUsec": 31442294,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:15:51.225Z",
+      "cpuPct": 0.028,
+      "cpuDeltaUsec": 5591,
+      "cpuTotalUsec": 31447885,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:16:11.241Z",
+      "cpuPct": 0.018,
+      "cpuDeltaUsec": 3547,
+      "cpuTotalUsec": 31451432,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:16:31.249Z",
+      "cpuPct": 0.021,
+      "cpuDeltaUsec": 4217,
+      "cpuTotalUsec": 31455649,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:16:51.269Z",
+      "cpuPct": 0.012,
+      "cpuDeltaUsec": 2348,
+      "cpuTotalUsec": 31457997,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:17:11.285Z",
+      "cpuPct": 0.018,
+      "cpuDeltaUsec": 3535,
+      "cpuTotalUsec": 31461532,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:17:31.293Z",
+      "cpuPct": 0.017,
+      "cpuDeltaUsec": 3473,
+      "cpuTotalUsec": 31465005,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:17:51.313Z",
+      "cpuPct": 0.012,
+      "cpuDeltaUsec": 2425,
+      "cpuTotalUsec": 31467430,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:18:11.331Z",
+      "cpuPct": 0.02,
+      "cpuDeltaUsec": 3992,
+      "cpuTotalUsec": 31471422,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:18:31.339Z",
+      "cpuPct": 0.013,
+      "cpuDeltaUsec": 2631,
+      "cpuTotalUsec": 31474053,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:18:51.345Z",
+      "cpuPct": 0.012,
+      "cpuDeltaUsec": 2499,
+      "cpuTotalUsec": 31476552,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:19:11.363Z",
+      "cpuPct": 0.022,
+      "cpuDeltaUsec": 4418,
+      "cpuTotalUsec": 31480970,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:19:31.368Z",
+      "cpuPct": 0.017,
+      "cpuDeltaUsec": 3329,
+      "cpuTotalUsec": 31484299,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:19:51.391Z",
+      "cpuPct": 0.013,
+      "cpuDeltaUsec": 2685,
+      "cpuTotalUsec": 31486984,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:20:11.408Z",
+      "cpuPct": 0.021,
+      "cpuDeltaUsec": 4241,
+      "cpuTotalUsec": 31491225,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:20:31.416Z",
+      "cpuPct": 0.013,
+      "cpuDeltaUsec": 2568,
+      "cpuTotalUsec": 31493793,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:20:51.436Z",
+      "cpuPct": 0.015,
+      "cpuDeltaUsec": 2952,
+      "cpuTotalUsec": 31496745,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:21:11.452Z",
+      "cpuPct": 0.015,
+      "cpuDeltaUsec": 3078,
+      "cpuTotalUsec": 31499823,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:21:31.460Z",
+      "cpuPct": 0.014,
+      "cpuDeltaUsec": 2730,
+      "cpuTotalUsec": 31502553,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:21:51.480Z",
+      "cpuPct": 0.016,
+      "cpuDeltaUsec": 3149,
+      "cpuTotalUsec": 31505702,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:22:11.498Z",
+      "cpuPct": 0.012,
+      "cpuDeltaUsec": 2459,
+      "cpuTotalUsec": 31508161,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:22:31.505Z",
+      "cpuPct": 0.013,
+      "cpuDeltaUsec": 2625,
+      "cpuTotalUsec": 31510786,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:22:51.524Z",
+      "cpuPct": 0.021,
+      "cpuDeltaUsec": 4270,
+      "cpuTotalUsec": 31515056,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:23:11.542Z",
+      "cpuPct": 0.016,
+      "cpuDeltaUsec": 3103,
+      "cpuTotalUsec": 31518159,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:23:31.550Z",
+      "cpuPct": 0.017,
+      "cpuDeltaUsec": 3399,
+      "cpuTotalUsec": 31521558,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:23:51.565Z",
+      "cpuPct": 0.013,
+      "cpuDeltaUsec": 2608,
+      "cpuTotalUsec": 31524166,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:24:11.580Z",
+      "cpuPct": 0.019,
+      "cpuDeltaUsec": 3853,
+      "cpuTotalUsec": 31528019,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:24:31.589Z",
+      "cpuPct": 0.018,
+      "cpuDeltaUsec": 3578,
+      "cpuTotalUsec": 31531597,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:24:51.611Z",
+      "cpuPct": 0.012,
+      "cpuDeltaUsec": 2433,
+      "cpuTotalUsec": 31534030,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:25:11.629Z",
+      "cpuPct": 0.017,
+      "cpuDeltaUsec": 3353,
+      "cpuTotalUsec": 31537383,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:25:31.633Z",
+      "cpuPct": 0.017,
+      "cpuDeltaUsec": 3328,
+      "cpuTotalUsec": 31540711,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:25:51.653Z",
+      "cpuPct": 0.016,
+      "cpuDeltaUsec": 3296,
+      "cpuTotalUsec": 31544007,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:26:11.669Z",
+      "cpuPct": 0.025,
+      "cpuDeltaUsec": 5009,
+      "cpuTotalUsec": 31549016,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:26:31.677Z",
+      "cpuPct": 0.017,
+      "cpuDeltaUsec": 3403,
+      "cpuTotalUsec": 31552419,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:26:51.697Z",
+      "cpuPct": 0.025,
+      "cpuDeltaUsec": 5010,
+      "cpuTotalUsec": 31557429,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:27:11.713Z",
+      "cpuPct": 0.02,
+      "cpuDeltaUsec": 3990,
+      "cpuTotalUsec": 31561419,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:27:31.720Z",
+      "cpuPct": 0.016,
+      "cpuDeltaUsec": 3301,
+      "cpuTotalUsec": 31564720,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:27:51.741Z",
+      "cpuPct": 0.019,
+      "cpuDeltaUsec": 3838,
+      "cpuTotalUsec": 31568558,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:28:11.757Z",
+      "cpuPct": 0.023,
+      "cpuDeltaUsec": 4534,
+      "cpuTotalUsec": 31573092,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:28:31.767Z",
+      "cpuPct": 0.027,
+      "cpuDeltaUsec": 5357,
+      "cpuTotalUsec": 31578449,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:28:51.789Z",
+      "cpuPct": 0.022,
+      "cpuDeltaUsec": 4382,
+      "cpuTotalUsec": 31582831,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:29:11.808Z",
+      "cpuPct": 0.021,
+      "cpuDeltaUsec": 4106,
+      "cpuTotalUsec": 31586937,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:29:31.816Z",
+      "cpuPct": 0.021,
+      "cpuDeltaUsec": 4229,
+      "cpuTotalUsec": 31591166,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:29:51.838Z",
+      "cpuPct": 0.015,
+      "cpuDeltaUsec": 2911,
+      "cpuTotalUsec": 31594077,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:30:11.855Z",
+      "cpuPct": 0.032,
+      "cpuDeltaUsec": 6480,
+      "cpuTotalUsec": 31600557,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:30:31.867Z",
+      "cpuPct": 0.035,
+      "cpuDeltaUsec": 6939,
+      "cpuTotalUsec": 31607496,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:30:51.891Z",
+      "cpuPct": 0.027,
+      "cpuDeltaUsec": 5410,
+      "cpuTotalUsec": 31612906,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:31:11.908Z",
+      "cpuPct": 0.018,
+      "cpuDeltaUsec": 3628,
+      "cpuTotalUsec": 31616534,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:31:31.914Z",
+      "cpuPct": 0.019,
+      "cpuDeltaUsec": 3772,
+      "cpuTotalUsec": 31620306,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:31:51.936Z",
+      "cpuPct": 0.028,
+      "cpuDeltaUsec": 5610,
+      "cpuTotalUsec": 31625916,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:32:11.953Z",
+      "cpuPct": 0.014,
+      "cpuDeltaUsec": 2901,
+      "cpuTotalUsec": 31628817,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:32:31.964Z",
+      "cpuPct": 0.021,
+      "cpuDeltaUsec": 4229,
+      "cpuTotalUsec": 31633046,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:32:51.984Z",
+      "cpuPct": 0.025,
+      "cpuDeltaUsec": 5079,
+      "cpuTotalUsec": 31638125,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:33:12.000Z",
+      "cpuPct": 0.014,
+      "cpuDeltaUsec": 2715,
+      "cpuTotalUsec": 31640840,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:33:32.006Z",
+      "cpuPct": 0.021,
+      "cpuDeltaUsec": 4287,
+      "cpuTotalUsec": 31645127,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:33:52.031Z",
+      "cpuPct": 0.024,
+      "cpuDeltaUsec": 4815,
+      "cpuTotalUsec": 31649942,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:34:12.049Z",
+      "cpuPct": 0.017,
+      "cpuDeltaUsec": 3386,
+      "cpuTotalUsec": 31653328,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:34:32.057Z",
+      "cpuPct": 0.019,
+      "cpuDeltaUsec": 3707,
+      "cpuTotalUsec": 31657035,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:34:52.078Z",
+      "cpuPct": 0.024,
+      "cpuDeltaUsec": 4859,
+      "cpuTotalUsec": 31661894,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:35:12.098Z",
+      "cpuPct": 0.03,
+      "cpuDeltaUsec": 5948,
+      "cpuTotalUsec": 31667842,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:35:32.107Z",
+      "cpuPct": 0.023,
+      "cpuDeltaUsec": 4618,
+      "cpuTotalUsec": 31672460,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:35:52.129Z",
+      "cpuPct": 0.018,
+      "cpuDeltaUsec": 3511,
+      "cpuTotalUsec": 31675971,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:36:12.149Z",
+      "cpuPct": 0.023,
+      "cpuDeltaUsec": 4600,
+      "cpuTotalUsec": 31680571,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:36:32.157Z",
+      "cpuPct": 0.018,
+      "cpuDeltaUsec": 3615,
+      "cpuTotalUsec": 31684186,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:36:52.177Z",
+      "cpuPct": 0.021,
+      "cpuDeltaUsec": 4302,
+      "cpuTotalUsec": 31688488,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:37:12.192Z",
+      "cpuPct": 0.018,
+      "cpuDeltaUsec": 3516,
+      "cpuTotalUsec": 31692004,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:37:32.201Z",
+      "cpuPct": 0.016,
+      "cpuDeltaUsec": 3130,
+      "cpuTotalUsec": 31695134,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:37:52.221Z",
+      "cpuPct": 0.02,
+      "cpuDeltaUsec": 3986,
+      "cpuTotalUsec": 31699120,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:38:12.236Z",
+      "cpuPct": 0.018,
+      "cpuDeltaUsec": 3524,
+      "cpuTotalUsec": 31702644,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:38:32.244Z",
+      "cpuPct": 0.02,
+      "cpuDeltaUsec": 4038,
+      "cpuTotalUsec": 31706682,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:38:52.264Z",
+      "cpuPct": 0.013,
+      "cpuDeltaUsec": 2615,
+      "cpuTotalUsec": 31709297,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:39:12.269Z",
+      "cpuPct": 0.019,
+      "cpuDeltaUsec": 3863,
+      "cpuTotalUsec": 31713160,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:39:32.276Z",
+      "cpuPct": 0.018,
+      "cpuDeltaUsec": 3612,
+      "cpuTotalUsec": 31716772,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:39:52.299Z",
+      "cpuPct": 0.02,
+      "cpuDeltaUsec": 3934,
+      "cpuTotalUsec": 31720706,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:40:12.317Z",
+      "cpuPct": 0.02,
+      "cpuDeltaUsec": 3998,
+      "cpuTotalUsec": 31724704,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:40:32.324Z",
+      "cpuPct": 0.025,
+      "cpuDeltaUsec": 5048,
+      "cpuTotalUsec": 31729752,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:40:52.346Z",
+      "cpuPct": 0.014,
+      "cpuDeltaUsec": 2810,
+      "cpuTotalUsec": 31732562,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:41:12.365Z",
+      "cpuPct": 0.024,
+      "cpuDeltaUsec": 4746,
+      "cpuTotalUsec": 31737308,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:41:32.373Z",
+      "cpuPct": 0.014,
+      "cpuDeltaUsec": 2841,
+      "cpuTotalUsec": 31740149,
+      "wallSeconds": 20
+    },
+    {
+      "timestamp": "2026-06-02T10:41:52.396Z",
+      "cpuPct": 0.024,
+      "cpuDeltaUsec": 4796,
+      "cpuTotalUsec": 31744945,
       "wallSeconds": 20
     }
   ],
