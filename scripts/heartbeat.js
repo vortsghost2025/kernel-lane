@@ -1,4 +1,12 @@
 'use strict';
+// PAUSE-GUARD: If .lanes-paused exists in repos root, exit immediately
+const _pauseFile = '/home/we4free/agent/repos/.lanes-paused';
+if (require('fs').existsSync(_pauseFile)) {
+  const _reason = require('fs').readFileSync(_pauseFile, 'utf8').trim();
+  console.error('[PAUSE-GUARD] Lanes paused: ' + _reason + '. Exiting.');
+  process.exit(0);
+}
+
 
 const fs = require('fs');
 const path = require('path');
