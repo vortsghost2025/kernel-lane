@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "emitted_at": "2026-05-16T01:51:46.988Z",
+  "generator": "emit-identity.js",
+  "whoami": {
+    "lane_id": "kernel",
+    "role": "execution",
+    "repo": "https://github.com/vortsghost2025/kernel-lane.git",
+    "local_path": "S:/kernel-lane",
+    "key_id": "2effb49ea02dff5b"
+  },
+  "session": {
+    "active": false,
+    "session_id": null,
+    "acquired_at": null
+  },
+  "watcher": {
+    "mode": "auto",
+    "will_process": true
+  },
+  "last_activity": {
+    "commit": "84e797b",
+    "commit_subject": "[CI:kernel] Auto-commit: housekeeping cycle 20260516-010126",
+    "commit_time": "2026-05-16T01:01:26Z",
+    "branch": "main",
+    "dirty_files": 5,
+    "unpushed_commits": 0
+  },
+  "health": {
+    "inbox_unread": 0,
+    "outbox_pending": 8,
+    "heartbeat_age_sec": 17499,
+    "garbage_collect": false
+  },
+  "inbox": {
+    "unprocessed": 1,
+    "processed": 5,
+    "invalid": 3
+  },
+  "governance": {
+    "cps_score": null,
+    "active_blocker": null
+  },
+  "system": {
+    "topology_ok": true,
+    "drift_status": "EXPECTED_DRIFT_CANONICAL_CHANGED",
+    "drift_aligned": 60,
+    "drift_count": 3,
+    "drift_regressions": null,
+    "ledger_time": "2026-05-16T00:29:26.313Z"
+  }
+}

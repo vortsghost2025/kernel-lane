@@ -1,0 +1,41 @@
+=== KERNEL LANE IDENTITY ===
+
+WHO AM I
+  Lane:        kernel
+  Role:        execution
+  Key ID:      2effb49ea02dff5b
+  Repo:        https://github.com/vortsghost2025/kernel-lane.git
+  Path:        S:/kernel-lane
+
+SESSION
+  Active:      NO
+  Watcher:     auto (process: yes)
+
+LAST ACTIVITY
+  Branch:      main
+  Commit:      84e797b [CI:kernel] Auto-commit: housekeeping cycle 20260516-010126
+  When:        2026-05-16T01:01:26Z
+  Dirty:       5 files
+  Unpushed:    0 commits
+
+HEALTH
+  Unread:      0
+  Outbox:      8
+  Heartbeat:   4.9h ago
+  GC:          no
+
+INBOX
+  Pending:     1
+  Processed:   5
+  Invalid:     3
+
+GOVERNANCE
+  CPS Score:   unknown
+  Blocker:     none
+
+SYSTEM
+  Topology:    OK
+  Drift:       EXPECTED_DRIFT_CANONICAL_CHANGED (60/63 aligned, ? regressions)
+  Ledger at:   2026-05-16T00:29:26.313Z
+
+--- emitted 2026-05-16T01:51:46.988Z by emit-identity.js v1.0 ---

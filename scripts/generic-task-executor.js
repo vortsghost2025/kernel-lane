@@ -10,7 +10,7 @@ const { LaneDiscovery, sToLocal } = require('./util/lane-discovery');
 const { sanitizeFilename } = require('./util/sanitize-filename');
 const { ensureOutputProvenance, verifyOutputProvenance } = require('./output-provenance');
 
-const EXECUTOR_VERSION = '3.2.0';
+const EXECUTOR_VERSION = '3.3.0';
 const FEATURE_FLAGS = {
 v3_enabled: true,
 nlp_routing: true,
@@ -516,6 +516,9 @@ const NLP_ROUTES = [
   { patterns: [/latest.*commit/, /recent.*change/, /commit.*hist/, /what.*chang/], verb: 'git log' },
   { patterns: [/uncommit/, /\bstag(?:e|ing)?\b/, /\bdirty\b/, /\bmodif(?:ied|ication)\s+file/], verb: 'git status' },
   { patterns: [/run.*test/, /execut.*test/, /run.*bench/], verb: 'run script' },
+  { patterns: [/drift\s+(?:sweep|audit|check)/, /script\s+drift/, /cross.?lane\s+drift/], verb: 'drift_sweep' },
+  { patterns: [/watcher\s+health/, /heartbeat\s+health/, /scheduled\s+task\s+check/, /pipeline\s+health/], verb: 'watcher_health_audit' },
+  { patterns: [/stale\s+(?:work|items|messages|inbox)/, /aging\s+(?:inbox|items)/, /undeliver/, /old\s+(?:blocked|quarantine)/], verb: 'stale_work_detection' },
 ];
 
 function nlpRoute(msg) {
@@ -555,6 +558,221 @@ function executeConsistencyCheck(msg, lane) {
   } catch (e) {
     return { task_kind: 'report', results: { error: e.message.slice(0, 5000) }, summary: 'Error running consistency check' };
   }
+}
+
+function executeDriftSweepTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const registryPath = path.join(root, 'scripts', 'CANONICAL_SCRIPT_REGISTRY.json');
+  const regResult = safeReadJson(registryPath);
+  if (!regResult.ok) {
+    return { task_kind: 'report', results: { error: `Cannot read CANONICAL_SCRIPT_REGISTRY.json: ${regResult.error}` }, summary: 'Error: canonical script registry not found' };
+  }
+  const registry = regResult.value;
+  const scriptNames = Array.isArray(registry.canonical_scripts) ? registry.canonical_scripts : [];
+  if (scriptNames.length === 0) {
+    return { task_kind: 'report', results: { warning: 'No canonical_scripts entries in registry', lanes_checked: Object.keys(LANE_REGISTRY) }, summary: 'Drift sweep: empty registry, nothing to compare' };
+  }
+  const laneNames = Object.keys(LANE_REGISTRY);
+  const drift = [];
+  const missing = [];
+  const matched = [];
+  for (const scriptName of scriptNames) {
+    const hashes = {};
+    const perLane = {};
+    for (const ln of laneNames) {
+      const scriptPath = path.join(LANE_REGISTRY[ln].root, 'scripts', scriptName);
+      try {
+        if (!fs.existsSync(scriptPath)) {
+          hashes[ln] = null;
+          perLane[ln] = 'MISSING';
+          missing.push({ script: scriptName, lane: ln });
+          continue;
+        }
+        const content = fs.readFileSync(scriptPath, 'utf8');
+        const hash = crypto.createHash('sha256').update(content).digest('hex');
+        hashes[ln] = hash;
+        perLane[ln] = hash;
+      } catch (e) {
+        hashes[ln] = null;
+        perLane[ln] = `ERROR:${e.message.slice(0, 80)}`;
+      }
+    }
+    const uniqueHashes = [...new Set(Object.values(hashes).filter(h => h !== null))];
+    if (uniqueHashes.length === 0) {
+      drift.push({ script: scriptName, classification: 'MISSING', detail: 'All lanes missing', per_lane: perLane });
+    } else if (uniqueHashes.length === 1) {
+      matched.push({ script: scriptName, classification: 'OK', hash: uniqueHashes[0], per_lane: perLane });
+    } else if (uniqueHashes.length === 2) {
+      drift.push({ script: scriptName, classification: 'NEEDS_SYNC', detail: '2 distinct versions detected', per_lane: perLane });
+    } else {
+      drift.push({ script: scriptName, classification: 'RISK', detail: `${uniqueHashes.length} distinct versions detected`, per_lane: perLane });
+    }
+  }
+  return {
+    task_kind: 'report',
+    results: {
+      check_type: 'drift_sweep',
+      scripts_checked: scriptNames.length,
+      lanes_checked: laneNames,
+      ok_count: matched.length,
+      drift_count: drift.length,
+      missing_count: missing.length,
+      drift_detail: drift,
+      missing_detail: missing,
+      ok_detail: matched.map(m => ({ script: m.script, hash: m.hash })),
+    },
+    summary: `Drift sweep: ${matched.length} OK, ${drift.length} drift, ${missing.length} missing across ${laneNames.length} lanes`,
+  };
+}
+
+function executeWatcherHealthAuditTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const { execSync } = require('child_process');
+  const findings = [];
+  const now = Date.now();
+
+  const hbPath = path.join(root, 'lanes', lane, 'state', `heartbeat-${lane}.json`);
+  const hbResult = safeReadJson(hbPath);
+  if (hbResult.ok) {
+    const hbTs = hbResult.value.timestamp ? new Date(hbResult.value.timestamp).getTime() : 0;
+    const ageMin = Math.round((now - hbTs) / 60000);
+    if (ageMin > 15) findings.push({ severity: 'WARN', area: 'heartbeat', detail: `Heartbeat ${ageMin} min old (threshold 15)` });
+  } else {
+    findings.push({ severity: 'CRIT', area: 'heartbeat', detail: 'No heartbeat file found' });
+  }
+
+  const wakePath = path.join(root, 'lanes', lane, 'state', 'codex-wake-packet.json');
+  const wakeResult = safeReadJson(wakePath);
+  if (wakeResult.ok) {
+    const wakeTs = wakeResult.value.generated_at ? new Date(wakeResult.value.generated_at).getTime() : 0;
+    const ageMin = Math.round((now - wakeTs) / 60000);
+    if (ageMin > 120) findings.push({ severity: 'WARN', area: 'wake_packet', detail: `Wake packet ${ageMin} min old (threshold 120)` });
+  } else {
+    findings.push({ severity: 'INFO', area: 'wake_packet', detail: 'No wake packet file found' });
+  }
+
+  const watcherLog = path.join(root, 'scripts', 'inbox-watcher.log');
+  if (fs.existsSync(watcherLog)) {
+    try {
+      const logContent = fs.readFileSync(watcherLog, 'utf8');
+      const errorLines = logContent.split('\n').filter(l => /\bERROR\b|\bFAIL\b|\bCRASH\b/i.test(l));
+      if (errorLines.length > 0) findings.push({ severity: 'WARN', area: 'watcher_log', detail: `${errorLines.length} error lines in watcher log`, sample: errorLines.slice(0, 3) });
+    } catch (_) {}
+  }
+
+  const activeLock = path.join(root, 'lanes', lane, 'state', 'agent-active.lock');
+  if (fs.existsSync(activeLock)) {
+    try {
+      const stat = fs.statSync(activeLock);
+      const ageMin = Math.round((now - stat.mtimeMs) / 60000);
+      if (ageMin > 60) findings.push({ severity: 'WARN', area: 'agent_active_lock', detail: `Lock ${ageMin} min old (threshold 60), possible stale session` });
+    } catch (_) {}
+  }
+
+  let scheduledTaskStatus = null;
+  try {
+    const taskName = lane === 'swarmmind' ? 'SwarmMindHeartbeat' : `${lane.charAt(0).toUpperCase() + lane.slice(1)}Heartbeat`;
+    const psOutput = execSync(`powershell -NoProfile -Command "Get-ScheduledTaskInfo -TaskName '${taskName}' | ConvertTo-Json"`, { timeout: 15000, encoding: 'utf8' });
+    scheduledTaskStatus = JSON.parse(psOutput);
+    if (scheduledTaskStatus.LastTaskResult !== 0) {
+      findings.push({ severity: 'WARN', area: 'scheduled_task', detail: `LastTaskResult=${scheduledTaskStatus.LastTaskResult}` });
+    }
+  } catch (e) {
+    findings.push({ severity: 'INFO', area: 'scheduled_task', detail: `Could not query scheduled task: ${e.message.slice(0, 120)}` });
+  }
+
+  const inboxCounts = {};
+  for (const sub of ['processed', 'quarantine', 'blocked', 'action-required']) {
+    inboxCounts[sub] = countJson(path.join(root, 'lanes', lane, 'inbox', sub));
+  }
+
+  return {
+    task_kind: 'report',
+    results: {
+      check_type: 'watcher_health_audit',
+      lane,
+      findings,
+      finding_count: findings.length,
+      critical_count: findings.filter(f => f.severity === 'CRIT').length,
+      warn_count: findings.filter(f => f.severity === 'WARN').length,
+      info_count: findings.filter(f => f.severity === 'INFO').length,
+      scheduled_task: scheduledTaskStatus,
+      inbox_state: inboxCounts,
+    },
+    summary: `Watcher health audit: ${findings.length} findings (${findings.filter(f => f.severity === 'CRIT').length} crit, ${findings.filter(f => f.severity === 'WARN').length} warn)`,
+  };
+}
+
+function executeStaleWorkDetectionTask(msg, lane) {
+  const now = Date.now();
+  const buckets = { under_12h: [], '12h_24h': [], '24h_48h': [], '48h_72h': [], over_72h: [] };
+  const issues = [];
+  const laneNames = Object.keys(LANE_REGISTRY);
+
+  for (const ln of laneNames) {
+    const inboxDir = path.join(LANE_REGISTRY[ln].root, 'lanes', ln, 'inbox');
+    if (!fs.existsSync(inboxDir)) continue;
+    let entries;
+    try { entries = fs.readdirSync(inboxDir); } catch (_) { continue; }
+    for (const entry of entries) {
+      if (!entry.endsWith('.json') || entry.toLowerCase().startsWith('heartbeat')) continue;
+      const filePath = path.join(inboxDir, entry);
+      let ageMin = null;
+      try {
+        const stat = fs.statSync(filePath);
+        ageMin = Math.round((now - stat.mtimeMs) / 60000);
+      } catch (_) { continue; }
+      const ageH = ageMin / 60;
+      const item = { lane: ln, file: entry, age_minutes: ageMin };
+      if (ageH < 12) buckets.under_12h.push(item);
+      else if (ageH < 24) buckets['12h_24h'].push(item);
+      else if (ageH < 48) buckets['24h_48h'].push(item);
+      else if (ageH < 72) buckets['48h_72h'].push(item);
+      else buckets.over_72h.push(item);
+
+      const content = safeReadJson(filePath);
+      if (!content.ok) continue;
+      const msgData = content.value;
+      if (!msgData.convergence_gate && !msgData._convergence_gate) {
+        issues.push({ lane: ln, file: entry, issue: 'missing_convergence_gate' });
+      }
+    }
+
+    const outboxDir = path.join(LANE_REGISTRY[ln].root, 'lanes', ln, 'outbox');
+    if (!fs.existsSync(outboxDir)) continue;
+    let outEntries;
+    try { outEntries = fs.readdirSync(outboxDir); } catch (_) { continue; }
+    for (const entry of outEntries) {
+      if (!entry.endsWith('.json') || entry.toLowerCase().startsWith('heartbeat')) continue;
+      const filePath = path.join(outboxDir, entry);
+      const content = safeReadJson(filePath);
+      if (!content.ok) continue;
+      const msgData = content.value;
+      if (!msgData.signature && !msgData._signature) {
+        issues.push({ lane: ln, file: entry, issue: 'unsigned_outbox_message' });
+      }
+    }
+  }
+
+  const totalStale = buckets['12h_24h'].length + buckets['24h_48h'].length + buckets['48h_72h'].length + buckets.over_72h.length;
+  return {
+    task_kind: 'report',
+    results: {
+      check_type: 'stale_work_detection',
+      lanes_scanned: laneNames,
+      age_buckets: {
+        under_12h: { count: buckets.under_12h.length, items: buckets.under_12h.slice(0, 20) },
+        '12h_24h': { count: buckets['12h_24h'].length, items: buckets['12h_24h'].slice(0, 20) },
+        '24h_48h': { count: buckets['24h_48h'].length, items: buckets['24h_48h'].slice(0, 20) },
+        '48h_72h': { count: buckets['48h_72h'].length, items: buckets['48h_72h'].slice(0, 20) },
+        over_72h: { count: buckets.over_72h.length, items: buckets.over_72h.slice(0, 20) },
+      },
+      stale_count: totalStale,
+      issues,
+      issue_count: issues.length,
+    },
+    summary: `Stale work detection: ${totalStale} items older than 12h, ${issues.length} issues (missing gates, unsigned outbox)`,
+  };
 }
 
 function executeTask(msg, lane) {
@@ -608,6 +826,15 @@ function executeTask(msg, lane) {
   }
   if (body.includes('consistency check') || body.includes('audit')) {
     return attachRouting(executeConsistencyCheck(msg, lane), { source: 'explicit', verb: 'consistency check', confidence: 1.0 });
+  }
+  if (kind === 'drift_sweep' || body.includes('drift sweep') || body.includes('script drift') || body.includes('cross-lane drift')) {
+    return attachRouting(executeDriftSweepTask(msg, lane), { source: 'explicit', verb: 'drift_sweep', confidence: 1.0 });
+  }
+  if (kind === 'watcher_health_audit' || body.includes('watcher health') || body.includes('heartbeat health') || body.includes('scheduled task check')) {
+    return attachRouting(executeWatcherHealthAuditTask(msg, lane), { source: 'explicit', verb: 'watcher_health_audit', confidence: 1.0 });
+  }
+  if (kind === 'stale_work_detection' || body.includes('stale work') || body.includes('stale items') || body.includes('aging inbox')) {
+    return attachRouting(executeStaleWorkDetectionTask(msg, lane), { source: 'explicit', verb: 'stale_work_detection', confidence: 1.0 });
   }
 
   const nlpDecision = nlpRoute(msg);
@@ -667,13 +894,16 @@ function executeTask(msg, lane) {
       case 'git log': return attachRouting(executeGitTask(Object.assign({}, nlpMsg, { body: 'git log' }), lane), routing);
       case 'git status': return attachRouting(executeGitTask(Object.assign({}, nlpMsg, { body: 'git status' }), lane), routing);
       case 'run script': return attachRouting(executeScriptTask(nlpMsg, lane), routing);
-      case 'consistency check': return attachRouting(executeConsistencyCheck(nlpMsg, lane), routing);
-    }
+  case 'consistency check': return attachRouting(executeConsistencyCheck(nlpMsg, lane), routing);
+  case 'drift_sweep': return attachRouting(executeDriftSweepTask(nlpMsg, lane), routing);
+  case 'watcher_health_audit': return attachRouting(executeWatcherHealthAuditTask(nlpMsg, lane), routing);
+  case 'stale_work_detection': return attachRouting(executeStaleWorkDetectionTask(nlpMsg, lane), routing);
+  }
   }
 
   return attachRouting({
     task_kind: 'ack',
-    results: { acknowledged: true, note: 'Task type not recognized. Supported: status, "read file <path>", "run script <name>", "git status/log/diff", "grep <pattern> in <path>", "write file <path>\\n<content>", "list dir <path>", "hash file <path>", "diff <file1> <file2>", "count \\"pattern\\" in <path>", "consistency check" — or use natural language (e.g. "check if trust store is consistent")' },
+    results: { acknowledged: true, note: 'Task type not recognized. Supported: status, "read file <path>", "run script <name>", "git status/log/diff", "grep <pattern> in <path>", "write file <path>\\n<content>", "list dir <path>", "hash file <path>", "diff <file1> <file2>", "count \\"pattern\\" in <path>", "consistency check", "drift_sweep", "watcher_health_audit", "stale_work_detection" — or use natural language (e.g. "check if trust store is consistent")' },
     summary: `Acknowledged task: ${msg.subject || msg.task_id || 'unknown'}`,
   }, { source: 'fallback', verb: 'ack', confidence: 0.0 });
 }
@@ -850,4 +1080,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { GenericTaskExecutor, executeTask, createResponse, LANE_REGISTRY, NLP_ROUTES, isPathAllowed, resolveLocalPath, EXECUTOR_VERSION, FEATURE_FLAGS };
+module.exports = { GenericTaskExecutor, executeTask, createResponse, LANE_REGISTRY, NLP_ROUTES, isPathAllowed, resolveLocalPath, EXECUTOR_VERSION, FEATURE_FLAGS, executeDriftSweepTask, executeWatcherHealthAuditTask, executeStaleWorkDetectionTask };

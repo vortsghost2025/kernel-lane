@@ -10,7 +10,7 @@ const { LaneDiscovery } = require('./util/lane-discovery');
 
 let localInference = null;
 try { localInference = require('./local-inference'); } catch (e) { if (process.env.DEBUG_LOCAL_INFERENCE) console.error('[AUDIT] local-inference load failed:', e.message); }
-const AUDIT_VERSION = '5.0.0';
+const AUDIT_VERSION = '5.1.0';
 const LEDGER_PATH = process.env.AUTONOMY_LEDGER || path.join(__dirname, '..', 'context-buffer', 'autonomy-ledger.jsonl');
 const ROLLUP_PATH = process.env.AUTONOMY_ROLLUP || path.join(__dirname, '..', 'context-buffer', 'headless-autonomy-rollup.json');
 const CANONICAL_REGISTRY = path.join(__dirname, 'CANONICAL_SCRIPT_REGISTRY.json');
@@ -491,6 +491,90 @@ function getInboxOutboxMovement() {
   return movement;
 }
 
+// === WORK-UNIT ACCOUNTING ===
+function getWorkUnitAccounting(windowHours) {
+  windowHours = windowHours || 24;
+  const cutoff = Date.now() - (windowHours * 3600000);
+  const result = {
+    window_hours: windowHours,
+    work_units_attempted: 0,
+    work_units_completed: 0,
+    work_units_failed: 0,
+    work_units_quarantined: 0,
+    work_units_output_gate_rejected: 0,
+    verified_artifacts_created: 0,
+    per_lane: {}
+  };
+
+  for (const lane of SERVICED_LANES) {
+    const root = LANE_ROOTS[lane];
+    const processedDir = path.join(root, 'lanes', lane, 'inbox', 'processed');
+    const quarantineDir = path.join(root, 'lanes', lane, 'inbox', 'quarantine');
+    const agentLogsDir = path.join(root, 'agent-logs');
+
+    const laneWork = {
+      attempted: 0,
+      completed: 0,
+      failed: 0,
+      quarantined: 0,
+      output_gate_rejected: 0,
+      verified_artifacts: 0
+    };
+
+    if (fs.existsSync(processedDir)) {
+      for (const f of fs.readdirSync(processedDir).filter(n => n.endsWith('.json'))) {
+        try {
+          const stat = fs.statSync(path.join(processedDir, f));
+          if (stat.mtimeMs >= cutoff) {
+            laneWork.attempted++;
+            laneWork.completed++;
+          }
+        } catch (_) {}
+      }
+    }
+
+    if (fs.existsSync(quarantineDir)) {
+      for (const f of fs.readdirSync(quarantineDir).filter(n => n.endsWith('.json'))) {
+        try {
+          const stat = fs.statSync(path.join(quarantineDir, f));
+          if (stat.mtimeMs >= cutoff) {
+            laneWork.attempted++;
+            laneWork.quarantined++;
+            const content = fs.readFileSync(path.join(quarantineDir, f), 'utf8');
+            if (content.includes('REQUIRE_OUTPUT_GATE') || content.includes('require_output_gate_rejected')) {
+              laneWork.output_gate_rejected++;
+            }
+          }
+        } catch (_) {}
+      }
+    }
+
+    if (fs.existsSync(agentLogsDir)) {
+      for (const f of fs.readdirSync(agentLogsDir).filter(n => n.endsWith('.md'))) {
+        try {
+          const stat = fs.statSync(path.join(agentLogsDir, f));
+          if (stat.mtimeMs >= cutoff && stat.size > 0) {
+            const content = fs.readFileSync(path.join(agentLogsDir, f), 'utf8');
+            if (content.includes('OUTPUT_PROVENANCE:') && content.includes('agent:') && content.includes('lane:')) {
+              laneWork.verified_artifacts++;
+            }
+          }
+        } catch (_) {}
+      }
+    }
+
+    result.per_lane[lane] = laneWork;
+    result.work_units_attempted += laneWork.attempted;
+    result.work_units_completed += laneWork.completed;
+    result.work_units_failed += laneWork.failed;
+    result.work_units_quarantined += laneWork.quarantined;
+    result.work_units_output_gate_rejected += laneWork.output_gate_rejected;
+    result.verified_artifacts_created += laneWork.verified_artifacts;
+  }
+
+  return result;
+}
+
 // === LEDGER ===
 function appendLedgerEntry(auditResults) {
   const entry = {
@@ -520,6 +604,7 @@ function appendLedgerEntry(auditResults) {
     bcast: { passed: auditResults.broadcast_proof.passed, n: auditResults.broadcast_proof.delivered_count },
     cognition: auditResults.agent_activation.length > 0,
     recommendations: auditResults.agent_activation.map(r => `${r.priority}:${r.trigger}`),
+    work_units: auditResults.work_units || { attempted: 0, completed: 0, failed: 0, quarantined: 0, output_gate_rejected: 0, verified_artifacts: 0 },
     summary: auditResults.summary
   };
 
@@ -654,21 +739,31 @@ const cogHandoffSuppressed = recent.filter(e => e.cognition === true && e.cognit
   const rollup = {
     generated_at: nowIso(),
     window_hours: windowHours,
+    substrate_cycles: recent.length,
     cycle_count: recent.length,
     topology_stability_pct: recent.length > 0 ? Math.round(topoOk / recent.length * 100) : 0,
     drift_incidents: driftIncidents,
     broadcast_proof_pass_rate: bcastTotal > 0 ? Math.round(bcastPass / bcastTotal * 100) : null,
     dependency_validation_pass_rate: recent.length > 0 ? Math.round(depsOk / recent.length * 100) : 0,
-  cognition_needed_count: cogNeeded,
-  cognition_needed_pct: recent.length > 0 ? Math.round(cogNeeded / recent.length * 100) : 0,
-  cognition_handoff_emitted_count: cogHandoffEmitted,
-  cognition_handoff_emitted_pct: recent.length > 0 ? Math.round(cogHandoffEmitted / recent.length * 100) : 0,
-  cognition_handoff_suppressed_count: cogHandoffSuppressed,
-  cognition_handoff_suppressed_pct: recent.length > 0 ? Math.round(cogHandoffSuppressed / recent.length * 100) : 0,
+    cognition_needed_count: cogNeeded,
+    cognition_needed_pct: recent.length > 0 ? Math.round(cogNeeded / recent.length * 100) : 0,
+    cognition_handoff_emitted_count: cogHandoffEmitted,
+    cognition_handoff_emitted_pct: recent.length > 0 ? Math.round(cogHandoffEmitted / recent.length * 100) : 0,
+    cognition_handoff_suppressed_count: cogHandoffSuppressed,
+    cognition_handoff_suppressed_pct: recent.length > 0 ? Math.round(cogHandoffSuppressed / recent.length * 100) : 0,
     top_recommendation_types: topRecTypes,
     last_cycle_summary: lastEntry ? lastEntry.summary : null,
     substrate_status: status
   };
+
+  const workUnitsAttempted = recent.filter(e => e.work_units && e.work_units.attempted > 0);
+  const workUnitsCompleted = recent.filter(e => e.work_units && e.work_units.completed > 0);
+  rollup.work_units_attempted = workUnitsAttempted.reduce((sum, e) => sum + (e.work_units.attempted || 0), 0);
+  rollup.work_units_completed = workUnitsCompleted.reduce((sum, e) => sum + (e.work_units.completed || 0), 0);
+  rollup.work_units_failed = recent.reduce((sum, e) => sum + ((e.work_units && e.work_units.failed) || 0), 0);
+  rollup.work_units_quarantined = recent.reduce((sum, e) => sum + ((e.work_units && e.work_units.quarantined) || 0), 0);
+  rollup.work_units_output_gate_rejected = recent.reduce((sum, e) => sum + ((e.work_units && e.work_units.output_gate_rejected) || 0), 0);
+  rollup.verified_artifacts_created = recent.reduce((sum, e) => sum + ((e.work_units && e.work_units.verified_artifacts) || 0), 0);
 
   const dir = path.dirname(ROLLUP_PATH);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -995,6 +1090,8 @@ async function runFullAudit(opts) {
 
   auditResults.agent_activation = checkAgentActivationNeeded(auditResults);
 
+  auditResults.work_units = getWorkUnitAccounting(24);
+
   const issues = [];
   if (!serviceTopology.invariant_ok) {
     issues.push(`topology: ${serviceTopology.active}/${serviceTopology.expected_total} active, ${serviceTopology.missing.length} missing, ${serviceTopology.crash_loops.length} crash`);
@@ -1126,6 +1223,7 @@ module.exports = {
   buildRecommendationPackets, buildRollup, buildEnhancedRollup,
   emitCognitionHandoff, buildDedupeKey, updateRecommendationLedger,
   recordDisposition, loadRecommendationLedger, getRecLedgerPath,
+  getWorkUnitAccounting,
   SERVICED_LANES, VIRTUAL_LANES, REQUIRED_EXECUTOR_FILES,
   RECOMMENDATION_TYPES, REC_LIFECYCLE_STATES, REC_DISPOSITIONS,
   REC_LEDGER_PATH, DEDUPE_SUPPRESS_CYCLES, AUDIT_VERSION

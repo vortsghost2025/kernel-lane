@@ -18,7 +18,7 @@ const { spawnSync } = require('child_process');
 const _ld = require('./util/lane-discovery');
 const { sanitizeFilename } = require('./util/sanitize-filename');
 
-const AUTONOMOUS_VERSION = '1.2.0';
+const AUTONOMOUS_VERSION = '1.3.0';
 const POLL_INTERVAL_MS = 15000;
 const REMEDIATOR_INTERVAL_MS = 600000;
 const STALE_AR_MS = 3600000;
@@ -116,6 +116,65 @@ function runGenericExecutor(lane, dryRun) {
     output: res.stdout,
     error: res.stderr,
     timedOut: res.timedOut,
+  };
+}
+
+function verifyTaskOutput(msg, lane) {
+  const requiredOutput = msg.require_output || msg.required_output || null;
+  if (!requiredOutput) {
+    return {
+      ok: true,
+      reason: 'no_required_output_declared',
+      checked: false
+    };
+  }
+
+  const repoRoot = resolveRepoRoot(lane);
+  const outputPath = path.isAbsolute(requiredOutput)
+    ? requiredOutput
+    : path.join(repoRoot, requiredOutput);
+
+  if (!fs.existsSync(outputPath)) {
+    return {
+      ok: false,
+      reason: 'required_output_path_missing',
+      checked: true,
+      path: requiredOutput,
+      detail: `Declared required_output "${requiredOutput}" does not exist at ${outputPath}`
+    };
+  }
+
+  const stat = fs.statSync(outputPath);
+  if (stat.size === 0) {
+    return {
+      ok: false,
+      reason: 'required_output_file_empty',
+      checked: true,
+      path: requiredOutput,
+      detail: `Declared required_output "${requiredOutput}" exists but is empty (0 bytes)`
+    };
+  }
+
+  const { verifyOutputProvenance } = require('./output-provenance');
+  const content = fs.readFileSync(outputPath, 'utf8');
+  const provenanceResult = verifyOutputProvenance(content);
+  if (!provenanceResult.ok) {
+    return {
+      ok: false,
+      reason: 'required_output_provenance_invalid',
+      checked: true,
+      path: requiredOutput,
+      detail: `Declared required_output "${requiredOutput}" missing provenance fields: ${provenanceResult.missing.join(', ')}`,
+      provenance_missing: provenanceResult.missing
+    };
+  }
+
+  return {
+    ok: true,
+    reason: 'verified',
+    checked: true,
+    path: requiredOutput,
+    size_bytes: stat.size
   };
 }
 
@@ -223,6 +282,30 @@ function executeTaskWithJournal(lane, fileInfo) {
 
   const execResult = runGenericExecutor(lane, false);
 
+  const outputGate = verifyTaskOutput(msg, lane);
+  if (!outputGate.ok) {
+    const quarantineDir = path.join(repoRoot, 'lanes', lane, 'inbox', 'quarantine');
+    ensureDir(quarantineDir);
+    const qPath = path.join(quarantineDir, fileInfo.filename);
+    try {
+      if (fs.existsSync(inProgressPath)) fs.renameSync(inProgressPath, qPath);
+    } catch (_) {}
+
+    journalAppend(lane, 'output_gate_rejection', {
+      target: fileInfo.filename,
+      intent: `requireOutput hard gate REJECTED: ${outputGate.reason}`,
+      handoff: {
+        task_id: msg.task_id || fileInfo.filename,
+        executor: 'autonomous-executor',
+        gate_result: outputGate.reason,
+        gate_detail: outputGate.detail || '',
+        required_output: outputGate.path || null
+      },
+    });
+
+    return { status: 'QUARANTINED', reason: `REQUIRE_OUTPUT_GATE: ${outputGate.reason}`, gate: outputGate, execResult };
+  }
+
   let processedPath;
   try {
     processedPath = path.join(procDir, fileInfo.filename);
@@ -284,11 +367,12 @@ class AutonomousExecutor {
     this.running = false;
     this.stats = {
       cycleCount: 0,
-      tasksExecuted: 0,
-      tasksBlocked: 0,
-      tasksExpired: 0,
-      tasksQuarantined: 0,
-      remediatorRuns: 0,
+    tasksExecuted: 0,
+    tasksBlocked: 0,
+    tasksExpired: 0,
+    tasksQuarantined: 0,
+    tasksOutputGateRejected: 0,
+    remediatorRuns: 0,
       errors: [],
       uncertainty: [],
     };
@@ -352,6 +436,24 @@ class AutonomousExecutor {
         };
         this.stats.uncertainty.push(blockedUncertainty);
         process.stdout.write(`[autonomous-executor] BLOCKED: ${fileInfo.filename} reason=${result.reason}\n`);
+      } else if (result.status === 'QUARANTINED' && result.gate) {
+        this.stats.tasksOutputGateRejected++;
+        this.stats.tasksQuarantined++;
+        var gateUncertainty = {
+          level: 'high',
+          type: ['require_output_gate_rejected'],
+          why: 'Task quarantined by requireOutput hard gate: ' + (result.reason || 'unknown'),
+          evidence_needed: ['required_output_path', 'output_artifact', 'gate_detail'],
+          operator_decision_needed: true,
+          next_safe_check: 'Verify task declared correct require_output path, then re-queue with correct output or fix executor',
+          detected_at: nowIso(),
+          detected_by: 'autonomous-executor-v' + AUTONOMOUS_VERSION,
+          task_id: (fileInfo.msg || {}).task_id || fileInfo.filename,
+          gate_result: result.gate,
+        };
+        this.stats.uncertainty.push(gateUncertainty);
+        process.stdout.write(`[autonomous-executor] OUTPUT_GATE_REJECTED: ${fileInfo.filename} reason=${result.reason}\n`);
+        process.stdout.write(`[autonomous-executor] UNCERTAINTY: level=high operator_needed=true 👤\n`);
       } else if (result.status === 'QUARANTINED') {
         this.stats.tasksQuarantined++;
         var qUncertainty = {
@@ -452,6 +554,7 @@ class AutonomousExecutor {
       version: AUTONOMOUS_VERSION,
       dryRun: this.dryRun,
       ...this.stats,
+      tasksOutputGateRejected: this.stats.tasksOutputGateRejected,
       uncertainty_summary: uncertaintySummary,
     };
   }

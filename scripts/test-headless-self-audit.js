@@ -10,7 +10,7 @@ const {
   testBroadcastDelivery, checkExecutorDependencies,
   buildRecommendationPackets, buildRollup, buildEnhancedRollup,
   emitCognitionHandoff, buildDedupeKey, updateRecommendationLedger,
-  recordDisposition, loadRecommendationLedger,
+  recordDisposition, loadRecommendationLedger, getWorkUnitAccounting,
   SERVICED_LANES, VIRTUAL_LANES, REQUIRED_EXECUTOR_FILES,
   RECOMMENDATION_TYPES, REC_LIFECYCLE_STATES, REC_DISPOSITIONS,
   DEDUPE_SUPPRESS_CYCLES, AUDIT_VERSION
@@ -306,6 +306,106 @@ test('RESOLVED entry re-activated clears resolved_at and resets state to NEW', (
   assert.strictEqual(entry.cognition_handoff_emitted, true);
   delete process.env.REC_LEDGER;
   if (fs.existsSync(testLedger)) fs.unlinkSync(testLedger);
+  });
+
+// === A2: Work-unit accounting ===
+console.log('A2. Work-unit accounting');
+test('getWorkUnitAccounting returns expected structure', () => {
+  const result = getWorkUnitAccounting(24);
+  assert.strictEqual(typeof result.window_hours, 'number');
+  assert.strictEqual(result.window_hours, 24);
+  assert.strictEqual(typeof result.work_units_attempted, 'number');
+  assert.strictEqual(typeof result.work_units_completed, 'number');
+  assert.strictEqual(typeof result.work_units_failed, 'number');
+  assert.strictEqual(typeof result.work_units_quarantined, 'number');
+  assert.strictEqual(typeof result.work_units_output_gate_rejected, 'number');
+  assert.strictEqual(typeof result.verified_artifacts_created, 'number');
+  assert.strictEqual(typeof result.per_lane, 'object');
+  for (const lane of SERVICED_LANES) {
+    assert(result.per_lane[lane], `per_lane entry for ${lane} exists`);
+    assert.strictEqual(typeof result.per_lane[lane].attempted, 'number');
+    assert.strictEqual(typeof result.per_lane[lane].verified_artifacts, 'number');
+  }
+});
+test('rollup includes work-unit fields from ledger entries with work_units', () => {
+  const testLedger = path.join(os.tmpdir(), `test-rollup-work-${Date.now()}.jsonl`);
+  const now = new Date().toISOString();
+  fs.writeFileSync(testLedger, JSON.stringify({
+    v: AUDIT_VERSION, ts: now, host: 'test',
+    topology: { exp: 18, act: 18, ok: true, miss: 0, dup: 0, crash: 0, orphan: 0 },
+    drift: { status: 'NO_DRIFT', checked: 0, aligned: 0, drift_n: 0, regress: 0, gov: null },
+    health: {}, io: {}, deps: { ok: true, miss: 0 },
+    bcast: { passed: true, n: 3 },
+    cognition: false, recommendations: [],
+    work_units: { attempted: 2, completed: 1, failed: 0, quarantined: 1, output_gate_rejected: 1, verified_artifacts: 1 },
+    summary: 'test'
+  }) + '\n', 'utf8');
+  const rollup = buildRollup(testLedger, 24);
+  assert.strictEqual(rollup.substrate_cycles, 1, 'substrate_cycles field present');
+  assert.strictEqual(rollup.work_units_attempted, 2);
+  assert.strictEqual(rollup.work_units_completed, 1);
+  assert.strictEqual(rollup.work_units_quarantined, 1);
+  assert.strictEqual(rollup.work_units_output_gate_rejected, 1);
+  assert.strictEqual(rollup.verified_artifacts_created, 1);
+  if (fs.existsSync(testLedger)) fs.unlinkSync(testLedger);
+});
+
+// === A1: requireOutput hard gate ===
+console.log('A1. requireOutput hard gate');
+test('verifyTaskOutput returns ok when no required_output declared', () => {
+  const { verifyTaskOutput } = require('./autonomous-executor');
+  const result = verifyTaskOutput({ task_id: 'test-no-output' }, 'kernel');
+  assert.strictEqual(result.ok, true);
+  assert.strictEqual(result.reason, 'no_required_output_declared');
+  assert.strictEqual(result.checked, false);
+});
+test('verifyTaskOutput rejects when required_output path does not exist', () => {
+  const { verifyTaskOutput } = require('./autonomous-executor');
+  const result = verifyTaskOutput({
+    task_id: 'test-missing-output',
+    require_output: '/tmp/nonexistent-a1-test-output-' + Date.now() + '.md'
+  }, 'kernel');
+  assert.strictEqual(result.ok, false);
+  assert.strictEqual(result.reason, 'required_output_path_missing');
+  assert.strictEqual(result.checked, true);
+});
+test('verifyTaskOutput rejects when required_output file is empty', () => {
+  const { verifyTaskOutput } = require('./autonomous-executor');
+  const emptyFile = path.join(os.tmpdir(), `a1-test-empty-${Date.now()}.md`);
+  fs.writeFileSync(emptyFile, '', 'utf8');
+  const result = verifyTaskOutput({
+    task_id: 'test-empty-output',
+    require_output: emptyFile
+  }, 'kernel');
+  assert.strictEqual(result.ok, false);
+  assert.strictEqual(result.reason, 'required_output_file_empty');
+  fs.unlinkSync(emptyFile);
+});
+test('verifyTaskOutput rejects when required_output file lacks provenance', () => {
+  const { verifyTaskOutput } = require('./autonomous-executor');
+  const noProvFile = path.join(os.tmpdir(), `a1-test-noprov-${Date.now()}.md`);
+  fs.writeFileSync(noProvFile, 'Some content without provenance header', 'utf8');
+  const result = verifyTaskOutput({
+    task_id: 'test-no-provenance',
+    require_output: noProvFile
+  }, 'kernel');
+  assert.strictEqual(result.ok, false);
+  assert.strictEqual(result.reason, 'required_output_provenance_invalid');
+  fs.unlinkSync(noProvFile);
+});
+test('verifyTaskOutput passes when required_output file has valid provenance', () => {
+  const { verifyTaskOutput } = require('./autonomous-executor');
+  const goodFile = path.join(os.tmpdir(), `a1-test-valid-${Date.now()}.md`);
+  fs.writeFileSync(goodFile, 'OUTPUT_PROVENANCE:\nagent: test\nlane: kernel\ntarget: a1-test\n\nReal content here.', 'utf8');
+  const result = verifyTaskOutput({
+    task_id: 'test-valid-output',
+    require_output: goodFile
+  }, 'kernel');
+  assert.strictEqual(result.ok, true);
+  assert.strictEqual(result.reason, 'verified');
+  assert.strictEqual(result.checked, true);
+  assert.strictEqual(typeof result.size_bytes, 'number');
+  fs.unlinkSync(goodFile);
 });
 
 // === Summary ===

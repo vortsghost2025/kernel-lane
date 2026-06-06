@@ -361,6 +361,7 @@ function isActionable(msg) {
   );
 }
 
+<<<<<<< HEAD
 const NON_ASCII_PATTERN = /[^\x20-\x7E]/;
 
 function isEnglishOnly(msg) {
@@ -370,6 +371,17 @@ function isEnglishOnly(msg) {
     let val = msg[field];
     if (typeof val === 'string') {
       val = normalizeToAscii(val);
+=======
+const NON_ASCII_PATTERN = /[^\x20-\x7E]/;
+
+function isEnglishOnly(msg) {
+  if (!msg || typeof msg !== 'object') return true;
+  const textFields = ['subject', 'body', 'type', 'from', 'to'];
+  for (const field of textFields) {
+    let val = msg[field];
+    if (typeof val === 'string') {
+      val = normalizeToAscii(val);
+>>>>>>> cab85967 ([CI:kernel-lane] autonomous executor, scripts, CUDA kernel docs, state files, ollama reroute)
       if (NON_ASCII_PATTERN.test(val)) {
         return false;
       }
@@ -657,6 +669,7 @@ class LaneWorker {
       return { queue: 'blocked', reason: 'SIGNATURE_INVALID', detail: signatureResult.reason || 'Signature validation failed' };
     }
     // Law 5: Confidence Ratings Mandatory check
+<<<<<<< HEAD
     // Exempt system message types (notification, heartbeat, status) from confidence requirement
     const exemptTypes = new Set(['notification', 'heartbeat', 'status']);
     const msgType = (msg && typeof msg === 'object' ? String(msg.type || '') : '').toLowerCase();
@@ -699,11 +712,52 @@ class LaneWorker {
         } catch (_) {}
       }
     }
+=======
+    const confidence = msg && typeof msg === 'object' ? msg.confidence : null;
+    if (confidence === null || typeof confidence !== 'number' || confidence < 1 || confidence > 10 || !Number.isInteger(confidence)) {
+      return { queue: 'quarantine', reason: 'CONFIDENCE_REQUIRED', detail: 'Assessment must include confidence rating as integer between 1-10' };
+    }
+  if (confidence < 7) {
+    const investigation = msg && typeof msg === 'object' ? msg.investigation : null;
+    if (!investigation || typeof investigation !== 'string' || investigation.trim() === '') {
+      return { queue: 'blocked', reason: 'LOW_CONFIDENCE_NO_INVESTIGATION', detail: 'Assessment with confidence < 7 requires investigation evidence' };
+    }
+  }
+  // CONFIDENCE_DERIVATION_CONTRACT enforcement (graduated: flag, don't block yet)
+  // High confidence (>=7) without derivation is performative confidence — a governance violation.
+  // Per S:/.global/CONFIDENCE_DERIVATION_CONTRACT.md Rule 1: confidence MUST include
+  // what measured, how measured, what produced, how mapped. Missing = PROHIBITED.
+  // Graduated phase: attach PERFORMATIVE_CONFIDENCE flag to metadata, log to cps_log.
+  if (confidence >= 7) {
+    const derivation = msg && typeof msg === 'object' ? msg.confidence_derivation : null;
+    if (!derivation || typeof derivation !== 'object' || Array.isArray(derivation)) {
+      if (!msg._governance_flags) msg._governance_flags = [];
+      msg._governance_flags.push('PERFORMATIVE_CONFIDENCE');
+      const cpsEntry = {
+        timestamp: new Date().toISOString(),
+        event: 'PERFORMATIVE_CONFIDENCE',
+        agent: msg.from || 'unknown',
+        task_id: msg.task_id || 'unknown',
+        confidence: confidence,
+        has_derivation: false,
+        detail: 'confidence >= 7 without confidence_derivation object — performative confidence per CONFIDENCE_DERIVATION_CONTRACT Rule 1',
+      };
+      try {
+        const cpsPath = path.join(this.laneRoot || path.resolve(__dirname, '..'), 'context-buffer', 'cps_log.jsonl');
+        fs.appendFileSync(cpsPath, JSON.stringify(cpsEntry) + '\n');
+      } catch (_) {}
+    }
+  }
+>>>>>>> cab85967 ([CI:kernel-lane] autonomous executor, scripts, CUDA kernel docs, state files, ollama reroute)
   if (!isEnglishOnly(msg)) {
       return { queue: 'quarantine', reason: 'FORMAT_VIOLATION_NON_ASCII', detail: 'Message contains non-ASCII content. Re-request in English per governance constraint.' };
     }
 
+<<<<<<< HEAD
   const OUTPUT_PROV_EXEMPT_TYPES = new Set(['task', 'escalation', 'request', 'notification', 'heartbeat', 'status']);
+=======
+  const OUTPUT_PROV_EXEMPT_TYPES = new Set(['task', 'escalation', 'request']);
+>>>>>>> cab85967 ([CI:kernel-lane] autonomous executor, scripts, CUDA kernel docs, state files, ollama reroute)
   if (typeof msg.body === 'string' && !OUTPUT_PROV_EXEMPT_TYPES.has(String(msg.type || '').toLowerCase()) && !isActionable(msg)) {
     var prov = verifyOutputProvenance(msg.body);
     if (!prov.ok) {
@@ -829,7 +883,11 @@ class LaneWorker {
     }
   }
   // Non-actionable messages claiming completion without verifiable artifact = blocked
+<<<<<<< HEAD
   if (gate.pass && !isActionable(msg) && !cp.isTerminalInformational(msg)) {
+=======
+  if (gate.pass && !isActionable(msg)) {
+>>>>>>> cab85967 ([CI:kernel-lane] autonomous executor, scripts, CUDA kernel docs, state files, ollama reroute)
     const proofClassification2 = this.artifactResolver.classifyProof(msg);
     const isLegacyPath2 = proofClassification2.type === 'LEGACY_ARTIFACT_PATH';
 
@@ -1408,4 +1466,8 @@ module.exports = {
   hasUnresolvableEvidence: cp.hasUnresolvableEvidence,
 };
 
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> cab85967 ([CI:kernel-lane] autonomous executor, scripts, CUDA kernel docs, state files, ollama reroute)
