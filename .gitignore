@@ -118,3 +118,7 @@ backup_*/
 
 # Recovery docs
 docs/recovery/
+
+# Work claim registry (runtime coordination, advisory only)
+lanes/*/state/work-claim.json
+.work-claim.json
