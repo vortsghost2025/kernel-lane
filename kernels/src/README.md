@@ -28,8 +28,23 @@ Produces CSV reports under `profiles/headless/`.
 
 ## RTX 5060 Benchmark (1024×1024, FP16)
 
-| Kernel | Latency (ms) | TFLOPS | Tensor Core Util |
-|-------|--------------|--------|------------------|
-| baseline (1 warp) | 5.1 | 0.88 | ~35% |
-| padded 4-warp | 0.32 | 14.0 | ~95% |
-| async scaffold | 0.30 | 15.0 | ~96% |
+> **Benchmark numbers are versioned — read before quoting TFLOPS.**
+>
+> The table below is an **early async scaffold run** (pre-GEN5). It used an
+> earlier kernel + timing method and is **superseded**. The corrected,
+> evidence-backed figures live in **`kernels/benchmark_report.json`** (GEN5
+> release run, with correctness checks + Nsight Compute evidence) — that file
+> is the **source of truth**.
+>
+> For 1024×1024 FP16 the GEN5 report gives ~6.14 TFLOPS for the
+> `fastpath-async-8warp` kernel (vs the 14–15 TFLOPS shown here). The higher
+> scaffold figures came from a different timing method and are not the current
+> canonical result.
+
+| Kernel | Latency (ms) | TFLOPS | Tensor Core Util | Version |
+|-------|--------------|--------|------------------|---------|
+| baseline (1 warp) | 5.1 | 0.88 | ~35% | scaffold (pre-GEN5) |
+| padded 4-warp | 0.32 | 14.0 | ~95% | scaffold (pre-GEN5) |
+| async scaffold | 0.30 | 15.0 | ~96% | scaffold (pre-GEN5) |
+
+**Source of truth:** `kernels/benchmark_report.json` (report version GEN5).

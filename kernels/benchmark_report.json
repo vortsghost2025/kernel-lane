@@ -1,6 +1,8 @@
 {
   "benchmark": "WMMA GEMM Matrix Multiplication on RTX 5060",
   "updated_at_utc": "2026-05-03T14:45:00Z",
+  "report_version": "GEN5",
+  "version_note": "These figures are the corrected GEN5 release run (correctness checks + Nsight Compute evidence). Earlier docs (e.g. kernels/src/README.md) show 14-15 TFLOPS for 1024x1024 FP16 from an early async scaffold run with a different timing method; those scaffold numbers are SUPERSEDED by this report, which is the source of truth.",
   "architecture": "sm_120",
   "data_type": "FP16 (half-precision) + FP8 (e4m3) via cuBLASLt",
   "results": {
@@ -70,15 +72,10 @@
  }
  }
  },
- "missing_metrics": [
- "ncu profiling for cuBLASLt FP8 kernel (proprietary, may not be profilable)",
- "FP8 numerical accuracy verification at 4096³"
- ],
- "next_steps": [
- "Verify FP8 numerical accuracy at 4096³",
- "Profile inference sub-kernels with ncu",
- "Investigate higher arithmetic intensity tiling to close gap with cuBLASLt"
- ],
+  "missing_metrics": [
+  "ncu profiling for cuBLASLt FP8 kernel (proprietary, may not be profilable)",
+  "FP8 numerical accuracy verification at 4096³"
+  ],
   "next_steps": [
     "Verify FP8 numerical accuracy at 4096³",
     "Profile inference sub-kernels with ncu",
