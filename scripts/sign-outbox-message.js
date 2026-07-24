@@ -8,9 +8,19 @@ const crypto = require('crypto');
 const { deriveKeyId } = require(path.join(__dirname, '..', '.global', 'deriveKeyId.js'));
 const { loadPrivateKey, getAlgorithmParams, sign: algoSign, isPassphraseRequired, SUPPORTED_ALGORITHMS } = require(path.join(__dirname, '..', '.global', 'algorithm-helpers.js'));
 
+// LEASE + ATOMIC WRITE: Use local copy to avoid cross-lane require()
+const { atomicWriteJson, atomicWriteWithLease } = require('./atomic-write-util');
+
+const isWin32 = process.platform === 'win32';
+const UBUNTU_ROOT = path.join(require('os').homedir(), 'agent', 'repos');
+function _resolve(winPath) {
+  if (isWin32) return winPath;
+  const m = winPath.match(/^S:\/(.+)$/);
+  return m ? path.join(UBUNTU_ROOT, m[1]) : winPath;
+}
+
 const PASSFILE_CANDIDATES = [
   path.join(__dirname, '..', '.runtime', 'lane-passphrases.json'),
-  'S:/Archivist-Agent/.runtime/lane-passphrases.json'
 ];
 
 function parseArgs(argv) {
@@ -50,10 +60,11 @@ function base64UrlEncode(input) {
 }
 
 const LANE_IDENTITY_DIRS = {
-  archivist: 'S:/Archivist-Agent/.identity',
-  library: 'S:/self-organizing-library/.identity',
-  swarmmind: 'S:/SwarmMind/.identity',
-  kernel: 'S:/kernel-lane/.identity',
+  archivist: _resolve('S:/Archivist-Agent/.identity'),
+  authority: _resolve('S:/Archivist-Agent/.identity/authority'),
+  library: _resolve('S:/self-organizing-library/.identity'),
+  swarmmind: _resolve('S:/SwarmMind/.identity'),
+  kernel: _resolve('S:/kernel-lane/.identity'),
 };
 
 function resolvePassphrase(lane) {
@@ -96,6 +107,7 @@ function loadKeyMaterial(identityDir, lane, passphrase) {
   }
 
   const algoParams = getAlgorithmParams(privateKey);
+
   const keyId = deriveKeyId(publicPem);
   return { privateKey, keyId, algoParams };
 }
@@ -135,7 +147,7 @@ function signInboxShape(msg, lane, privateKey, keyId, algoParams) {
   };
 }
 
-function signMessageFile(messagePath, lane, force) {
+async function signMessageFile(messagePath, lane, force) {
   const absolutePath = path.resolve(messagePath);
   if (!fs.existsSync(absolutePath)) {
     throw new Error(`MESSAGE_FILE_MISSING: ${absolutePath}`);
@@ -164,11 +176,12 @@ function signMessageFile(messagePath, lane, force) {
   const { privateKey, keyId, algoParams } = loadKeyMaterial(identityDir, effectiveLane, passphrase);
   const signed = signInboxShape(msg, effectiveLane, privateKey, keyId, algoParams);
 
-  fs.writeFileSync(absolutePath, JSON.stringify(signed, null, 2) + '\n', 'utf8');
+  // Atomic write with mandatory lease
+  await atomicWriteWithLease(absolutePath, signed, effectiveLane, 30000);
   console.log(`[sign-outbox] Signed ${absolutePath} with key_id=${keyId}`);
 }
 
-(function main() {
+(async function main() {
   const args = parseArgs(process.argv.slice(2));
   const message = args.message || args.path;
   if (!message) {
@@ -177,7 +190,7 @@ function signMessageFile(messagePath, lane, force) {
   }
 
   try {
-    signMessageFile(message, args.lane || null, args.force === 'true');
+    await signMessageFile(message, args.lane || null, args.force === 'true');
   } catch (err) {
     console.error(`[sign-outbox] ERROR: ${err.message}`);
     process.exit(1);

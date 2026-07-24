@@ -23,13 +23,13 @@ const checks = [
   // Trust Store
   { 
     category: 'Trust Store',
-    name: 'keys.json',
-    path: `${ARCHIVIST_ROOT}/.trust/keys.json`,
-    required: true,
-    validate: (content) => {
-      const data = JSON.parse(content);
-      return data.keys && data.keys.archivist && data.keys.library && data.keys.swarmmind;
-    }
+  name: 'trust-store.json',
+  path: `${ARCHIVIST_ROOT}/lanes/broadcast/trust-store.json`,
+  required: true,
+  validate: (content) => {
+    const data = JSON.parse(content);
+    return data.keys && data.keys.archivist && data.keys.library && data.keys.swarmmind && data.keys.kernel;
+  }
   },
   
   // System Anchor

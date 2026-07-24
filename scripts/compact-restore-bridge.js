@@ -61,6 +61,124 @@ class CompactRestoreBridge {
     }
   }
 
+  generatePacket(lane, options = {}) {
+    const laneRoot = this.roots[lane];
+    if (!laneRoot) return { ok: false, error: 'unknown_lane', lane };
+
+    const auditDir = this.auditDirs[lane];
+    this._ensureDir(auditDir);
+
+    const constraintPath = process.env.CONSTRAINTS_PATH ||
+      path.join(laneRoot, 'constitutional_constraints.yaml');
+    const constraints = this._readConstraintsYaml(constraintPath);
+
+    const driftBaseline = this._readJsonSafe(
+      path.join(laneRoot, 'context-buffer', 'drift-baseline.json')
+    ) || { uds_score: 0, last_updated: null };
+
+    const sessionCtx = this._readJsonSafe(
+      path.join(laneRoot, 'context-buffer', 'session-context.json')
+    ) || { lane_id: lane, role: 'archivist', governance_active: true };
+
+    const workingCtx = this._collectWorkingContext(laneRoot);
+
+    const packet = {
+      schema_version: '1.4',
+      timestamp: new Date().toISOString(),
+      lane,
+      generator: 'compact-restore-bridge.js',
+      generator_command: 'generate-packet',
+      authority: {
+        fields_authoritative: [
+          'governance_constraints', 'active_checkpoints',
+          'drift_baseline', 'session_context'
+        ],
+        fields_advisory: ['working_context_resume']
+      },
+      restore_payload: {
+        governance_constraints: constraints,
+        active_checkpoints: this._getActiveCheckpoints(laneRoot),
+        drift_baseline: driftBaseline,
+        session_context: sessionCtx,
+        working_context_resume: workingCtx
+      }
+    };
+
+    const outPath = options.outPath ||
+      path.join(auditDir, 'COMPACT_RESTORE_PACKET.json');
+    fs.writeFileSync(outPath, JSON.stringify(packet, null, 2));
+
+    const stats = fs.statSync(outPath);
+    return {
+      ok: true,
+      lane,
+      path: outPath,
+      size_bytes: stats.size,
+      constraint_count: Object.keys(constraints).length,
+      checkpoint_count: packet.restore_payload.active_checkpoints.length,
+      working_context_items: workingCtx.length
+    };
+  }
+
+  _readConstraintsYaml(yamlPath) {
+    if (!fs.existsSync(yamlPath)) {
+      return {
+        STRUCTURE_OVER_IDENTITY: true,
+        CORRECTION_MANDATORY: true,
+        SINGLE_ENTRY_POINT: true,
+        OPERATOR_ACCOUNTABILITY: true
+      };
+    }
+    const raw = fs.readFileSync(yamlPath, 'utf8');
+    const constraints = {};
+    const re = /^(\w+):\s*(\d+)/gm;
+    let m;
+    while ((m = re.exec(raw)) !== null) {
+      constraints[m[1]] = parseInt(m[2], 10) > 0;
+    }
+    if (Object.keys(constraints).length === 0) {
+      return {
+        STRUCTURE_OVER_IDENTITY: true,
+        CORRECTION_MANDATORY: true,
+        SINGLE_ENTRY_POINT: true,
+        OPERATOR_ACCOUNTABILITY: true
+      };
+    }
+    return constraints;
+  }
+
+  _getActiveCheckpoints(laneRoot) {
+    const cpPath = path.join(laneRoot, 'CHECKPOINTS.md');
+    if (!fs.existsSync(cpPath)) return [];
+    const content = fs.readFileSync(cpPath, 'utf8');
+    const checkpoints = [];
+    const re = /^[-*]\s*\[(x| )\]\s*(CP-\d+):\s*(.+)/gim;
+    let m;
+    while ((m = re.exec(content)) !== null) {
+      checkpoints.push({
+        id: m[2],
+        name: m[3].trim(),
+        active: m[1].toLowerCase() === 'x'
+      });
+    }
+    return checkpoints;
+  }
+
+  _collectWorkingContext(laneRoot) {
+    const items = [];
+    const handoffPath = path.join(laneRoot, 'COMPACT_CONTEXT_HANDOFF.md');
+    if (fs.existsSync(handoffPath)) {
+      items.push('handoff_exists:true');
+    }
+    const blockerPath = path.join(laneRoot, 'lanes', 'broadcast', 'active-blocker.json');
+    const blocker = this._readJsonSafe(blockerPath);
+    items.push(`blocker_active:${blocker && blocker.exists ? 'true' : 'false'}`);
+    const ts = this._extractTrustStoreKeyIds();
+    items.push(`trust_store_lanes:${Object.keys(ts).length}`);
+    items.push('graph_snapshot_excluded:true');
+    return items;
+  }
+
   _hashContent(content) {
     return crypto.createHash('sha256').update(content).digest('hex');
   }
@@ -214,12 +332,17 @@ class CompactRestoreBridge {
     }
 
     const packetConstraints = restorePacket.restore_payload.governance_constraints || {};
-    const preConstraints = preSnapshot.compact_restore_packet.constraints || preSnapshot.constraint_names || {};
+    const preCrp = preSnapshot.compact_restore_packet || {};
+    const preConstraints = preCrp.constraints || preSnapshot.constraint_names || {};
     const packetCheckpoints = restorePacket.restore_payload.active_checkpoints || [];
-    const preCheckpoints = preSnapshot.compact_restore_packet.checkpoints || [];
+    const preCheckpoints = preCrp.checkpoints || preSnapshot.active_checkpoints || [];
 
-    const constraintMatch = JSON.stringify(Object.keys(packetConstraints).sort()) ===
-      JSON.stringify((Array.isArray(preConstraints) ? preConstraints : Object.keys(preConstraints)).sort());
+    const normalizeConstraints = (c) => {
+      if (Array.isArray(c)) return c.sort();
+      return Object.keys(c).sort();
+    };
+    const constraintMatch = JSON.stringify(normalizeConstraints(packetConstraints)) ===
+      JSON.stringify(normalizeConstraints(preConstraints));
 
     const checkpointIds = (cps) => cps.map(c => c.id || c).sort();
     const checkpointMatch = JSON.stringify(checkpointIds(packetCheckpoints)) ===
@@ -354,6 +477,20 @@ if (require.main === module) {
       console.log(`  FAIL: ${result.error}`);
     }
     process.exit(result.ok ? 0 : 1);
+  } else if (command === 'generate-packet') {
+    const lane = args[1] || 'archivist';
+    console.log(`=== Generating lightweight restore packet for ${lane} ===`);
+    const result = bridge.generatePacket(lane);
+    if (result.ok) {
+      console.log(`  Path: ${result.path}`);
+      console.log(`  Size: ${result.size_bytes} bytes`);
+      console.log(`  Constraints: ${result.constraint_count}`);
+      console.log(`  Checkpoints: ${result.checkpoint_count}`);
+      console.log(`  Working context: ${result.working_context_items} items`);
+    } else {
+      console.log(`  FAIL: ${result.error}`);
+    }
+    process.exit(result.ok ? 0 : 1);
   } else if (command === 'cross-verify') {
     const lane = args[1] || 'archivist';
     console.log(`=== Cross-verifying ${lane} audit vs restore packet ===`);
@@ -364,12 +501,13 @@ if (require.main === module) {
     }
     process.exit(result.ok ? 0 : 1);
   } else {
-    console.log('Usage: compact-restore-bridge.js <init|pre-compact|restore|cross-verify> [lane] [packet-path]');
+    console.log('Usage: compact-restore-bridge.js <init|generate-packet|pre-compact|restore|cross-verify> [lane] [packet-path]');
     console.log('');
-    console.log('  init          Initialize .compact-audit/ dirs for all lanes');
-    console.log('  pre-compact   Capture pre-compact snapshot from restore packet');
-    console.log('  restore       Rebuild handoff + hash log from restore packet');
-    console.log('  cross-verify  Compare restore packet against pre-compact snapshot');
+    console.log(' init             Initialize .compact-audit/ dirs for all lanes');
+    console.log(' generate-packet  Create lightweight restore packet from live state (no graph)');
+    console.log(' pre-compact      Capture pre-compact snapshot from restore packet');
+    console.log(' restore          Rebuild handoff + hash log from restore packet');
+    console.log(' cross-verify     Compare restore packet against pre-compact snapshot');
     process.exit(0);
   }
 }

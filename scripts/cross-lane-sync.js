@@ -26,13 +26,19 @@ function log(message, level = 'info') {
     console.log(`${LOG[level] || ''} ${message}`);
 }
 
+const REPO_ROOT = path.resolve(__dirname, '..');
+const LANE_ROOTS = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'config', 'lane-roots.json'), 'utf8'));
+const isWin32 = process.platform === 'win32';
+const BASE = isWin32 ? LANE_ROOTS.base_paths.windows : LANE_ROOTS.base_paths.unix;
+function laneRoot(laneId) { return path.join(BASE, LANE_ROOTS.lanes[laneId]); }
+
 // Lane definitions
 const LANES = {
     'archivist-agent': {
         id: 'archivist-agent',
         role: 'governance-root',
         position: 1,
-        root: 'S:\\Archivist-Agent',
+        root: laneRoot('archivist'),
         runtimeState: 'RUNTIME_STATE.json',
         downstream: ['swarmmind']
     },
@@ -40,7 +46,7 @@ const LANES = {
         id: 'swarmmind',
         role: 'trace-layer',
         position: 2,
-        root: 'S:\\SwarmMind',
+        root: laneRoot('swarmmind'),
         runtimeState: 'RUNTIME_STATE.json',
         upstream: 'archivist-agent'
     },
@@ -48,7 +54,7 @@ const LANES = {
         id: 'self-organizing-library',
         role: 'memory-layer',
         position: 3,
-        root: 'S:\\self-organizing-library',
+        root: laneRoot('library'),
         runtimeState: 'RUNTIME_STATE.json',
         upstream: ['archivist-agent', 'swarmmind']
     }

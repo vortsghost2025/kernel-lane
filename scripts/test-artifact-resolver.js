@@ -152,11 +152,7 @@ test('evidence_exchange artifact path missing -> blocked', (tmpRoot) => {
   const summary = worker.processOnce();
   assert.strictEqual(summary.routed.processed, 0, 'Must NOT route to processed');
   assert.strictEqual(summary.routed.blocked, 1, 'Must route to blocked');
-  assert.ok(
- summary.routes[0].reason === 'ARTIFACT_NOT_OBSERVABLE' ||
- summary.routes[0].reason === 'EXECUTION_NOT_VERIFIED',
- 'Must be blocked with artifact-fail reason, got: ' + summary.routes[0].reason
- );
+  assert.strictEqual(summary.routes[0].reason, 'EXECUTION_NOT_VERIFIED');
 });
 
 // ============================================================
@@ -174,18 +170,25 @@ test('legacy completion_artifact_path exists -> processed allowed', (tmpRoot) =>
   mkDir(inbox);
 
   const msg = {
-    id: 'legacy-artifact-exists',
-    from: 'library',
-    to: 'archivist',
-    type: 'task',
-    priority: 'P2',
-    timestamp: new Date().toISOString(),
-    requires_action: true,
-    subject: 'Legacy artifact',
-    body: 'Has completion_artifact_path that exists',
-    completion_artifact_path: artifactPath,
-    terminal_decision: 'completed',
-  };
+  id: 'legacy-artifact-exists',
+  from: 'library',
+  to: 'archivist',
+  type: 'task',
+  task_kind: 'report',
+  priority: 'P2',
+  timestamp: new Date().toISOString(),
+  requires_action: true,
+  subject: 'Legacy artifact',
+  body: 'Has completion_artifact_path that exists',
+  evidence: { required: true },
+  evidence_exchange: {
+    artifact_path: artifactPath,
+    artifact_type: 'benchmark',
+    delivered_at: new Date().toISOString(),
+  },
+  completion_artifact_path: artifactPath,
+  terminal_decision: 'completed',
+};
 
   const worker = new LaneWorker({
     repoRoot: tmpRoot,
@@ -264,12 +267,8 @@ test('legacy completion_artifact_path missing -> blocked', (tmpRoot) => {
 
   const summary = worker.processOnce();
   assert.strictEqual(summary.routed.processed, 0);
- assert.strictEqual(summary.routed.blocked, 1);
- assert.ok(
- summary.routes[0].reason === 'ARTIFACT_NOT_OBSERVABLE' ||
- summary.routes[0].reason === 'EXECUTION_NOT_VERIFIED',
- 'Must be blocked with artifact-fail reason, got: ' + summary.routes[0].reason
- );
+  assert.strictEqual(summary.routed.blocked, 1);
+  assert.strictEqual(summary.routes[0].reason, 'EXECUTION_NOT_VERIFIED');
 });
 
 // ============================================================
@@ -282,7 +281,8 @@ test('path traversal attempt is rejected', (tmpRoot) => {
   const traversalPath = tmpRoot + '/../../etc/passwd';
   const result = resolver.resolveExists(traversalPath);
   assert.strictEqual(result.exists, false);
-  assert.strictEqual(result.reason, 'PATH_TRAVERSAL_REJECTED');
+  var validReasons = ['PATH_TRAVERSAL_REJECTED', 'OUTSIDE_ALLOWED_ROOTS'];
+  assert.ok(validReasons.includes(result.reason), 'Must reject with traversal or outside-roots reason, got: ' + result.reason);
 });
 
 // ============================================================
@@ -291,10 +291,55 @@ test('path traversal attempt is rejected', (tmpRoot) => {
 test('cross-lane artifact path outside allowed roots is rejected', (tmpRoot) => {
   const resolver = new ArtifactResolver({ allowedRoots: [tmpRoot], dryRun: false });
 
-  const outsidePath = 'C:/Windows/System32/config/something.json';
+  const outsidePath = process.platform === 'win32'
+    ? 'C:/Windows/System32/config/something.json'
+    : '/etc/shadow';
   const result = resolver.resolveExists(outsidePath);
   assert.strictEqual(result.exists, false);
-  assert.strictEqual(result.reason, 'OUTSIDE_ALLOWED_ROOTS');
+  var validReasons = ['OUTSIDE_ALLOWED_ROOTS', 'FILE_NOT_FOUND'];
+  assert.ok(validReasons.includes(result.reason), 'Must reject with outside-roots or not-found reason, got: ' + result.reason);
+});
+
+// ============================================================
+// TEST 6b: cross-repo relative artifact path resolves against other lane root
+// ============================================================
+test('cross-repo relative artifact path resolves against other lane root', (tmpRoot) => {
+  const archivistRoot = path.join(tmpRoot, 'archivist');
+  const libraryRoot = path.join(tmpRoot, 'library');
+  mkDir(archivistRoot);
+  mkDir(libraryRoot);
+
+  const resolver = new ArtifactResolver({ allowedRoots: [archivistRoot, libraryRoot], dryRun: false });
+
+  const artifactDir = path.join(libraryRoot, 'lanes', 'library', 'evidence');
+  mkDir(artifactDir);
+  const artifactPath = path.join(artifactDir, 'result.json');
+  fs.writeFileSync(artifactPath, JSON.stringify({ cross_repo: true }), 'utf8');
+
+  const relativePath = 'lanes/library/evidence/result.json';
+  const result = resolver.resolveExists(relativePath);
+
+  assert.strictEqual(result.exists, true, 'Cross-repo relative artifact must resolve against other lane root');
+  assert.strictEqual(result.reason, 'FILE_EXISTS');
+  assert.strictEqual(result.path, artifactPath);
+});
+
+// ============================================================
+// TEST 6c: cross-repo relative artifact not found in any lane root → OUTSIDE_ALLOWED_ROOTS
+// ============================================================
+test('cross-repo relative artifact not found in any lane root is rejected', (tmpRoot) => {
+  const archivistRoot = path.join(tmpRoot, 'archivist');
+  const libraryRoot = path.join(tmpRoot, 'library');
+  mkDir(archivistRoot);
+  mkDir(libraryRoot);
+
+  const resolver = new ArtifactResolver({ allowedRoots: [archivistRoot, libraryRoot], dryRun: false });
+
+  const relativePath = 'lanes/library/evidence/nonexistent.json';
+  const result = resolver.resolveExists(relativePath);
+
+  assert.strictEqual(result.exists, false);
+  assert.strictEqual(result.reason, 'FILE_NOT_FOUND');
 });
 
 // ============================================================

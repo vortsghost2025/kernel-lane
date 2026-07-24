@@ -76,6 +76,17 @@ class Heartbeat {
     return `heartbeat-${laneName}.json`;
   }
 
+  _getLaneState() {
+    try {
+      const trustStorePath = path.join(__dirname, '..', 'lanes', 'broadcast', 'trust-store.json');
+      const ts = JSON.parse(fs.readFileSync(trustStorePath, 'utf8'));
+      const entry = ts[this.config.laneName];
+      return (entry && entry.lane_state) || 'ACTIVE';
+    } catch (_) {
+      return 'ACTIVE';
+    }
+  }
+
   _renewActiveOwner() {
     const stateDir = path.join(REPO_ROOT, 'lanes', this.config.laneName, 'state');
     const lockPath = path.join(stateDir, 'active-owner.json');
@@ -84,6 +95,7 @@ class Heartbeat {
     const owner = {
       session_id: this._sessionId,
       lane: this.config.laneName,
+      lane_state: this._getLaneState(),
       claimed_at: this._claimedAt,
       renewed_at: now.toISOString(),
       expires_at: expiresAt.toISOString(),
@@ -172,15 +184,16 @@ class Heartbeat {
     task_kind: "heartbeat",
     priority: "P3",
     subject: `Heartbeat from ${this.config.laneName} lane`,
-    body: JSON.stringify({
-      lane: this.config.laneName,
-      agent_mode: this.config.agentMode,
-      session_active: !this._shuttingDown,
-      uptime_seconds: uptimeSeconds,
-      messages_processed: this.messagesProcessed,
-      last_inbox_scan: now.toISOString(),
-      version: '1.3',
-    }),
+      body: JSON.stringify({
+        lane: this.config.laneName,
+        lane_state: this._getLaneState(),
+        agent_mode: this.config.agentMode,
+        session_active: !this._shuttingDown,
+        uptime_seconds: uptimeSeconds,
+        messages_processed: this.messagesProcessed,
+        last_inbox_scan: now.toISOString(),
+        version: '1.3',
+      }),
     timestamp: now.toISOString(),
     requires_action: false,
     payload: {

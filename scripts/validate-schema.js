@@ -17,11 +17,17 @@ function log(message, level = 'info') {
   console.log(`${LOG[level] || ''} ${message}`);
 }
 
-const SCHEMAS_DIR = path.join('S:', 'Archivist-Agent', 'schemas');
+const REPO_ROOT = path.resolve(__dirname, '..');
+const LANE_ROOTS = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'config', 'lane-roots.json'), 'utf8'));
+const isWin32 = process.platform === 'win32';
+const BASE = isWin32 ? LANE_ROOTS.base_paths.windows : LANE_ROOTS.base_paths.unix;
+function lanePath(laneId) { return path.join(BASE, LANE_ROOTS.lanes[laneId]); }
+
+const SCHEMAS_DIR = path.join(REPO_ROOT, 'schemas');
 const LANES = {
-  'archivist-agent': 'S:\\Archivist-Agent',
-  'swarmmind': 'S:\\SwarmMind',
-  'library': 'S:\\self-organizing-library'
+  'archivist-agent': lanePath('archivist'),
+  'swarmmind': lanePath('swarmmind'),
+  'library': lanePath('library')
 };
 
 /**

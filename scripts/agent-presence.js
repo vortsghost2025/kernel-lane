@@ -78,6 +78,7 @@ function acquire(lane, opts = {}) {
   };
   fs.writeFileSync(lockPath(lane), JSON.stringify(lock, null, 2));
   setWatcherMode(lane, 'agent-assist');
+  try { require('./emit-identity').emit(lane); } catch (_) {}
   return lock;
 }
 
@@ -87,6 +88,7 @@ function release(lane) {
     try { fs.unlinkSync(lp); } catch (_) {}
   }
   setWatcherMode(lane, 'auto');
+  try { require('./emit-identity').emit(lane); } catch (_) {}
 }
 
 function setWatcherMode(lane, mode) {

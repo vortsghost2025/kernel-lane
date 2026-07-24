@@ -1,20 +1,22 @@
 #!/usr/bin/env node
 /**
- * CI/CD SOVEREIGNTY GATES — Phase 1
+ * CI/CD SOVEREIGNTY GATES — Phase 1 + HARDEN-2
  * Gate 1: Push-time sovereignty scan (full repo, not just staged)
  * Gate 2: Schema compliance check for lane message files
+ * Gate 2b: Consensus dual-verification check for lane message files
  *
- * Spec: cicd-sovereignty-gates-v1
- * Phase: 1 (Gates 1+2)
+ * Spec: cicd-sovereignty-gates-v1 + HARDEN-2 consensus integration
+ * Phase: 1 (Gates 1+2) + HARDEN-2 (Gate 2b)
  * Origin: Adapted from cicd-sovereignty-gates-v1 spec approved 2026-05-02
- * Last Updated: 2026-05-02
+ * Last Updated: 2026-05-05
  */
 
 const fs = require('fs');
 const path = require('path');
+const { consensusCheck, routeMessage, loadPolicy: loadConsensusPolicy } = require('./consensus-check');
 
 const LANE_ROOT = path.join(__dirname, '..');
-const LANE_NAME = 'Kernel';
+const LANE_NAME = 'Archivist';
 const SCHEMA_DIR = path.join(LANE_ROOT, 'schemas');
 const INBOX_MESSAGE_SCHEMA = 'inbox-message-v1.json';
 const BROADCAST_MESSAGE_SCHEMA = 'broadcast-message-v1.json';
@@ -27,7 +29,7 @@ const gateValue = gateFilter ? gateFilter.split('=')[1] : null;
 const jsonOutput = args.includes('--json');
 
 let exitCode = 0;
-const results = { gate1: null, gate2: null, passed: true, violations: [] };
+const results = { gate1: null, gate2: null, gate2b: null, passed: true, violations: [] };
 
 function runGate1() {
   const gateResult = { name: 'push-time-sovereignty-scan', passed: true, violations: [], scanned: 0 };
@@ -164,8 +166,8 @@ function runGate2() {
   }
 
   const dirs = [
-    { path: path.join(LANE_ROOT, 'lanes', 'kernel', 'inbox'), schema: inboxSchema, label: 'inbox' },
-    { path: path.join(LANE_ROOT, 'lanes', 'kernel', 'outbox'), schema: inboxSchema, label: 'outbox' }
+    { path: path.join(LANE_ROOT, 'lanes', 'archivist', 'inbox'), schema: inboxSchema, label: 'inbox' },
+    { path: path.join(LANE_ROOT, 'lanes', 'archivist', 'outbox'), schema: inboxSchema, label: 'outbox' }
   ];
 
   let totalScanned = 0;
@@ -182,6 +184,76 @@ function runGate2() {
   }
 
   gateResult.scanned = totalScanned;
+  return gateResult;
+}
+
+function collectMessageFiles(dirPath) {
+  const files = [];
+  if (!fs.existsSync(dirPath)) return files;
+
+  const SKIP_DIRS = new Set(['archive', 'processed', 'quarantine']);
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i];
+    if (entry.isDirectory() && SKIP_DIRS.has(entry.name)) continue;
+    if (entry.isDirectory()) continue;
+    if (!entry.name.endsWith('.json')) continue;
+    if (entry.name.startsWith('heartbeat-')) continue;
+    if (entry.name.startsWith('README')) continue;
+    files.push(path.join(dirPath, entry.name));
+  }
+  return files;
+}
+
+function runGate2b() {
+  const gateResult = { name: 'consensus-dual-verification', passed: true, violations: [], scanned: 0, details: [] };
+
+  const policy = loadConsensusPolicy();
+  const dirs = [
+    path.join(LANE_ROOT, 'lanes', 'archivist', 'inbox'),
+    path.join(LANE_ROOT, 'lanes', 'archivist', 'outbox')
+  ];
+
+  const FAIL_ACTIONS = new Set(['block', 'escalate']);
+
+  for (let d = 0; d < dirs.length; d++) {
+    const files = collectMessageFiles(dirs[d]);
+    for (let f = 0; f < files.length; f++) {
+      const filePath = files[f];
+      gateResult.scanned++;
+      try {
+        const msg = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        const consensusResult = consensusCheck(msg, { policy: policy, repoRoot: LANE_ROOT });
+        const routing = routeMessage(msg, consensusResult, { policy: policy });
+
+        gateResult.details.push({
+          file: filePath,
+          status: consensusResult.status,
+          weighted_score: consensusResult.weighted_score,
+          action: routing.action,
+          reason: routing.reason
+        });
+
+        if (FAIL_ACTIONS.has(routing.action)) {
+          gateResult.passed = false;
+          gateResult.violations.push({
+            file: filePath,
+            error: 'consensus ' + consensusResult.status + ' -> ' + routing.action + ': ' + routing.reason,
+            status: consensusResult.status,
+            weighted_score: consensusResult.weighted_score,
+            action: routing.action
+          });
+        }
+      } catch (e) {
+        gateResult.passed = false;
+        gateResult.violations.push({
+          file: filePath,
+          error: 'consensus check failed: ' + e.message.substring(0, 200)
+        });
+      }
+    }
+  }
+
   return gateResult;
 }
 
@@ -205,6 +277,16 @@ if (gateValue === '2' || gateValue === null) {
   }
 }
 
+if (gateValue === '2b' || gateValue === null) {
+  results.gate2b = runGate2b();
+  if (!results.gate2b.passed) {
+    results.passed = false;
+    for (let i = 0; i < results.gate2b.violations.length; i++) {
+      results.violations.push(results.gate2b.violations[i]);
+    }
+  }
+}
+
 if (jsonOutput) {
   console.log(JSON.stringify(results, null, 2));
 } else {
@@ -222,18 +304,34 @@ if (jsonOutput) {
     }
   }
 
-  if (results.gate2) {
+if (results.gate2) {
     console.log('Gate 2 (' + results.gate2.name + '): ' + (results.gate2.passed ? 'PASS' : 'FAIL'));
     if (!results.gate2.passed) {
       for (let i = 0; i < results.gate2.violations.length; i++) {
         const v = results.gate2.violations[i];
-        console.log('  - ' + v.file + ': ' + v.error + (v.field ? ' (field: ' + v.field + ')' : '') + (v.value ? ' value=' + v.value : ''));
+        console.log(' - ' + v.file + ': ' + v.error + (v.field ? ' (field: ' + v.field + ')' : '') + (v.value ? ' value=' + v.value : ''));
       }
     }
   }
 
-  console.log('');
-  console.log('Overall: ' + (results.passed ? 'PASS' : 'FAIL'));
+  if (results.gate2b) {
+    console.log('Gate 2b (' + results.gate2b.name + '): ' + (results.gate2b.passed ? 'PASS' : 'FAIL') + ' [scanned=' + results.gate2b.scanned + ']');
+    if (!results.gate2b.passed) {
+      for (let i = 0; i < results.gate2b.violations.length; i++) {
+        const v = results.gate2b.violations[i];
+        console.log(' - ' + v.file + ': ' + v.error);
+      }
+    }
+    if (results.gate2b.details && results.gate2b.details.length > 0) {
+      for (let i = 0; i < results.gate2b.details.length; i++) {
+        const d = results.gate2b.details[i];
+        console.log('   ' + path.basename(d.file) + ': status=' + d.status + ' score=' + d.weighted_score + ' action=' + d.action);
+      }
+    }
+  }
+
+ console.log('');
+ console.log('Overall: ' + (results.passed ? 'PASS' : 'FAIL'));
 }
 
 if (strict && !results.passed) {

@@ -3,17 +3,22 @@
 
 const fs = require('fs');
 const path = require('path');
-const { LaneDiscovery } = require('./util/lane-discovery');
 const crypto = require('crypto');
-const { getVerifyParamsFromPem, verify: algoVerify, SUPPORTED_ALGORITHMS, getAlgorithmParams, sign: algoSign } = require(path.join(__dirname, '..', '.global', 'algorithm-helpers.js'));
+const {
+  getVerifyParamsFromPem,
+  verify: algoVerify,
+  SUPPORTED_ALGORITHMS,
+  getAlgorithmParams,
+  sign: algoSign
+} = require(path.join(__dirname, '..', '.global', 'algorithm-helpers.js'));
 
 const LOCAL_TRUST_STORE = path.join(__dirname, '..', 'lanes', 'broadcast', 'trust-store.json');
 const TRUST_STORE_SEARCH_PATHS = [
   LOCAL_TRUST_STORE,
-  path.join(new LaneDiscovery().getLocalPath('archivist'), 'lanes', 'broadcast', 'trust-store.json'),
-  path.join(new LaneDiscovery().getLocalPath('kernel'), 'lanes', 'broadcast', 'trust-store.json'),
-  path.join(new LaneDiscovery().getLocalPath('library'), 'lanes', 'broadcast', 'trust-store.json'),
-  path.join(new LaneDiscovery().getLocalPath('swarmmind'), 'lanes', 'broadcast', 'trust-store.json'),
+  'S:/Archivist-Agent/lanes/broadcast/trust-store.json',
+  'S:/kernel-lane/lanes/broadcast/trust-store.json',
+  'S:/self-organizing-library/lanes/broadcast/trust-store.json',
+  'S:/SwarmMind/lanes/broadcast/trust-store.json',
 ];
 
 const TRUST_STORE_PRECOMMIT_CHECKS = [
@@ -21,13 +26,16 @@ const TRUST_STORE_PRECOMMIT_CHECKS = [
   'key_id_matches_trust_store_entry',
   'lane_id_invariant'
 ];
-const CONVERGED_STATUSES = new Set(['proven', 'approved', 'ratified', 'accept', 'accepted']);
+const { CONVERGED_STATUS_SET, ENFORCEMENT_MODE_SET, EnforcementMode } = require('./governance-types');
 
 class IdentityEnforcer {
   constructor(options = {}) {
     this.trustStore = null;
     this.trustStorePath = options.trustStorePath || this._findTrustStore();
-    this.enforcementMode = options.enforcementMode || 'enforce'; // 'enforce' | 'warn' | 'audit'
+        this.enforcementMode = options.enforcementMode || 'enforce';
+        if (!ENFORCEMENT_MODE_SET.has(this.enforcementMode)) {
+            throw new Error(`IDENTITY_INVALID_MODE: "${this.enforcementMode}" is not a valid EnforcementMode. Must be one of: ${[...ENFORCEMENT_MODE_SET].join(', ')}`);
+        }
     this.verificationLog = [];
     this._loadTrustStore();
   }
@@ -55,7 +63,7 @@ class IdentityEnforcer {
       } else {
         this.trustStore = { keys: {}, version: '1.0', archived_keys: parsed.archived_keys || {}, rotation_policy: parsed.rotation_policy || null, key_lineage: parsed.key_lineage || null };
         for (const [laneId, entry] of Object.entries(parsed)) {
-          if (entry && entry.public_key_pem && entry.lane_id) {
+          if (entry && entry.lane_id && (entry.public_key_pem || entry.lane_state)) {
             this.trustStore.keys[laneId] = entry;
           }
         }
@@ -97,18 +105,24 @@ class IdentityEnforcer {
     return entry.public_key_pem;
   }
 
-  _getPublicKeyByKeyId(keyId) {
-    for (const [laneId, entry] of Object.entries((this.trustStore && this.trustStore.keys) || {})) {
-      if (entry.key_id === keyId && !entry.revoked_at) {
-        return { publicKey: entry.public_key_pem, laneId, archived: false };
-      }
-    }
-    const archived = this.trustStore && this.trustStore.archived_keys && this.trustStore.archived_keys[keyId];
-    if (archived && archived.public_key_pem) {
-      return { publicKey: archived.public_key_pem, laneId: archived.lane_id, archived: true };
-    }
-    return null;
+  getLaneState(laneId) {
+    const entry = this.trustStore && this.trustStore.keys && this.trustStore.keys[laneId];
+    if (!entry || !entry.lane_state) return 'ACTIVE';
+    return entry.lane_state;
   }
+
+  _getPublicKeyByKeyId(keyId) {
+  for (const [laneId, entry] of Object.entries((this.trustStore && this.trustStore.keys) || {})) {
+    if (entry.key_id === keyId && !entry.revoked_at) {
+      return { publicKey: entry.public_key_pem, laneId, archived: false };
+    }
+  }
+  const archived = this.trustStore && this.trustStore.archived_keys && this.trustStore.archived_keys[keyId];
+  if (archived && archived.public_key_pem) {
+    return { publicKey: archived.public_key_pem, laneId: archived.lane_id, archived: true };
+  }
+  return null;
+}
 
   verifyJWS(jws, expectedLaneId) {
     if (!this.trustStore) {
@@ -137,46 +151,46 @@ class IdentityEnforcer {
       };
     }
 
-    const laneId = parsed.payload.lane || expectedLaneId;
-    if (!laneId) {
-      return { valid: false, error: 'NO_LANE_ID', authenticated: false };
+  const laneId = parsed.payload.lane || expectedLaneId;
+  if (!laneId) {
+    return { valid: false, error: 'NO_LANE_ID', authenticated: false };
+  }
+
+  let publicKeyPem = this._getPublicKey(laneId);
+  let archived = false;
+
+  if (!publicKeyPem && parsed.header.kid) {
+    const keyById = this._getPublicKeyByKeyId(parsed.header.kid);
+    if (keyById) {
+      publicKeyPem = keyById.publicKey;
+      archived = keyById.archived;
     }
+  }
 
-    let publicKeyPem = this._getPublicKey(laneId);
-    let archived = false;
+  if (!publicKeyPem) {
+    return { valid: false, error: 'KEY_NOT_FOUND', lane: laneId, authenticated: false };
+  }
 
-    if (!publicKeyPem && parsed.header.kid) {
-      const keyById = this._getPublicKeyByKeyId(parsed.header.kid);
-      if (keyById) {
-        publicKeyPem = keyById.publicKey;
-        archived = keyById.archived;
-      }
-    }
+  try {
+    const signature = this._base64UrlDecode(parsed.signature);
+    const verifyParams = getVerifyParamsFromPem(publicKeyPem);
+    const verified = algoVerify(
+      verifyParams.verifyAlg,
+      Buffer.from(parsed.signingInput),
+      publicKeyPem,
+      signature
+    );
 
-    if (!publicKeyPem) {
-      return { valid: false, error: 'KEY_NOT_FOUND', lane: laneId, authenticated: false };
-    }
-
-    try {
-      const signature = this._base64UrlDecode(parsed.signature);
-      const verifyParams = getVerifyParamsFromPem(publicKeyPem);
-      const verified = algoVerify(
-        verifyParams.verifyAlg,
-        Buffer.from(parsed.signingInput),
-        publicKeyPem,
-        signature
-      );
-
-      if (verified) {
-        return {
-          valid: true,
-          authenticated: true,
-          lane: laneId,
-          key_id: parsed.header.kid,
-          payload: parsed.payload,
-          mode: 'JWS_VERIFIED',
-          archived_key: archived
-        };
+    if (verified) {
+      return {
+        valid: true,
+        authenticated: true,
+        lane: laneId,
+        key_id: parsed.header.kid,
+        payload: parsed.payload,
+        mode: 'JWS_VERIFIED',
+        archived_key: archived
+      };
       } else {
         return { valid: false, error: 'SIGNATURE_MISMATCH', lane: laneId, authenticated: false };
       }
@@ -226,6 +240,20 @@ class IdentityEnforcer {
     result.key_id = verifyResult.key_id;
 
     if (verifyResult.valid) {
+      const laneState = this.getLaneState(fromLane);
+      if (laneState === 'ARCHIVED') {
+        result.decision = this.enforcementMode === 'enforce' ? 'reject' : 'pass';
+        result.reason = 'lane_archived';
+        if (this.enforcementMode === 'warn') {
+          console.log(`[identity] WARN: message from ARCHIVED lane ${fromLane} — ${msg.id || msg._sourceFile}`);
+        }
+        this._log(result);
+        return result;
+      }
+      if (laneState === 'DORMANT' && (this.enforcementMode === 'warn' || this.enforcementMode === 'audit')) {
+        console.log(`[identity] WARN: message from DORMANT lane ${fromLane} — ${msg.id || msg._sourceFile}`);
+      }
+      result.lane_state = laneState;
       result.decision = 'accept';
       result.reason = 'identity_verified';
     } else {
@@ -270,11 +298,11 @@ class IdentityEnforcer {
 
   static signMessage(msg, privateKey, keyId, algoParams) {
     const { stableStringify } = require(path.join(
-      fs.existsSync(path.join(new LaneDiscovery().getLocalPath('swarmmind'), 'src', 'attestation', 'stableStringify.js'))
-      ? path.join(new LaneDiscovery().getLocalPath('swarmmind'), 'src', 'attestation')
-      : fs.existsSync(path.join(new LaneDiscovery().getLocalPath('library'), 'src', 'attestation', 'stableStringify.js'))
-      ? path.join(new LaneDiscovery().getLocalPath('library'), 'src', 'attestation')
-      : path.join(new LaneDiscovery().getLocalPath('kernel'), 'src', 'attestation'),
+      fs.existsSync('S:/SwarmMind/src/attestation/stableStringify.js')
+        ? 'S:/SwarmMind/src/attestation'
+        : fs.existsSync('S:/self-organizing-library/src/attestation/stableStringify.js')
+        ? 'S:/self-organizing-library/src/attestation'
+        : 'S:/kernel-lane/src/attestation',
       'stableStringify.js'
     ));
 
@@ -369,7 +397,7 @@ class IdentityEnforcer {
       const lane = typeof entry.lane === 'string' ? entry.lane.trim().toLowerCase() : '';
       const status = typeof entry.status === 'string' ? entry.status.trim().toLowerCase() : '';
       const signature = typeof entry.signature === 'string' ? entry.signature.trim() : '';
-      if (!lane || !CONVERGED_STATUSES.has(status) || signature.length < 20) continue;
+      if (!lane || !CONVERGED_STATUS_SET.has(status) || signature.length < 20) continue;
       if (seen.has(lane)) continue;
       seen.add(lane);
       accepted.push({ lane, status, signature });
@@ -404,6 +432,8 @@ class IdentityEnforcer {
   }
 
   static writeTrustStoreStrict(trustStorePath, trustStore, options = {}) {
+    const { enforceMutation } = require('./mode-check');
+    enforceMutation('trust_store_write', trustStorePath);
     IdentityEnforcer.assertTrustStoreWriteAuthorized(options);
     const serialized = { ...trustStore };
     if (!Array.isArray(serialized.preCommitChecks)) {
@@ -426,7 +456,7 @@ if (require.main === module) {
 
   if (enforcer.trustStore) {
     for (const [laneId, entry] of Object.entries(enforcer.trustStore.keys || {})) {
-      console.log(`  ${laneId}: keyId=${entry.key_id} algorithm=${entry.algorithm} revoked=${!!entry.revoked_at}`);
+      console.log(`  ${laneId}: keyId=${entry.key_id} algorithm=${entry.algorithm} revoked=${!!entry.revoked_at} lane_state=${entry.lane_state || 'ACTIVE'}`);
     }
   } else {
     console.log('  NO TRUST STORE LOADED');

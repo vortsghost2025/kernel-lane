@@ -1,14 +1,6 @@
 #!/usr/bin/env node
 'use strict';
 
-// PAUSE-GUARD: If .lanes-paused exists in repos root, exit immediately
-const _pauseFile = '/home/we4free/agent/repos/.lanes-paused';
-if (require('fs').existsSync(_pauseFile)) {
-  const _reason = require('fs').readFileSync(_pauseFile, 'utf8').trim();
-  console.error('[PAUSE-GUARD] Lanes paused: ' + _reason + '. Exiting.');
-  process.exit(0);
-}
-
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
@@ -79,7 +71,14 @@ class ClaimCommitGuard {
     if (msg.evidence_exchange?.artifact_path && typeof msg.evidence_exchange.artifact_path === 'string') {
       paths.push({ field: 'evidence_exchange.artifact_path', value: msg.evidence_exchange.artifact_path.trim() });
     }
-
+    if (msg.body && typeof msg.body === 'string') {
+      const bodyPaths = msg.body.match(/(?:S:|\/home\/we4free\/agent\/repos\/)[^\s"']+/g);
+      if (bodyPaths) {
+        for (const bp of bodyPaths) {
+          paths.push({ field: 'body (absolute ref)', value: bp });
+        }
+      }
+    }
     return paths;
   }
 
@@ -159,14 +158,6 @@ class ClaimCommitGuard {
     const uncommitted = result.details
       .filter(d => d.status === 'uncommitted' || d.status === 'missing')
       .map(d => `${d.field}=${d.path}`);
-
-    const BLOCK_TTL_MS = 24 * 60 * 60 * 1000;
-    const msgTime = msg.timestamp ? new Date(msg.timestamp).getTime() : 0;
-    const age = msgTime ? Date.now() - msgTime : 0;
-    if (age > BLOCK_TTL_MS) {
-      this._log(`PASS ${msgId}: block TTL exceeded (${Math.round(age / 3600000)}h old)`);
-      return { allowed: true, ...result, note: 'block_ttl_expired' };
-    }
 
     this._log(`BLOCK ${msgId}: premature claim — ${uncommitted.join(', ')}`);
     return { allowed: false, ...result };

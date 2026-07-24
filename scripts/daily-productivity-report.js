@@ -95,7 +95,7 @@ function analyzeBlockers(stats, audit) {
       impact: stats.blocked > 5 ? 'high' : 'medium',
       count_last_24h: stats.blocked + stats.quarantine,
       actionable: true,
-      request_to_other_lanes: 'All lanes: please ensure all outgoing messages use RS256 signatures and schema v1.3 with non-null evidence_exchange.artifact_path.'
+      request_to_other_lanes: 'All lanes: please ensure all outgoing messages use RS256 or EdDSA signatures and schema v1.3 with non-null evidence_exchange.artifact_path.'
     });
   }
 

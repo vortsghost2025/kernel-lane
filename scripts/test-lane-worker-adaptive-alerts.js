@@ -25,7 +25,7 @@ function test(name, fn) {
 }
 
 function setupLaneDir(tmpDir) {
-  const lane = 'kernel';
+  const lane = 'archivist';
   const dirs = [
     path.join(tmpDir, 'lanes', lane, 'inbox'),
     path.join(tmpDir, 'lanes', lane, 'inbox', 'processed'),
@@ -106,7 +106,7 @@ test('LaneWorker adaptiveAlerts replaces broken 80,000µs threshold', (tmpDir) =
 });
 
 test('LaneWorker _loadAdaptiveAlertConfig falls back gracefully on missing file', (tmpDir) => {
-  const lane = 'kernel';
+  const lane = 'archivist';
   fs.mkdirSync(path.join(tmpDir, 'lanes', lane, 'inbox', 'processed'), { recursive: true });
   fs.mkdirSync(path.join(tmpDir, 'config'), { recursive: true });
   const worker = new LaneWorker({ repoRoot: tmpDir, lane, dryRun: true });

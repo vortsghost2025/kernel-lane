@@ -8,6 +8,7 @@ const os = require('os');
 
 const { deriveKeyId } = require(path.join(__dirname, '..', '.global', 'deriveKeyId.js'));
 const { loadPrivateKey, getAlgorithmParams, sign: algoSign, isPassphraseRequired } = require(path.join(__dirname, '..', '.global', 'algorithm-helpers.js'));
+const { normalizeMessageForSchema } = require(path.join(__dirname, '..', 'src', 'lane', 'SchemaValidator.js'));
 
 const isWin32 = process.platform === 'win32';
 const UBUNTU_ROOT = path.join(os.homedir(), 'agent', 'repos');
@@ -28,6 +29,7 @@ const PASSFILE_CANDIDATES = [
 
 const LANE_IDENTITY_DIRS = {
   archivist: _resolve('S:/Archivist-Agent/.identity'),
+  authority: _resolve('S:/Archivist-Agent/.identity/authority'),
   library: _resolve('S:/self-organizing-library/.identity'),
   swarmmind: _resolve('S:/SwarmMind/.identity'),
   kernel: _resolve('S:/kernel-lane/.identity'),
@@ -111,7 +113,7 @@ function buildCanonicalMessage(options = {}) {
     ...heartbeat,
   };
 
-  return {
+  return normalizeMessageForSchema({
     schema_version,
     task_id: resolvedTaskId,
     idempotency_key: resolvedIdempotency,
@@ -132,7 +134,7 @@ function buildCanonicalMessage(options = {}) {
     evidence_exchange: mergedEvidenceExchange,
     heartbeat: mergedHeartbeat,
     ...extra,
-  };
+  });
 }
 
 function stableStringify(value) {
@@ -182,16 +184,15 @@ function createSignedMessage(msg, laneId) {
 
   let privateKey;
   try {
-    if (passphrase) {
-      privateKey = loadPrivateKey(privatePem, passphrase);
-    } else {
-      privateKey = loadPrivateKey(privatePem, null);
+    if (!passphrase && isPassphraseRequired(privatePem)) {
+      throw new Error('passphrase required for encrypted key but none provided');
     }
+    privateKey = loadPrivateKey(privatePem, passphrase);
   } catch (e) {
     throw new Error(`PRIVATE_KEY_LOAD_FAILED for ${laneId}: ${e.message}`);
   }
-
   const algoParams = getAlgorithmParams(privateKey);
+
   const keyId = deriveKeyId(publicPem);
   const from = msg.from || msg.from_lane || laneId;
   const to = msg.to || msg.to_lane || null;
@@ -240,7 +241,7 @@ async function writeSignedMessage(msg, laneId, outboxPath) {
   if (!fs.existsSync(outboxPath)) {
     fs.mkdirSync(outboxPath, { recursive: true });
   }
-  const filename = `${signed.id || 'msg-' + Date.now()}.json`;
+  const filename = `${msg.id || 'msg-' + Date.now()}.json`;
   const filePath = path.join(outboxPath, filename);
   // Governance invariant: every outbound write must carry explicit lease metadata.
   if (!signed.lease || typeof signed.lease !== 'object') {
@@ -254,9 +255,8 @@ async function writeSignedMessage(msg, laneId, outboxPath) {
     };
   }
   guardWrite(signed, outboxPath, filename);
-  // Atomic write requires string or Buffer content.
-  const contentStr = JSON.stringify(signed, null, 2);
-  await atomicWriteWithLease(filePath, contentStr, laneId, 30000);
+  // Atomic write with mandatory lease
+  await atomicWriteWithLease(filePath, signed, laneId, 30000);
   return { filePath, keyId: signed.key_id, filename };
 }
 

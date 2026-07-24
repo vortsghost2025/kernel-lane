@@ -16,7 +16,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = 'S:\\Archivist-Agent';
+const ROOT = path.resolve(__dirname, '..');
 
 function computeHash(content) {
   return crypto.createHash('sha256').update(content).digest('hex');

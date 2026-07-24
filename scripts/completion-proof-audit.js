@@ -34,24 +34,39 @@ function hasCompletionProof(msg) {
   return false;
 }
 
+function hasEscalatedReview(msg) {
+  if (!msg || !msg.review) return false;
+  var r = msg.review;
+  if (r.status === 'escalated') return true;
+  if (typeof r.round === 'number' && typeof r.max_rounds === 'number' && r.round >= r.max_rounds && r.status !== 'approved') return true;
+  return false;
+}
+
+function hasHighUncertainty(msg) {
+  if (!msg || !msg.uncertainty) return false;
+  var u = msg.uncertainty;
+  if (u.level === 'high' || u.level === 'critical') return true;
+  if (u.operator_decision_needed === true) return true;
+  return false;
+}
+
 function auditProcessedDir(laneId) {
   const root = LANE_ROOTS[laneId];
   if (!root) return { lane: laneId, ok: false, error: 'LANE_ROOT_NOT_FOUND' };
-  
+
   const processedPath = path.join(root, 'lanes', laneId, 'inbox', 'processed');
   if (!fs.existsSync(processedPath)) {
     return { lane: laneId, ok: true, total: 0, violations: [], message: 'No processed/ directory' };
   }
-  
+
   const files = fs.readdirSync(processedPath).filter(f => f.endsWith('.json'));
   const violations = [];
-  
+
   for (const f of files) {
     try {
       const filePath = path.join(processedPath, f);
       const msg = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-      
-      // Check: requires_action=true AND no completion proof = VIOLATION
+
       if (msg.requires_action === true && !hasCompletionProof(msg)) {
         violations.push({
           file: f,
@@ -60,11 +75,33 @@ function auditProcessedDir(laneId) {
           requires_action: msg.requires_action
         });
       }
+
+      // v1.4: Escalated reviews in processed = violation (should be in action-required)
+      if (hasEscalatedReview(msg) && !hasCompletionProof(msg)) {
+        violations.push({
+          file: f,
+          type: 'escalated_review_no_proof',
+          subject: (msg.subject || '').substring(0, 60),
+          review_status: (msg.review || {}).status,
+          review_round: (msg.review || {}).round
+        });
+      }
+
+      // v1.4: High-uncertainty actionable tasks in processed without proof = violation
+      if (hasHighUncertainty(msg) && msg.requires_action === true && !hasCompletionProof(msg)) {
+        violations.push({
+          file: f,
+          type: 'high_uncertainty_no_proof',
+          subject: (msg.subject || '').substring(0, 60),
+          uncertainty_level: (msg.uncertainty || {}).level,
+          operator_decision_needed: (msg.uncertainty || {}).operator_decision_needed
+        });
+      }
     } catch (e) {
       violations.push({ file: f, error: e.message });
     }
   }
-  
+
   return {
     lane: laneId,
     ok: violations.length === 0,

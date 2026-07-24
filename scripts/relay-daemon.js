@@ -199,19 +199,19 @@ class RelayDaemon {
         const targetDir = getInboxDir(targetLane);
         const targetPath = path.join(targetDir, ent.name);
 
-        if (!this.dryRun) {
-          try {
-            if (!fs.existsSync(targetDir)) {
-              fs.mkdirSync(targetDir, { recursive: true });
-            }
-            // Sender signs the message with their own identity before delivery
-            const signedMsg = signOutboxMessage(msg, this.lane);
-            if (!signedMsg) {
-              results.errors.push({ file: ent.name, error: `signing_failed: outbox message could not be signed, skipping delivery` });
-              allDelivered = false;
-              continue;
-            }
-            fs.writeFileSync(targetPath, JSON.stringify(signedMsg, null, 2), 'utf8');
+      if (!this.dryRun) {
+        try {
+          if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+          }
+          // Sender signs the message with their own identity before delivery
+          const signedMsg = signOutboxMessage(msg, this.lane);
+          if (!signedMsg) {
+            results.errors.push({ file: ent.name, error: `signing_failed: outbox message could not be signed, skipping delivery` });
+            allDelivered = false;
+            continue;
+          }
+          fs.writeFileSync(targetPath, JSON.stringify(signedMsg, null, 2), 'utf8');
             results.delivered++;
             results.details.push({ file: ent.name, from: this.lane, to: targetLane, target: targetPath });
             runStoreJournalAppend(this.repoRoot, this.lane, 'message_delivered', msg.subject || msg.task_id, msg.task_id);
@@ -255,37 +255,37 @@ class RelayDaemon {
         const read = safeReadJson(filePath);
         if (!read.ok) continue;
 
-      const msg = read.value;
-      if (msg.to !== this.lane) continue;
+        const msg = read.value;
+        if (msg.to !== this.lane) continue;
 
-      // Fail-closed: reject unsigned incoming messages instead of writing them
-      const sigCheck = validateIncomingSignature(msg);
-      if (!sigCheck.ok) {
-        process.stderr.write(`[relay-daemon] REJECT: unsigned message from ${otherLane}: ${ent.name} (${sigCheck.reason})\n`);
-        try { fs.unlinkSync(filePath); } catch (_) {}
-        results.errors.push({ file: ent.name, error: `rejected_unsigned: ${sigCheck.reason}` });
-        continue;
-      }
+        // Fail-closed: reject unsigned incoming messages instead of writing them
+        const sigCheck = validateIncomingSignature(msg);
+        if (!sigCheck.ok) {
+          process.stderr.write(`[relay-daemon] REJECT: unsigned message from ${otherLane}: ${ent.name} (${sigCheck.reason})\n`);
+          try { fs.unlinkSync(filePath); } catch (_) {}
+          results.errors.push({ file: ent.name, error: `rejected_unsigned: ${sigCheck.reason}` });
+          continue;
+        }
 
-      const targetDir = getInboxDir(this.lane);
-      const targetPath = path.join(targetDir, ent.name);
+        const targetDir = getInboxDir(this.lane);
+        const targetPath = path.join(targetDir, ent.name);
 
-      if (!this.dryRun) {
-        try {
-          if (fs.existsSync(targetPath)) {
+        if (!this.dryRun) {
+          try {
+            if (fs.existsSync(targetPath)) {
+              fs.unlinkSync(filePath);
+              results.collected++;
+              results.details.push({ file: ent.name, from: otherLane, to: this.lane, target: targetPath, skipped: 'already_exists' });
+              continue;
+            }
+            if (!fs.existsSync(targetDir)) {
+              fs.mkdirSync(targetDir, { recursive: true });
+            }
+            // Write message as-is (already signed by sender) — do NOT re-sign with receiver key
+            fs.writeFileSync(targetPath, JSON.stringify(msg, null, 2), 'utf8');
             fs.unlinkSync(filePath);
             results.collected++;
-            results.details.push({ file: ent.name, from: otherLane, to: this.lane, target: targetPath, skipped: 'already_exists' });
-            continue;
-          }
-          if (!fs.existsSync(targetDir)) {
-            fs.mkdirSync(targetDir, { recursive: true });
-          }
-          // Write message as-is (already signed by sender) — do NOT re-sign with receiver key
-          fs.writeFileSync(targetPath, JSON.stringify(msg, null, 2), 'utf8');
-          fs.unlinkSync(filePath);
-          results.collected++;
-          results.details.push({ file: ent.name, from: otherLane, to: this.lane, target: targetPath, signed: !!(msg.signature || msg.jws) });
+            results.details.push({ file: ent.name, from: otherLane, to: this.lane, target: targetPath, signed: !!(msg.signature || msg.jws) });
           } catch (err) {
             results.errors.push({ file: ent.name, error: err.message });
           }
@@ -315,31 +315,28 @@ class RelayDaemon {
 
       for (const ent of jsonFiles) {
         const filePath = path.join(crossInbox, ent.name);
-      const targetDir = getInboxDir(this.lane);
-      const targetPath = path.join(targetDir, ent.name);
+        const targetDir = getInboxDir(this.lane);
+        const targetPath = path.join(targetDir, ent.name);
 
         if (!this.dryRun) {
-        try {
-          if (!fs.existsSync(targetDir)) {
-            fs.mkdirSync(targetDir, { recursive: true });
-          }
-          const crossMsg = safeReadJson(filePath).value || {};
-          // Fail-closed: reject unsigned cross-lane messages
-          const sigCheck = validateIncomingSignature(crossMsg);
-          if (!sigCheck.ok) {
-            process.stderr.write(`[relay-daemon] REJECT: unsigned cross-inbox message from ${otherLane}: ${ent.name} (${sigCheck.reason})\n`);
-            try { fs.unlinkSync(filePath); } catch (_) {}
-            results.errors.push({ file: ent.name, error: `rejected_unsigned: ${sigCheck.reason}` });
-            continue;
-          }
-          if (!fs.existsSync(targetDir)) {
-            fs.mkdirSync(targetDir, { recursive: true });
-          }
-          // Write message as-is (already signed by sender) — do NOT re-sign
-          fs.writeFileSync(targetPath, JSON.stringify(crossMsg, null, 2), 'utf8');
-          fs.unlinkSync(filePath);
-          results.collected++;
-          results.details.push({ file: ent.name, from: otherLane + '/lanes/' + this.lane + '/inbox', to: this.lane, target: targetPath, signed: !!(crossMsg.signature || crossMsg.jws) });
+          try {
+            const crossMsg = safeReadJson(filePath).value || {};
+            // Fail-closed: reject unsigned cross-lane messages
+            const sigCheck = validateIncomingSignature(crossMsg);
+            if (!sigCheck.ok) {
+              process.stderr.write(`[relay-daemon] REJECT: unsigned cross-inbox message from ${otherLane}: ${ent.name} (${sigCheck.reason})\n`);
+              try { fs.unlinkSync(filePath); } catch (_) {}
+              results.errors.push({ file: ent.name, error: `rejected_unsigned: ${sigCheck.reason}` });
+              continue;
+            }
+            if (!fs.existsSync(targetDir)) {
+              fs.mkdirSync(targetDir, { recursive: true });
+            }
+            // Write message as-is (already signed by sender) — do NOT re-sign
+            fs.writeFileSync(targetPath, JSON.stringify(crossMsg, null, 2), 'utf8');
+            fs.unlinkSync(filePath);
+            results.collected++;
+            results.details.push({ file: ent.name, from: otherLane + '/lanes/' + this.lane + '/inbox', to: this.lane, target: targetPath, signed: !!(crossMsg.signature || crossMsg.jws) });
           } catch (err) {
             results.errors.push({ file: ent.name, error: err.message });
           }
