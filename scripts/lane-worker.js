@@ -55,7 +55,8 @@ const UNICODE_NORMALIZE_MAP = {
   '\u2011': '-',    // non-breaking hyphen
   '\u2012': '-',    // figure dash
   '\u2015': '--',   // horizontal bar
-  '\u2212': '-',    // minus sign
+  '\u2212': '-', // minus sign
+  '\u00B5': 'u', // micro sign (µs → us in resource alerts)
 };
 
 const UNICODE_NORMALIZE_RE = new RegExp('[' + Object.keys(UNICODE_NORMALIZE_MAP).join('') + ']', 'g');
@@ -361,7 +362,6 @@ function isActionable(msg) {
   );
 }
 
-<<<<<<< HEAD
 const NON_ASCII_PATTERN = /[^\x20-\x7E]/;
 
 function isEnglishOnly(msg) {
@@ -371,17 +371,6 @@ function isEnglishOnly(msg) {
     let val = msg[field];
     if (typeof val === 'string') {
       val = normalizeToAscii(val);
-=======
-const NON_ASCII_PATTERN = /[^\x20-\x7E]/;
-
-function isEnglishOnly(msg) {
-  if (!msg || typeof msg !== 'object') return true;
-  const textFields = ['subject', 'body', 'type', 'from', 'to'];
-  for (const field of textFields) {
-    let val = msg[field];
-    if (typeof val === 'string') {
-      val = normalizeToAscii(val);
->>>>>>> cab85967 ([CI:kernel-lane] autonomous executor, scripts, CUDA kernel docs, state files, ollama reroute)
       if (NON_ASCII_PATTERN.test(val)) {
         return false;
       }
@@ -490,13 +479,6 @@ class LaneWorker {
       dryRun: this.dryRun,
       configPath: path.join(this.repoRoot, 'config', 'allowed_roots.json'),
     });
-    this.latestMetrics = null;
-    this.adaptiveAlerts = new AdaptiveCpuAlerts({
-      lane: this.lane,
-      stateDir: path.join(this.repoRoot, 'lanes', this.lane, 'state'),
-      config: this._loadAdaptiveAlertConfig(),
-    });
-    if (!this.dryRun) this.startMetricsServer();
     this.executionGate = options.executionGate || new ExecutionGate({
       lane: this.lane,
       dryRun: this.dryRun,
@@ -507,6 +489,11 @@ class LaneWorker {
     this.sessionId = SESSION_ID;
     this.isOwner = false;
     this.journalContext = this._readJournalContext();
+    this.adaptiveAlerts = new AdaptiveCpuAlerts({
+      lane: this.lane,
+      stateDir: path.join(this.repoRoot, 'lanes', this.lane, 'state'),
+      config: this._loadAdaptiveAlertConfig(),
+    });
     if (!this.dryRun) {
       const existing = getActiveOwner(this.repoRoot);
       if (!existing || existing.session_id === SESSION_ID || (Date.now() - new Date(existing.claimed_at).getTime()) > 900000) {
@@ -516,19 +503,6 @@ class LaneWorker {
     } else {
       this.isOwner = true;
     }
-  }
-
-  _loadAdaptiveAlertConfig() {
-    try {
-      const configPath = path.join(this.repoRoot, 'config', 'adaptive-alerts.json');
-      if (fs.existsSync(configPath)) {
-        const raw = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-        return Object.assign({}, AdaptiveCpuAlerts.DEFAULT_CONFIG, raw);
-      }
-    } catch (e) {
-      process.stderr.write(`[lane-worker] Failed to load adaptive alert config: ${e.message}\n`);
-    }
-    return {};
   }
 
   _readJournalContext() {
@@ -618,6 +592,19 @@ class LaneWorker {
     return () => ({ valid: false, reason: 'IDENTITY_ENFORCER_UNAVAILABLE_FAIL_CLOSED', details: null });
   }
 
+    _loadAdaptiveAlertConfig() {
+     try {
+       const configPath = path.join(this.repoRoot, 'config', 'adaptive-alerts.json');
+       if (fs.existsSync(configPath)) {
+         const raw = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+         return Object.assign({}, AdaptiveCpuAlerts.DEFAULT_CONFIG, raw);
+       }
+     } catch (e) {
+       process.stderr.write(`[lane-worker] Failed to load adaptive alert config: ${e.message}\n`);
+     }
+     return {};
+   }
+
   ensureQueues() {
     const q = this.config.queues;
     if (!fs.existsSync(q.inbox)) {
@@ -669,7 +656,6 @@ class LaneWorker {
       return { queue: 'blocked', reason: 'SIGNATURE_INVALID', detail: signatureResult.reason || 'Signature validation failed' };
     }
     // Law 5: Confidence Ratings Mandatory check
-<<<<<<< HEAD
     // Exempt system message types (notification, heartbeat, status) from confidence requirement
     const exemptTypes = new Set(['notification', 'heartbeat', 'status']);
     const msgType = (msg && typeof msg === 'object' ? String(msg.type || '') : '').toLowerCase();
@@ -712,52 +698,32 @@ class LaneWorker {
         } catch (_) {}
       }
     }
-=======
-    const confidence = msg && typeof msg === 'object' ? msg.confidence : null;
-    if (confidence === null || typeof confidence !== 'number' || confidence < 1 || confidence > 10 || !Number.isInteger(confidence)) {
-      return { queue: 'quarantine', reason: 'CONFIDENCE_REQUIRED', detail: 'Assessment must include confidence rating as integer between 1-10' };
+// CONFIDENCE_DERIVATION_CONTRACT: Flag performative confidence (≥7 without derivation)
+if (msg.confidence !== undefined && msg.confidence >= 7) {
+    const derivation = msg.confidence_derivation;
+    if (!derivation || typeof derivation !== 'object' || !derivation.measured || !derivation.how_measured) {
+        if (!msg._governance_flags) msg._governance_flags = [];
+        msg._governance_flags.push('PERFORMATIVE_CONFIDENCE');
+        const cpsEntry = {
+            timestamp: new Date().toISOString(),
+            event: 'PERFORMATIVE_CONFIDENCE',
+            agent: msg.from || 'unknown',
+            task_id: msg.task_id || 'unknown',
+            confidence: msg.confidence,
+        };
+        const cpsPath = path.join(repoRoot, 'context-buffer', 'cps_log.jsonl');
+        try {
+            fs.appendFileSync(cpsPath, JSON.stringify(cpsEntry) + '\n');
+        } catch (e) {
+            process.stderr.write(`[lane-worker] CPS log failed: ${e.message}\n`);
+        }
     }
-  if (confidence < 7) {
-    const investigation = msg && typeof msg === 'object' ? msg.investigation : null;
-    if (!investigation || typeof investigation !== 'string' || investigation.trim() === '') {
-      return { queue: 'blocked', reason: 'LOW_CONFIDENCE_NO_INVESTIGATION', detail: 'Assessment with confidence < 7 requires investigation evidence' };
-    }
-  }
-  // CONFIDENCE_DERIVATION_CONTRACT enforcement (graduated: flag, don't block yet)
-  // High confidence (>=7) without derivation is performative confidence — a governance violation.
-  // Per S:/.global/CONFIDENCE_DERIVATION_CONTRACT.md Rule 1: confidence MUST include
-  // what measured, how measured, what produced, how mapped. Missing = PROHIBITED.
-  // Graduated phase: attach PERFORMATIVE_CONFIDENCE flag to metadata, log to cps_log.
-  if (confidence >= 7) {
-    const derivation = msg && typeof msg === 'object' ? msg.confidence_derivation : null;
-    if (!derivation || typeof derivation !== 'object' || Array.isArray(derivation)) {
-      if (!msg._governance_flags) msg._governance_flags = [];
-      msg._governance_flags.push('PERFORMATIVE_CONFIDENCE');
-      const cpsEntry = {
-        timestamp: new Date().toISOString(),
-        event: 'PERFORMATIVE_CONFIDENCE',
-        agent: msg.from || 'unknown',
-        task_id: msg.task_id || 'unknown',
-        confidence: confidence,
-        has_derivation: false,
-        detail: 'confidence >= 7 without confidence_derivation object — performative confidence per CONFIDENCE_DERIVATION_CONTRACT Rule 1',
-      };
-      try {
-        const cpsPath = path.join(this.laneRoot || path.resolve(__dirname, '..'), 'context-buffer', 'cps_log.jsonl');
-        fs.appendFileSync(cpsPath, JSON.stringify(cpsEntry) + '\n');
-      } catch (_) {}
-    }
-  }
->>>>>>> cab85967 ([CI:kernel-lane] autonomous executor, scripts, CUDA kernel docs, state files, ollama reroute)
+}
   if (!isEnglishOnly(msg)) {
       return { queue: 'quarantine', reason: 'FORMAT_VIOLATION_NON_ASCII', detail: 'Message contains non-ASCII content. Re-request in English per governance constraint.' };
     }
 
-<<<<<<< HEAD
   const OUTPUT_PROV_EXEMPT_TYPES = new Set(['task', 'escalation', 'request', 'notification', 'heartbeat', 'status']);
-=======
-  const OUTPUT_PROV_EXEMPT_TYPES = new Set(['task', 'escalation', 'request']);
->>>>>>> cab85967 ([CI:kernel-lane] autonomous executor, scripts, CUDA kernel docs, state files, ollama reroute)
   if (typeof msg.body === 'string' && !OUTPUT_PROV_EXEMPT_TYPES.has(String(msg.type || '').toLowerCase()) && !isActionable(msg)) {
     var prov = verifyOutputProvenance(msg.body);
     if (!prov.ok) {
@@ -883,11 +849,7 @@ class LaneWorker {
     }
   }
   // Non-actionable messages claiming completion without verifiable artifact = blocked
-<<<<<<< HEAD
   if (gate.pass && !isActionable(msg) && !cp.isTerminalInformational(msg)) {
-=======
-  if (gate.pass && !isActionable(msg)) {
->>>>>>> cab85967 ([CI:kernel-lane] autonomous executor, scripts, CUDA kernel docs, state files, ollama reroute)
     const proofClassification2 = this.artifactResolver.classifyProof(msg);
     const isLegacyPath2 = proofClassification2.type === 'LEGACY_ARTIFACT_PATH';
 
@@ -997,23 +959,6 @@ class LaneWorker {
     fs.writeFileSync(targetPath, JSON.stringify(enriched, null, 2), 'utf8');
   }
 
-
-  logEvent(event) {
-    try {
-      const laneRoot = path.resolve(this.config.queues.inbox, '..', '..', '..');
-      const logDir = path.join(laneRoot, 'lanes', this.lane, 'state');
-      if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
-      const logFile = path.join(logDir, 'events.log');
-      const entry = {
-        timestamp: nowIso(),
-        lane: this.lane,
-        event,
-      };
-      fs.appendFileSync(logFile, JSON.stringify(entry) + '\n', 'utf8');
-    } catch (err) {
-      process.stderr.write(`[lane-worker] Event logging failed: ${err.message}\n`);
-    }
-  }
 processFile(filePath) {
   const filename = path.basename(filePath);
   const rawRead = safeReadJson(filePath);
@@ -1027,7 +972,7 @@ processFile(filePath) {
   }
 
   let msg = rawRead.value;
-    this.logEvent(msg);
+  this.logEvent(msg);
 
   if (!this.isOwner && msg.requires_action === true) {
     const needsReviewDir = this.config.queues.needsReview || path.join(path.dirname(filePath), 'needs-review');
@@ -1224,6 +1169,23 @@ _routeRaw(filePath, queueKey, meta) {
     this.writeSnapshot();
     return summary;
   }
+
+  logEvent(event) {
+    try {
+      const laneRoot = path.resolve(this.config.queues.inbox, '..', '..', '..');
+      const logDir = path.join(laneRoot, 'lanes', this.lane, 'state');
+      if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+      const logFile = path.join(logDir, 'events.log');
+      const entry = {
+        timestamp: nowIso(),
+        lane: this.lane,
+        event,
+      };
+      fs.appendFileSync(logFile, JSON.stringify(entry) + '\n', 'utf8');
+    } catch (err) {
+      process.stderr.write(`[lane-worker] Event logging failed: ${err.message}\n`);
+    }
+  }
   logResourceMetrics() {
     try {
       const metricsDir = path.join(this.repoRoot, 'lanes', this.lane, 'metrics');
@@ -1240,68 +1202,81 @@ _routeRaw(filePath, queueKey, meta) {
           rss: mem.rss,
           heapTotal: mem.heapTotal,
           heapUsed: mem.heapUsed,
-          external: mem.external,
-          arrayBuffers: mem.arrayBuffers,
         },
       };
-      this.latestMetrics = entry;
       fs.appendFileSync(metricsFile, JSON.stringify(entry) + '\n', 'utf8');
-
-      const cpuTotalUsec = cpu.user + cpu.system;
-      const alertResult = this.adaptiveAlerts.evaluate(cpuTotalUsec, mem.rss);
-      if (alertResult && alertResult.shouldAlert) {
+      try {
+        const cpuTotalUsec = cpu.user + cpu.system;
+        this.adaptiveAlerts.evaluate(cpuTotalUsec, mem.rss);
+      } catch (e) {
+        process.stderr.write(`[lane-worker] Adaptive alert evaluation failed: ${e.message}\n`);
+      }
+// Alerting: check thresholds (delta-based CPU, not cumulative)
+      const cpuUsageMs = cpu.user + cpu.system;
+      const cpuDeltaMs = this._lastCpuMs ? (cpuUsageMs - this._lastCpuMs) : 0;
+      this._lastCpuMs = cpuUsageMs;
+      const cpuDeltaThresholdMs = 80000; // 80ms delta per tick
+      const memThresholdBytes = 100 * 1024 * 1024; // 100 MB
+      const alertCooldownMs = 3600000; // 1 hour between same-type alerts
+      const lastAlertTime = this._lastResourceAlertTime || 0;
+      const alertNow = Date.now();
+      const alertCooldownOk = (alertNow - lastAlertTime) >= alertCooldownMs;
+      if ((cpuDeltaMs > cpuDeltaThresholdMs || mem.rss > memThresholdBytes) && alertCooldownOk) {
+        const alertLine = `${new Date().toISOString()},lane=${this.lane},pid=${process.pid},cpu_delta=${cpuDeltaMs}us,cpu_total=${cpuUsageMs}us,mem=${mem.rss}bytes`;
         const alertDir = path.join(this.repoRoot, 'lanes', this.lane, 'state');
         if (!fs.existsSync(alertDir)) fs.mkdirSync(alertDir, { recursive: true });
         const alertFile = path.join(alertDir, 'alerts.log');
-        const alertLine = `${new Date().toISOString()},lane=${this.lane},pid=${process.pid},cpu_pct=${alertResult.cpuPct.toFixed(1)},severity=${alertResult.severity},alerts=${alertResult.alerts.map(a => a.thresholdType).join(',')}`;
         fs.appendFileSync(alertFile, alertLine + '\n', 'utf8');
-
-        try {
-          const alertMsg = {
-            schema_version: '1.3',
-            task_id: `alert-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
-            idempotency_key: `alert-${this.lane}-${Date.now()}`,
-            from: this.lane,
-            to: 'archivist',
-            type: 'notification',
-            task_kind: 'alert',
-            priority: alertResult.escalate ? 'P0' : 'P1',
-            subject: `Resource Alert: ${this.lane} ${alertResult.severity} cpu=${alertResult.cpuPct.toFixed(1)}%`,
-            body: alertResult.alerts.map(a => a.message).join('; '),
-            timestamp: nowIso(),
-            requires_action: alertResult.escalate,
-            payload: { mode: 'inline', compression: 'none' },
-            execution: { mode: 'manual', engine: 'kilo', actor: 'lane' },
-            lease: { owner: null, acquired_at: null },
-            retry: { attempt: 1, max_attempts: 3 },
-            evidence: { required: false, verified: false },
-            heartbeat: { status: 'pending', last_heartbeat_at: nowIso(), interval_seconds: 300, timeout_seconds: 900 },
-            watcher: { enabled: false, poll_seconds: 60, p0_fast_path: true, max_concurrent: 1, heartbeat_required: true, stale_after_seconds: 300, backoff: { initial_seconds: 60, max_seconds: 300, multiplier: 2 } },
-            delivery_verification: { verified: false, verified_at: null, retries: 0 }
-          };
-          const signFn = getCreateSignedMessage();
-          let finalMsg = alertMsg;
-          if (signFn) {
-            try {
-              finalMsg = signFn(alertMsg, 'archivist');
-            } catch (e) {
-              process.stderr.write(`[lane-worker] Alert signing failed: ${e.message}\n`);
-            }
+      }
+      // Send notification to Archivist lane as P0 alert (only if cooldown elapsed)
+      if (alertCooldownOk) {
+      try {
+        const alertMsg = {
+          schema_version: '1.3',
+          task_id: `alert-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+          idempotency_key: `alert-${this.lane}-${Date.now()}`,
+          from: this.lane,
+          to: 'archivist',
+          type: 'notification',
+          task_kind: 'alert',
+          priority: 'P0',
+          subject: `Resource Alert: ${this.lane}`,
+          body: `Resource usage exceeded thresholds: cpu_delta=${cpuDeltaMs}us (threshold ${cpuDeltaThresholdMs}us), cpu_total=${cpuUsageMs}us, mem=${mem.rss}bytes (threshold ${memThresholdBytes}bytes).`,
+          timestamp: nowIso(),
+          requires_action: true,
+          payload: { mode: 'inline', compression: 'none' },
+          execution: { mode: 'manual', engine: 'kilo', actor: 'lane' },
+          lease: { owner: null, acquired_at: null },
+          retry: { attempt: 1, max_attempts: 3 },
+          evidence: { required: false, verified: false },
+          heartbeat: { status: 'pending', last_heartbeat_at: nowIso(), interval_seconds: 300, timeout_seconds: 900 },
+          watcher: { enabled: false, poll_seconds: 60, p0_fast_path: true, max_concurrent: 1, heartbeat_required: true, stale_after_seconds: 300, backoff: { initial_seconds: 60, max_seconds: 300, multiplier: 2 } },
+          delivery_verification: { verified: false, verified_at: null, retries: 0 }
+        };
+        const signFn = getCreateSignedMessage();
+        let finalMsg = alertMsg;
+        if (signFn) {
+          try {
+            finalMsg = signFn(alertMsg, 'archivist');
+          } catch (e) {
+            process.stderr.write(`[lane-worker] Alert signing failed: ${e.message}\n`);
           }
-          const archivistRoot = LANE_ROOTS['archivist'];
-          if (archivistRoot) {
-            const archivistInbox = path.join(archivistRoot, 'lanes', 'archivist', 'inbox');
-            if (!fs.existsSync(archivistInbox)) {
-              fs.mkdirSync(archivistInbox, { recursive: true });
-            }
-            const alertPath = path.join(archivistInbox, `alert-${finalMsg.task_id}.json`);
-            fs.writeFileSync(alertPath, JSON.stringify(finalMsg, null, 2), 'utf8');
-          } else {
-            process.stderr.write(`[lane-worker] Could not determine archivist root for alert notification\n`);
-          }
-        } catch (notifyErr) {
-          process.stderr.write(`[lane-worker] Failed to send resource alert notification: ${notifyErr.message}\n`);
         }
+        const archivistRoot = LANE_ROOTS['archivist'];
+        if (archivistRoot) {
+          const archivistInbox = path.join(archivistRoot, 'lanes', 'archivist', 'inbox');
+          if (!fs.existsSync(archivistInbox)) {
+            fs.mkdirSync(archivistInbox, { recursive: true });
+          }
+          const alertPath = path.join(archivistInbox, `alert-${finalMsg.task_id}.json`);
+          fs.writeFileSync(alertPath, JSON.stringify(finalMsg, null, 2), 'utf8');
+          this._lastResourceAlertTime = alertNow;
+        } else {
+          process.stderr.write(`[lane-worker] Could not determine archivist root for alert notification\n`);
+        }
+      } catch (notifyErr) {
+        process.stderr.write(`[lane-worker] Failed to send resource alert notification: ${notifyErr.message}\n`);
+      }
       }
     } catch (err) {
       process.stderr.write(`[lane-worker] Resource metrics logging failed: ${err.message}\n`);
@@ -1320,64 +1295,6 @@ _routeRaw(filePath, queueKey, meta) {
       fs.writeFileSync(snapshotFile, JSON.stringify(snapshot, null, 2), 'utf8');
     } catch (err) {
       process.stderr.write(`[lane-worker] Snapshot write failed: ${err.message}\n`);
-    }
-  }
-
-  startMetricsServer() {
-    try {
-      const http = require('http');
-      // Compute a port based on lane name to avoid conflicts
-      let portHash = 0;
-      for (let i = 0; i < this.lane.length; i++) {
-        portHash += this.lane.charCodeAt(i);
-      }
-      const port = 3000 + (portHash % 1000);
-      const server = http.createServer((req, res) => {
-        res.setHeader('Content-Type', 'application/json');
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        if (this.latestMetrics) {
-          res.end(JSON.stringify(this.latestMetrics));
-        } else {
-          res.end(JSON.stringify({ error: 'No metrics available yet' }));
-        }
-      });
-      server.listen(port, () => {
-        console.log(`[lane-worker] Metrics server listening on port ${port}`);
-      });
-      server.on('error', (err) => {
-        console.error(`[lane-worker] Metrics server error: ${err.message}`);
-      });
-    } catch (err) {
-      console.error(`[lane-worker] Failed to start metrics server: ${err.message}`);
-    }
-  }
-
-  startMetricsServer() {
-    try {
-      const http = require('http');
-      // Compute a port based on lane name to avoid conflicts
-      let portHash = 0;
-      for (let i = 0; i < this.lane.length; i++) {
-        portHash += this.lane.charCodeAt(i);
-      }
-      const port = 3000 + (portHash % 1000);
-      const server = http.createServer((req, res) => {
-        res.setHeader('Content-Type', 'application/json');
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        if (this.latestMetrics) {
-          res.end(JSON.stringify(this.latestMetrics));
-        } else {
-          res.end(JSON.stringify({ error: 'No metrics available yet' }));
-        }
-      });
-      server.listen(port, () => {
-        console.log(`[lane-worker] Metrics server listening on port ${port}`);
-      });
-      server.on('error', (err) => {
-        console.error(`[lane-worker] Metrics server error: ${err.message}`);
-      });
-    } catch (err) {
-      console.error(`[lane-worker] Failed to start metrics server: ${err.message}`);
     }
   }
 }
@@ -1466,8 +1383,4 @@ module.exports = {
   hasUnresolvableEvidence: cp.hasUnresolvableEvidence,
 };
 
-<<<<<<< HEAD
 
-=======
-
->>>>>>> cab85967 ([CI:kernel-lane] autonomous executor, scripts, CUDA kernel docs, state files, ollama reroute)
