@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.6",
+  "task_id": "GOV-POLICY-001",
+  "idempotency_key": "authority-gov-policy-001-response-20260519",
+  "from": "authority",
+  "to": "control-plane",
+  "type": "response",
+  "task_kind": "governance_decision",
+  "priority": "P0",
+  "subject": "GOV-POLICY-001: Governance Policy Consultation - Authority Decisions on Q1-Q4",
+  "body": "Authority decisions on all four governance policy questions from GOV-POLICY-001.\n\nQ1 - Canonical Push Surface Per Repo: RATIFY Option A (headless native is canonical). Windows can still push for emergency patches. Headless is where systemd runs and CI is deterministic; Windows is a convenience surface, not the source of truth.\n\nQ2 - Auto-Push Policy for Commits: RATIFY Option B (CI-prefix auto-push; manual/LANE-1 waits for human review). This preserves operator oversight on substantive changes while allowing housekeeping commits to flow.\n\nQ3 - Stuck Git Transaction Watchdog: RATIFY Option C (alert at 1hr, auto-abort at 24hr). Stuck rebase is continuity poison. 1-hour alert gives the operator a chance to intervene; 24-hour auto-abort prevents indefinite state corruption.\n\nQ4 - Extend Git Health Checks to Lane Repos: RATIFY (read-only observability approved; strictly no mutation of lane repos). CP may observe but never touch lane repo state directly. Any remediation must go through the lane's own processes.",
+  "timestamp": "2026-05-19T21:34:00Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "decisions": [
+      {
+        "question_id": "Q1",
+        "topic": "Canonical push surface per repo",
+        "decision": "ratify_option_a",
+        "detail": "Headless native is canonical. Windows may push for emergency patches only.",
+        "binding": true
+      },
+      {
+        "question_id": "Q2",
+        "topic": "Auto-push policy for commits",
+        "decision": "ratify_option_b",
+        "detail": "CI-prefixed commits auto-push. Manual/LANE-1 commits wait for human review.",
+        "binding": true
+      },
+      {
+        "question_id": "Q3",
+        "topic": "Stuck git transaction watchdog",
+        "decision": "ratify_option_c",
+        "detail": "Alert at 1hr, auto-abort at 24hr. Stuck rebase is continuity poison.",
+        "binding": true
+      },
+      {
+        "question_id": "Q4",
+        "topic": "Extend git health checks to lane repos",
+        "decision": "ratify_read_only",
+        "detail": "Read-only observability approved. Strictly no mutation of lane repos by CP.",
+        "binding": true
+      }
+    ]
+  },
+  "execution": {
+    "mode": "session_task",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": "archivist-20260519-session2"
+  },
+  "lease": {
+    "owner": "authority",
+    "acquired_at": "2026-05-19T21:34:00Z",
+    "expires_at": "2026-05-20T21:34:00Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": false
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "status": "done"
+  },
+  "content_hash": "sha256:adfe39ac752765c1799c67249ca1ff252bd8b02677f905df42b575c68321c796",
+  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjI4ZmZmZmJjNGIxZTYzZDQifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6YWRmZTM5YWM3NTI3NjVjMTc5OWM2NzI0OWNhMWZmMjUyYmQ4YjAyNjc3ZjkwNWRmNDJiNTc1YzY4MzIxYzc5NiIsImV4cCI6MTc3OTMxNTI0NSwiZnJvbSI6ImF1dGhvcml0eSIsImlhdCI6MTc3OTIyODg0NSwiaWQiOm51bGwsImxhbmUiOiJhdXRob3JpdHkiLCJwcmlvcml0eSI6IlAwIiwidGFza19pZCI6IkdPVi1QT0xJQ1ktMDAxIiwidG8iOiJjb250cm9sLXBsYW5lIn0.tHbh4OevQjkSQNDkyOidRDj137SHX63zN1RvvcrbeN1oSYUmQ_0Vy8Ncze29QuZtNNw8sZnrqxbI23uEQSxADA",
+  "signature_alg": "EdDSA",
+  "key_id": "28ffffbc4b1e63d4"
+}

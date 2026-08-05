@@ -38,14 +38,17 @@
         "swarmmind"
       ],
       "acknowledged": [],
-      "status": "PENDING_ACK",
+      "status": "EXPIRED_ACK",
       "created_at": "2026-04-20T21:05:00Z",
       "verified_at": null,
       "blocking": false,
       "missing_acks": [
         "library",
         "swarmmind"
-      ]
+      ],
+      "reminder_sent_at": "2026-05-04T00:21:00Z",
+      "expired_ack_at": "2026-05-18T16:37:00Z",
+      "expired_ack_reason": "28 days past threshold with no response; lanes not processing autonomously (confirmed CP operator finding 2026-05-14). Reminder already sent 2026-05-04."
     },
     "2026-04-20T21-25-00Z-archivist-lane4-review": {
       "type": "review",
@@ -61,14 +64,17 @@
         "swarmmind"
       ],
       "acknowledged": [],
-      "status": "PENDING_ACK",
+      "status": "EXPIRED_ACK",
       "created_at": "2026-04-20T21:25:00Z",
       "verified_at": null,
       "blocking": false,
       "missing_acks": [
         "library",
         "swarmmind"
-      ]
+      ],
+      "reminder_sent_at": "2026-05-04T00:21:00Z",
+      "expired_ack_at": "2026-05-18T16:37:00Z",
+      "expired_ack_reason": "28 days past threshold with no response; lanes not processing autonomously (confirmed CP operator finding 2026-05-14). Reminder already sent 2026-05-04."
     },
     "2026-04-20T21-30-00Z-archivist-urgent-rate-limit": {
       "type": "task",
@@ -88,8 +94,76 @@
       "created_at": "2026-04-20T21:30:00Z",
       "verified_at": "2026-04-22T12:50:00Z",
       "blocking": false
+    },
+    "2026-05-04T01-35-00Z-archivist-workpath-ruling": {
+      "type": "response",
+      "priority": "P0",
+      "subject": "RULING: Work-path P0 contradiction candidates (184) are STALE",
+      "from": "archivist",
+      "required_acks": [
+        "library"
+      ],
+      "delivered": [
+        "library"
+      ],
+      "acknowledged": [],
+      "status": "EXPIRED_ACK",
+      "created_at": "2026-05-04T01:35:00Z",
+      "verified_at": null,
+      "blocking": false,
+      "missing_acks": [
+        "library"
+      ],
+      "expired_ack_at": "2026-05-18T16:37:00Z",
+      "expired_ack_reason": "14 days past threshold; library lane not processing autonomously (confirmed CP operator finding 2026-05-14). Ruling stands as unilateral archivist decision pending lane reactivation."
+    },
+    "2026-05-04T01-36-00Z-archivist-reconciliation-ruling": {
+      "type": "response",
+      "priority": "P1",
+      "subject": "RULING: Reconciliation-packet lease expired — requires re-initiation",
+      "from": "archivist",
+      "required_acks": [
+        "library"
+      ],
+      "delivered": [
+        "library"
+      ],
+      "acknowledged": [],
+      "status": "EXPIRED_ACK",
+      "created_at": "2026-05-04T01:36:00Z",
+      "verified_at": null,
+      "blocking": false,
+      "missing_acks": [
+        "library"
+      ],
+      "expired_ack_at": "2026-05-18T16:37:00Z",
+      "expired_ack_reason": "14 days past threshold; library lane not processing autonomously (confirmed CP operator finding 2026-05-14). Ruling stands as unilateral archivist decision pending lane reactivation."
+    },
+    "2026-05-04T01-55-00Z-archivist-swarmmind-status-inquiry": {
+      "type": "task",
+      "task_kind": "review",
+      "priority": "P1",
+      "subject": "SwarmMind Status Inquiry — heartbeat silent, PENDING_ACK items unanswered",
+      "from": "archivist",
+      "required_acks": [
+        "swarmmind"
+      ],
+      "delivered": [
+        "swarmmind"
+      ],
+      "acknowledged": [],
+      "status": "EXPIRED_ACK",
+      "created_at": "2026-05-04T01:55:00Z",
+      "verified_at": null,
+      "blocking": false,
+      "missing_acks": [
+        "swarmmind"
+      ],
+      "expired_ack_at": "2026-05-18T16:37:00Z",
+      "expired_ack_reason": "14 days past threshold; swarmmind lane not processing autonomously (confirmed CP operator finding 2026-05-14). Status inquiry unresolved; lane reactivation required."
     }
   },
-  "last_scan": "2026-04-22T12:47:44.357Z",
-  "alert_threshold_hours": 24
+  "last_scan": "2026-05-18T16:37:00Z",
+  "alert_threshold_hours": 24,
+  "remediation_notes": "2026-05-18T16:37:00Z: All 5 PENDING_ACK items escalated to EXPIRED_ACK. Autonomous lanes (library, swarmmind) confirmed not processing messages (CP operator report 2026-05-14, finding #6). Rulings stand as unilateral archivist decisions. When lanes reactivate, they must review EXPIRED_ACK items and either ratify or contest within 72h."
 }

@@ -57,8 +57,8 @@ function executionWeight(node) {
     const ts = Date.parse(lastInvoked);
     if (!Number.isNaN(ts)) {
       const ageHours = (Date.now() - ts) / (1000 * 60 * 60);
-      if (ageHours < 24) weight += 3; // invoked within last day
-      else if (ageHours < 168) weight += 1; // within a week
+      if (ageHours < 24) weight += 3;          // invoked within last day
+      else if (ageHours < 168) weight += 1;    // within a week
     }
   }
 

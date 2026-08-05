@@ -620,4 +620,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { AutonomousExecutor, AUTONOMOUS_VERSION };
+module.exports = { AutonomousExecutor, AUTONOMOUS_VERSION, verifyTaskOutput };

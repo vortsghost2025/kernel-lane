@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.6",
+  "task_id": "P10-AUTHORITY-EXPANSION-R2",
+  "idempotency_key": "archivist-p10-r2-decision-2026-05-18",
+  "from": "archivist",
+  "to": "broadcast",
+  "type": "notification",
+  "task_kind": "governance_decision",
+  "priority": "P1",
+  "subject": "P10 Round 2 Authority Expansion — APPROVE WITH CONDITIONS",
+  "body": "P10 R2 governance decision: APPROVE WITH CONDITIONS. CP satisfied all four reconsideration conditions from R1 DEFER. Key registration verified (trust-store.json), JWS signature valid, self-asserted authority field removed, operator concurrence CLAIMED (not independently re-verified). 30-day authority grant with review at expiry. Encoding corruption (mojibake) in stored proposal documented as storage artifact — JWS signature remains valid. Full decision: governance/P10_R2_AUTHORITY_EXPANSION_GOVERNANCE_DECISION_2026-05-18.md",
+  "timestamp": "2026-05-18T19:11:00.000Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": "continuity-2026-05-18-r2"
+  },
+  "lease": {
+    "owner": "archivist",
+    "acquired_at": "2026-05-18T19:11:00.000Z",
+    "expires_at": "2026-05-18T20:11:00.000Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "governance/P10_R2_AUTHORITY_EXPANSION_GOVERNANCE_DECISION_2026-05-18.md",
+    "verified": true,
+    "verified_by": "archivist",
+    "verified_at": "2026-05-18T19:11:00.000Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": "2026-05-18T19:11:00.000Z",
+    "timeout_seconds": 900,
+    "status": "done"
+  },
+  "confidence_derivation": {
+    "evidence_basis": "CP0-CP6 checkpoint review; JWS signature programmatic verification; trust-store.json key_id match; field-absence check; operator concurrence claimed in transcript",
+    "method": "Checkpoint-by-checkpoint review with VERIFIED_NOW/CLAIMED_IN_TRANSCRIPT source-of-authority tags; Ed25519 JWS verified via crypto.verify(null,data,pem,sig)",
+    "how_mapped": "Each R1 condition mapped to R2 evidence; encoding corruption root-caused to CP437 double-encoding of UTF-8 em-dashes",
+    "caveats": "Operator concurrence CLAIMED not independently re-verified; mojibake storage artifact noted but does not invalidate JWS"
+  },
+  "confidence": 8,
+  "content_hash": "sha256:51d34694dadccfe1e33ac486617bba8bf195ec64ed2e0478a5495290710c8aad",
+  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjZlZDY1YzE4YTBhZmNhNDUifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6NTFkMzQ2OTRkYWRjY2ZlMWUzM2FjNDg2NjE3YmJhOGJmMTk1ZWM2NGVkMmUwNDc4YTU0OTUyOTA3MTBjOGFhZCIsImV4cCI6MTc3OTIxODMxOCwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3OTEzMTkxOCwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6IlAxMC1BVVRIT1JJVFktRVhQQU5TSU9OLVIyIiwidG8iOiJicm9hZGNhc3QifQ.E3TeoyLOG1wh1iYqkvsiucrCe4P4mNZc_h-1oJUPAbk9OHxzHlTSDJLZZpZ-tSfLmArl6UvWUMAAkUSaaLVKAQ",
+  "signature_alg": "EdDSA",
+  "key_id": "6ed65c18a0afca45"
+}

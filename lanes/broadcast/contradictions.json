@@ -1,39 +1,48 @@
-[
-  {
-    "id": "swarmmind_no_heartbeat",
-    "priority": "P0",
-    "description": "RESOLVING: Scheduled task created (every 5 min), heartbeat updating successfully. Monitoring stability.",
-    "detected_at": "2026-04-23T21:45:00.000Z",
-    "source": "convergence-monitor-report-20260423.json",
-    "status": "resolved",
-    "resolution": "SwarmMind heartbeat stable and operational. 9 messages processed, sync-gate-verify PASS, heartbeat age <5min. Stability window passed.",
-    "last_heartbeat": "2026-04-23T22:09:19.646Z",
-    "scheduled_task": "SwarmMindHeartbeat (every 5 min, created 22:02Z)",
-    "consecutive_updates": 4,
-    "resolved_at": "2026-04-25T13:40:32.601Z"
+{
+  "OUTPUT_PROVENANCE": {
+    "agent": "opencode",
+    "lane": "library",
+    "target": "contradictions",
+    "generated_at": "2026-04-23T21:45:00.000Z",
+    "session_id": "sess-20260516-library-opencode"
   },
-  {
-    "id": "message_loss",
-    "priority": "P1",
-    "description": "RESOLVED: 42 actionable messages processed from action-required/ to processed/ (41 completed + 1 informational)",
-    "detected_at": "2026-04-23T21:30:00.000Z",
-    "source": "post-compact-audit.js + recover-action-required-from-processed.js + manual processing",
-    "status": "resolved",
-    "resolution": "All actionable messages in action-required/ processed and moved to processed/. 0 remaining.",
-    "verified_at": "2026-04-23T22:01:53.241Z",
-    "resolved_at": "2026-04-23T22:10:00.000Z",
-    "action-required_final_count": 0
-  },
-  {
-    "id": "priority_P0_contradiction",
-    "priority": "P0",
-    "description": "RESOLVING: System now reports 'degraded' (not 'aligned'). Contradiction being addressed.",
-    "detected_at": "2026-04-23T17:49:00.000Z",
-    "source": "SYSTEM.txt",
-    "status": "resolved",
-    "resolution": "System status correctly reported as degraded during contradiction period. All contradictions now resolved. System stable: 9 processed, 0 blocked, sync-gate-verify PASS.",
-    "system_state_now": "degraded",
-    "corrected_at": "2026-04-23T21:45:00.000Z",
-    "resolved_at": "2026-04-25T13:40:32.601Z"
-  }
-]
+  "contradictions": [
+    {
+      "id": "swarmmind_no_heartbeat",
+      "priority": "P0",
+      "description": "RESOLVING: Scheduled task created (every 5 min), heartbeat updating successfully. Monitoring stability.",
+      "detected_at": "2026-04-23T21:45:00.000Z",
+      "source": "convergence-monitor-report-20260423.json",
+      "status": "resolved",
+      "resolution": "SwarmMind heartbeat stable and operational. 9 messages processed, sync-gate-verify PASS, heartbeat age <5min. Stability window passed.",
+      "last_heartbeat": "2026-04-23T22:09:19.646Z",
+      "scheduled_task": "SwarmMindHeartbeat (every 5 min, created 22:02Z)",
+      "consecutive_updates": 4,
+      "resolved_at": "2026-04-25T13:40:32.601Z"
+    },
+    {
+      "id": "message_loss",
+      "priority": "P1",
+      "description": "RESOLVED: 42 actionable messages processed from action-required/ to processed/ (41 completed + 1 informational)",
+      "detected_at": "2026-04-23T21:30:00.000Z",
+      "source": "post-compact-audit.js + recover-action-required-from-processed.js + manual processing",
+      "status": "resolved",
+      "resolution": "All actionable messages in action-required/ processed and moved to processed/. 0 remaining.",
+      "verified_at": "2026-04-23T22:01:53.241Z",
+      "resolved_at": "2026-04-23T22:10:00.000Z",
+      "action-required_final_count": 0
+    },
+    {
+      "id": "priority_P0_contradiction",
+      "priority": "P0",
+      "description": "RESOLVING: System now reports 'degraded' (not 'aligned'). Contradiction being addressed.",
+      "detected_at": "2026-04-23T17:49:00.000Z",
+      "source": "SYSTEM.txt",
+      "status": "resolved",
+      "resolution": "System status correctly reported as degraded during contradiction period. All contradictions now resolved. System stable: 9 processed, 0 blocked, sync-gate-verify PASS.",
+      "system_state_now": "degraded",
+      "corrected_at": "2026-04-23T21:45:00.000Z",
+      "resolved_at": "2026-04-25T13:40:32.601Z"
+    }
+  ]
+}

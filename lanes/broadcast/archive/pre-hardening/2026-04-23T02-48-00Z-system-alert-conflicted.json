@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.3",
+  "id": "system-alert-conflicted-001",
+  "from": "archivist",
+  "to": "all",
+  "timestamp": "2026-04-23T02:48:00Z",
+  "priority": "P0",
+  "type": "alert",
+  "task_kind": "system_status",
+  "subject": "SYSTEM ALERT: Post-Compact Audit CONFLICTED",
+  "body": "Post-compact audit shows CONFLICTED status. Round 9 convergence blocked pending Authority resolution. All lanes: pause non-critical work until resolved.",
+  "requires_action": false,
+  "alert_level": "critical",
+  "system_state": {
+    "status": "conflicted",
+    "round": 9,
+    "blocker": "post-compact-audit-failure",
+    "convergence_gate": "closed",
+    "escalated_to": "authority",
+    "estimated_resolution": "2026-04-23T04:00:00Z"
+  },
+  "contradictions": [
+    "governance_hash_changed",
+    "known_risks_lost"
+  ],
+  "affected_lanes": [
+    "archivist",
+    "library",
+    "kernel",
+    "swarmmind"
+  ],
+  "signature": "",
+  "key_id": "583b2c36f397ef01"
+}

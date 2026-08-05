@@ -3,23 +3,17 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
-function safeUnlink(filePath, context) {
-  try {
-    fs.unlinkSync(filePath);
-    return 'ok';
-  } catch (e) {
-    if (e.code === 'ENOENT') {
-      console.log('[watcher] RACE_SKIPPED: ' + (context || 'file') + ' already removed by another process');
-      return 'race_skipped';
-    }
-    throw e;
-  }
+const isWin32 = process.platform === 'win32';
+const UBUNTU_ROOT = path.join(os.homedir(), 'agent', 'repos');
+function _resolve(winPath) {
+  if (isWin32) return winPath;
+  const m = winPath.match(/^S:\/(.+)$/);
+  return m ? path.join(UBUNTU_ROOT, m[1]) : winPath;
 }
 
-const { LaneDiscovery } = require('./util/lane-discovery');
-const discovery = new LaneDiscovery();
-const KERNEL_ROOT = discovery.getLocalPath('kernel');
+const KERNEL_ROOT = _resolve('S:/kernel-lane');
 const { atomicWriteWithLease } = require(path.join(KERNEL_ROOT, 'scripts', 'atomic-write-util'));
 
 function ensureParentDir(filePath) {

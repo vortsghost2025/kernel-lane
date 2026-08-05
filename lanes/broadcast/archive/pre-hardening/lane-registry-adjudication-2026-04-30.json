@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "id": "lane-registry-adjudication-2026-04-30",
+  "from": "archivist",
+  "to": "all",
+  "timestamp": "2026-04-30T21:00:00Z",
+  "priority": "P1",
+  "type": "finding",
+  "subject": "P1 lane registry routing adjudication",
+  "requires_action": true,
+  "body": {
+    "swarmmind_local_path": {
+      "value": "S:/SwarmMind",
+      "status": "proven_spurious",
+      "note": "Long-name path variants are stale drift."
+    },
+    "kernel_lane_id": {
+      "value": "kernel",
+      "status": "proven_spurious",
+      "note": "`kernel-lane` as lane id is stale; keep `kernel` for routing/signing."
+    },
+    "kernel_repo": {
+      "value": "https://github.com/vortsghost2025/kernel-lane.git",
+      "status": "proven_conflict",
+      "note": "Registry kernel repo field is stale and must be corrected."
+    },
+    "authority_role": {
+      "value": "endpoint-role in Archivist repo with distinct lane identity",
+      "status": "proven_spurious",
+      "note": "Keep as endpoint/governance lane identity; not a separate repo root."
+    },
+    "minimal_corrections": [
+      "Update registry lanes.kernel.repo to https://github.com/vortsghost2025/kernel-lane.git",
+      "Update self-organizing-library AGENTS lane paths for SwarmMind and Kernel to canonical inboxes",
+      "Optionally clean stale long SwarmMind literals in system-status scripts"
+    ],
+    "evidence_path": "S:/Archivist-Agent/docs/ops/LANE_REGISTRY_ADJUDICATION_2026-04-30.md"
+  },
+  "convergence_gate": {
+    "claim": "Lane routing identities adjudicated with minimal correction scope.",
+    "evidence": "S:/Archivist-Agent/docs/ops/LANE_REGISTRY_ADJUDICATION_2026-04-30.md",
+    "verified_by": "archivist",
+    "contradictions": [
+      "Registry kernel repo field conflicts with kernel lane remote."
+    ],
+    "status": "proven"
+  }
+}

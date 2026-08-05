@@ -1,0 +1,94 @@
+{
+  "audit_type": "trust_store_alignment",
+  "timestamp": "2026-05-06T03:39:56.841Z",
+  "auditor": "lane-worker-autonomous-setup",
+  "trust_store_sha256": "91c9c98645334b2db053d7fe8dc1fe2eaacf19abb542b6feb14e066e2bd394b1",
+  "canonical_source": "Archivist-Agent",
+  "lanes": {
+    "Archivist-Agent": {
+      "path": "/home/we4free/agent/repos/Archivist-Agent/lanes/broadcast/trust-store.json",
+      "sha256": "91c9c98645334b2db053d7fe8dc1fe2eaacf19abb542b6feb14e066e2bd394b1",
+      "aligned": true
+    },
+    "kernel-lane": {
+      "path": "/home/we4free/agent/repos/kernel-lane/lanes/broadcast/trust-store.json",
+      "sha256": "91c9c98645334b2db053d7fe8dc1fe2eaacf19abb542b6feb14e066e2bd394b1",
+      "aligned": true
+    },
+    "self-organizing-library": {
+      "path": "/home/we4free/agent/repos/self-organizing-library/lanes/broadcast/trust-store.json",
+      "sha256": "91c9c98645334b2db053d7fe8dc1fe2eaacf19abb542b6feb14e066e2bd394b1",
+      "aligned": true
+    },
+    "SwarmMind": {
+      "path": "/home/we4free/agent/repos/SwarmMind/lanes/broadcast/trust-store.json",
+      "sha256": "91c9c98645334b2db053d7fe8dc1fe2eaacf19abb542b6feb14e066e2bd394b1",
+      "aligned": true
+    }
+  },
+  "key_ids": {
+    "archivist": "65ae05b2a9e749cb",
+    "library": "a5a5f5c2edbee56a",
+    "swarmmind": "ec467e7103736c28",
+    "kernel": "d475d23aeed6c7b8"
+  },
+  "watcher_services": {
+    "kernel": {
+      "service": "kernel-watcher.service",
+      "level": "system",
+      "status": "active",
+      "enabled": true
+    },
+    "swarmmind": {
+      "service": "swarmmind-watcher.service",
+      "level": "system",
+      "status": "active",
+      "enabled": true
+    }
+  },
+  "executor_timers": {
+    "kernel": {
+      "timer": "kernel-executor.timer",
+      "level": "user",
+      "status": "active"
+    },
+    "swarmmind": {
+      "timer": "swarmmind-executor.timer",
+      "level": "user",
+      "status": "active"
+    }
+  },
+  "round_trip_proofs": {
+    "kernel": {
+      "proof_id": "watcher-proof-1778034776567",
+      "direction": "SwarmMind->Kernel->SwarmMind",
+      "signature_verified": true,
+      "route": "action-required",
+      "executor_processed": true,
+      "timestamp": "2026-05-06T02:33:00Z"
+    },
+    "swarmmind": {
+      "proof_id": "swarmmind-watcher-proof-2-1778036960000",
+      "direction": "Kernel->SwarmMind->Kernel",
+      "signature_verified": true,
+      "kernel_signature_on_incoming": true,
+      "swarmmind_signature_on_response": true,
+      "route": "action-required",
+      "executor_processed": true,
+      "timestamp": "2026-05-06T03:39:56.841Z"
+    }
+  },
+  "issues_resolved": [
+    "SwarmMind artifact-resolver.js:17 optional chaining (?.) replaced with compatible (LANES[laneId] && LANES[laneId].root)",
+    "Duplicate user-level swarmmind-watcher.service stopped and disabled (conflicting with system-level)",
+    "Duplicate user-level kernel-watcher.service stopped and disabled (conflicting with system-level)",
+    "Stale active-owner.json cleared for SwarmMind (PID 972248 was from old nohup)",
+    "Cross-instance session_identity check caused stale-foreign routing; proof-2 message included allow_cross_instance: true",
+    "Kernel watcher crash-loop (crypto.randomUUID) resolved by ensuring NVM Node v20 path in ExecStart"
+  ],
+  "constraints_observed": [
+    "No trust store changes during watcher setup",
+    "No key rotation during watcher setup",
+    "No governance edits during watcher setup"
+  ]
+}

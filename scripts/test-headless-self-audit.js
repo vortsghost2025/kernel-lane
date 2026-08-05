@@ -16,7 +16,12 @@ const {
   DEDUPE_SUPPRESS_CYCLES, AUDIT_VERSION
 } = require('./headless-self-audit');
 
+// verifyTaskOutput imported lazily inside tests to avoid circular dependency with autonomous-executor
 let pass = 0, fail = 0;
+
+function getVerifyTaskOutput() {
+  return require('./autonomous-executor').verifyTaskOutput;
+}
 
 function test(name, fn) {
   try {
@@ -353,15 +358,13 @@ test('rollup includes work-unit fields from ledger entries with work_units', () 
 // === A1: requireOutput hard gate ===
 console.log('A1. requireOutput hard gate');
 test('verifyTaskOutput returns ok when no required_output declared', () => {
-  const { verifyTaskOutput } = require('./autonomous-executor');
-  const result = verifyTaskOutput({ task_id: 'test-no-output' }, 'kernel');
+  const result = getVerifyTaskOutput()({ task_id: 'test-no-output' }, 'kernel');
   assert.strictEqual(result.ok, true);
   assert.strictEqual(result.reason, 'no_required_output_declared');
   assert.strictEqual(result.checked, false);
 });
 test('verifyTaskOutput rejects when required_output path does not exist', () => {
-  const { verifyTaskOutput } = require('./autonomous-executor');
-  const result = verifyTaskOutput({
+  const result = getVerifyTaskOutput()({
     task_id: 'test-missing-output',
     require_output: '/tmp/nonexistent-a1-test-output-' + Date.now() + '.md'
   }, 'kernel');
@@ -370,10 +373,9 @@ test('verifyTaskOutput rejects when required_output path does not exist', () => 
   assert.strictEqual(result.checked, true);
 });
 test('verifyTaskOutput rejects when required_output file is empty', () => {
-  const { verifyTaskOutput } = require('./autonomous-executor');
   const emptyFile = path.join(os.tmpdir(), `a1-test-empty-${Date.now()}.md`);
   fs.writeFileSync(emptyFile, '', 'utf8');
-  const result = verifyTaskOutput({
+  const result = getVerifyTaskOutput()({
     task_id: 'test-empty-output',
     require_output: emptyFile
   }, 'kernel');
@@ -382,10 +384,9 @@ test('verifyTaskOutput rejects when required_output file is empty', () => {
   fs.unlinkSync(emptyFile);
 });
 test('verifyTaskOutput rejects when required_output file lacks provenance', () => {
-  const { verifyTaskOutput } = require('./autonomous-executor');
   const noProvFile = path.join(os.tmpdir(), `a1-test-noprov-${Date.now()}.md`);
   fs.writeFileSync(noProvFile, 'Some content without provenance header', 'utf8');
-  const result = verifyTaskOutput({
+  const result = getVerifyTaskOutput()({
     task_id: 'test-no-provenance',
     require_output: noProvFile
   }, 'kernel');
@@ -394,10 +395,9 @@ test('verifyTaskOutput rejects when required_output file lacks provenance', () =
   fs.unlinkSync(noProvFile);
 });
 test('verifyTaskOutput passes when required_output file has valid provenance', () => {
-  const { verifyTaskOutput } = require('./autonomous-executor');
   const goodFile = path.join(os.tmpdir(), `a1-test-valid-${Date.now()}.md`);
   fs.writeFileSync(goodFile, 'OUTPUT_PROVENANCE:\nagent: test\nlane: kernel\ntarget: a1-test\n\nReal content here.', 'utf8');
-  const result = verifyTaskOutput({
+  const result = getVerifyTaskOutput()({
     task_id: 'test-valid-output',
     require_output: goodFile
   }, 'kernel');

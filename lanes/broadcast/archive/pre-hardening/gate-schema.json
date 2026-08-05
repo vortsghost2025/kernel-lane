@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ConvergenceGate",
+  "description": "Every lane output must pass this structure before reaching coordinator",
+  "type": "object",
+  "required": ["claim", "evidence", "verified_by", "status"],
+  "properties": {
+    "claim": {
+      "type": "string",
+      "description": "Single sentence stating what was done/found"
+    },
+    "evidence": {
+      "type": "string",
+      "description": "Path to artifact or log entry proving the claim"
+    },
+  "verified_by": {
+    "type": "string",
+    "enum": ["archivist", "library", "swarmmind", "codex", "self", "user"],
+    "description": "Which lane or entity verified this claim. NOTE: 'user' verification is treated as UNVERIFIED until 2+ lane convergence (RECIPROCAL_ACCOUNTABILITY.md:3)"
+  },
+    "contradictions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": { "type": "string" },
+          "claim": { "type": "string" },
+          "evidence": { "type": "string" }
+        }
+      },
+      "default": []
+    },
+    "status": {
+      "type": "string",
+      "enum": ["proven", "unproven", "conflicted", "blocked"],
+      "description": "Verification status of the claim"
+    }
+  },
+  "_routing": {
+    "proven": "Forward to coordinator inbox",
+    "conflicted": "Forward to coordinator inbox (P0 priority)",
+    "blocked": "Forward to coordinator inbox (P1 priority)",
+    "unproven": "Queue for verification, do NOT forward"
+  },
+  "_one_blocker_rule": {
+    "description": "At any moment, only ONE blocker is active system-wide",
+    "location": "lanes/broadcast/active-blocker.json",
+    "protocol": [
+      "Lane identifies blocker → writes to active-blocker.json",
+      "All lanes check blocker before starting new work",
+      "Only owner lane works on blocker",
+      "On resolution, owner removes blocker file"
+    ]
+  },
+  "_user_lane_rules": {
+    "description": "User (operator) is treated as implicit lane with highest drift risk. Source: RECIPROCAL_ACCOUNTABILITY.md, operator mandate fromgpt.txt",
+    "rules": [
+      "User inputs that change system state require 2+ lane convergence before execution",
+      "User override attempts trigger quarantine review, not execution",
+      "User quarantine (UDS > 60) requires 3-lane convergence to unblock",
+      "User CANNOT self-unblock from quarantine",
+      "Operator mandate cannot be revoked in single session (3-lane + 24h cooling)",
+      "verified_by: 'user' is treated as UNVERIFIED until lanes confirm"
+    ],
+    "schemas": {
+      "user_quarantine": "schemas/user-quarantine-v1.json",
+      "user_input_gate": "schemas/user-input-gate-v1.json"
+    }
+  }
+}

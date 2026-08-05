@@ -88,12 +88,13 @@ function runSmokeTests() {
       name: 'Valid JSON',
       run: () => {
         try {
-          const content = fs.readFileSync(`${ARCHIVIST_ROOT}/.trust/keys.json`, 'utf8');
+          const content = fs.readFileSync(`${ARCHIVIST_ROOT}/lanes/broadcast/trust-store.json`, 'utf8');
           const data = JSON.parse(content);
           if (!data.keys) return { ok: false, error: 'Missing keys object' };
           if (!data.keys.archivist) return { ok: false, error: 'Missing archivist key' };
           if (!data.keys.library) return { ok: false, error: 'Missing library key' };
           if (!data.keys.swarmmind) return { ok: false, error: 'Missing swarmmind key' };
+        if (!data.keys.kernel) return { ok: false, error: 'Missing kernel key' };
           return { ok: true };
         } catch (e) {
           return { ok: false, error: e.message };

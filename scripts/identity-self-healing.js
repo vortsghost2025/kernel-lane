@@ -4,38 +4,47 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { getAllBroadcastTrustStorePaths, getLaneRoots, computeKeyIdFromPem } = require('./canonical-trust-resolver');
+const { IdentityEnforcer } = require('./identity-enforcer');
+const {
+  loadPrivateKey: loadPrivateKeyHelper,
+  getAlgorithmParams,
+  sign: algoSign,
+  isPassphraseRequired,
+  generateKeyPair,
+  SUPPORTED_ALGORITHMS,
+  getAlgorithmForLane
+} = require(path.join(__dirname, '..', '.global', 'algorithm-helpers.js'));
 const { deriveKeyId } = require(path.join(__dirname, '..', '.global', 'deriveKeyId.js'));
-const { loadPrivateKey: loadPrivateKeyHelper, getAlgorithmParams, sign: algoSign, isPassphraseRequired, generateKeyPair, SUPPORTED_ALGORITHMS, getAlgorithmForLane } = require(path.join(__dirname, '..', '.global', 'algorithm-helpers.js'));
-const IS_WIN32 = process.platform === 'win32';
 
-const PASSFILE_SEARCH = IS_WIN32
-  ? [
-      'S:/Archivist-Agent/.runtime/lane-passphrases.json',
-      'S:/self-organizing-library/.runtime/lane-passphrases.json',
-      'S:/SwarmMind/.runtime/lane-passphrases.json',
-      'S:/kernel-lane/.runtime/lane-passphrases.json',
-    ]
-  : [
-      '/home/we4free/agent/repos/Archivist-Agent/.runtime/lane-passphrases.json',
-      '/home/we4free/agent/repos/self-organizing-library/.runtime/lane-passphrases.json',
-      '/home/we4free/agent/repos/SwarmMind/.runtime/lane-passphrases.json',
-      '/home/we4free/agent/repos/kernel-lane/.runtime/lane-passphrases.json',
-    ];
+const isWin32 = process.platform === 'win32';
+const UBUNTU_ROOT = path.join(require('os').homedir(), 'agent', 'repos');
+function _resolve(winPath) {
+  if (isWin32) return winPath;
+  const m = winPath.match(/^S:\/(.+)$/);
+  return m ? path.join(UBUNTU_ROOT, m[1]) : winPath;
+}
 
-const LANE_IDENTITY_DIRS = IS_WIN32
-  ? {
-      archivist: 'S:/Archivist-Agent/.identity',
-      library: 'S:/self-organizing-library/.identity',
-      swarmmind: 'S:/SwarmMind/.identity',
-      kernel: 'S:/kernel-lane/.identity',
-    }
-  : {
-      archivist: '/home/we4free/agent/repos/Archivist-Agent/.identity',
-      library: '/home/we4free/agent/repos/self-organizing-library/.identity',
-      swarmmind: '/home/we4free/agent/repos/SwarmMind/.identity',
-      kernel: '/home/we4free/agent/repos/kernel-lane/.identity',
-    };
+const PASSFILE_SEARCH = [
+  _resolve('S:/Archivist-Agent/.runtime/lane-passphrases.json'),
+  _resolve('S:/self-organizing-library/.runtime/lane-passphrases.json'),
+  _resolve('S:/SwarmMind/.runtime/lane-passphrases.json'),
+  _resolve('S:/kernel-lane/.runtime/lane-passphrases.json'),
+];
+
+const TRUST_STORE_SEARCH_PATHS = [
+  _resolve('S:/Archivist-Agent/lanes/broadcast/trust-store.json'),
+  _resolve('S:/kernel-lane/lanes/broadcast/trust-store.json'),
+  _resolve('S:/self-organizing-library/lanes/broadcast/trust-store.json'),
+  _resolve('S:/SwarmMind/lanes/broadcast/trust-store.json'),
+];
+
+const LANE_IDENTITY_DIRS = {
+  archivist: _resolve('S:/Archivist-Agent/.identity'),
+  authority: _resolve('S:/Archivist-Agent/.identity/authority'),
+  library: _resolve('S:/self-organizing-library/.identity'),
+  swarmmind: _resolve('S:/SwarmMind/.identity'),
+  kernel: _resolve('S:/kernel-lane/.identity'),
+};
 
 class IdentitySelfHealing {
   constructor(options = {}) {
@@ -55,19 +64,10 @@ class IdentitySelfHealing {
       passphraseSource: null,
       keyId: null,
       error: null,
-      skipped: false,
     };
 
     if (!this.identityDir) {
       result.error = 'NO_IDENTITY_DIR';
-      result.skipped = true;
-      this._log('INFO', `identity dir not configured for ${this.laneId} — trust-store is canonical, skipping self-heal`);
-      return result;
-    }
-
-    if (!fs.existsSync(this.identityDir)) {
-      result.skipped = true;
-      this._log('INFO', `.identity/ deleted per P0 ruling for ${this.laneId} — trust-store is canonical, skipping self-heal`);
       return result;
     }
 
@@ -159,12 +159,10 @@ class IdentitySelfHealing {
       }
     } catch (_) {}
 
-    const trustStoreDirs = getAllBroadcastTrustStorePaths();
-    for (const [laneName, dir] of Object.entries(trustStoreDirs)) {
+    for (const dir of TRUST_STORE_SEARCH_PATHS) {
       try {
-        const tsPath2 = path.join(dir, 'trust-store.json');
-        if (!fs.existsSync(tsPath2)) continue;
-        const ts = JSON.parse(fs.readFileSync(tsPath2, 'utf8'));
+        if (!fs.existsSync(dir)) continue;
+        const ts = JSON.parse(fs.readFileSync(dir, 'utf8'));
         const stored = getAlgorithmForLane(ts, this.laneId);
         if (stored) return stored === 'EdDSA' ? 'EdDSA' : 'RS256';
       } catch (_) {}
@@ -203,19 +201,28 @@ class IdentitySelfHealing {
   }
 
   _updateTrustStores(publicKey, keyId, algorithm) {
-    const trustStorePaths = getAllBroadcastTrustStorePaths();
+    const trustStoreDirs = [
+      'S:/Archivist-Agent/lanes/broadcast',
+      'S:/self-organizing-library/lanes/broadcast',
+      'S:/kernel-lane/lanes/broadcast',
+    ];
+    if (this.identityDir.includes('SwarmMind')) {
+      trustStoreDirs.push('S:/SwarmMind/lanes/broadcast');
+    }
 
     let updated = 0;
-    for (const [laneName, tsPath] of Object.entries(trustStorePaths)) {
+    for (const dir of trustStoreDirs) {
+      const tsPath = path.join(dir, 'trust-store.json');
       try {
         if (!fs.existsSync(tsPath)) continue;
         const ts = JSON.parse(fs.readFileSync(tsPath, 'utf8'));
-        if (ts[this.laneId]) {
-          ts[this.laneId].public_key_pem = publicKey;
-          ts[this.laneId].key_id = keyId;
-          ts[this.laneId].algorithm = algorithm || 'EdDSA';
-          ts[this.laneId].registered_at = new Date().toISOString();
-          fs.writeFileSync(tsPath, JSON.stringify(ts, null, 2));
+        const entry = (ts.keys && ts.keys[this.laneId]) || ts[this.laneId];
+        if (entry) {
+          entry.public_key_pem = publicKey;
+          entry.key_id = keyId;
+          entry.algorithm = algorithm || 'EdDSA';
+          entry.registered_at = new Date().toISOString();
+          IdentityEnforcer.writeTrustStoreStrict(tsPath, ts, { actorLane: this.laneId });
           updated++;
         }
       } catch (_) {}

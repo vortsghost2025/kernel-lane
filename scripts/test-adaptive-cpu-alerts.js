@@ -55,14 +55,14 @@ const WALL = 60;
 console.log('=== Adaptive CPU Alert Tests ===\n');
 
 test('normal CPU does not alert', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   const normalDelta = 2.5 * WALL * 1_000_000 / 100;
   const result = alert.evaluate(normalDelta, 50 * 1024 * 1024, WALL);
   assert.strictEqual(result.shouldAlert, false, 'Normal CPU should not alert');
 });
 
 test('one CPU spike does not alert (below consecutive threshold)', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   const normalDelta = 2.5 * WALL * 1_000_000 / 100;
   let cpu = 0;
   for (let i = 0; i < 10; i++) {
@@ -76,7 +76,7 @@ test('one CPU spike does not alert (below consecutive threshold)', (tmpDir) => {
 });
 
 test('sustained high CPU triggers warning after consecutive samples', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   const normalDelta = 2.5 * WALL * 1_000_000 / 100;
   let cpu = 0;
   for (let i = 0; i < 10; i++) {
@@ -95,7 +95,7 @@ test('sustained high CPU triggers warning after consecutive samples', (tmpDir) =
 });
 
 test('sustained extreme CPU triggers critical', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   const normalDelta = 2.5 * WALL * 1_000_000 / 100;
   let cpu = 0;
   for (let i = 0; i < 10; i++) {
@@ -114,7 +114,7 @@ test('sustained extreme CPU triggers critical', (tmpDir) => {
 });
 
 test('emergency hard ceiling triggers immediately', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   const normalDelta = 2.5 * WALL * 1_000_000 / 100;
   let cpu = 0;
   for (let i = 0; i < 10; i++) {
@@ -133,7 +133,7 @@ test('emergency hard ceiling triggers immediately', (tmpDir) => {
 });
 
 test('cooldown suppresses alert storm', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   const normalDelta = 2.5 * WALL * 1_000_000 / 100;
   let cpu = 0;
   for (let i = 0; i < 10; i++) {
@@ -151,7 +151,7 @@ test('cooldown suppresses alert storm', (tmpDir) => {
 });
 
 test('memory threshold triggers alert', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   const result = alert.evaluate(1_500_000, 200 * 1024 * 1024, WALL);
   assert.strictEqual(result.shouldAlert, true, 'High memory should alert');
   const hasMem = result.alerts.some(a => a.metric === 'memory');
@@ -159,7 +159,7 @@ test('memory threshold triggers alert', (tmpDir) => {
 });
 
 test('memory cooldown suppresses repeated alerts', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   let alertCount = 0;
   let cpu = 0;
   const normalDelta = 2.5 * WALL * 1_000_000 / 100;
@@ -172,7 +172,7 @@ test('memory cooldown suppresses repeated alerts', (tmpDir) => {
 });
 
 test('adaptive thresholds use baseline when available', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   const normalDelta = 2.5 * WALL * 1_000_000 / 100;
   let cpu = 0;
   for (let i = 0; i < 10; i++) {
@@ -187,7 +187,7 @@ test('adaptive thresholds use baseline when available', (tmpDir) => {
 });
 
 test('falls back to static thresholds with insufficient baseline', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   alert.loadState();
   const thresholds = alert._getAdaptiveThresholds();
   assert.strictEqual(thresholds.mode, 'static', 'Should use static mode with no baseline');
@@ -195,23 +195,23 @@ test('falls back to static thresholds with insufficient baseline', (tmpDir) => {
 });
 
 test('CPU normalization is correct', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   const pct = alert._normalizeCpuPct(3_000_000, 60);
   assert.strictEqual(pct, 5, '3M usec over 60s should be 5%');
 });
 
 test('getStatus returns expected structure', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   alert.evaluate(1_500_000, 50 * 1024 * 1024, WALL);
   const status = alert.getStatus();
-  assert.strictEqual(status.lane, 'kernel');
+  assert.strictEqual(status.lane, 'archivist');
   assert.strictEqual(status.sampleCount, 1);
   assert.strictEqual(typeof status.thresholds, 'object');
   assert.strictEqual(typeof status.consecutive, 'object');
 });
 
 test('escalate flag set on CRITICAL alerts', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   const normalDelta = 2.5 * WALL * 1_000_000 / 100;
   let cpu = 0;
   for (let i = 0; i < 10; i++) {
@@ -230,24 +230,24 @@ test('escalate flag set on CRITICAL alerts', (tmpDir) => {
 });
 
 test('disabled config produces no alerts', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   alert.config.enabled = false;
   const result = alert.evaluate(55_000_000, 200 * 1024 * 1024, WALL);
   assert.strictEqual(result, null, 'Disabled should return null');
 });
 
 test('state persists across instances', (tmpDir) => {
-  const alert1 = makeAlert('kernel', tmpDir);
+  const alert1 = makeAlert('archivist', tmpDir);
   alert1.evaluate(1_500_000, 50 * 1024 * 1024, WALL);
   alert1.evaluate(3_000_000, 50 * 1024 * 1024, WALL);
 
-  const alert2 = makeAlert('kernel', tmpDir);
+  const alert2 = makeAlert('archivist', tmpDir);
   const status = alert2.getStatus();
   assert.strictEqual(status.sampleCount, 2, 'State should persist across instances');
 });
 
 test('consecutive counters reset on normal CPU', (tmpDir) => {
-  const alert = makeAlert('kernel', tmpDir);
+  const alert = makeAlert('archivist', tmpDir);
   const normalDelta = 2.5 * WALL * 1_000_000 / 100;
   let cpu = 0;
   for (let i = 0; i < 10; i++) {

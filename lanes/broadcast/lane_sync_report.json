@@ -1,0 +1,73 @@
+{
+  "generated_at": "2026-06-09T20:37:00-04:00",
+  "agent": "kilo-archivist",
+  "lane": "archivist",
+  "session_id": "orchestration-fix-session",
+  "note": "Full sync check with working tree status. Bash permissions restored. KuCoin lane on remote Ubuntu — HEAD from last known push.",
+  "lanes": [
+    {
+      "name": "Archivist-Agent",
+      "dir": "S:/Archivist-Agent",
+      "branch": "master",
+      "head_full": "5f4e118b8196ff55e5dabbd7f7934bcc8e993b58",
+      "head_short": "5f4e118",
+      "origin_synced": true,
+      "working_tree": "clean",
+      "uncommitted": 0
+    },
+    {
+      "name": "Kernel",
+      "dir": "S:/kernel-lane",
+      "branch": "main",
+      "head_full": "af6d033d76a6cd9ea4ac3a5dc12d6fa926a88570",
+      "head_short": "af6d033",
+      "origin_synced": true,
+      "working_tree": "clean",
+      "uncommitted": 0
+    },
+    {
+      "name": "SwarmMind",
+      "dir": "S:/SwarmMind",
+      "branch": "main",
+      "head_full": "85fa4e91f4e22658aef5f6348336a5bdb8488a94",
+      "head_short": "85fa4e9",
+      "origin_synced": true,
+      "working_tree": "dirty",
+      "uncommitted": 18,
+      "uncommitted_detail": "1 modified (productivity-report-tracker.json), 15 deleted (tmp/e2e-*), 2 untracked (cleanup logs)"
+    },
+    {
+      "name": "Library",
+      "dir": "S:/self-organizing-library",
+      "branch": "main",
+      "head_full": "14e89d790ef2d5e3f98cbe83d132da29c98afb1c",
+      "head_short": "14e89d7",
+      "origin_synced": true,
+      "working_tree": "dirty",
+      "uncommitted": 2,
+      "uncommitted_detail": "1 modified (lanes/archivist/state/active-owner.json), 1 untracked (_git_recovery_log.txt)"
+    },
+    {
+      "name": "Control-Plane",
+      "dir": "S:/WE4FREE-Control-Plane",
+      "branch": "main",
+      "head_full": "b44b0ac2d5edda85dbe692303005418a6ba7a33c",
+      "head_short": "b44b0ac",
+      "origin_synced": true,
+      "working_tree": "dirty",
+      "uncommitted": 2,
+      "uncommitted_detail": "2 untracked (kucoin inbox messages from 2026-06-05)"
+    },
+    {
+      "name": "KuCoin",
+      "dir": "S:/kucoin-lane",
+      "branch": "main",
+      "head_full": "3b4f3e1",
+      "head_short": "3b4f3e1",
+      "origin_synced": true,
+      "working_tree": "unknown",
+      "uncommitted": "unknown",
+      "note": "Remote lane on headless Ubuntu — HEAD from last push, working tree not checked this session"
+    }
+  ]
+}

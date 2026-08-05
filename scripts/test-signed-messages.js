@@ -9,6 +9,14 @@ const crypto = require('crypto');
 
 const { LaneWorker } = require('./lane-worker');
 const { ArtifactResolver } = require('./artifact-resolver');
+const {
+  generateKeyPair: algoGenerateKeyPair,
+  sign: algoSign,
+  loadPrivateKey: algoLoadPrivateKey,
+  ALG_RSA,
+  ALG_EDDSA,
+  SIGN_ALG_RSA,
+} = require(path.join(__dirname, '..', '.global', 'algorithm-helpers.js'));
 
 function mkDir(p) {
   if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
@@ -19,12 +27,11 @@ function rmDir(p) {
 }
 
 function generateKeyPair() {
-  const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
-    modulusLength: 2048,
-    publicKeyEncoding: { type: 'spki', format: 'pem' },
-    privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
-  });
-  return { publicKey, privateKey };
+  return algoGenerateKeyPair('RS256');
+}
+
+function generateEd25519KeyPair() {
+  return algoGenerateKeyPair('EdDSA');
 }
 
 function signMessage(msg, privateKey, keyId) {
@@ -48,7 +55,8 @@ function signMessage(msg, privateKey, keyId) {
     .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
   const signingInput = `${headerB64}.${payloadB64}`;
-  const signature = crypto.sign('RSA-SHA256', Buffer.from(signingInput), privateKey);
+  const keyObj = algoLoadPrivateKey(privateKey, 'archivist-lane-key');
+  const signature = algoSign(SIGN_ALG_RSA, Buffer.from(signingInput), keyObj);
   const signatureB64 = signature.toString('base64')
     .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
@@ -56,6 +64,39 @@ function signMessage(msg, privateKey, keyId) {
     ...msg,
     signature: `${headerB64}.${payloadB64}.${signatureB64}`,
     signature_alg: 'RS256',
+    key_id: keyId,
+  };
+}
+
+function signMessageEd25519(msg, privateKey, keyId) {
+  const header = { alg: 'EdDSA', typ: 'JWT', kid: keyId };
+  const headerB64 = Buffer.from(JSON.stringify(header)).toString('base64')
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+  const payload = {
+    id: msg.id,
+    lane: msg.from,
+    from: msg.from,
+    to: msg.to,
+    timestamp: msg.timestamp,
+    priority: msg.priority,
+    type: msg.type,
+    iat: Math.floor(Date.now() / 1000),
+    exp: Math.floor((Date.now() + 86400000) / 1000),
+  };
+
+  const payloadB64 = Buffer.from(JSON.stringify(payload)).toString('base64')
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+  const signingInput = `${headerB64}.${payloadB64}`;
+  const signature = algoSign(null, Buffer.from(signingInput), privateKey);
+  const signatureB64 = signature.toString('base64')
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+  return {
+    ...msg,
+    signature: `${headerB64}.${payloadB64}.${signatureB64}`,
+    signature_alg: 'EdDSA',
     key_id: keyId,
   };
 }
@@ -381,6 +422,181 @@ test('tampered signature fails with real IdentityEnforcer', (tmpRoot) => {
 
   const summary = worker.processOnce();
   assert.strictEqual(summary.routed.blocked, 1, 'Tampered signature must be blocked');
+  assert.strictEqual(summary.routed.processed, 0);
+});
+
+// ============================================================
+// TEST 4: valid Ed25519 signed message with valid artifact enters processed
+// ============================================================
+test('valid Ed25519 signed message with valid artifact enters processed', (tmpRoot) => {
+  const keys = generateEd25519KeyPair();
+  const keyId = crypto.randomBytes(8).toString('hex');
+
+  const trustStoreDir = path.join(tmpRoot, 'lanes', 'broadcast');
+  mkDir(trustStoreDir);
+  const trustStore = {
+    library: {
+      lane_id: 'library',
+      public_key_pem: keys.publicKey,
+      algorithm: 'EdDSA',
+      key_id: keyId,
+      registered_at: new Date().toISOString(),
+      expires_at: null,
+      revoked_at: null,
+    },
+  };
+  fs.writeFileSync(path.join(trustStoreDir, 'trust-store.json'), JSON.stringify(trustStore, null, 2), 'utf8');
+
+  const { IdentityEnforcer } = require('./identity-enforcer');
+
+  const artifactDir = path.join(tmpRoot, 'lanes', 'archivist', 'outbox');
+  mkDir(artifactDir);
+  const artifactPath = path.join(artifactDir, 'proof.json');
+  fs.writeFileSync(artifactPath, JSON.stringify({ result: 'done' }), 'utf8');
+
+  const inbox = path.join(tmpRoot, 'lanes', 'archivist', 'inbox');
+  mkDir(inbox);
+  for (const sub of ['action-required', 'in-progress', 'processed', 'blocked', 'quarantine']) {
+    mkDir(path.join(inbox, sub));
+  }
+
+  let msg = {
+    id: 'ed25519-valid-' + Date.now(),
+    from: 'library',
+    to: 'archivist',
+    type: 'task',
+    priority: 'P1',
+    timestamp: new Date().toISOString(),
+    requires_action: true,
+    subject: 'Ed25519 signed with artifact',
+    body: 'Valid EdDSA signature and artifact',
+    evidence: { required: true },
+    evidence_exchange: {
+      artifact_path: artifactPath,
+      artifact_type: 'benchmark',
+      delivered_at: new Date().toISOString(),
+    },
+  };
+  msg = signMessageEd25519(msg, keys.privateKey, keyId);
+
+  const configDir = path.join(tmpRoot, 'config');
+  mkDir(configDir);
+  fs.writeFileSync(path.join(configDir, 'allowed_roots.json'), JSON.stringify({
+    allowed_roots: [tmpRoot],
+  }), 'utf8');
+
+  const enforcer = new IdentityEnforcer({ trustStorePath: path.join(trustStoreDir, 'trust-store.json'), enforcementMode: 'enforce' });
+  const worker = new LaneWorker({
+    repoRoot: tmpRoot,
+    lane: 'archivist',
+    dryRun: false,
+    config: {
+      repoRoot: tmpRoot,
+      lane: 'archivist',
+      queues: {
+        inbox,
+        actionRequired: path.join(inbox, 'action-required'),
+        inProgress: path.join(inbox, 'in-progress'),
+        processed: path.join(inbox, 'processed'),
+        blocked: path.join(inbox, 'blocked'),
+        quarantine: path.join(inbox, 'quarantine'),
+      },
+    },
+    schemaValidator: () => ({ valid: true, errors: [] }),
+    signatureValidator: (m) => {
+      try {
+        const result = enforcer.enforceMessage(m);
+        const valid = !!result && result.decision !== 'reject';
+        return { valid, reason: valid ? null : (result.reason || 'IDENTITY_REJECT'), details: result };
+      } catch (err) {
+        return { valid: false, reason: err.message, details: null };
+      }
+    },
+    artifactResolver: new ArtifactResolver({ allowedRoots: [tmpRoot], dryRun: false }),
+  });
+
+  const msgPath = path.join(inbox, '2026-01-01_ed25519_valid.json');
+  fs.writeFileSync(msgPath, JSON.stringify(msg, null, 2), 'utf8');
+
+  const summary = worker.processOnce();
+  assert.strictEqual(summary.routed.processed, 1, 'Valid Ed25519 signed message with artifact must enter processed');
+  assert.strictEqual(summary.routed.blocked, 0);
+});
+
+// ============================================================
+// TEST 5: Ed25519 tampered signature fails
+// ============================================================
+test('Ed25519 tampered signature fails with real IdentityEnforcer', (tmpRoot) => {
+  const { IdentityEnforcer } = require('./identity-enforcer');
+
+  const keys = generateEd25519KeyPair();
+  const wrongKeys = generateEd25519KeyPair();
+  const keyId = crypto.randomBytes(8).toString('hex');
+
+  const trustStoreDir = path.join(tmpRoot, 'lanes', 'broadcast');
+  mkDir(trustStoreDir);
+  const trustStore = {
+    library: {
+      lane_id: 'library',
+      public_key_pem: keys.publicKey,
+      algorithm: 'EdDSA',
+      key_id: keyId,
+      registered_at: new Date().toISOString(),
+    },
+  };
+  fs.writeFileSync(path.join(trustStoreDir, 'trust-store.json'), JSON.stringify(trustStore, null, 2), 'utf8');
+
+  const enforcer = new IdentityEnforcer({ trustStorePath: path.join(trustStoreDir, 'trust-store.json'), enforcementMode: 'enforce' });
+
+  const inbox = path.join(tmpRoot, 'lanes', 'archivist', 'inbox');
+  mkDir(inbox);
+  for (const sub of ['action-required', 'in-progress', 'processed', 'blocked', 'quarantine']) {
+    mkDir(path.join(inbox, sub));
+  }
+
+  let msg = {
+    id: 'ed25519-tampered-sig',
+    from: 'library',
+    to: 'archivist',
+    type: 'task',
+    priority: 'P1',
+    timestamp: new Date().toISOString(),
+    requires_action: true,
+    subject: 'Wrong Ed25519 key',
+    body: 'Signed with wrong Ed25519 private key',
+  };
+  msg = signMessageEd25519(msg, wrongKeys.privateKey, keyId);
+
+  const worker = new LaneWorker({
+    repoRoot: tmpRoot,
+    lane: 'archivist',
+    dryRun: false,
+    config: {
+      repoRoot: tmpRoot,
+      lane: 'archivist',
+      queues: {
+        inbox,
+        actionRequired: path.join(inbox, 'action-required'),
+        inProgress: path.join(inbox, 'in-progress'),
+        processed: path.join(inbox, 'processed'),
+        blocked: path.join(inbox, 'blocked'),
+        quarantine: path.join(inbox, 'quarantine'),
+      },
+    },
+    schemaValidator: () => ({ valid: true, errors: [] }),
+    signatureValidator: (m) => {
+      const result = enforcer.enforceMessage(m);
+      const valid = !!result && result.decision !== 'reject';
+      return { valid, reason: valid ? null : (result.reason || 'IDENTITY_REJECT'), details: result };
+    },
+    artifactResolver: new ArtifactResolver({ allowedRoots: [tmpRoot], dryRun: false }),
+  });
+
+  const msgPath = path.join(inbox, '2026-01-01_ed25519_tampered.json');
+  fs.writeFileSync(msgPath, JSON.stringify(msg, null, 2), 'utf8');
+
+  const summary = worker.processOnce();
+  assert.strictEqual(summary.routed.blocked, 1, 'Ed25519 tampered signature must be blocked');
   assert.strictEqual(summary.routed.processed, 0);
 });
 

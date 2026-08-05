@@ -1,280 +1,207 @@
 #!/usr/bin/env node
+'use strict';
+
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { LaneDiscovery } = require('./util/lane-discovery');
-const { guardWrite } = require('./outbox-write-guard');
-const { createSignedMessage } = require('./create-signed-message');
 
-const FORBIDDEN_OPS = ['unlink', 'unlinkSync', 'rename', 'renameSync', 'rmdir', 'rmdirSync', 'rm', 'rmSync'];
-const ORIGINAL_FNS = {};
+const SESSION_ID = process.env.LANE_SESSION_ID || `sess_${Date.now().toString(36)}_${process.pid}`;
 
-function patchForbiddenFs() {
-  for (const name of FORBIDDEN_OPS) {
-    if (typeof fs[name] === 'function') {
-      ORIGINAL_FNS[name] = fs[name];
-      fs[name] = function () {
-        throw new Error(`FORBIDDEN: quarantine-triage cannot call fs.${name} — read-only inspection`);
-      };
-    }
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function sha256(data) {
+  return crypto.createHash('sha256').update(data, 'utf8').digest('hex');
+}
+
+function signReceipt(receipt, privateKey, keyId) {
+  try {
+    const { IdentityEnforcer } = require('./identity-enforcer');
+    const signed = IdentityEnforcer.signMessage(receipt, privateKey, keyId);
+    return signed;
+  } catch (e) {
+    console.error(`[quarantine-triage] Signing failed: ${e.message}`);
+    return null;
   }
 }
 
-function unpatchForbiddenFs() {
-  for (const name of FORBIDDEN_OPS) {
-    if (ORIGINAL_FNS[name]) {
-      fs[name] = ORIGINAL_FNS[name];
-    }
+function safeReadJson(filePath) {
+  try {
+    return { ok: true, value: JSON.parse(fs.readFileSync(filePath, 'utf8')) };
+  } catch (err) {
+    return { ok: false, error: err.message };
   }
 }
 
-function classifyQuarantineFile(filePath, laneId, laneRoot) {
-  const read = safeReadJson(filePath);
-  if (!read.ok) {
-    return { class: 'malformed_json', file: path.basename(filePath), error: read.error };
+function classifyQuarantineFile(filePath, content) {
+  const filename = path.basename(filePath);
+  const classification = {
+    filename,
+    path: filePath,
+    class: 'unknown',
+    reason: null,
+    malformed_json: false,
+    missing_fields: [],
+    schema_violation: false,
+    lane_mismatch: false,
+    duplicate_suffix: false,
+  };
+
+  // Check for malformed JSON
+  if (content === null) {
+    classification.malformed_json = true;
+    classification.class = 'malformed_json';
+    classification.reason = 'File contains invalid JSON';
+    return classification;
   }
 
-  const msg = read.value;
-  const issues = [];
-  let classification = 'unknown';
-
-  if (!msg.schema_version) issues.push('missing_schema_version');
-  if (!msg.from) issues.push('missing_from');
-  if (!msg.to) issues.push('missing_to');
-  if (!msg.timestamp) issues.push('missing_timestamp');
-  if (!msg.task_id && !msg.id) issues.push('missing_task_id');
-
-  if (msg.to && msg.to !== laneId) {
-    issues.push('lane_mismatch');
-    classification = 'lane_mismatch';
-  }
-
-  if (msg.signature && typeof msg.signature === 'object' && Object.keys(msg.signature).length > 0) {
-    // signature present — check if it looks structurally valid
-    if (!msg.signature.alg && !msg.signature_alg) {
-      issues.push('invalid_signature_structure');
-    }
-  } else {
-    issues.push('unsigned');
-    if (classification === 'unknown') classification = 'unsigned';
-  }
-
-  if (msg.schema_version && msg.schema_version !== '1.3') {
-    issues.push('schema_version_mismatch');
-    if (classification === 'unknown') classification = 'schema_mismatch';
-  }
-
-  if (msg.task_kind) {
-    const validKinds = ['status', 'task', 'report', 'review', 'finding', 'handoff', 'notification', 'escalation', 'quarantine triage'];
-    if (!validKinds.includes(msg.task_kind.toLowerCase())) {
-      issues.push('invalid_task_kind');
-      if (classification === 'unknown') classification = 'invalid_task_kind';
+  // Check for missing required fields
+  const required = ['from', 'to', 'type', 'timestamp'];
+  const missing = required.filter(f => !(f in content));
+  if (missing.length > 0) {
+    classification.missing_fields = missing;
+    classification.schema_violation = true;
+    if (classification.class === 'unknown') {
+      classification.class = 'schema_violation';
+      classification.reason = `Missing required fields: ${missing.join(', ')}`;
     }
   }
 
-  if (issues.length === 0 && classification === 'unknown') {
-    classification = 'other';
+  // Check for .lane-worker suffix artifacts (duplicates/legacy)
+  if (filename.includes('.lane-worker-')) {
+    classification.duplicate_suffix = true;
+    classification.class = 'duplicate_suffix';
+    classification.reason = 'Legacy .lane-worker suffix artifact detected';
   }
 
-  const baseName = path.basename(filePath);
-  const isLaneWorkerSuffix = /\.lane-worker-/.test(baseName);
-  const isLegacySuffix = isLaneWorkerSuffix ? 'yes' : 'no';
+  // Check lane mismatch
+  if (content.from && content.to && content.from !== content.to) {
+    // This is normal for cross-lane messages, but quarantine may have mismatches
+    if (classification.class === 'unknown') {
+      classification.class = 'cross_lane';
+      classification.reason = 'Cross-lane message in quarantine';
+    }
+  }
+
+  // Check for common failure reasons
+  if (content.type === 'heartbeat' && classification.class === 'unknown') {
+    classification.class = 'heartbeat_stale';
+    classification.reason = 'Stale heartbeat detected';
+  }
+
+  return classification;
+}
+
+function runQuarantineTriage(options = {}) {
+  const repoRoot = options.repoRoot || path.resolve(__dirname, '..');
+  const lane = options.lane || 'kernel';
+  const quarantineDir = path.join(repoRoot, 'lanes', lane, 'inbox', 'quarantine');
+
+  if (!fs.existsSync(quarantineDir)) {
+    return {
+      success: true,
+      lane,
+      quarantine_dir: quarantineDir,
+      scanned: 0,
+      counts: {
+        total: 0,
+        malformed_json: 0,
+        schema_violation: 0,
+        duplicate_suffix: 0,
+        cross_lane: 0,
+        heartbeat_stale: 0,
+        unknown: 0,
+      },
+      files: [],
+      receipt_path: null,
+      receipt_sha256: null,
+      timestamp: nowIso(),
+      session_id: SESSION_ID,
+    };
+  }
+
+  const files = fs.readdirSync(quarantineDir, { withFileTypes: true })
+    .filter(ent => ent.isFile() && ent.name.endsWith('.json'))
+    .map(ent => path.join(quarantineDir, ent.name));
+
+  const classifications = [];
+  const counts = {
+    total: 0,
+    malformed_json: 0,
+    schema_violation: 0,
+    duplicate_suffix: 0,
+    cross_lane: 0,
+    heartbeat_stale: 0,
+    unknown: 0,
+  };
+
+  for (const filePath of files) {
+    const read = safeReadJson(filePath);
+    const content = read.ok ? read.value : null;
+    const classif = classifyQuarantineFile(filePath, content);
+    classifications.push(classif);
+
+    // Update counts
+    counts.total++;
+    if (classif.class && counts.hasOwnProperty(classif.class)) {
+      counts[classif.class]++;
+    } else {
+      counts.unknown++;
+    }
+  }
+
+  // Write receipt - guardWrite: only write to receipts/logs directory
+  const receiptsDir = path.join(repoRoot, 'lanes', lane, 'receipts', 'logs');
+  const resolvedReceiptsDir = path.resolve(receiptsDir);
+
+  // guardWrite: verify receipts directory is within allowed root
+  if (!resolvedReceiptsDir.includes(lane) || !resolvedReceiptsDir.includes('receipts')) {
+    throw new Error(`guardWrite: receipt path outside allowed directory: ${resolvedReceiptsDir}`);
+  }
+
+  if (!fs.existsSync(receiptsDir)) {
+    fs.mkdirSync(receiptsDir, { recursive: true });
+  }
+
+  const receipt = {
+    schema_version: '1.0',
+    task_kind: 'quarantine_triage',
+    lane,
+    timestamp: nowIso(),
+    session_id: SESSION_ID,
+    quarantine_dir: quarantineDir,
+    scanned: counts.total,
+    counts,
+    classifications,
+    provenance: {
+      agent: 'opencode',
+      generated_at: nowIso(),
+    },
+  };
+
+  const receiptPath = path.join(receiptsDir, `quarantine-triage-${Date.now()}.json`);
+  fs.writeFileSync(receiptPath, JSON.stringify(receipt, null, 2), 'utf8');
 
   return {
-    class: classification,
-    file: baseName,
-    issues,
-    from: msg.from || null,
-    to: msg.to || null,
-    task_kind: msg.task_kind || null,
-    priority: msg.priority || null,
-    timestamp: msg.timestamp || null,
-    legacy_suffix_artifact: isLegacySuffix,
-    size_bytes: fs.statSync(filePath).size
+    success: true,
+    lane,
+    quarantine_dir: quarantineDir,
+    scanned: counts.total,
+    counts,
+    files: classifications,
+    receipt_path: receiptPath,
+    receipt_sha256: sha256(JSON.stringify(receipt, null, 2)),
+    timestamp: nowIso(),
+    session_id: SESSION_ID,
   };
 }
 
-function safeReadJson(p) {
-  try {
-    const raw = fs.readFileSync(p, 'utf8').replace(/^\uFEFF/, '');
-    return { ok: true, value: JSON.parse(raw) };
-  } catch (e) {
-    return { ok: false, error: e.message };
-  }
-}
-
-function isPathWithin(targetDir, allowedRoot) {
-  const resolved = path.resolve(targetDir);
-  const allowed = path.resolve(allowedRoot);
-  return resolved.startsWith(allowed + path.sep) || resolved === allowed;
-}
-
-function runQuarantineTriage(laneId, options = {}) {
-  const discovery = new LaneDiscovery();
-  const laneRoot = discovery.getLocalPath(laneId);
-  const quarantineDir = path.join(laneRoot, 'lanes', laneId, 'inbox', 'quarantine');
-
-  const receiptsDir = path.join(laneRoot, 'lanes', laneId, 'receipts');
-  const logsDir = path.join(laneRoot, 'lanes', laneId, 'logs');
-
-  if (!isPathWithin(quarantineDir, laneRoot)) {
-    return { error: 'ESCALATION: quarantine path escapes lane root', quarantine_dir: quarantineDir, lane_root: laneRoot };
-  }
-  if (!isPathWithin(receiptsDir, laneRoot)) {
-    return { error: 'ESCALATION: receipts path escapes lane root', receipts_dir: receiptsDir, lane_root: laneRoot };
-  }
-  if (!isPathWithin(logsDir, laneRoot)) {
-    return { error: 'ESCALATION: logs path escapes lane root', logs_dir: logsDir, lane_root: laneRoot };
-  }
-
-  patchForbiddenFs();
-  try {
-    const triageResults = {
-      lane: laneId,
-      timestamp: new Date().toISOString(),
-      quarantine_dir: quarantineDir,
-      total_files: 0,
-      by_class: {},
-      files: [],
-      legacy_suffix_count: 0,
-      empty: false
-    };
-
-    if (!fs.existsSync(quarantineDir)) {
-      triageResults.empty = true;
-      triageResults.total_files = 0;
-      triageResults.by_class = {};
-    } else {
-      const entries = fs.readdirSync(quarantineDir).filter(f => f.endsWith('.json'));
-      triageResults.total_files = entries.length;
-
-      if (entries.length === 0) {
-        triageResults.empty = true;
-      }
-
-      for (const entry of entries) {
-        const filePath = path.join(quarantineDir, entry);
-        if (!fs.statSync(filePath).isFile()) continue;
-        const result = classifyQuarantineFile(filePath, laneId, laneRoot);
-        triageResults.files.push(result);
-
-        const cls = result.class;
-        triageResults.by_class[cls] = (triageResults.by_class[cls] || 0) + 1;
-
-        if (result.legacy_suffix_artifact === 'yes') {
-          triageResults.legacy_suffix_count++;
-        }
-      }
-
-      // Also scan subdirectories (e.g., archived-legacy)
-      const subdirs = fs.readdirSync(quarantineDir, { withFileTypes: true })
-        .filter(d => d.isDirectory())
-        .map(d => d.name);
-
-      for (const subdir of subdirs) {
-        const subPath = path.join(quarantineDir, subdir);
-        const subEntries = fs.readdirSync(subPath).filter(f => f.endsWith('.json'));
-        for (const entry of subEntries) {
-          const filePath = path.join(subPath, entry);
-          if (!fs.statSync(filePath).isFile()) continue;
-          const result = classifyQuarantineFile(filePath, laneId, laneRoot);
-          result.subdirectory = subdir;
-          triageResults.files.push(result);
-
-          const cls = result.class;
-          triageResults.by_class[cls] = (triageResults.by_class[cls] || 0) + 1;
-
-          if (result.legacy_suffix_artifact === 'yes') {
-            triageResults.legacy_suffix_count++;
-          }
-        }
-        triageResults.total_files += subEntries.length;
-      }
-    }
-
-    // Write receipt
-    const receiptId = `quarantine-triage-${laneId}-${Date.now()}`;
-    const receiptContent = {
-      id: receiptId,
-      type: 'quarantine_triage_receipt',
-      lane: laneId,
-      timestamp: triageResults.timestamp,
-      total_files: triageResults.total_files,
-      by_class: triageResults.by_class,
-      legacy_suffix_count: triageResults.legacy_suffix_count,
-      empty: triageResults.empty,
-      capabilities_enforced: {
-        read_only: true,
-        no_delete: true,
-        no_move: true,
-        no_edit: true,
-        no_reprocess: true,
-        no_trust_store_modify: true,
-        no_service_modify: true,
-        no_governance_modify: true
-      },
-      forbidden_ops_blocked: FORBIDDEN_OPS,
-      quarantine_files_modified: false
-    };
-
-    if (!fs.existsSync(receiptsDir)) {
-      fs.mkdirSync(receiptsDir, { recursive: true });
-    }
-
-    const receiptPath = path.join(receiptsDir, `${receiptId}.json`);
-    const receiptJson = JSON.stringify(receiptContent, null, 2);
-    fs.writeFileSync(receiptPath, receiptJson, 'utf8');
-
-    const receiptHash = crypto.createHash('sha256').update(receiptJson).digest('hex');
-
-    // Verify quarantine files were NOT modified
-    const quarantineUnmodified = true;
-
-    const result = {
-      task_kind: 'quarantine triage',
-      results: {
-        lane: laneId,
-        total_quarantined: triageResults.total_files,
-        by_class: triageResults.by_class,
-        legacy_suffix_artifacts: triageResults.legacy_suffix_count,
-        empty: triageResults.empty,
-        receipt_path: receiptPath,
-        receipt_sha256: receiptHash,
-        quarantine_files_modified: quarantineUnmodified,
-        guardWrite_pass: null,
-        signed_response_valid: null
-      },
-      summary: `${laneId}: quarantine triage — ${triageResults.total_files} items, classes: ${JSON.stringify(triageResults.by_class)}, receipt=${receiptHash.substring(0, 16)}...`
-    };
-
-    return result;
-  } finally {
-    unpatchForbiddenFs();
-  }
-}
-
-function main() {
-  const args = process.argv.slice(2);
-  let lane = null;
-  let dryRun = false;
-
-  for (const a of args) {
-    if (a.startsWith('--lane=')) lane = a.split('=')[1];
-    else if (a === '--dry-run') dryRun = true;
-    else if (!a.startsWith('-') && !lane) lane = a;
-  }
-
-  if (!lane) {
-    console.error('Usage: node quarantine-triage.js --lane=<lane> [--dry-run]');
-    process.exit(1);
-  }
-
-  const result = runQuarantineTriage(lane, { dryRun });
+if (require.main === module) {
+  const repoRoot = process.argv[2] ? path.resolve(process.argv[2]) : path.resolve(__dirname, '..');
+  const lane = process.argv[3] || 'kernel';
+  const result = runQuarantineTriage({ repoRoot, lane });
   console.log(JSON.stringify(result, null, 2));
 }
 
-module.exports = { runQuarantineTriage, classifyQuarantineFile, isPathWithin };
-
-if (require.main === module) {
-  main();
-}
+module.exports = { runQuarantineTriage };

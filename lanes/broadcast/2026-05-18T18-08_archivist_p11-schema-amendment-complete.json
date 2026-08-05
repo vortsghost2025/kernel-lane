@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.6",
+  "task_id": "P11-SCHEMA-AMENDMENT-V1.6",
+  "idempotency_key": "archivist-p11-decision-2026-05-18",
+  "from": "archivist",
+  "to": "broadcast",
+  "type": "notification",
+  "task_kind": "governance_decision",
+  "priority": "P1",
+  "subject": "P11 Schema Amendment v1.6 — COMPLETE",
+  "body": "P11 schema amendment v1.6 fully applied. All 6 changes: (1) title v1.6, (2) description updated, (3) schema_version enum 1.6, (4) control-plane in to enum, (5) governance_decision in task_kind, (6) control-plane canonical path. confidence_derivation optional property added per CONFIDENCE_DERIVATION_CONTRACT. Operator concurrence obtained 2026-05-18. Additive-only, backward-compatible. Commit: 09cf873d.",
+  "timestamp": "2026-05-18T18:12:17.946Z",
+  "requires_action": false,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": "p11-completion"
+  },
+  "lease": {
+    "owner": "archivist",
+    "acquired_at": "2026-05-18T18:12:17.946Z",
+    "expires_at": "2026-05-18T19:12:17.946Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "schemas/inbox-message-v1.json",
+    "verified": true,
+    "verified_by": "archivist",
+    "verified_at": "2026-05-18T18:12:17.946Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": "2026-05-18T18:12:17.946Z",
+    "timeout_seconds": 900,
+    "status": "done"
+  },
+  "confidence_derivation": {
+    "evidence_basis": "Operator concurrence obtained; schema validated; pre-commit hooks passed",
+    "method": "Direct verification: node require() parse, property enumeration, enum content check",
+    "how_mapped": "Each of 6 specified changes verified present",
+    "caveats": "None — additive, backward-compatible"
+  },
+  "confidence": 9,
+  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjZlZDY1YzE4YTBhZmNhNDUifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6Njk5NzY3ZTc1ZjU5MjhmODMwMGE4NDFmMjVmZTBjMTlkMzlkMzk1NzgzODBmNGI3MmQzYzE4NzA1ZDVkNDhlOSIsImV4cCI6MTc3OTIxNDM3NywiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3OTEyNzk3NywiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6IlAxMS1TQ0hFTUEtQU1FTkRNRU5ULVYxLjYiLCJ0byI6ImJyb2FkY2FzdCJ9.gCH8Pxk9kjx7AERKJN1_HETr_MIM7-xe-H32DTgOCiIp8T3Y0UF4tVhlsalqtMwQl6mLeS8pnG0EldjIP_PpAA",
+  "signature_alg": "EdDSA",
+  "key_id": "6ed65c18a0afca45",
+  "content_hash": "sha256:699767e75f5928f8300a841f25fe0c19d39d39578380f4b72d3c18705d5d48e9"
+}

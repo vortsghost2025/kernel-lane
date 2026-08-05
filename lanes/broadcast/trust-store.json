@@ -1,6 +1,7 @@
 {
   "archivist": {
     "lane_id": "archivist",
+    "lane_state": "ACTIVE",
     "key_id": "6ed65c18a0afca45",
     "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA5DRX8RTimrz1XgnAsIqHyjw4OFcMOCeNpoofoo6EYj8=\n-----END PUBLIC KEY-----",
     "algorithm": "EdDSA",
@@ -10,15 +11,17 @@
   },
   "library": {
     "lane_id": "library",
-    "key_id": "4c04aa9176b68810",
-    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6fGepJezFqv3WPhKY0AR\nGgjiedbmLF0fZG5xVADoUZ5bA3n13QkgVN8ownF3ZuO7bBnndRsCLDcffGEytdVM\n+mXiDUyQEwGIU9YIQq2cwP0lzfnePxmb/9Gw9HhAHNbbAzF9Zz5PnSUx+EOv51q3\nSz9yIXFDOKZnMTLJtcD6nL2LUj52Olm/kKeYWYJKk8jITUgJOGgAkLl02OtU6Ta0\nt0X6UelSRRhpSYo3aUchDhLJyJ9WfQsWoV1NXHk3+H1rED9AfFfXN+KRJWA2O4JD\n0tyKpnBYa6YSRe943mqJdjfEKgBRTmziPCmS4NI+Q8Fe8ESo16R6OzwOZiWArSEC\nZwIDAQAB\n-----END PUBLIC KEY-----",
-    "algorithm": "RS256",
-    "registered_at": "2026-05-14T22:05:00Z",
+    "lane_state": "ACTIVE",
+    "key_id": "42e853d4ec37955d",
+    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAw9w42sDe8qPJ1LKRsFcQ+2/ptA/N+grOA3TGz+xQPpU=\n-----END PUBLIC KEY-----",
+    "algorithm": "EdDSA",
+    "registered_at": "2026-05-11T04:43:13.806Z",
     "expires_at": null,
     "revoked_at": null
   },
   "swarmmind": {
     "lane_id": "swarmmind",
+    "lane_state": "ACTIVE",
     "key_id": "c707d41a7bb96d96",
     "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEATXheIcdwPQANHCUydfYbhWX32ZOFsANZKcoTYHOiJFM=\n-----END PUBLIC KEY-----",
     "algorithm": "EdDSA",
@@ -28,6 +31,7 @@
   },
   "kernel": {
     "lane_id": "kernel",
+    "lane_state": "ACTIVE",
     "key_id": "2effb49ea02dff5b",
     "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEADf1gv/zNKaVskjPiIdzoyL6OBrmJRH+HHzSoRTjFEi8=\n-----END PUBLIC KEY-----",
     "algorithm": "EdDSA",
@@ -35,11 +39,40 @@
     "expires_at": null,
     "revoked_at": null
   },
+  "control_plane": {
+    "lane_id": "control_plane",
+    "lane_state": "ACTIVE",
+    "key_id": "bc7e06b864676199",
+    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA0yQ75AywXUfSN/tW4UaIB2ZLJ9BWuUAIuEFb1vb5LOI=\n-----END PUBLIC KEY-----",
+    "algorithm": "EdDSA",
+    "registered_at": "2026-05-18T16:31:15.000Z",
+    "expires_at": null,
+    "revoked_at": null
+  },
+  "kucoin": {
+    "lane_id": "kucoin",
+    "lane_state": "ACTIVE",
+    "key_id": "0d60dbaef2343bf5",
+    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEATbulCqxWlHIyd2v10IR4KdoRQkcu+zmvw+K5yOsULCs=\n-----END PUBLIC KEY-----\n",
+    "algorithm": "EdDSA",
+    "registered_at": "2026-05-20T23:32:52.000Z",
+    "expires_at": null,
+    "revoked_at": null,
+    "activation_notes": "Promoted DORMANT→ACTIVE 2026-05-20. Ed25519 key registered. VPS process deployment and CircuitBreaker wiring pending. Lane has existing test trail and journal from prior work."
+  },
+  "authority": {
+    "lane_id": "authority",
+    "lane_state": "ACTIVE",
+    "key_id": "28ffffbc4b1e63d4",
+    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAXctTMojya3Xy5Ck56dbb0tTN5waAnn/w4MV5tq63hhk=\n-----END PUBLIC KEY-----",
+    "algorithm": "EdDSA",
+    "registered_at": "2026-05-12T00:00:00.000Z"
+  },
   "key_lineage": {
-    "reconciled_at": "2026-05-06T00:44:26.725Z",
-    "reconciled_by": "archivist",
-    "source_machine": "windows-desktop-S-drive",
-    "reason": "Key convergence ratification 2026-05-05. All 4 lanes now aligned with fresh working key pairs. Library passphrase was lost - generated fresh key pair. SwarmMind/Kernel keys from Ubuntu headless. Archivist key already aligned.",
+"reconciled_at": "2026-05-20T22:28:00Z",
+  "reconciled_by": "archivist",
+  "source_machine": "windows-desktop-S-drive",
+    "reason": "Key activation 2026-05-20. Kucoin promoted DORMANT→ACTIVE with Ed25519 key 0d60dbaef2343bf5. All 6 operational lanes now ACTIVE. VPS process deployment and CircuitBreaker wiring still pending.",
     "rotations": {
       "archivist": {
         "previous_key_id": "65ae05b2a9e749cb",
@@ -47,12 +80,12 @@
         "reason": "Ed25519 migration (Option D). Previous RSA key archived.",
         "rotated_at": "2026-05-11"
       },
-    "library": {
-      "previous_key_id": "a5a5f5c2edbee56a",
-      "current_key_id": "4c04aa9176b68810",
-      "reason": "Key rotation after private key leak (commit 19c109d3). Ed25519 identity key also rotated. New RSA-2048 signing key for cross-lane messages.",
-      "rotated_at": "2026-05-14"
-    },
+      "library": {
+        "previous_key_id": "a5a5f5c2edbee56a",
+        "current_key_id": "42e853d4ec37955d",
+        "reason": "Ed25519 migration (Option D). Previous RSA key archived.",
+        "rotated_at": "2026-05-11"
+      },
       "swarmmind": {
         "previous_key_id": "ec467e7103736c28",
         "current_key_id": "c707d41a7bb96d96",
@@ -64,8 +97,20 @@
         "current_key_id": "2effb49ea02dff5b",
         "reason": "Ed25519 migration (Option D). Previous RSA key archived.",
         "rotated_at": "2026-05-11"
-      }
+      },
+      "control_plane": {
+        "previous_key_id": null,
+        "current_key_id": "bc7e06b864676199",
+        "reason": "Initial key registration. Control Plane identity established per P10 governance decision (DEFER pending key registration).",
+      "rotated_at": "2026-05-18"
+    },
+    "kucoin": {
+      "previous_key_id": null,
+      "current_key_id": "0d60dbaef2343bf5",
+      "reason": "Initial Ed25519 key registration. Kucoin lane promoted DORMANT to ACTIVE.",
+      "rotated_at": "2026-05-20"
     }
+  }
   },
   "archived_keys": {
     "65ae05b2a9e749cb": {
@@ -98,31 +143,21 @@
       "archived_reason": "ed25519-migration",
       "superseded_by": "c707d41a7bb96d96"
     },
-  "a5a5f5c2edbee56a": {
-    "lane_id": "library",
-    "key_id": "a5a5f5c2edbee56a",
-    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkuJ5L9o+h9s2AZfo1g9u\nnsw2Rbw7rCdqGyITNkA/yRsthzcgP/OYQWickU+XBy+bXudRiHYA/HzttAmB6SxK\n/ap/XHHWc36F/XN5qvYTgeS7FSlwkE8dxUL0zFCHtyjkKsZb3v/SJB0gbF630dKR\ns3vx2uiCa7jsgD0nZy4fF47BZlOnkN8v3ltJS1cHfKsSl4CL73VGC7yeSxn1ToQV\n2mQ1vgV8E1m5URQ9T2c87XKIn70JyvDtMKIklj3dhnsP3UBFNtN46fgdHHLBfPOy\nQF4KW0w/jTcpgQvJTcoUg9PidFw0/xHEwMfK/C+i1F5NS8vPGpP8rpwh5x8b4lsn\nTwIDAQAB\n-----END PUBLIC KEY-----",
-    "algorithm": "RS256",
-    "registered_at": "2026-05-06T00:44:26.725Z",
-    "archived_at": "2026-05-11T04:43:13.806Z",
-    "archived_reason": "ed25519-migration",
-    "superseded_by": "4c04aa9176b68810"
-  },
-  "42e853d4ec37955d": {
-    "lane_id": "library",
-    "key_id": "42e853d4ec37955d",
-    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAw9w42sDe8qPJ1LKRsFcQ+2/ptA/N+grOA3TGz+xQPpU=\n-----END PUBLIC KEY-----",
-    "algorithm": "EdDSA",
-    "registered_at": "2026-05-11T04:43:13.806Z",
-    "archived_at": "2026-05-14T22:05:00Z",
-    "archived_reason": "key-compromise-rotation",
-    "superseded_by": "4c04aa9176b68810"
-  }
+    "a5a5f5c2edbee56a": {
+      "lane_id": "library",
+      "key_id": "a5a5f5c2edbee56a",
+      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkuJ5L9o+h9s2AZfo1g9u\nnsw2Rbw7rCdqGyITNkA/yRsthzcgP/OYQWickU+XBy+bXudRiHYA/HzttAmB6SxK\n/ap/XHHWc36F/XN5qvYTgeS7FSlwkE8dxUL0zFCHtyjkKsZb3v/SJB0gbF630dKR\ns3vx2uiCa7jsgD0nZy4fF47BZlOnkN8v3ltJS1cHfKsSl4CL73VGC7yeSxn1ToQV\n2mQ1vgV8E1m5URQ9T2c87XKIn70JyvDtMKIklj3dhnsP3UBFNtN46fgdHHLBfPOy\nQF4KW0w/jTcpgQvJTcoUg9PidFw0/xHEwMfK/C+i1F5NS8vPGpP8rpwh5x8b4lsn\nTwIDAQAB\n-----END PUBLIC KEY-----",
+      "algorithm": "RS256",
+      "registered_at": "2026-05-06T00:44:26.725Z",
+      "archived_at": "2026-05-11T04:43:13.806Z",
+      "archived_reason": "ed25519-migration",
+      "superseded_by": "42e853d4ec37955d"
+    }
   },
   "rotation_policy": {
     "rotation_days": 90,
     "warning_days": 14,
     "grace_days": 7,
-    "last_rotated": "2026-05-14"
+    "last_rotated": "2026-05-18"
   }
 }

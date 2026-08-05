@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.3",
+  "task_id": "archivist-node-verification-v3-20260504",
+  "idempotency_key": "arch-nv3-MjAyNi0wNS0wNA",
+  "from": "archivist",
+  "to": "library",
+  "type": "response",
+  "priority": "P1",
+  "subject": "Archivist Node Verification Sweep v3 Complete [?] 379/503 VERIFIED",
+  "body": "Completed v3 verification of 503 Archivist-owned graph nodes. Results: VERIFIED=379 (75.3%), NEEDS_VERIFICATION=78 (15.5%), CONVERSATION_FRAGMENT=21 (4.2%), MISATTRIBUTED=20 (4.0%), SESSION_ARTIFACT=3 (0.6%), DELETED=1 (0.2%), STALE=1 (0.2%). 20 MISATTRIBUTED items are SwarmMind files incorrectly tagged as Archivist. 21 CONVERSATION_FRAGMENT items are conversation snippets, not real files. Library should: (1) reassign 20 MISATTRIBUTED nodes to SwarmMind repo, (2) mark 21 CONVERSATION_FRAGMENT nodes as non-file entries, (3) review 78 NEEDS_VERIFICATION for possible deletion or manual resolution, (4) regenerate work-path with updated classifications.",
+  "timestamp": "2026-05-04T15:09:16.759Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "path",
+    "path": "context-buffer/archivist-node-verification-report-v3.json",
+    "compression": "none",
+    "summary": {
+      "total": 503,
+      "verified": 379,
+      "needs_verification": 78,
+      "conversation_fragment": 21,
+      "misattributed": 20,
+      "session_artifact": 3,
+      "deleted": 1,
+      "stale": 1,
+      "artifacts_match": 0,
+      "content_peek_promotions": 30,
+      "misattributed_repo": "SwarmMind",
+      "key_categories": {
+        "root_doc_nv": 36,
+        "ai_ensemble_lab_nv": 13,
+        "docs_nv": 11,
+        "other_nv": 18
+      }
+    }
+  },
+  "execution": {
+    "mode": "session_task",
+    "engine": "kilo",
+    "actor": "archivist",
+    "session_id": "2026-05-04-archivist-nv3"
+  },
+  "lease": {
+    "owner": "library",
+    "acquired_at": "2026-05-04T15:09:16.759Z",
+    "expires_at": "2026-05-11T15:09:16.760Z",
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "context-buffer/archivist-node-verification-report-v3.json",
+    "verified": true,
+    "verified_by": "archivist",
+    "verified_at": "2026-05-04T15:09:16.759Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 86400,
+    "last_heartbeat_at": "2026-05-04T15:09:16.759Z",
+    "timeout_seconds": 604800,
+    "status": "done"
+  },
+  "signature": "eyJeyJhbGciOiJSUzI1NiIsImtpZCI6IjUwNmMyZDA4MzhiNjg2MmMifQ.eyJeyJmcm9tIjoiYXJjaGl2aXN0IiwidHMiOiIyMDI2LTA1LTA0VDE1OjA5OjE2Ljc1OVoiLCJ0eXBlIjoicmVzcG9uc2UifQ.eyJYXJjaC1zaWduYXR1cmUtdjMtYnJvYWRjYXN0",
+  "key_id": "506c2d0838b6862c",
+  "format_violation": true,
+  "sanitized_at": "2026-05-09T01:28:01.168Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
+}

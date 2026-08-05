@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.6",
+  "task_id": "gov-quarantine-format-001",
+  "idempotency_key": "authority-quarantine-format-20260520-001",
+  "from": "authority",
+  "to": "control-plane",
+  "type": "task",
+  "task_kind": "governance_decision",
+  "priority": "P1",
+  "subject": "Governance Quarantine Format v1.0 — Formal Specification Delivery",
+  "body": "Authority delivers the governance quarantine format specification to Control Plane for integration.\n\nThis format resolves CP P6 audit weak point #3 (GUARD_RESULT: CORRUPT unrecoverable). The format defines:\n\n1. Directory convention: lanes/{lane}/quarantine/governance/{timestamp}_{manifest_id}/\n2. Manifest schema: schemas/quarantine-manifest-v1.json (formal JSON Schema)\n3. 8 reason categories: CORRUPT, VERIFICATION_FAILED, SIGNATURE_INVALID, SCHEMA_INVALID, UNDER_ADJUDICATION, DRIFT_DETECTED, ORPHANED, UNKNOWN\n4. 4 recovery statuses: BLOCKED (needs operator/authority), RECOVERABLE (re-verification may clear), ESCALATED (under adjudication), RESOLVED (recovered)\n5. Tombstone markers at original path with manifest_id reference\n6. Escalation rules: BLOCKED 24hr->P1, ESCALATED 48hr->P0, 3+ same-file quarantines->P0+root-cause\n7. CP integration guide: Write-GuardedReport auto-quarantine on exit 3, preflight .quarantined tombstone checks, status includes quarantine count, observer NACK loop detection\n\nTwo deliverable files:\n- S:/.global/GOVERNANCE_QUARANTINE_FORMAT.md — full specification\n- S:/Archivist-Agent/schemas/quarantine-manifest-v1.json — formal JSON Schema\n\nCP SHOULD integrate this format into cp-preflight.ps1, cp-supervise.ps1, and cp-lane-observer.ps1 as described in Section 7 (CP Integration Guide) of the format document.\n\nRatification conditions C1-C4 from GOV-RATIFY-001 remain binding.",
+  "timestamp": "2026-05-20T01:16:53Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "deliverable_files": [
+      {
+        "path": "S:/.global/GOVERNANCE_QUARANTINE_FORMAT.md",
+        "description": "Full governance quarantine format specification v1.0"
+      },
+      {
+        "path": "S:/Archivist-Agent/schemas/quarantine-manifest-v1.json",
+        "description": "Formal JSON Schema for quarantine manifest"
+      }
+    ],
+    "resolves_weak_point": "CP-P6-AUDIT-WEAK-POINT-3",
+    "format_version": "1.0",
+    "reason_categories": [
+      "CORRUPT",
+      "VERIFICATION_FAILED",
+      "SIGNATURE_INVALID",
+      "SCHEMA_INVALID",
+      "UNDER_ADJUDICATION",
+      "DRIFT_DETECTED",
+      "ORPHANED",
+      "UNKNOWN"
+    ],
+    "recovery_statuses": [
+      "BLOCKED",
+      "RECOVERABLE",
+      "ESCALATED",
+      "RESOLVED"
+    ],
+    "binding_conditions": [
+      "C1-Notify-First",
+      "C2-Post-Action-Report",
+      "C3-No-Precedent",
+      "C4-Operator-Verbal-Auth-Insufficient"
+    ]
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane",
+    "deadline": "2026-06-03T00:00:00Z",
+    "assignee": "control-plane",
+    "status": "pending"
+  },
+  "lease": {
+    "owner": "control-plane",
+    "acquired_at": "2026-05-20T01:16:53Z",
+    "expires_at": "2026-06-03T00:00:00Z",
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_attempt_at": "2026-05-20T01:16:53Z"
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "S:/.global/GOVERNANCE_QUARANTINE_FORMAT.md",
+    "verified": true,
+    "verified_by": "authority",
+    "verified_at": "2026-05-20T01:16:53Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 86400,
+    "last_heartbeat_at": "2026-05-20T01:16:53Z",
+    "timeout_seconds": 900,
+    "status": "pending"
+  },
+  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjI4ZmZmZmJjNGIxZTYzZDQifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6ZGMwYWVhOTEwZjBkZGI1ZjU5YWFlYmIyYTY3OWEzNWY2M2RlNjY4NTBmYmIwMWU3NWEwOGVkMzRkMjYyNTZhOSIsImV4cCI6MTc3OTMyNzE5MywiZnJvbSI6ImF1dGhvcml0eSIsImlhdCI6MTc3OTI0MDc5MywiaWQiOm51bGwsImxhbmUiOiJhdXRob3JpdHkiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6Imdvdi1xdWFyYW50aW5lLWZvcm1hdC0wMDEiLCJ0byI6ImNvbnRyb2wtcGxhbmUifQ.WxHNeP6APdlcIYadFj_eyLIyOjO_Mtn8dI4dHB9MDEKJyOZLiTYRLE_afErNXrpUvtRNIOAor63_gYhudoY_Dw",
+  "key_id": "28ffffbc4b1e63d4",
+  "signature_alg": "EdDSA",
+  "content_hash": "sha256:dc0aea910f0ddb5f59aaebb2a679a35f63de66850fbb01e75a08ed34d26256a9"
+}

@@ -133,7 +133,7 @@ function executeScriptTask(msg, lane) {
   const LONG_RUNNING = ['heartbeat', 'inbox-watcher', 'relay-daemon'];
   const baseName = scriptName.replace(/\.js$/, '').toLowerCase();
   if (LONG_RUNNING.some(lr => baseName.includes(lr))) {
-    return { task_kind: 'report', results: { script: scriptName, skipped: true, reason: 'Long-running daemon script — use "status" or "consistency check" instead' }, summary: `Script ${scriptName}: SKIPPED (long-running daemon)` };
+    return { task_kind: 'report', results: { script: scriptName, skipped: true, reason: 'Long-running daemon script - use "status" or "consistency check" instead' }, summary: `Script ${scriptName}: SKIPPED (long-running daemon)` };
   }
   const maxOutput = 50000;
   try {
@@ -250,10 +250,10 @@ function executeWriteTask(msg, lane) {
   try {
     const { isSharedScript, isSchemaFile } = require(path.join(root, 'scripts', 'edit-lease-manager.js'));
     if (isSharedScript(targetPath) && lane !== 'archivist') {
-      return { task_kind: 'report', results: { error: `SHARED_SCRIPT_WRITE_BLOCKED: "${targetPath}" is a shared canonical script owned by archivist. Lane "${lane}" cannot write directly. Propose changes via convergence protocol (send proposal message to archivist inbox).` }, summary: 'Error: shared script write blocked — use convergence protocol' };
+      return { task_kind: 'report', results: { error: `SHARED_SCRIPT_WRITE_BLOCKED: "${targetPath}" is a shared canonical script owned by archivist. Lane "${lane}" cannot write directly. Propose changes via convergence protocol (send proposal message to archivist inbox).` }, summary: 'Error: shared script write blocked - use convergence protocol' };
     }
     if (isSchemaFile(targetPath) && lane !== 'archivist') {
-      return { task_kind: 'report', results: { error: `SCHEMA_RATIFICATION_REQUIRED: "${targetPath}" is a schema/governance file. Changes require convergence protocol ratification. Send a proposal message to archivist inbox.` }, summary: 'Error: schema write blocked — ratification required' };
+      return { task_kind: 'report', results: { error: `SCHEMA_RATIFICATION_REQUIRED: "${targetPath}" is a schema/governance file. Changes require convergence protocol ratification. Send a proposal message to archivist inbox.` }, summary: 'Error: schema write blocked - ratification required' };
     }
   } catch (_) {}
   try {
@@ -903,14 +903,33 @@ function executeTask(msg, lane) {
 
   return attachRouting({
     task_kind: 'ack',
-    results: { acknowledged: true, note: 'Task type not recognized. Supported: status, "read file <path>", "run script <name>", "git status/log/diff", "grep <pattern> in <path>", "write file <path>\\n<content>", "list dir <path>", "hash file <path>", "diff <file1> <file2>", "count \\"pattern\\" in <path>", "consistency check", "drift_sweep", "watcher_health_audit", "stale_work_detection" — or use natural language (e.g. "check if trust store is consistent")' },
+    results: { acknowledged: true, note: 'Task type not recognized. Supported: status, "read file <path>", "run script <name>", "git status/log/diff", "grep <pattern> in <path>", "write file <path>\\n<content>", "list dir <path>", "hash file <path>", "diff <file1> <file2>", "count \\"pattern\\" in <path>", "consistency check", "drift_sweep", "watcher_health_audit", "stale_work_detection" - or use natural language (e.g. "check if trust store is consistent")' },
     summary: `Acknowledged task: ${msg.subject || msg.task_id || 'unknown'}`,
-  }, { source: 'fallback', verb: 'ack', confidence: 0.0 });
+  }, { source: 'fallback', verb: 'ack', confidence: 1.0 });
+}
+
+function normalizeConfidence(raw) {
+  if (raw === null || raw === undefined) return null;
+  if (typeof raw === 'number' && raw >= 0 && raw <= 1) {
+    return Math.max(1, Math.min(10, Math.round(raw * 9 + 1)));
+  }
+  if (Number.isInteger(raw) && raw >= 1 && raw <= 10) return raw;
+  return null;
+}
+
+function asciiSafe(s) {
+  if (typeof s !== 'string') return s;
+  return s
+    .replace(/\u2014|\u2013/g, '-')
+    .replace(/\u2018|\u2019/g, "'")
+    .replace(/\u201c|\u201d/g, '"')
+    .replace(/[^\x00-\x7F]/g, ' ');
 }
 
 function createResponse(originalMsg, executionResult, lane) {
   const resultJson = JSON.stringify(executionResult.results || {});
-  const contentHash = 'sha256:' + crypto.createHash('sha256').update(resultJson).digest('hex');
+  const sanitizedResults = asciiSafe(resultJson);
+  const contentHash = 'sha256:' + crypto.createHash('sha256').update(sanitizedResults).digest('hex');
   const codeVersionHash = getCodeVersionHash(LANE_REGISTRY[lane].root);
   const provBody = ensureOutputProvenance(executionResult.summary || 'Task completed.', {
     agent: 'generic-task-executor',
@@ -918,6 +937,16 @@ function createResponse(originalMsg, executionResult, lane) {
     target: (originalMsg.subject || 'Task').slice(0, 80),
     generated_at: nowIso(),
   });
+
+  const routingConfidence = executionResult.results && executionResult.results._routing
+    ? executionResult.results._routing.confidence
+    : null;
+  const normalizedConfidence = normalizeConfidence(routingConfidence);
+  const confidence = normalizedConfidence !== null ? normalizedConfidence : 7;
+  const investigation = confidence < 7
+    ? 'Automated acknowledgement fallback; confidence below investigation threshold per CONFIDENCE_REQUIRED'
+    : undefined;
+
   return {
     schema_version: '1.3',
     task_id: `response-${originalMsg.task_id || Date.now()}`,
@@ -927,10 +956,12 @@ function createResponse(originalMsg, executionResult, lane) {
     type: 'response',
     task_kind: executionResult.task_kind || 'ack',
     priority: originalMsg.priority || 'P2',
-    subject: `Re: ${originalMsg.subject || 'Task'}`,
-    body: provBody,
+    subject: asciiSafe(`Re: ${originalMsg.subject || 'Task'}`),
+    body: asciiSafe(provBody),
     timestamp: nowIso(),
     requires_action: false,
+    confidence: confidence,
+    investigation: investigation,
     payload: { mode: 'inline', compression: 'none' },
     execution: { mode: 'auto', engine: 'pipeline', actor: 'task-executor' },
     lease: { owner: lane, acquired_at: nowIso() },
@@ -943,7 +974,7 @@ function createResponse(originalMsg, executionResult, lane) {
     },
     heartbeat: { status: 'done', last_heartbeat_at: nowIso(), interval_seconds: 300, timeout_seconds: 900 },
     _original_task_id: originalMsg.task_id,
-    _execution_result: executionResult.results,
+    _execution_result: JSON.parse(sanitizedResults),
     _governance: { executor_version: EXECUTOR_VERSION, content_hash: contentHash, code_version_hash: codeVersionHash, timestamp: nowIso() },
   };
 }

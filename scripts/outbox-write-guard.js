@@ -91,7 +91,10 @@ function scanAllLanes() {
   return report;
 }
 
+const { enforceMutation } = require('./mode-check');
+
 function guardWrite(msg, outboxPath, filename) {
+  enforceMutation('outbox_write', outboxPath);
   const check = validateOutboxMessage(msg);
   if (!check.valid) {
     const logEntry = {

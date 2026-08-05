@@ -32,7 +32,7 @@ const ENUM_CONSTRAINTS = {
   // v1.3 adds support for schema_version 1.3
   schema_version: ['1.0', '1.1', '1.2', '1.3'],
   // Updated canonical target name for kernel lane
-  to: ['archivist', 'library', 'swarmmind', 'kernel'],
+  to: ['archivist', 'library', 'swarmmind', 'kernel', 'broadcast', 'all', 'authority', 'functions.git'],
   type: ['task', 'response', 'heartbeat', 'escalation', 'handoff', 'ack', 'alert', 'notification', 'status'],
   // NFM-019 fix: extend task_kind to cover task lifecycle + alert + notification + heartbeat
   // Governance process: proposal, review, amendment, ratification
@@ -57,6 +57,7 @@ const TYPE_CHECKS = {
   to: 'string',
   type: 'string',
   task_kind: 'string',
+  metrics: 'object',
   priority: 'string',
   subject: 'string',
   body: 'string',
@@ -304,14 +305,13 @@ function createMessage(template = {}) {
       },
       ...template.watcher,
     },
-  delivery_verification: {
-    verified: false,
-    verified_at: null,
-    retries: 0,
-    // NOTE: template.delivery_verification is NOT spread here.
-    // Bug 3 fix: caller cannot override verified=true during construction.
-    // Only deliverMessage() can set verified=true after validating + writing.
-  },
+    delivery_verification: {
+      verified: false,
+      verified_at: null,
+      retries: 0,
+    },
+    confidence: template.confidence !== undefined ? template.confidence : 8,
+    investigation: template.investigation || null,
   };
 
   const message = normalizeMessageForSchema({ ...defaults, ...template });

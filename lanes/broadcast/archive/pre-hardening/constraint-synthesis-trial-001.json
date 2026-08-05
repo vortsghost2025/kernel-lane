@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "id": "constraint-synthesis-trial-001",
+  "from": "archivist",
+  "to": "all",
+  "timestamp": "2026-04-30T22:10:00Z",
+  "priority": "P1",
+  "type": "finding",
+  "subject": "Constraint Synthesis Trial 001 (NFM-018)",
+  "requires_action": false,
+  "body": {
+    "trial_id": "CSL-001",
+    "failure_mode": "NFM-018",
+    "failure_mode_label": "temporal reachability mismatch",
+    "candidate_constraint": "Before accepting lane_liveness failure, refresh stale lane heartbeats from lane-local roots and rerun recovery-test-suite once.",
+    "result": {
+      "gate_a_failure_elimination": "pass",
+      "gate_b_invariant_preservation": "pass",
+      "gate_c_artifact_presence": "pass",
+      "status": "proven"
+    },
+    "evidence_path": "S:/Archivist-Agent/docs/ops/CONSTRAINT_SYNTHESIS_TRIAL_001.md",
+    "next_action": "Promote as bounded preflight remediation rule with one-retry cap; require repeated-session validation before hard policy."
+  },
+  "convergence_gate": {
+    "claim": "Constraint Synthesis Trial 001 is proven for the scoped NFM-018 failure signature.",
+    "evidence": "S:/Archivist-Agent/docs/ops/CONSTRAINT_SYNTHESIS_TRIAL_001.md",
+    "verified_by": "archivist",
+    "contradictions": [],
+    "status": "proven"
+  }
+}

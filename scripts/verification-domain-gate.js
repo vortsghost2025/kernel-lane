@@ -35,38 +35,42 @@ function toMs(value) {
 }
 
 function evaluateTemporal(msg) {
- const dispatchTs = toMs(msg.dispatch_timestamp || msg.timestamp);
- const executionTs = toMs(
- msg.execution_timestamp ||
- (msg.evidence_exchange && msg.evidence_exchange.delivered_at) ||
- (msg.heartbeat && msg.heartbeat.last_heartbeat_at)
- );
+  const dispatchTs = toMs(msg.dispatch_timestamp || msg.timestamp);
+  const executionTs = toMs(
+    msg.execution_timestamp ||
+    (msg.evidence_exchange && msg.evidence_exchange.delivered_at) ||
+    (msg.heartbeat && msg.heartbeat.last_heartbeat_at)
+  );
 
- if (!dispatchTs) {
- return { valid: false, reason: 'no dispatch timestamp', expected: 'execution_timestamp > dispatch_timestamp', actual: null };
- }
+  if (!dispatchTs || !executionTs) {
+    return {
+      valid: false,
+      reason: 'temporal constraint unreachable',
+      expected: 'execution_timestamp > dispatch_timestamp',
+      actual: null,
+    };
+  }
 
- if (!executionTs) {
- if (msg.completion_artifact_path || msg.resolved_by_task_id) {
- return { valid: true, reason: null, expected: 'execution_timestamp > dispatch_timestamp', actual: 'legacy_proof_assumed_valid' };
- }
- return { valid: false, reason: 'temporal constraint unreachable', expected: 'execution_timestamp > dispatch_timestamp', actual: null };
- }
-
- return { valid: executionTs >= dispatchTs, reason: executionTs >= dispatchTs ? null : 'execution timestamp precedes dispatch', expected: 'execution_timestamp >= dispatch_timestamp', actual: executionTs >= dispatchTs };
+    return {
+      valid: executionTs >= dispatchTs,
+      reason: executionTs >= dispatchTs ? null : 'execution timestamp precedes dispatch',
+      expected: 'execution_timestamp >= dispatch_timestamp',
+      actual: executionTs >= dispatchTs,
+    };
 }
 
 function evaluateSemantic(msg, localCodeVersionHash = null) {
   const taskKindValid = !msg.task_kind || VALID_TASK_KINDS.has(String(msg.task_kind).toLowerCase());
-  const hasProof = cp.hasCompletionProof(msg);
-  const evidenceFieldsPresent = hasProof
-    ? Boolean(
-      (msg.evidence_exchange && msg.evidence_exchange.artifact_path) ||
-      msg.completion_artifact_path ||
-      msg.completion_message_id ||
-      msg.resolved_by_task_id
-    )
-    : true;
+const hasProof = cp.hasCompletionProof(msg);
+const evidenceFieldsPresent = hasProof
+? Boolean(
+(msg.evidence && msg.evidence.evidence_path) ||
+(msg.evidence_exchange && msg.evidence_exchange.artifact_path) ||
+msg.completion_artifact_path ||
+msg.completion_message_id ||
+msg.resolved_by_task_id
+)
+: true;
   const routingMetadataValid = !msg._execution_result || !msg._execution_result._routing || Boolean(msg._execution_result._routing.verb);
 
   const messageCodeHash = msg && msg._governance ? msg._governance.code_version_hash : null;

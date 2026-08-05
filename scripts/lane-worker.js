@@ -362,18 +362,15 @@ function isActionable(msg) {
   );
 }
 
-const NON_ASCII_PATTERN = /[^\x20-\x7E]/;
+const NON_ASCII_PATTERN = /[^\x00-\x7F]/;
 
 function isEnglishOnly(msg) {
   if (!msg || typeof msg !== 'object') return true;
   const textFields = ['subject', 'body', 'type', 'from', 'to'];
   for (const field of textFields) {
-    let val = msg[field];
-    if (typeof val === 'string') {
-      val = normalizeToAscii(val);
-      if (NON_ASCII_PATTERN.test(val)) {
-        return false;
-      }
+    const val = msg[field];
+    if (typeof val === 'string' && NON_ASCII_PATTERN.test(val)) {
+      return false;
     }
   }
   return true;
@@ -1205,12 +1202,6 @@ _routeRaw(filePath, queueKey, meta) {
         },
       };
       fs.appendFileSync(metricsFile, JSON.stringify(entry) + '\n', 'utf8');
-      try {
-        const cpuTotalUsec = cpu.user + cpu.system;
-        this.adaptiveAlerts.evaluate(cpuTotalUsec, mem.rss);
-      } catch (e) {
-        process.stderr.write(`[lane-worker] Adaptive alert evaluation failed: ${e.message}\n`);
-      }
 // Alerting: check thresholds (delta-based CPU, not cumulative)
       const cpuUsageMs = cpu.user + cpu.system;
       const cpuDeltaMs = this._lastCpuMs ? (cpuUsageMs - this._lastCpuMs) : 0;

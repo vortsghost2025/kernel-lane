@@ -1,0 +1,14 @@
+{
+  "OUTPUT_PROVENANCE": {
+    "agent": "opencode",
+    "lane": "archivist",
+    "target": "archivist-p0-edit-intent-registry",
+    "generated_at": "2026-04-28T00:00:00Z",
+    "session_id": "sess-20260516-library-opencode"
+  },
+  "p0_id": "P0-1",
+  "description": "Create edit-intent registry file",
+  "status": "RESOLVED",
+  "evidence_file": "lanes/broadcast/edit-intent-registry.json",
+  "proof": "Registry file created with schema v1.0, empty entries array"
+}

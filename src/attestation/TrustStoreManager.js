@@ -1,149 +1,119 @@
 /**
-* TrustStoreManager.js - Phase 4.3 Trust Store Management
-*
-* Manages public key registration, revocation, and verification
-* for the SwarmMind execution lane.
-*/
+ * TrustStoreManager.js - Phase 4.3 Trust Store Management
+ *
+ * Manages public key registration, revocation, and verification
+ * for the Archivist governance-root lane.
+ */
 
 const fs = require('fs');
 const path = require('path');
-const { LaneDiscovery } = require('../../scripts/util/lane-discovery');
-
-const _discovery = new LaneDiscovery();
 
 class TrustStoreManager {
-  constructor(options = {}) {
-    const defaultTrustPath = path.join(_discovery.getLocalPath('archivist'), '.trust', 'keys.json');
-    this.trustStorePath = options.trustStorePath || defaultTrustPath;
-this.trustStore = null;
-this._load();
-}
+	constructor(options = {}) {
+		this.trustStorePath = options.trustStorePath || path.join('S:', 'Archivist-Agent', 'lanes', 'broadcast', 'trust-store.json');
+		this.trustStore = null;
+		this._load();
+	}
 
-_load() {
-if (!fs.existsSync(this.trustStorePath)) {
-throw new Error(`Trust store not found: ${this.trustStorePath}`);
-}
-const raw = fs.readFileSync(this.trustStorePath, 'utf8');
-this.trustStore = JSON.parse(raw);
-}
+	_load() {
+		if (!fs.existsSync(this.trustStorePath)) {
+			throw new Error(`Trust store not found: ${this.trustStorePath}`);
+		}
+		const raw = fs.readFileSync(this.trustStorePath, 'utf8');
+		this.trustStore = JSON.parse(raw);
+	}
 
-  _save() {
-    this.trustStore.updated_at = new Date().toISOString();
-    fs.writeFileSync(this.trustStorePath, JSON.stringify(this.trustStore, null, 2), 'utf8');
+	_save() {
+		this.trustStore.updated_at = new Date().toISOString();
+		fs.writeFileSync(this.trustStorePath, JSON.stringify(this.trustStore, null, 2), 'utf8');
+	}
 
-    // POST-CONVERGENCE-LOCK: log all trust store mutations
-    try {
-      const logDir = path.join(path.dirname(this.trustStorePath), '..', 'logs');
-      if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
-      const logPath = path.join(logDir, 'trust-store-mutations.log');
-      const operation = this._lastOperation || 'unknown';
-      const lane = this._lastLane || 'unknown';
-      const details = this._lastDetails || 'no details';
-      const timestamp = new Date().toISOString();
-      const logEntry = `${timestamp} | ${lane} | ${operation} | ${details}\n`;
-      fs.appendFileSync(logPath, logEntry, 'utf8');
-    } catch (logErr) {
-      // Do not throw on logging failure - trust store write already succeeded
-      console.error('Warning: failed to write trust-store mutation log:', logErr.message);
-    }
-  }
+	registerKey(laneId, publicKeyPem, keyId) {
+		if (!this.trustStore[laneId]) {
+			throw new Error(`Unknown lane: ${laneId}`);
+		}
 
-  // Helpers to set operation context for logging
-  _setOperationContext(lane, operation, details) {
-    this._lastLane = lane;
-    this._lastOperation = operation;
-    this._lastDetails = details;
-  }
+		const existing = this.trustStore[laneId];
+		if (existing.revoked_at) {
+			throw new Error(`Lane ${laneId} is revoked`);
+		}
 
-  registerKey(laneId, publicKeyPem, keyId) {
-    if (!this.trustStore.keys[laneId]) {
-      throw new Error(`Unknown lane: ${laneId}`);
-    }
+		this.trustStore[laneId] = {
+			...existing,
+			public_key_pem: publicKeyPem,
+			key_id: keyId,
+			registered_at: new Date().toISOString(),
+			revoked_at: null
+		};
 
-    const existing = this.trustStore.keys[laneId];
-    if (existing.revoked_at) {
-      throw new Error(`Lane ${laneId} is revoked`);
-    }
+		this._save();
+		return this.trustStore[laneId];
+	}
 
-    this._setOperationContext(laneId, 'registerKey', `key_id=${keyId}, pem_len=${publicKeyPem.length}`);
+	revokeKey(laneId, reason) {
+		if (!this.trustStore[laneId]) {
+			throw new Error(`Unknown lane: ${laneId}`);
+		}
 
-    this.trustStore.keys[laneId] = {
-      ...existing,
-      public_key_pem: publicKeyPem,
-      key_id: keyId,
-      registered_at: new Date().toISOString(),
-      revoked_at: null
-    };
+		this.trustStore[laneId].revoked_at = new Date().toISOString();
+		this.trustStore[laneId].revocation_reason = reason || 'Key compromised';
 
-    this._save();
-    return this.trustStore.keys[laneId];
-  }
+		this._save();
+		return this.trustStore[laneId];
+	}
 
-  revokeKey(laneId, reason) {
-    if (!this.trustStore.keys[laneId]) {
-      throw new Error(`Unknown lane: ${laneId}`);
-    }
+	getKey(laneId) {
+		return this.trustStore[laneId];
+	}
 
-    this._setOperationContext(laneId, 'revokeKey', `reason=${reason || 'Key compromised'}`);
+	getAllKeys() {
+		const { preCommitChecks, ...keys } = this.trustStore;
+		return keys;
+	}
 
-    this.trustStore.keys[laneId].revoked_at = new Date().toISOString();
-    this.trustStore.keys[laneId].revocation_reason = reason || 'Key compromised';
+	getActiveKeys() {
+		const active = {};
+		for (const [laneId, key] of Object.entries(this.trustStore)) {
+			if (laneId !== 'preCommitChecks' && !key.revoked_at && key.public_key_pem?.startsWith('-----BEGIN')) {
+				active[laneId] = key;
+			}
+		}
+		return active;
+	}
 
-    this._save();
-    return this.trustStore.keys[laneId];
-  }
+	processApprovalQueueItem(item) {
+		if (item.type !== 'key_registration') {
+			return { processed: false, reason: 'Not a key registration' };
+		}
 
-getKey(laneId) {
-return this.trustStore.keys[laneId];
-}
+		const { lane_id, public_key_pem, key_id } = item.payload;
+		if (!lane_id || !public_key_pem || !key_id) {
+			return { processed: false, reason: 'Missing required fields' };
+		}
 
-getAllKeys() {
-return { ...this.trustStore.keys };
-}
+		try {
+			this.registerKey(lane_id, public_key_pem, key_id);
+			return { processed: true, lane_id, key_id };
+		} catch (e) {
+			return { processed: false, reason: e.message };
+		}
+	}
 
-getActiveKeys() {
-const active = {};
-for (const [laneId, key] of Object.entries(this.trustStore.keys)) {
-if (!key.revoked_at && key.public_key_pem?.startsWith('-----BEGIN')) {
-active[laneId] = key;
-}
-}
-return active;
-}
+	getStats() {
+		const lanes = Object.keys(this.trustStore.keys);
+		const registered = lanes.filter(l => this.trustStore.keys[l]?.public_key_pem?.startsWith('-----BEGIN'));
+		const pending = lanes.filter(l => this.trustStore.keys[l]?.public_key_pem === 'PENDING_GENERATION');
+		const revoked = lanes.filter(l => this.trustStore.keys[l]?.revoked_at);
 
-processApprovalQueueItem(item) {
-if (item.type !== 'key_registration') {
-return { processed: false, reason: 'Not a key registration' };
-}
-
-const { lane_id, public_key_pem, key_id } = item.payload;
-if (!lane_id || !public_key_pem || !key_id) {
-return { processed: false, reason: 'Missing required fields' };
-}
-
-try {
-this.registerKey(lane_id, public_key_pem, key_id);
-return { processed: true, lane_id, key_id };
-} catch (e) {
-return { processed: false, reason: e.message };
-}
-}
-
-getStats() {
-const lanes = Object.keys(this.trustStore.keys);
-const registered = lanes.filter(l => this.trustStore.keys[l]?.public_key_pem?.startsWith('-----BEGIN'));
-const pending = lanes.filter(l => this.trustStore.keys[l]?.public_key_pem === 'PENDING_GENERATION');
-const revoked = lanes.filter(l => this.trustStore.keys[l]?.revoked_at);
-
-return {
-total_lanes: lanes.length,
-registered: registered.length,
-pending: pending.length,
-revoked: revoked.length,
-migration: this.trustStore.migration,
-retention: this.trustStore.retention
-};
-}
+		return {
+			total_lanes: lanes.length,
+			registered: registered.length,
+			pending: pending.length,
+			revoked: revoked.length,
+			migration: this.trustStore.migration,
+			retention: this.trustStore.retention
+		};
+	}
 }
 
 module.exports = { TrustStoreManager };

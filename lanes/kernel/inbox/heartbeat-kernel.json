@@ -8,8 +8,8 @@
   "task_kind": "heartbeat",
   "priority": "P3",
   "subject": "Heartbeat from kernel lane",
-  "body": "{\"lane\":\"kernel\",\"agent_mode\":\"governing\",\"session_active\":true,\"uptime_seconds\":0,\"messages_processed\":0,\"last_inbox_scan\":\"2026-05-16T01:10:03.116Z\",\"version\":\"1.3\",\"identity_status\":\"ratified\"}",
-  "timestamp": "2026-05-16T01:10:03.116Z",
+  "body": "{\"lane\":\"kernel\",\"agent_mode\":\"governing\",\"session_active\":true,\"uptime_seconds\":162512,\"messages_processed\":0,\"last_inbox_scan\":\"2026-08-05T18:30:41.110Z\",\"version\":\"1.3\",\"identity_status\":\"ratified\"}",
+  "timestamp": "2026-08-05T18:30:41.110Z",
   "requires_action": false,
   "payload": {
     "mode": "inline",
@@ -42,25 +42,25 @@
   },
   "heartbeat": {
     "interval_seconds": 60,
-    "last_heartbeat_at": "2026-05-16T01:10:03.116Z",
+    "last_heartbeat_at": "2026-08-05T18:30:41.110Z",
     "timeout_seconds": 900,
     "status": "in_progress"
   },
   "system_state": "consistent",
   "active_contradictions": [],
-  "processed_ok": false,
+  "processed_ok": true,
   "compaction_enabled": true,
   "compaction_suspend_reason": null,
   "id": "heartbeat-kernel",
-  "content_hash": "sha256:5d9fafb40a23434e186cd886218e1431edc0ba44482c9d4bd88d6f9b0b03d555",
-  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjJlZmZiNDllYTAyZGZmNWIifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6NWQ5ZmFmYjQwYTIzNDM0ZTE4NmNkODg2MjE4ZTE0MzFlZGMwYmE0NDQ4MmM5ZDRiZDg4ZDZmOWIwYjAzZDU1NSIsImV4cCI6MTc3ODk4MDIwMywiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc3ODg5MzgwMywiaWQiOiJoZWFydGJlYXQta2VybmVsIiwibGFuZSI6Imtlcm5lbCIsInByaW9yaXR5IjoiUDMiLCJ0YXNrX2lkIjoiaGVhcnRiZWF0LWtlcm5lbCIsInRvIjoia2VybmVsIn0.ErankCOJnSFj0reDG-Efcd38aNpp2Trs86b9-fo9Vq-zBMMiWWHDzqslDfQlLPbyRkPXFikfaG6yD1x1L0jtAA",
+  "content_hash": "sha256:8d5f08fc29f4b2d5e893cedde73533b9acdc071bad2ad2df0b76b2fc4075df25",
+  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjJlZmZiNDllYTAyZGZmNWIifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6OGQ1ZjA4ZmMyOWY0YjJkNWU4OTNjZWRkZTczNTMzYjlhY2RjMDcxYmFkMmFkMmRmMGI3NmIyZmM0MDc1ZGYyNSIsImV4cCI6MTc4NjA0MTA0MSwiZnJvbSI6Imtlcm5lbCIsImlhdCI6MTc4NTk1NDY0MSwiaWQiOiJoZWFydGJlYXQta2VybmVsIiwibGFuZSI6Imtlcm5lbCIsInByaW9yaXR5IjoiUDMiLCJ0YXNrX2lkIjoiaGVhcnRiZWF0LWtlcm5lbCIsInRvIjoia2VybmVsIn0.mvxVbB61rJesU4Mzg5DQXR1L-w4oQelDR1Iv3UvYTx3BtPs60lGOQMhJB1w-oNRT8jwSJ_vGlMalchJk7HL2AA",
   "signature_alg": "EdDSA",
   "key_id": "2effb49ea02dff5b",
   "session_identity": {
-    "session_id": "sess-1778893803114-8f9dccd1",
-    "session_epoch_started_at": "2026-05-16T01:10:03.115Z",
+    "session_id": "sess-1785792128233-111ebe23",
+    "session_epoch_started_at": "2026-08-03T21:22:08.239Z",
     "origin_runtime": "opencode",
-    "origin_workspace": "C:\\Windows\\system32"
+    "origin_workspace": "/home/we4free/agent/repos/kernel-lane"
   },
   "identity_status": "ratified"
 }

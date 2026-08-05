@@ -1,45 +1,49 @@
 {
   "schema_version": "1.0",
   "artifact": "last-recovery",
-  "timestamp": "2026-04-30T18:10:34.746Z",
+  "timestamp": "2026-08-05T13:44:43.284Z",
   "suite": "recovery-verification-v1",
-  "verdict": "CONFLICTED",
+  "verdict": "PROVEN",
   "summary": {
-    "passed": 10,
-    "total": 11,
-    "all_passed": false
+    "passed": 12,
+    "total": 12,
+    "all_passed": true
   },
-  "claim": "Restored context has contradictions — cannot prove correctness",
+  "claim": "Restored context matches pre-compact state across all checked dimensions",
   "evidence": {
     "relative": ".compact-audit/RECOVERY_TEST_RESULTS.json",
-    "absolute": "S:\\Archivist-Agent\\.compact-audit\\RECOVERY_TEST_RESULTS.json"
+    "absolute": "/home/we4free/agent/repos/Archivist-Agent/.compact-audit/RECOVERY_TEST_RESULTS.json"
   },
   "lane_heartbeats": {
     "archivist": {
       "status": "alive",
-      "timestamp": "2026-04-30T18:10:02.185Z",
-      "age_seconds": 32
+      "timestamp": "2026-08-05T13:44:23.326Z",
+      "age_seconds": 19,
+      "source": "windows-local"
     },
     "library": {
-      "status": "stale",
-      "timestamp": "2026-04-29T13:45:33Z",
-      "age_seconds": 102301
+      "status": "alive",
+      "timestamp": "2026-08-05T13:44:24.636Z",
+      "age_seconds": 18,
+      "source": "windows-local"
     },
     "swarmmind": {
       "status": "alive",
-      "timestamp": "2026-04-30T18:09:43.789Z",
-      "age_seconds": 50
+      "timestamp": "2026-08-05T13:44:23.766Z",
+      "age_seconds": 19,
+      "source": "windows-local"
     },
     "kernel": {
-      "status": "stale",
-      "timestamp": "2026-04-30T17:02:30Z",
-      "age_seconds": 4084
+      "status": "alive",
+      "timestamp": "2026-08-05T13:44:24.818Z",
+      "age_seconds": 18,
+      "source": "windows-local"
     }
   },
   "lane_liveness": {
-    "alive_count": 2,
+    "alive_count": 4,
     "expected": 4
   },
   "run_by": "scripts/recovery-test-suite.js",
-  "archivist_repo_git_sha": "4815b3fc5f6ad0e0047a605faf2d8a3dbde7465a"
+  "archivist_repo_git_sha": "029b0af241a385294ae37534ec702560e9a9dcd7"
 }

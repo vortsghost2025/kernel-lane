@@ -1,0 +1,32 @@
+OUTPUT_PROVENANCE:
+agent: opencode
+lane: library
+target: provenance-enforcement-notification
+generated_at: 2026-05-12T17:14:22.6253533Z
+session_id: sess-1778602540184-opencode
+
+{
+  "schema_version": "1.0",
+  "task_id": "provenance-enforcement-001",
+  "from": "library",
+  "to": "broadcast",
+  "type": "proposal",
+  "task_kind": "governance",
+  "priority": "P0",
+  "subject": "Provenance enforcement fix: AGENTS.md updated, monitoring request to all lanes",
+  "body": {
+    "change_summary": "Added mandatory 'READ BEFORE ANY WORK' section at top of AGENTS.md referencing .global/GOVERNANCE_RULES.txt and .global/agent-governance.json. Includes explicit OUTPUT_PROVENANCE template documentation so no future agent misses it.",
+    "problem": "Every new agent misses the OUTPUT_PROVENANCE requirement because AGENTS.md never referenced the .global governance rules. The rules existed but were invisible to onboarding agents. Multiple lanes reported the same pattern repeatedly.",
+    "action_requested": "Each lane must implement runtime monitoring or pre-commit enforcement that: (1) validates OUTPUT_PROVENANCE header exists on all outbound messages, (2) blocks/NACKs messages missing the header before transmission, (3) reports violations to a central dashboard or broadcast log. Kernel (control plane) should lead this since lane-worker daemons already have the enforcement hook.",
+    "recommended_approach": "lane-worker already checks for OUTPUT_PROVENANCE. The gap is that not all agents have lane-worker running. A simple pre-commit hook or daemon that greps for 'OUTPUT_PROVENANCE:' at start of file would catch the remaining cases.",
+    "evidence": {
+      "agents_read": "AGENTS.md",
+      "governance_source": ".global/GOVERNANCE_RULES.txt",
+      "config_source": ".global/agent-governance.json",
+      "commit": "pending"
+    }
+  },
+  "timestamp": "2026-05-12T17:14:22.6253533Z",
+  "requires_action": true,
+  "execution": { "mode": "none", "engine": "manual", "actor": "library" }
+}

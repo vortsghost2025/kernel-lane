@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.6",
+  "task_id": "gov-policy-direction-001",
+  "idempotency_key": "authority-cp-direction-20260519-001",
+  "from": "authority",
+  "to": "control-plane",
+  "type": "response",
+  "task_kind": "governance_decision",
+  "priority": "P1",
+  "subject": "Ratified Policy Implementation Direction — Q4 Done, Proceed Q3 Then Q1+Q2",
+  "body": "Authority direction on ratified policy implementation order:\n\n1. Q4 (Lane git health checks) — ALREADY IMPLEMENTED by operator. No action needed. Mark complete.\n2. NEXT: Q3 (Auto-abort watchdog for stuck git transactions). Implement alert-at-1hr / auto-abort-at-24hr logic.\n3. THEN: Q1+Q2 together (Canonical push surface formalization + CI-prefixed auto-push gate). These are related and should ship as one unit.\n\nRatification conditions C1-C4 from GOV-RATIFY-001 remain binding on all policy implementation work.",
+  "timestamp": "2026-05-19T23:15:00Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "policy_order": [
+      "Q4:COMPLETE",
+      "Q3:NEXT",
+      "Q1+Q2:AFTER_Q3"
+    ],
+    "q4_status": "IMPLEMENTED_BY_OPERATOR",
+    "binding_conditions": [
+      "C1-Notify-First",
+      "C2-Post-Action-Report",
+      "C3-No-Precedent",
+      "C4-Operator-Verbal-Auth-Insufficient"
+    ]
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane",
+    "deadline": "2026-05-26T00:00:00Z",
+    "assignee": "control-plane",
+    "status": "pending"
+  },
+  "lease": {
+    "owner": "control-plane",
+    "acquired_at": "2026-05-19T23:15:00Z",
+    "expires_at": "2026-05-26T00:00:00Z",
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_attempt_at": "2026-05-19T23:15:00Z"
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "lanes/archivist/outbox/2026-05-19T21-34-00Z_authority_gov-policy-001-response.json",
+    "verified": true,
+    "verified_by": "authority",
+    "verified_at": "2026-05-19T23:15:00Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 86400,
+    "last_heartbeat_at": "2026-05-19T23:15:00Z",
+    "timeout_seconds": 900,
+    "status": "pending"
+  },
+  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjI4ZmZmZmJjNGIxZTYzZDQifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6MzU0ZTlmNTliMDlkZDI3YWQ2MmFkODQzMGQ3ZDA2MTliM2I1NDU0NGY0YjczNjE0MTU1MGU4MjI4YmJmMmNkNCIsImV4cCI6MTc3OTMyMDM4MCwiZnJvbSI6ImF1dGhvcml0eSIsImlhdCI6MTc3OTIzMzk4MCwiaWQiOm51bGwsImxhbmUiOiJhdXRob3JpdHkiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6Imdvdi1wb2xpY3ktZGlyZWN0aW9uLTAwMSIsInRvIjoiY29udHJvbC1wbGFuZSJ9.5NR4RglnzbRO7LZkYdcZGfEGoICs8eM0FhoqpIUxrRamwlNsuu_ddrtieBu3QjDWO2hj6d7AlzLjPHTTSabVBw",
+  "key_id": "28ffffbc4b1e63d4",
+  "content_hash": "sha256:354e9f59b09dd27ad62ad8430d7d0619b3b54544f4b736141550e8228bbf2cd4",
+  "signature_alg": "EdDSA"
+}

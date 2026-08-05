@@ -1,0 +1,21 @@
+{
+  "snapshot_id": "round10-known-good",
+  "timestamp": "2026-04-22T16:26:00Z",
+  "source": "archivist",
+  "recovery_suite": {
+    "result": "11/11 PASS",
+    "commit": "b275b79"
+  },
+  "phase4_gates": {
+    "result": "33/33 PASS"
+  },
+  "collision_check": {
+    "result": "no active claims"
+  },
+  "broadcast_message_id": "e2e-test-broadcast-001",
+  "summary_request_id": "e2e-summary-request-001",
+  "anchor_commit": "b275b79",
+  "trust_store_hash": "979144d54a7eae4641a60b0b2e26b9f09ce7358e",
+  "status": "KNOWN_GOOD",
+  "expires_at": "2026-04-22T17:30:00Z"
+}

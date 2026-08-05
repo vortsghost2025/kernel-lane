@@ -5,7 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { executionWeight } = require('./execution-weight');
 
-const ROOT = 'S:/kernel-lane';
+const ROOT = 'S:/Archivist-Agent';
 const OUT_DIR = path.join(ROOT, 'context-buffer');
 
 function usage() {
@@ -117,6 +117,7 @@ function buildStatusCounts(nodes) {
       counts[status] += 1;
     }
     const weight = executionWeight({ ...node, status });
+    // Gather inputs for provenance
     const meta = node.metadata || node.meta || node.props || node.properties || {};
     const probe = node.probe || node.runtime_probe || node.runtime || {};
     const inputs = { status, meta, probe };
@@ -163,6 +164,7 @@ function countContradictionEdges(edges) {
 }
 
 function topPriorityWork(detailed) {
+  // Filter to conflicted or blocked nodes, then sort by descending weight (default 0)
   return detailed
     .filter((n) => n.status === 'conflicted' || n.status === 'blocked')
     .sort((a, b) => (b.weight || 0) - (a.weight || 0))
@@ -249,9 +251,9 @@ function writeOutputs(inputPath, payload) {
     ...payload.next_actions.map((a) => `- ${a}`),
     '',
     '## Top Conflict/Blocker Nodes',
-    ...(payload.focus_nodes.length > 0
-      ? payload.focus_nodes.map((n) => `- ${n.id} | ${n.status} | ${n.label} | weight:${n.weight || 0}`)
-      : ['- none']),
+      ...(payload.focus_nodes.length > 0
+        ? payload.focus_nodes.map((n) => `- ${n.id} | ${n.status} | ${n.label} | weight:${n.weight || 0}`)
+        : ['- none']),
     '',
     '## Discipline Gate',
     '- No new feature work until one conflicted node is closed with evidence.'
@@ -293,7 +295,7 @@ function main() {
   const payload = {
     output_provenance: {
       agent: 'codex-5.3',
-      lane: 'kernel',
+      lane: 'archivist',
       generated_at: new Date().toISOString(),
       session_id: 'unknown'
     },
@@ -302,7 +304,7 @@ function main() {
       node_count: nodes.length,
       edge_count: edges.length,
       finding_count: findings.length,
-      hash: fileHash
+        hash: fileHash
     },
     summary: {
       conflicted: counts.conflicted,

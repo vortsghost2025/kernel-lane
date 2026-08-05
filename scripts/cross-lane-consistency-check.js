@@ -2,19 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const lanes = ['archivist', 'kernel', 'library', 'swarmmind'];
-const isWindows = process.platform === 'win32';
-const roots = isWindows ? {
-archivist: 'S:/Archivist-Agent',
-kernel: 'S:/kernel-lane',
-library: 'S:/self-organizing-library',
-swarmmind: 'S:/SwarmMind'
-} : {
-archivist: '/home/we4free/agent/repos/Archivist-Agent',
-kernel: '/home/we4free/agent/repos/kernel-lane',
-library: '/home/we4free/agent/repos/self-organizing-library',
-swarmmind: '/home/we4free/agent/repos/SwarmMind'
-};
+const { LaneDiscovery } = require('./util/lane-discovery');
+const _discovery = new LaneDiscovery();
+
+const lanes = _discovery.listLanes();
+const roots = {};
+for (const lane of lanes) {
+  roots[lane] = _discovery.getLocalPath(lane);
+}
 
 console.log('=== CROSS-LANE CONSISTENCY CHECK ===\n');
 

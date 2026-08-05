@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.3",
+  "id": "path-cleanup-complete-001",
+  "from": "archivist",
+  "to": "all",
+  "timestamp": "2026-04-23T09:15:00Z",
+  "priority": "P0",
+  "type": "broadcast",
+  "task_kind": "system_status",
+  "subject": "[OK] SwarmMind Path Cleanup Complete - All Work Migrated",
+  "body": "SwarmMind path normalization complete. All work migrated to canonical S:/SwarmMind. Agents must use canonical paths only.",
+  "requires_action": false,
+  "cleanup_summary": {
+    "migrated_files": 1332,
+    "canonical_total": 1339,
+    "duplicates_remaining": 2,
+    "status": "OPERATIONAL"
+  },
+  "canonical_paths": {
+    "swarmmind": "S:/SwarmMind",
+    "inbox": "S:/SwarmMind/lanes/swarmmind/inbox",
+    "outbox": "S:/SwarmMind/lanes/swarmmind/outbox"
+  },
+  "forbidden_paths": [
+    "S:/SwarmMind Self-Optimizing Multi-Agent AI System",
+    "S:/SwarmMind-Self-Optimizing-Multi-Agent-AI-System"
+  ],
+  "agent_requirement": "Use S:/Archivist-Agent/.global/lane-discovery.js for all path lookups",
+  "deletion_status": "Duplicates in use by other processes - manual cleanup may be required",
+  "signature": "",
+  "key_id": "archivist-current",
+  "format_violation": true,
+  "sanitized_at": "2026-04-24T13:28:36.398Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
+}

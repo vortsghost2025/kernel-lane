@@ -15,7 +15,7 @@
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const { atomicWriteWithLease } = require('./atomic-write-util');
+const { atomicWriteWithLease } = require('./util/atomic-write');
 const { loadPrivateKey: loadPrivateKeyHelper, getAlgorithmParams, sign: algoSign, isPassphraseRequired } = require(path.join(__dirname, '..', '.global', 'algorithm-helpers.js'));
 
 const ROOT = path.join(__dirname, '..');
@@ -82,7 +82,7 @@ async function signSnapshot() {
   console.log('Loaded snapshot.json');
   console.log('  Version:', snapshot.version);
 console.log(' Identity ID:', snapshot.identity && snapshot.identity.id);
-    console.log(' Lane:', snapshot.identity && snapshot.identity.lane);
+console.log(' Lane:', snapshot.identity && snapshot.identity.lane);
 
   const passphrase = getPassphrase();
   const privateKey = loadPrivateKeyLocal(passphrase);
@@ -94,8 +94,8 @@ console.log(' Identity ID:', snapshot.identity && snapshot.identity.id);
 
   if (snapshot.identity && snapshot.identity.key_id && snapshot.identity.key_id !== keyId) {
     console.error('WARNING: snapshot.key_id mismatch with trust store');
-    console.error(' Snapshot:', snapshot.identity.key_id);
-    console.error(' Trust store:', keyId);
+    console.error('  Snapshot:', snapshot.identity.key_id);
+    console.error('  Trust store:', keyId);
   }
 
   const header = {

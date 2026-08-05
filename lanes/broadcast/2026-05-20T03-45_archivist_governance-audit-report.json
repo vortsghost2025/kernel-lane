@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.6",
+  "task_id": "GOV-EARNED-COMPLEXITY-AUDIT",
+  "idempotency_key": "archivist-gov-audit-report-2026-05-20",
+  "from": "archivist",
+  "to": "broadcast",
+  "type": "notification",
+  "task_kind": "audit",
+  "priority": "P1",
+  "subject": "Governance Earned-Complexity Audit — Full Report with Recommendations",
+  "body": "Archivist completed the earned-complexity audit of all governance mechanisms as directed by the operator's exterior read. Key findings: CPS has ZERO operational triggers (enforcement loop unimplemented) — DEMOTE to informational. UDS has ZERO operational code (400+ lines of spec with no implementation) — DEMOTE to advisory checklist. Convergence gates HAVE live consumers (identity-enforcer, claim-commit-guard, inbox-watcher) — RETAIN with compression. Output provenance is the gold standard of earned governance (8+ enforcement points) — RETAIN unchanged. Schema v1.6: reduce 19 required fields to ~14-15, demote retry/prior_attempts/canonical_paths to optional. Governance docs: 17 docs → 4 canonical roots + annexes. Lane state model: add ACTIVE/DORMANT/EXPERIMENTAL/ARCHIVED states. Full report: context-buffer/GOVERNANCE_EARNED_COMPLEXITY_AUDIT_2026-05-20.md. Operator approval required before executing P0-P3 changes.",
+  "timestamp": "2026-05-20T03:45:00.000Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "inline",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": "continuity-2026-05-20-audit"
+  },
+  "lease": {
+    "owner": "archivist",
+    "acquired_at": "2026-05-20T03:45:00.000Z",
+    "expires_at": "2026-05-20T04:45:00.000Z"
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 1
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "context-buffer/GOVERNANCE_EARNED_COMPLEXITY_AUDIT_2026-05-20.md",
+    "verified": true,
+    "verified_by": "archivist",
+    "verified_at": "2026-05-20T03:45:00.000Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": "2026-05-20T03:45:00.000Z",
+    "timeout_seconds": 900,
+    "status": "done"
+  },
+  "confidence_derivation": {
+    "evidence_basis": "Full grep of all scripts for CPS/UDS/convergence/provenance/schema consumers; source code reads of constitution.rs, cps_check.rs, schema-validator.js, lane-worker.js; CPS log analysis (42 lines, 0 operational blocks); all 17 governance docs read in full",
+    "method": "Per-mechanism consumer grep + source code analysis + operational log audit; each finding tagged VERIFIED_NOW/CLAIMED_IN_TRANSCRIPT/INFERRED/UNKNOWN",
+    "how_mapped": "Every governance claim mapped to code evidence; unimplemented features identified by absence of consuming code; operator exterior read used as authoritative framework",
+    "caveats": "Audit conducted by Archivist (not CP, per conflict-of-interest principle); recommendations are advisory pending operator approval; no changes executed yet"
+  },
+  "confidence": 9,
+  "uncertainty": {
+    "type": "structural",
+    "level": 2,
+    "note": "Audit recommendations require operator approval before execution; some schema field consumers may exist in unexamined scripts",
+    "resolution_path": "operator_approval",
+    "operator_decision_needed": true
+  },
+  "review": {
+    "round": 1,
+    "status": "pending_operator",
+    "reviewer": "operator",
+    "verdict": null
+  },
+  "delivery_verification": {
+    "method": "file_write",
+    "evidence": "pending",
+    "verified_at": null
+  },
+  "convergence_gate": {
+    "status": "pending_review",
+    "required_approvals": 1,
+    "received_approvals": 0,
+    "evidence": "context-buffer/GOVERNANCE_EARNED_COMPLEXITY_AUDIT_2026-05-20.md"
+  },
+  "content_hash": "sha256:5338e26d44b9ab39597f177cd82ea88df1ae1c8b5819e6def6d2587e0c82cfaf",
+  "signature": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjZlZDY1YzE4YTBhZmNhNDUifQ.eyJjb250ZW50X2hhc2giOiJzaGEyNTY6NTMzOGUyNmQ0NGI5YWIzOTU5N2YxNzdjZDgyZWE4OGRmMWFlMWM4YjU4MTllNmRlZjZkMjU4N2UwYzgyY2ZhZiIsImV4cCI6MTc3OTMzNjQ0MiwiZnJvbSI6ImFyY2hpdmlzdCIsImlhdCI6MTc3OTI1MDA0MiwiaWQiOm51bGwsImxhbmUiOiJhcmNoaXZpc3QiLCJwcmlvcml0eSI6IlAxIiwidGFza19pZCI6IkdPVi1FQVJORUQtQ09NUExFWElUWS1BVURJVCIsInRvIjoiYnJvYWRjYXN0In0.cxxVbloj-x4e8OUSG7VdHgCED7zfyJER9Tr-plFTqAKAbBcGKyKvmRiW7Y__unL9KM1mZLXTyyLuD1lOE0CuBA",
+  "signature_alg": "EdDSA",
+  "key_id": "6ed65c18a0afca45"
+}

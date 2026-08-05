@@ -10,7 +10,15 @@ const LANES = [
   { name: 'swarmmind', dir: 'S:/SwarmMind' }
 ];
 
-const SUBDIRS_TO_REMOVE = ['processed', 'expired', 'quarantine', 'invalid-schema', 'pending', 'duplicates', 'unsigned', 'unsigned-archive'];
+const SUBDIRS_TO_REMOVE = [
+  'processed', 'expired', 'quarantine', 'invalid-schema',
+  'pending', 'duplicates', 'unsigned', 'unsigned-archive',
+  'blocked',           // NFM-020: nack-nack cascade accumulates here
+  'archive',           // NFM-020: summary broadcast spam accumulates here
+  'stale-foreign',     // NFM-020: stale-foreign cleanup
+];
+
+const ARCHIVE_SUFFIX = '.bak';  // NFM-020: handle renamed .bak files
 
 for (const lane of LANES) {
   for (const box of ['inbox', 'outbox']) {
@@ -25,8 +33,10 @@ for (const lane of LANES) {
       }
     }
 
-    // Remove all .json files from inbox/outbox root
-    const rootFiles = fs.readdirSync(boxDir).filter(f => f.endsWith('.json'));
+    // Remove .json files AND .bak-* files from inbox/outbox root
+    const rootFiles = fs.readdirSync(boxDir).filter(f => {
+      return f.endsWith('.json') || f.includes(ARCHIVE_SUFFIX);
+    });
     for (const f of rootFiles) {
       fs.unlinkSync(path.join(boxDir, f));
     }

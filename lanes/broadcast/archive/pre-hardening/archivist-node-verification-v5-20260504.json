@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.3",
+  "task_id": "archivist-nv-v5-broadcast-1777920041698",
+  "idempotency_key": "887e2b702aa99a4221cd77c33873f7fbbe05200cce2c35537ca7ac0d13cdb42c",
+  "from": "archivist",
+  "to": "library",
+  "type": "notification",
+  "task_kind": "report",
+  "priority": "P1",
+  "subject": "Archivist Node Verification v5 Complete [?] 503 nodes classified, NEEDS_VERIFICATION=50 (target met)",
+  "body": "v5 verification of all 503 Archivist-owned graph nodes is complete. Results: VERIFIED=381 (75.7%), NEEDS_VERIFICATION=50 (9.9%), MISATTRIBUTED=37 (7.4%), CONVERSATION_FRAGMENT=32 (6.4%), SESSION_ARTIFACT=3 (0.6%), ARTIFACTS_MATCH=0, STALE=0, DELETED=0. Key findings: (1) 37 MISATTRIBUTED nodes are ai-ensemble-lab content incorrectly tagged repo=Archivist-Agent [?] Library should re-attribute these to SwarmMind. (2) 32 CONVERSATION_FRAGMENT nodes are chat/session fragments, not files [?] Library should mark as non-file or remove from active graph. (3) 50 NEEDS_VERIFICATION remain: 27 root-doc, 14 docs, 3 code, 2 paper, 1 each config/script/coordination/log [?] most are session artifacts, deleted files, or descriptive titles with no repo file. Full report: context-buffer/archivist-node-verification-report-v5.json",
+  "timestamp": "2026-05-04T18:40:41.699Z",
+  "requires_action": true,
+  "payload": {
+    "mode": "path",
+    "path": "context-buffer/archivist-node-verification-report-v5.json",
+    "compression": "none"
+  },
+  "execution": {
+    "mode": "manual",
+    "engine": "kilo",
+    "actor": "lane",
+    "session_id": "archivist-20260504b"
+  },
+  "lease": {
+    "owner": "library",
+    "acquired_at": "2026-05-04T18:40:41.699Z",
+    "expires_at": "2026-05-05T18:40:41.699Z",
+    "renew_count": 0,
+    "max_renewals": 3
+  },
+  "retry": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "last_error": null,
+    "last_attempt_at": null
+  },
+  "evidence": {
+    "required": true,
+    "evidence_path": "context-buffer/archivist-node-verification-report-v5.json",
+    "verified": true,
+    "verified_by": "archivist",
+    "verified_at": "2026-05-04T18:40:41.699Z"
+  },
+  "heartbeat": {
+    "interval_seconds": 300,
+    "last_heartbeat_at": "2026-05-04T18:40:41.699Z",
+    "timeout_seconds": 900,
+    "status": "done"
+  },
+  "signature": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmcm9tIjoiYXJjaGl2aXN0IiwidG8iOiJsaWJyYXJ5IiwidGltZXN0YW1wIjoiMjAyNi0wNS0wNFQxODo0MDo0MS42OTlaIn0.eyJwbGFjZWhvbGRlciI6dHJ1ZSwiZ2VuZXJhdGVkX2F0IjoiMjAyNi0wNS0wNFQxODo0MDo0MS42OTlaIn0",
+  "key_id": "506c2d0838b6862c",
+  "format_violation": true,
+  "sanitized_at": "2026-05-09T01:28:01.169Z",
+  "sanitization_reason": "Non-ASCII characters replaced with ASCII equivalents per English-only constraint"
+}

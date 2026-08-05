@@ -14,6 +14,26 @@ const AUDIT_VERSION = '5.1.0';
 const LEDGER_PATH = process.env.AUTONOMY_LEDGER || path.join(__dirname, '..', 'context-buffer', 'autonomy-ledger.jsonl');
 const ROLLUP_PATH = process.env.AUTONOMY_ROLLUP || path.join(__dirname, '..', 'context-buffer', 'headless-autonomy-rollup.json');
 const CANONICAL_REGISTRY = path.join(__dirname, 'CANONICAL_SCRIPT_REGISTRY.json');
+
+// Platform detection
+const IS_WINDOWS = process.platform === 'win32';
+const IS_LINUX = process.platform === 'linux';
+
+// Cross-platform UID getter
+function getUid() {
+  if (typeof process.getuid === 'function') {
+    return process.getuid();
+  }
+  // Windows fallback - derive a consistent UID from username for isolation
+  const username = process.env.USERNAME || process.env.USER || 'default';
+  let hash = 0;
+  for (let i = 0; i < username.length; i++) {
+    hash = ((hash << 5) - hash) + username.charCodeAt(i);
+    hash |= 0;
+  }
+  // Ensure positive and in reasonable range (1000-65535)
+  return Math.abs(hash) % 64535 + 1000;
+}
 const RECOMMENDATION_TYPES = [
   'NO_ACTION', 'REVIEW_DRIFT', 'SPAWN_AGENT_RECOMMENDED',
   'OPERATOR_PING_SEEN', 'P0_STALE_TASK', 'TOPOLOGY_ANOMALY',
@@ -190,10 +210,47 @@ function checkServiceTopology() {
     duplicates: [],
     crash_loops: [],
     orphan_processes: 0,
-    per_lane_status: {}
+    per_lane_status: {},
+    platform_skipped: false
   };
 
-  const xdg = process.env.XDG_RUNTIME_DIR || `/run/user/${process.getuid()}`;
+  if (IS_WINDOWS) {
+    // On Windows, check for services using PowerShell/Get-Service
+    // Since we don't have systemd on Windows, we check for the equivalent
+    // processes or Windows services if they exist
+    results.platform_skipped = true;
+    
+    // Check for node processes running our services
+    const nodePids = runCmd('tasklist /FI "IMAGENAME eq node.exe" /FO CSV 2>NUL', { env: process.env });
+    const nodeCount = nodePids ? nodePids.split('\n').filter(l => l.includes('node.exe')).length : 0;
+    
+    // We can't reliably check systemd services on Windows, so we report what we can
+    for (const lane of SERVICED_LANES) {
+      results.per_lane_status[lane] = { services: {} };
+      for (const svc of EXPECTED_SERVICES.per_lane) {
+        // On Windows, we can't check systemd units, so mark as platform-limited
+        results.per_lane_status[lane].services[svc] = 'platform-limited';
+      }
+    }
+    for (const svc of EXPECTED_SERVICES.system) {
+      results.per_lane_status[svc] = 'platform-limited';
+    }
+    
+    // We can't determine invariant_ok on Windows without service manager integration
+    // Report what we know and emit a recommendation
+    results.invariant_ok = null; // Unknown on Windows
+    results.active = nodeCount; // At least report node process count
+    results.missing.push({ 
+      service: 'systemd-service-check', 
+      state: 'platform-limited',
+      note: 'Full service topology check requires Linux/systemd. Run audit on Linux for complete verification.'
+    });
+    
+    return results;
+  }
+
+  // Linux path - full systemd check
+  const xdg = process.env.XDG_RUNTIME_DIR || `/run/user/${getUid()}`;
   const dbus = `unix:path=${xdg}/bus`;
   const env = { ...process.env, XDG_RUNTIME_DIR: xdg, DBUS_SESSION_BUS_ADDRESS: dbus };
 
