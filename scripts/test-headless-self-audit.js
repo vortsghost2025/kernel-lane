@@ -313,6 +313,53 @@ test('RESOLVED entry re-activated clears resolved_at and resets state to NEW', (
   if (fs.existsSync(testLedger)) fs.unlinkSync(testLedger);
   });
 
+// === A1b: false_positive RESOLVED reopen suppresses handoff and preserves adjudication ===
+test('false_positive RESOLVED reopen preserves adjudication and suppresses cognition handoff', () => {
+  const testLedger = '/tmp/test-rec-ledger-fp-reopen.jsonl';
+  if (fs.existsSync(testLedger)) fs.unlinkSync(testLedger);
+  process.env.REC_LEDGER = testLedger;
+  const dir = path.dirname(testLedger);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(testLedger, JSON.stringify({
+    recommendation_id: 'rec-test-fp',
+    dedupe_key: 'TOPOLOGY_ANOMALY:archivist+kernel',
+    recommendation_type: 'TOPOLOGY_ANOMALY',
+    first_seen_at: '2026-05-15T05:00:00Z',
+    last_seen_at: '2026-08-06T02:31:00Z',
+    occurrence_count: 1,
+    current_state: 'RESOLVED',
+    severity: 'P1',
+    affected_lanes: ['archivist', 'kernel'],
+    reason: 'topology anomaly adjudicated false',
+    cycles_since_first: 0,
+    cycles_since_last_escalation: 0,
+    disposition: 'ACCEPT',
+    disposition_at: '2026-08-06T02:31:00Z',
+    resolution_evidence_refs: ['.compact-audit/TOPOLGY_EVIDENCE_20260806.txt'],
+    false_positive: true,
+    cognition_handoff_emitted: false,
+    resolved_at: '2026-08-06T02:31:00Z'
+  }) + '\n', 'utf8');
+  const packets = [{
+    id: 'rec-fp-001', recommendation_type: 'TOPOLOGY_ANOMALY',
+    severity: 'P1', affected_lanes: ['archivist', 'kernel'], reason: 'topology anomaly recurred',
+    requires_agent_cognition: true
+  }];
+  const result = updateRecommendationLedger(packets, 'test-fp-cycle');
+  assert.strictEqual(result.new_count, 1);
+  const entry = loadRecommendationLedger().find(e => e.dedupe_key === 'TOPOLOGY_ANOMALY:archivist+kernel');
+  assert.strictEqual(entry.current_state, 'NEW');
+  assert.strictEqual(entry.resolved_at, undefined);
+  // Adjudication evidence trail preserved (B2)
+  assert.strictEqual(entry.disposition, 'ACCEPT');
+  assert.strictEqual(entry.disposition_at, '2026-08-06T02:31:00Z');
+  assert.strictEqual(entry.false_positive, true);
+  // Handoff re-emission suppressed for adjudicated false-positive (Finding 4)
+  assert.strictEqual(entry.cognition_handoff_emitted, false);
+  delete process.env.REC_LEDGER;
+  if (fs.existsSync(testLedger)) fs.unlinkSync(testLedger);
+  });
+
 // === A2: Work-unit accounting ===
 console.log('A2. Work-unit accounting');
 test('getWorkUnitAccounting returns expected structure', () => {

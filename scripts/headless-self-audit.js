@@ -47,9 +47,17 @@ const DEDUPE_SUPPRESS_CYCLES = 6;
 const SERVICED_LANES = ['archivist', 'kernel', 'swarmmind', 'library'];
 const VIRTUAL_LANES = ['authority'];
 
-const EXPECTED_SERVICES = {
-  per_lane: ['lane-worker', 'relay-daemon', 'heartbeat', 'executor'],
-  system: ['continuous-improvement', 'headless-supervision'],
+const EXPECTED_SERVICE_TEMPLATES = {
+  per_lane: {
+    'lane-worker': 'we4free-lane-worker@${lane}.lane.service',
+    'relay-daemon': 'we4free-relay-daemon@${lane}.service',
+    'heartbeat': 'we4free-heartbeat@${lane}.service',
+    'executor': 'we4free-autonomous-executor@${lane}.service'
+  },
+  system: {
+    'continuous-improvement': 'we4free-continuous-improvement.service',
+    'headless-supervision': 'we4free-headless-self-audit.service'
+  },
   deprecated: ['worker', 'relay', 'watcher', 'agent-runner']
 };
 
@@ -197,8 +205,8 @@ function checkCanonicalDrift() {
 
 // === 2. SERVICE TOPOLOGY INVARIANT GUARD ===
 function checkServiceTopology() {
-  const perLaneCount = SERVICED_LANES.length * EXPECTED_SERVICES.per_lane.length;
-  const systemCount = EXPECTED_SERVICES.system.length;
+  const perLaneCount = SERVICED_LANES.length * Object.keys(EXPECTED_SERVICE_TEMPLATES.per_lane).length;
+  const systemCount = Object.keys(EXPECTED_SERVICE_TEMPLATES.system).length;
   const expectedTotal = perLaneCount + systemCount;
 
   const results = {
@@ -227,12 +235,12 @@ function checkServiceTopology() {
     // We can't reliably check systemd services on Windows, so we report what we can
     for (const lane of SERVICED_LANES) {
       results.per_lane_status[lane] = { services: {} };
-      for (const svc of EXPECTED_SERVICES.per_lane) {
+      for (const svc of Object.keys(EXPECTED_SERVICE_TEMPLATES.per_lane)) {
         // On Windows, we can't check systemd units, so mark as platform-limited
         results.per_lane_status[lane].services[svc] = 'platform-limited';
       }
     }
-    for (const svc of EXPECTED_SERVICES.system) {
+    for (const svc of Object.keys(EXPECTED_SERVICE_TEMPLATES.system)) {
       results.per_lane_status[svc] = 'platform-limited';
     }
     
@@ -254,37 +262,86 @@ function checkServiceTopology() {
   const dbus = `unix:path=${xdg}/bus`;
   const env = { ...process.env, XDG_RUNTIME_DIR: xdg, DBUS_SESSION_BUS_ADDRESS: dbus };
 
-  for (const lane of SERVICED_LANES) {
-    results.per_lane_status[lane] = { services: {} };
-    for (const svc of EXPECTED_SERVICES.per_lane) {
-      const unit = `${lane}-${svc}.service`;
-      const subState = runCmd(`systemctl --user show ${unit} -p ActiveState --value 2>/dev/null`, { env });
-      const resultState = runCmd(`systemctl --user show ${unit} -p Result --value 2>/dev/null`, { env });
+  // Helper: dual-lookup — try template (system scope) first, then legacy (user scope).
+  // Fetch ActiveState, Result, and NRestarts in ONE systemctl show call per scope
+  // (instead of one subprocess spawn per property) to cut spawns per service.
+  function showUnitProps(scope, unit) {
+    const scopeFlag = scope === 'system' ? '' : '--user ';
+    const out = runCmd(`systemctl ${scopeFlag}show ${unit} -p ActiveState,Result,NRestarts --value 2>/dev/null`, { env });
+    const [ActiveState, Result, NRestarts] = (out || '').split('\n');
+    return { ActiveState, Result, NRestarts };
+  }
 
-      results.per_lane_status[lane].services[svc] = subState || 'unknown';
+  // systemd Result values that indicate a real crash/failure (not success/inactive).
+  // 'exit-code' alone misses signal/core-dump/start-limit/oom crashes, which left a
+  // 'failed' ActiveState misattributed as a benign 'missing' service. Treat all the
+  // failure Results as crash-loop signals.
+  // systemd Result values: success, exit-code, signal, core-dump, watchdog,
+  // start-limit, resources. OOM kills surface as 'signal' (SIGKILL) or 'core-dump';
+  // there is no 'oom-kill' Result value.
+  const CRASH_RESULTS = new Set(['exit-code', 'signal', 'core-dump', 'watchdog', 'timeout', 'start-limit', 'resources']);
 
-      if (subState === 'active') {
-        results.active++;
-      } else if (resultState === 'exit-code') {
-        results.crash_loops.push({ service: unit, state: 'crash-loop', nrestarts: runCmd(`systemctl --user show ${unit} -p NRestarts --value 2>/dev/null`, { env }) || '?' });
-      } else {
-        results.missing.push({ service: unit, state: subState || 'inactive' });
-      }
+  function checkUnit(templateName, legacyName) {
+    // Try template unit in system scope first
+    const t = showUnitProps('system', templateName);
+    if (t.ActiveState === 'active') {
+      return { state: 'active', unit: templateName, scope: 'system' };
+    }
+    // Fallback: legacy unit in user scope
+    const l = showUnitProps('user', legacyName);
+    if (l.ActiveState === 'active') {
+      return { state: 'active', unit: legacyName, scope: 'user' };
+    }
+    // Neither active — capture Result from BOTH scopes so system-scope template
+    // crash-loops (the current deployment) are detected, not only legacy units.
+    // Preserve the actual systemd Result value (exit-code/signal/oom-kill/...) so
+    // crash_loops entries retain the crash cause for operator diagnostics.
+    if (CRASH_RESULTS.has(t.Result)) {
+      return { state: 'failed', unit: templateName, scope: 'system', resultState: t.Result, nrestarts: t.NRestarts };
+    }
+    if (CRASH_RESULTS.has(l.Result)) {
+      return { state: 'failed', unit: legacyName, scope: 'user', resultState: l.Result, nrestarts: l.NRestarts };
+    }
+    // No crash in either scope — report as missing. Attribute to the system template
+    // when it has a known non-inactive state (newer deployment); else legacy.
+    if (t.ActiveState && t.ActiveState !== 'inactive' && t.ActiveState !== 'failed') {
+      return { state: t.ActiveState, unit: templateName, scope: 'system' };
+    }
+    return { state: l.ActiveState || 'unknown', unit: legacyName, scope: 'user', resultState: l.Result };
+  }
+
+  // Shared active/crash/missing classification for both the per_lane and system
+  // loops (single source of truth to avoid drift between the two).
+  function classifyService(check) {
+    if (check.state === 'active') {
+      results.active++;
+    } else if (check.resultState && CRASH_RESULTS.has(check.resultState)) {
+      results.crash_loops.push({ service: check.unit, state: 'crash-loop', resultState: check.resultState, nrestarts: check.nrestarts || '?' });
+    } else {
+      results.missing.push({ service: check.unit, state: check.state || 'inactive', scope: check.scope });
     }
   }
 
-  for (const svc of EXPECTED_SERVICES.system) {
-    const unit = `${svc}.service`;
-    const state = runCmd(`systemctl --user show ${unit} -p ActiveState --value 2>/dev/null`, { env });
-    if (state === 'active') {
-      results.active++;
-    } else {
-      results.missing.push({ service: unit, state: state || 'inactive' });
+  for (const lane of SERVICED_LANES) {
+    results.per_lane_status[lane] = { services: {} };
+    for (const [svc, template] of Object.entries(EXPECTED_SERVICE_TEMPLATES.per_lane)) {
+      const templateUnit = template.replace('${lane}', lane);
+      const legacyUnit = `${lane}-${svc}.service`;
+      const check = checkUnit(templateUnit, legacyUnit);
+      
+      results.per_lane_status[lane].services[svc] = check.state;
+
+      classifyService(check);
     }
+  }
+
+  for (const [svc, template] of Object.entries(EXPECTED_SERVICE_TEMPLATES.system)) {
+    const check = checkUnit(template, `${svc}.service`);
+    classifyService(check);
   }
 
   for (const lane of ALL_LANES) {
-    for (const dep of EXPECTED_SERVICES.deprecated) {
+    for (const dep of EXPECTED_SERVICE_TEMPLATES.deprecated) {
       const depUnit = `${lane}-${dep}.service`;
       const depState = runCmd(`systemctl --user is-active ${depUnit} 2>/dev/null`, { env });
       if (depState === 'active') {
@@ -293,7 +350,7 @@ function checkServiceTopology() {
     }
   }
 
-  for (const dep of EXPECTED_SERVICES.deprecated) {
+  for (const dep of EXPECTED_SERVICE_TEMPLATES.deprecated) {
     const depUnit = `${dep}.service`;
     const depState = runCmd(`systemctl --user is-active ${depUnit} 2>/dev/null`, { env });
     if (depState === 'active') {
@@ -887,7 +944,32 @@ function writeRecommendationLedger(entries) {
   const ledgerPath = getRecLedgerPath();
   const dir = path.dirname(ledgerPath);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(ledgerPath, entries.map(e => JSON.stringify(e)).join('\n') + '\n', 'utf8');
+  // Self-healing dedupe: collapse records that share a dedupe_key (e.g. a manual
+  // adjudication append co-existing with a daemon-managed record). Prefer the
+  // adjudicated record (false_positive === true, else any disposition set);
+  // otherwise keep the latest by last_seen_at. Guarantees one record per dedupe_key.
+  const adjudicationRank = (rec) => (rec && rec.false_positive === true ? 2 : (rec && rec.disposition ? 1 : 0));
+  const bestByKey = {};
+  for (const e of entries) {
+    const k = e.dedupe_key;
+    const cur = bestByKey[k];
+    if (!cur) { bestByKey[k] = e; continue; }
+    const aRank = adjudicationRank(e);
+    const bRank = adjudicationRank(cur);
+    let keep;
+    if (aRank !== bRank) {
+      keep = aRank > bRank ? e : cur;
+    } else {
+      const aTs = e.last_seen_at || e.first_seen_at || '';
+      const bTs = cur.last_seen_at || cur.first_seen_at || '';
+      const aCnt = e.occurrence_count || 0;
+      const bCnt = cur.occurrence_count || 0;
+      keep = aTs !== bTs ? (aTs >= bTs ? e : cur) : (aCnt >= bCnt ? e : cur);
+    }
+    bestByKey[k] = keep;
+  }
+  const collapsed = Object.values(bestByKey);
+  fs.writeFileSync(ledgerPath, collapsed.map(e => JSON.stringify(e)).join('\n') + '\n', 'utf8');
 }
 
 function updateRecommendationLedger(newPackets, cycleId) {
@@ -934,12 +1016,20 @@ function updateRecommendationLedger(newPackets, cycleId) {
       prev.cycles_since_first++;
       prev.cycles_since_last_escalation++;
       if (prev.current_state === 'RESOLVED') {
+        const wasFalsePositive = prev.false_positive === true;
         prev.current_state = 'NEW';
         delete prev.resolved_at;
-        prev.cognition_handoff_emitted = true;
-        prev.disposition = null;
-        prev.disposition_at = null;
-        prev.false_positive = null;
+        if (!wasFalsePositive) {
+          prev.disposition = null;
+          prev.disposition_at = null;
+          prev.false_positive = null;
+          prev.cognition_handoff_emitted = true;
+        } else {
+          // Adjudicated false-positive that recurred: preserve the adjudication
+          // (disposition/false_positive) and suppress re-emitting the cognition
+          // handoff so the already-dismissed anomaly does not generate noise.
+          prev.cognition_handoff_emitted = false;
+        }
         results.new_count++;
         continue;
       }
