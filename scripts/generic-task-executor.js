@@ -1279,7 +1279,7 @@ function executeImplementProposalTask(msg, lane) {
 function executeCompareFilesTask(msg, lane) {
   const root = LANE_REGISTRY[lane].root;
   const body = (msg.body || '');
-  const diffMatch = body.match(/compare\s+files?\s+["']?([^"'\s]+)["']?\s+(?:to|with|and|vs)\s+["']?([^"'\s]+)["']?/i)
+  const diffMatch = body.match(/compare\s+(?:files?\s+)?["']?([^"'\s]+)["']?\s+(?:to|with|and|vs)\s+["']?([^"'\s]+)["']?/i)
     || body.match(/files?\s+["']?([^"'\s]+)["']?\s+(?:to|with|and|vs)\s+["']?([^"'\s]+)["']?/i);
   if (!diffMatch) {
     return { task_kind: 'report', results: { error: 'Need two file paths. Use: "compare files <file1> with <file2>"' }, summary: 'Error: need two file paths' };
@@ -1333,6 +1333,59 @@ function executeCompareFilesTask(msg, lane) {
   }
 }
 
+function executeWebResearchTask(msg, lane) {
+  const body = (msg.body || '');
+  const urlMatch = body.match(/(?:web\s+research|research|fetch|http[s]?:\/\/)\s*["']?([^"'\s]+)["']?/i)
+    || body.match(/https?:\/\/[^\s"'<>]+/i);
+  if (!urlMatch) {
+    return { task_kind: 'report', results: { error: 'No URL specified. Use: "web research <url>" or include an https:// URL' }, summary: 'Error: no URL in task body' };
+  }
+  const url = urlMatch[1] || urlMatch[0];
+  if (!url.match(/^https?:\/\//i)) {
+    return { task_kind: 'report', results: { error: `Invalid URL scheme: ${url}. Only http/https allowed.` }, summary: 'Error: invalid URL scheme' };
+  }
+
+  const MAX_BYTES = 50 * 1024;
+  const TIMEOUT_MS = 10000;
+  const ALLOWED_HOSTS = [
+    'github.com', 'raw.githubusercontent.com', 'docs.github.com',
+    'developer.mozilla.org', 'stackoverflow.com', 'stackoverflow.blog',
+    'nodejs.org', 'npmjs.com', 'github.io',
+    'archivist.dev', 'tauri.app', 'rust-lang.org',
+    'vercel.com', 'n8n.io', 'n8n.cloud',
+  ];
+
+  try {
+    const urlObj = new URL(url);
+    const host = urlObj.hostname.replace(/^www\./, '');
+    if (!ALLOWED_HOSTS.some(h => host === h || host.endsWith('.' + h))) {
+      return { task_kind: 'report', results: { error: `Host not allowed: ${host}. Allowed: ${ALLOWED_HOSTS.join(', ')}` }, summary: 'Error: host not allowed' };
+    }
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Invalid URL: ${url}` }, summary: 'Error: invalid URL' };
+  }
+
+  try {
+    const { execSync } = require('child_process');
+    const tmpFile = path.join(os.tmpdir(), `lane-research-${Date.now()}.html`);
+    const curlCmd = `curl -sS -L --max-time ${Math.ceil(TIMEOUT_MS / 1000)} --max-filesize ${MAX_BYTES} -o "${tmpFile}" "${url}"`;
+    execSync(curlCmd, { timeout: TIMEOUT_MS + 2000, encoding: 'utf8', maxBuffer: MAX_BYTES + 1024 });
+    let data = '';
+    try { data = fs.readFileSync(tmpFile, 'utf8'); } catch (_) {}
+    try { fs.unlinkSync(tmpFile); } catch (_) {}
+    const text = data.slice(0, MAX_BYTES);
+    const lines = text.split('\n').slice(0, 200);
+    const summary = lines.map(l => l.trim()).filter(l => l.length > 0).slice(0, 50).join('\n');
+    return {
+      task_kind: 'report',
+      results: { url, bytes: text.length, lines: lines.length, summary, method: 'curl' },
+      summary: `Web research: ${url} — ${text.length} bytes, ${lines.length} lines`,
+    };
+  } catch (e) {
+    return { task_kind: 'report', results: { url, error: e.message }, summary: `Web research error: ${e.message}` };
+  }
+}
+
 function executeTask(msg, lane) {
   const t0 = Date.now();
   const kind = (msg.task_kind || '').toLowerCase();
@@ -1345,186 +1398,46 @@ function executeTask(msg, lane) {
     return out;
   };
 
-  if (kind === 'status' || body.includes('report status') || body.includes('processed count')) {
-    return attachRouting(executeStatusTask(msg, lane), { source: 'explicit', verb: 'status', confidence: 1.0 });
-  }
-  if (body.match(/list\s+(dir|directory|folder)\s+/i) || body.match(/\bls\s+/i)) {
-    return attachRouting(executeListDirTask(msg, lane), { source: 'explicit', verb: 'list dir', confidence: 1.0 });
-  }
-  if (body.match(/hash\s+(?:file\s+)?/i) || body.match(/\bsha256?\s+/i) || body.match(/\bchecksum\s+/i)) {
-    return attachRouting(executeHashTask(msg, lane), { source: 'explicit', verb: 'hash file', confidence: 1.0 });
-  }
-  if (body.match(/\bcount\s+/i)) {
-    return attachRouting(executeCountTask(msg, lane), { source: 'explicit', verb: 'count', confidence: 1.0 });
-  }
-  if (body.includes('read file') || body.includes('read ') || body.includes('file:') || body.includes('file=')) {
-    return attachRouting(executeFileReadTask(msg, lane), { source: 'explicit', verb: 'read file', confidence: 1.0 });
-  }
-  if (body.includes('run script') || body.includes('script:') || body.includes('script=')) {
-    return attachRouting(executeScriptTask(msg, lane), { source: 'explicit', verb: 'run script', confidence: 1.0 });
-  }
-  if (body.match(/git\s+(status|log|diff|branch|remote)/i)) {
-    return attachRouting(executeGitTask(msg, lane), { source: 'explicit', verb: 'git', confidence: 1.0 });
-  }
-  if (body.match(/\bgit\s+\S+/i)) {
-    const gitSub = body.match(/git\s+(\S+)/i);
-    const allowed = ['status', 'log', 'diff', 'branch', 'remote'];
-    if (gitSub && !allowed.includes(gitSub[1].toLowerCase())) {
-      return attachRouting({ task_kind: 'report', results: { error: `Git subcommand "${gitSub[1]}" not allowed. Allowed: ${allowed.join(', ')}` }, summary: `Error: git ${gitSub[1]} not allowed` }, { source: 'explicit', verb: 'git', confidence: 1.0 });
-    }
-  }
-  if (body.match(/write\s+(file|to)?/i)) {
-    return attachRouting(executeWriteTask(msg, lane), { source: 'explicit', verb: 'write file', confidence: 1.0 });
-  }
-  if (body.includes('consistency check') || body.includes('audit')) {
-    return attachRouting(executeConsistencyCheck(msg, lane), { source: 'explicit', verb: 'consistency check', confidence: 1.0 });
-  }
-  if (kind === 'drift_sweep' || body.includes('drift sweep') || body.includes('script drift') || body.includes('cross-lane drift')) {
-    return attachRouting(executeDriftSweepTask(msg, lane), { source: 'explicit', verb: 'drift_sweep', confidence: 1.0 });
-  }
-  if (kind === 'watcher_health_audit' || body.includes('watcher health') || body.includes('heartbeat health') || body.includes('scheduled task check')) {
-    return attachRouting(executeWatcherHealthAuditTask(msg, lane), { source: 'explicit', verb: 'watcher_health_audit', confidence: 1.0 });
-  }
-  if (kind === 'stale_work_detection' || body.includes('stale work') || body.includes('stale items') || body.includes('aging inbox')) {
-    return attachRouting(executeStaleWorkDetectionTask(msg, lane), { source: 'explicit', verb: 'stale_work_detection', confidence: 1.0 });
-  }
+  const routes = [
+    { kind: 'status', body: /report status|processed count/i, fn: executeStatusTask },
+    { kind: 'list dir', body: /list\s+(dir|directory|folder)\s+|^\s*ls\s+/i, fn: executeListDirTask },
+    { kind: 'hash file', body: /hash\s+(?:file\s+)?|sha256?|checksum/i, fn: executeHashTask },
+    { kind: 'count', body: /\bcount\s+/i, fn: executeCountTask },
+    { kind: 'read file', body: /read\s+file|read\s+|file:|file=/i, fn: executeFileReadTask },
+    { kind: 'run script', body: /run\s+script|script:|script=/i, fn: executeScriptTask },
+    { kind: 'git', body: /git\s+(status|log|diff|branch|remote)/i, fn: executeGitTask },
+    { kind: 'git_error', body: /\bgit\s+\S+/i, fn: null },
+    { kind: 'write file', body: /write\s+(file|to)?/i, fn: executeWriteTask },
+    { kind: 'consistency check', body: /consistency\s+check|audit/i, fn: executeConsistencyCheck },
+    { kind: 'drift_sweep', body: /drift\s+sweep|script\s+drift|cross-lane\s+drift/i, fn: executeDriftSweepTask },
+    { kind: 'watcher_health_audit', body: /watcher\s+health|heartbeat\s+health|scheduled\s+task\s+check|pipeline\s+health/i, fn: executeWatcherHealthAuditTask },
+    { kind: 'stale_work_detection', body: /stale\s+(?:work|items|messages|inbox)|aging\s+(?:inbox|items)|undeliver|old\s+(?:blocked|quarantine)/i, fn: executeStaleWorkDetectionTask },
+    { kind: 'analyze_code', body: /\banalyze\s+(?:code\s+)?/i, fn: executeAnalyzeCodeTask },
+    { kind: 'trace_symbol', body: /\btrace\s+(?:symbol\s+)?/i, fn: executeTraceSymbolTask },
+    { kind: 'find_patterns', body: /\bfind\s+(?:patterns?\s+)/i, fn: executeFindPatternsTask },
+    { kind: 'dependency_map', body: /\bdependency\s+(?:map\s+)?|\bdependencies?\s+(?:for|of)\s+/i, fn: executeDependencyMapTask },
+    { kind: 'propose_improvement', body: /\bpropose\s+improvement\b|\bimprovement\s+proposal\b|\bcreate\s+proposal\b/i, fn: executeProposeImprovementTask },
+    { kind: 'create_patch', body: /\bcreate\s+patch\b/i, fn: executeCreatePatchTask },
+    { kind: 'validate_improvement', body: /\bvalidate\s+(?:improvement|proposal|patch)\b/i, fn: executeValidateImprovementTask },
+    { kind: 'implement_proposal', body: /\bimplement\s+(?:proposal|improvement)\b/i, fn: executeImplementProposalTask },
+    { kind: 'compare_files', body: /\bcompare\s+(?:files?\s+)?\S+\s+(?:with|to|and|vs)\s+\S+/i, fn: executeCompareFilesTask },
+    { kind: 'web_research', body: /\bweb\s+research\b|\bresearch\s+online\b|https?:\/\//i, fn: executeWebResearchTask },
+    { kind: 'diff', body: /\bdiff\s+/i, fn: executeDiffTask },
+    { kind: 'grep', body: /\b(grep|search|find)\b\s+/i, fn: executeGrepTask },
+  ];
 
-  if (kind === 'analyze_code' || body.match(/\banalyze\s+(?:code\s+)?/i)) {
-    return attachRouting(executeAnalyzeCodeTask(msg, lane), { source: 'explicit', verb: 'analyze_code', confidence: 1.0 });
-  }
-  if (kind === 'trace_symbol' || body.match(/\btrace\s+(?:symbol\s+)?/i)) {
-    return attachRouting(executeTraceSymbolTask(msg, lane), { source: 'explicit', verb: 'trace_symbol', confidence: 1.0 });
-  }
-  if (kind === 'find_patterns' || body.match(/\bfind\s+(?:patterns?\s+)/i) || body.match(/\bpatterns?\s+/i)) {
-    return attachRouting(executeFindPatternsTask(msg, lane), { source: 'explicit', verb: 'find_patterns', confidence: 1.0 });
-  }
-  if (kind === 'dependency_map' || body.match(/\bdependency\s+(?:map\s+)?/i) || body.match(/\bdependencies?\s+(?:for|of)\s+/i)) {
-    return attachRouting(executeDependencyMapTask(msg, lane), { source: 'explicit', verb: 'dependency_map', confidence: 1.0 });
-  }
-  if (kind === 'propose_improvement' || body.match(/\bpropose\s+improvement\b/i) || body.match(/\bimprovement\s+proposal\b/i) || body.match(/\bcreate\s+proposal\b/i)) {
-    return attachRouting(executeProposeImprovementTask(msg, lane), { source: 'explicit', verb: 'propose_improvement', confidence: 1.0 });
-  }
-  if (kind === 'create_patch' || body.match(/\bcreate\s+patch\b/i)) {
-    return attachRouting(executeCreatePatchTask(msg, lane), { source: 'explicit', verb: 'create_patch', confidence: 1.0 });
-  }
-  if (kind === 'validate_improvement' || body.match(/\bvalidate\s+(?:improvement|proposal|patch)\b/i)) {
-    return attachRouting(executeValidateImprovementTask(msg, lane), { source: 'explicit', verb: 'validate_improvement', confidence: 1.0 });
-  }
-  if (kind === 'implement_proposal' || body.match(/\bimplement\s+(?:proposal|improvement)\b/i)) {
-    return attachRouting(executeImplementProposalTask(msg, lane), { source: 'explicit', verb: 'implement_proposal', confidence: 1.0 });
-  }
-  if (kind === 'compare_files' || body.match(/\bcompare\s+files?\b/i) || body.match(/\bfiles?\s+\S+\s+(?:to|with|and|vs)\s+\S+/i)) {
-    return attachRouting(executeCompareFilesTask(msg, lane), { source: 'explicit', verb: 'compare_files', confidence: 1.0 });
-  }
-
-  if (body.match(/\bdiff\s+/i) && !body.match(/\bcompare\s+files?\b/i)) {
-    return attachRouting(executeDiffTask(msg, lane), { source: 'explicit', verb: 'diff', confidence: 1.0 });
-  }
-  if (body.match(/(grep|search|find)\s+/i) && !body.match(/\bfind\s+(?:patterns?\s+)/i) && !body.match(/\btrace\s+/i)) {
-    return attachRouting(executeGrepTask(msg, lane), { source: 'explicit', verb: 'grep', confidence: 1.0 });
-  }
-  if (body.match(/list\s+(dir|directory|folder)\s+/i) || body.match(/\bls\s+/i)) {
-    return attachRouting(executeListDirTask(msg, lane), { source: 'explicit', verb: 'list dir', confidence: 1.0 });
-  }
-  if (body.match(/hash\s+(?:file\s+)?/i) || body.match(/\bsha256?\s+/i) || body.match(/\bchecksum\s+/i)) {
-    return attachRouting(executeHashTask(msg, lane), { source: 'explicit', verb: 'hash file', confidence: 1.0 });
-  }
-  if (body.match(/\bdiff\s+/i) || body.match(/\bcompare\s+/i)) {
-    return attachRouting(executeDiffTask(msg, lane), { source: 'explicit', verb: 'diff', confidence: 1.0 });
-  }
-  if (body.match(/\bcount\s+/i)) {
-    return attachRouting(executeCountTask(msg, lane), { source: 'explicit', verb: 'count', confidence: 1.0 });
-  }
-  if (body.includes('read file') || body.includes('read ') || body.includes('file:') || body.includes('file=')) {
-    return attachRouting(executeFileReadTask(msg, lane), { source: 'explicit', verb: 'read file', confidence: 1.0 });
-  }
-  if (body.includes('run script') || body.includes('script:') || body.includes('script=')) {
-    return attachRouting(executeScriptTask(msg, lane), { source: 'explicit', verb: 'run script', confidence: 1.0 });
-  }
-  if (body.match(/git\s+(status|log|diff|branch|remote)/i)) {
-    return attachRouting(executeGitTask(msg, lane), { source: 'explicit', verb: 'git', confidence: 1.0 });
-  }
-  if (body.match(/\bgit\s+\S+/i)) {
-    const gitSub = body.match(/git\s+(\S+)/i);
-    const allowed = ['status', 'log', 'diff', 'branch', 'remote'];
-    if (gitSub && !allowed.includes(gitSub[1].toLowerCase())) {
-      return attachRouting({ task_kind: 'report', results: { error: `Git subcommand "${gitSub[1]}" not allowed. Allowed: ${allowed.join(', ')}` }, summary: `Error: git ${gitSub[1]} not allowed` }, { source: 'explicit', verb: 'git', confidence: 1.0 });
+  for (const route of routes) {
+    if (kind === route.kind || route.body.test(body)) {
+      if (route.kind === 'git_error') {
+        const gitSub = body.match(/git\s+(\S+)/i);
+        const allowed = ['status', 'log', 'diff', 'branch', 'remote'];
+        const sub = gitSub ? gitSub[1].toLowerCase() : 'unknown';
+        if (!allowed.includes(sub)) {
+          return attachRouting({ task_kind: 'report', results: { error: `Git subcommand "${sub}" not allowed. Allowed: ${allowed.join(', ')}` }, summary: `Error: git ${sub} not allowed` }, { source: 'explicit', verb: 'git', confidence: 1.0 });
+        }
+      }
+      return attachRouting(route.fn(msg, lane), { source: 'explicit', verb: route.kind, confidence: 1.0 });
     }
-  }
-  if (body.match(/(grep|search|find)\s+/i)) {
-    return attachRouting(executeGrepTask(msg, lane), { source: 'explicit', verb: 'grep', confidence: 1.0 });
-  }
-  if (body.match(/write\s+(file|to)?/i)) {
-    return attachRouting(executeWriteTask(msg, lane), { source: 'explicit', verb: 'write file', confidence: 1.0 });
-  }
-  if (body.includes('consistency check') || body.includes('audit')) {
-    return attachRouting(executeConsistencyCheck(msg, lane), { source: 'explicit', verb: 'consistency check', confidence: 1.0 });
-  }
-  if (kind === 'drift_sweep' || body.includes('drift sweep') || body.includes('script drift') || body.includes('cross-lane drift')) {
-    return attachRouting(executeDriftSweepTask(msg, lane), { source: 'explicit', verb: 'drift_sweep', confidence: 1.0 });
-  }
-  if (kind === 'watcher_health_audit' || body.includes('watcher health') || body.includes('heartbeat health') || body.includes('scheduled task check')) {
-    return attachRouting(executeWatcherHealthAuditTask(msg, lane), { source: 'explicit', verb: 'watcher_health_audit', confidence: 1.0 });
-  }
-  if (kind === 'stale_work_detection' || body.includes('stale work') || body.includes('stale items') || body.includes('aging inbox')) {
-    return attachRouting(executeStaleWorkDetectionTask(msg, lane), { source: 'explicit', verb: 'stale_work_detection', confidence: 1.0 });
-  }
-  if (kind === 'analyze_code' || body.match(/\banalyze\s+(?:code\s+)?/i)) {
-    return attachRouting(executeAnalyzeCodeTask(msg, lane), { source: 'explicit', verb: 'analyze_code', confidence: 1.0 });
-  }
-  if (kind === 'trace_symbol' || body.match(/\btrace\s+(?:symbol\s+)?/i)) {
-    return attachRouting(executeTraceSymbolTask(msg, lane), { source: 'explicit', verb: 'trace_symbol', confidence: 1.0 });
-  }
-  if (kind === 'find_patterns' || body.match(/\bfind\s+(?:patterns?\s+)/i) || body.match(/\bpatterns?\s+/i)) {
-    return attachRouting(executeFindPatternsTask(msg, lane), { source: 'explicit', verb: 'find_patterns', confidence: 1.0 });
-  }
-  if (kind === 'dependency_map' || body.match(/\bdependency\s+(?:map\s+)?/i) || body.match(/\bdependencies?\s+(?:for|of)\s+/i)) {
-    return attachRouting(executeDependencyMapTask(msg, lane), { source: 'explicit', verb: 'dependency_map', confidence: 1.0 });
-  }
-  if (kind === 'propose_improvement' || body.match(/\bpropose\s+improvement\b/i) || body.match(/\bimprovement\s+proposal\b/i) || body.match(/\bcreate\s+proposal\b/i)) {
-    return attachRouting(executeProposeImprovementTask(msg, lane), { source: 'explicit', verb: 'propose_improvement', confidence: 1.0 });
-  }
-  if (kind === 'create_patch' || body.match(/\bcreate\s+patch\b/i)) {
-    return attachRouting(executeCreatePatchTask(msg, lane), { source: 'explicit', verb: 'create_patch', confidence: 1.0 });
-  }
-  if (kind === 'validate_improvement' || body.match(/\bvalidate\s+(?:improvement|proposal|patch)\b/i)) {
-    return attachRouting(executeValidateImprovementTask(msg, lane), { source: 'explicit', verb: 'validate_improvement', confidence: 1.0 });
-  }
-  if (kind === 'implement_proposal' || body.match(/\bimplement\s+(?:proposal|improvement)\b/i)) {
-    return attachRouting(executeImplementProposalTask(msg, lane), { source: 'explicit', verb: 'implement_proposal', confidence: 1.0 });
-  }
-  if (kind === 'compare_files' || body.match(/\bcompare\s+files?\b/i) || body.match(/\bfiles?\s+\S+\s+(?:to|with|and|vs)\s+\S+/i)) {
-    return attachRouting(executeCompareFilesTask(msg, lane), { source: 'explicit', verb: 'compare_files', confidence: 1.0 });
-  }
-  if (body.match(/\bdiff\s+/i) && !body.match(/\bcompare\s+files?\b/i)) {
-    return attachRouting(executeDiffTask(msg, lane), { source: 'explicit', verb: 'diff', confidence: 1.0 });
-  }
-  if (body.match(/(grep|search|find)\s+/i) && !body.match(/\bfind\s+(?:patterns?\s+)/i) && !body.match(/\btrace\s+/i)) {
-    return attachRouting(executeGrepTask(msg, lane), { source: 'explicit', verb: 'grep', confidence: 1.0 });
-  }
-  if (kind === 'trace_symbol' || body.match(/\btrace\s+(?:symbol\s+)?/i)) {
-    return attachRouting(executeTraceSymbolTask(msg, lane), { source: 'explicit', verb: 'trace_symbol', confidence: 1.0 });
-  }
-  if (kind === 'find_patterns' || body.match(/\bfind\s+(?:patterns?\s+)?/i) || body.match(/\bpatterns?\s+/i)) {
-    return attachRouting(executeFindPatternsTask(msg, lane), { source: 'explicit', verb: 'find_patterns', confidence: 1.0 });
-  }
-  if (kind === 'dependency_map' || body.match(/\bdependency\s+(?:map\s+)?/i) || body.match(/\bdependencies?\s+(?:for|of)\s+/i)) {
-    return attachRouting(executeDependencyMapTask(msg, lane), { source: 'explicit', verb: 'dependency_map', confidence: 1.0 });
-  }
-  if (kind === 'propose_improvement' || body.match(/\bpropose\s+improvement\b/i) || body.match(/\bimprovement\s+proposal\b/i) || body.match(/\bproposal\b/i)) {
-    return attachRouting(executeProposeImprovementTask(msg, lane), { source: 'explicit', verb: 'propose_improvement', confidence: 1.0 });
-  }
-  if (kind === 'create_patch' || body.match(/\bcreate\s+patch\b/i) || body.match(/\bpatch\b/i)) {
-    return attachRouting(executeCreatePatchTask(msg, lane), { source: 'explicit', verb: 'create_patch', confidence: 1.0 });
-  }
-  if (kind === 'validate_improvement' || body.match(/\bvalidate\s+(?:improvement|proposal|patch)\b/i)) {
-    return attachRouting(executeValidateImprovementTask(msg, lane), { source: 'explicit', verb: 'validate_improvement', confidence: 1.0 });
-  }
-  if (kind === 'implement_proposal' || body.match(/\bimplement\s+(?:proposal|improvement)\b/i)) {
-    return attachRouting(executeImplementProposalTask(msg, lane), { source: 'explicit', verb: 'implement_proposal', confidence: 1.0 });
-  }
-  if (kind === 'compare_files' || body.match(/\bcompare\s+files?\b/i) || body.match(/\bfiles?\s+\S+\s+(?:to|with|and|vs)\s+\S+/i)) {
-    return attachRouting(executeCompareFilesTask(msg, lane), { source: 'explicit', verb: 'compare_files', confidence: 1.0 });
   }
 
   const nlpDecision = nlpRoute(msg);
@@ -1597,12 +1510,13 @@ function executeTask(msg, lane) {
       case 'validate_improvement': return attachRouting(executeValidateImprovementTask(nlpMsg, lane), routing);
       case 'implement_proposal': return attachRouting(executeImplementProposalTask(nlpMsg, lane), routing);
       case 'compare_files': return attachRouting(executeCompareFilesTask(nlpMsg, lane), routing);
+      case 'web_research': return attachRouting(executeWebResearchTask(nlpMsg, lane), routing);
     }
   }
 
   return attachRouting({
     task_kind: 'ack',
-    results: { acknowledged: true, note: 'Task type not recognized. Supported: status, "read file <path>", "run script <name>", "git status/log/diff", "grep <pattern> in <path>", "write file <path>\\n<content>", "list dir <path>", "hash file <path>", "diff <file1> <file2>", "count \\"pattern\\" in <path>", "consistency check", "drift_sweep", "watcher_health_audit", "stale_work_detection", "analyze code <path>", "trace symbol <name> in <path>", "find pattern <regex> in <path>", "dependency map <path>", "compare files <file1> with <file2>", "propose improvement <title>", "create patch <file>: <diff>", "validate improvement <path>", "implement proposal <path>" - or use natural language' },
+    results: { acknowledged: true, note: 'Task type not recognized. Supported: status, "read file <path>", "run script <name>", "git status/log/diff", "grep <pattern> in <path>", "write file <path>\\n<content>", "list dir <path>", "hash file <path>", "diff <file1> <file2>", "count \\"pattern\\" in <path>", "consistency check", "drift_sweep", "watcher_health_audit", "stale_work_detection", "analyze code <path>", "trace symbol <name> in <path>", "find pattern <regex> in <path>", "dependency map <path>", "compare files <file1> with <file2>", "web research <url>", "propose improvement <title>", "create patch <file>: <diff>", "validate improvement <path>", "implement proposal <path>" - or use natural language' },
     summary: `Acknowledged task: ${msg.subject || msg.task_id || 'unknown'}`,
   }, { source: 'fallback', verb: 'ack', confidence: 1.0 });
 }
@@ -1828,4 +1742,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { GenericTaskExecutor, executeTask, createResponse, LANE_REGISTRY, NLP_ROUTES, isPathAllowed, resolveLocalPath, EXECUTOR_VERSION, FEATURE_FLAGS, executeDriftSweepTask, executeWatcherHealthAuditTask, executeStaleWorkDetectionTask, executeAnalyzeCodeTask, executeTraceSymbolTask, executeFindPatternsTask, executeDependencyMapTask, executeProposeImprovementTask, executeCreatePatchTask, executeValidateImprovementTask, executeImplementProposalTask, executeCompareFilesTask };
+module.exports = { GenericTaskExecutor, executeTask, createResponse, LANE_REGISTRY, NLP_ROUTES, isPathAllowed, resolveLocalPath, EXECUTOR_VERSION, FEATURE_FLAGS, executeDriftSweepTask, executeWatcherHealthAuditTask, executeStaleWorkDetectionTask, executeAnalyzeCodeTask, executeTraceSymbolTask, executeFindPatternsTask, executeDependencyMapTask, executeProposeImprovementTask, executeCreatePatchTask, executeValidateImprovementTask, executeImplementProposalTask, executeCompareFilesTask, executeWebResearchTask };
