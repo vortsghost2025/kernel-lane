@@ -7,6 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 const { LaneDiscovery } = require('./lane-discovery.js');
+const { createMessage } = require('../src/lane/SchemaValidator.js');
 
 class CanonicalMessageBuilder {
   constructor(laneId) {
@@ -42,7 +43,7 @@ class CanonicalMessageBuilder {
     } = options;
 
     // Validate type against enforcement schema
-    const validTypes = ['task', 'response', 'heartbeat', 'escalation', 'handoff', 'ack', 'alert'];
+    const validTypes = ['task', 'response', 'heartbeat', 'escalation', 'handoff', 'ack', 'alert', 'notification', 'status'];
     if (!validTypes.includes(type)) {
       throw new Error(`Invalid type: "${type}". Must be one of: ${validTypes.join(', ')}`);
     }
@@ -50,7 +51,7 @@ class CanonicalMessageBuilder {
     const timestamp = new Date().toISOString();
     const id = `${this.laneId}-${type}-${Date.now()}`;
     
-    const message = {
+    const message = createMessage({
       schema_version: '1.3',
       task_id: id,
       idempotency_key: this.generateIdempotencyKey(),
@@ -67,13 +68,25 @@ class CanonicalMessageBuilder {
         owner: this.laneId,
         acquired_at: timestamp,
         expires_at: this.addMinutes(timestamp, leaseDurationMinutes),
-        duration_minutes: leaseDurationMinutes
+        renew_count: 0,
+        max_renewals: 3
       },
       retry: {
         attempt: 1,
         max_attempts: 3,
         last_error: null,
         last_attempt_at: null
+      },
+      payload: {
+        mode: 'inline',
+        compression: 'none'
+      },
+      execution: {
+        mode: 'session_task',
+        engine: 'opencode',
+        actor: 'lane',
+        session_id: null,
+        parent_id: null
       },
       evidence: {
         required: evidence.required || false,
@@ -83,8 +96,14 @@ class CanonicalMessageBuilder {
         verified_by: null,
         verified_at: null
       },
+      heartbeat: {
+        interval_seconds: 300,
+        last_heartbeat_at: timestamp,
+        timeout_seconds: 900,
+        status: 'pending'
+      },
       ...custom
-    };
+    });
 
     return message;
   }
