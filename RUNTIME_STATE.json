@@ -1,0 +1,46 @@
+{
+  "$schema": "https://archivist.dev/schemas/runtime-state.json",
+  "version": "1.0.0",
+  "timestamp": "2026-06-11T20:50:00.000Z",
+  "lane": {
+    "id": "archivist-agent",
+    "role": "governance-root",
+    "position": 1
+  },
+  "capabilities": {
+    "can_respond_to_sync": true,
+    "can_govern": true,
+    "can_restore_context": true,
+    "can_archive_traces": true
+  },
+  "runtime": {
+    "mode": "governance-root",
+    "governance_active": true,
+    "external_lane_enabled": true,
+    "claim_limit": "full"
+  },
+  "session": {
+    "id": "ses_1486e9ea5ffePerej3R1kiMPOV",
+    "branch": "main"
+  },
+  "governance": {
+    "active": true,
+    "source": null,
+    "bootstrap_verified": true
+  },
+  "upstream_lanes": [
+    {
+      "lane_id": "swarmmind",
+      "runtime_state": "active"
+    },
+    {
+      "lane_id": "self-organizing-library",
+      "runtime_state": "active"
+    }
+  ],
+  "memory": {
+    "artifacts_stored": 142,
+    "traces_archived": 87,
+    "restoration_packets_available": 3
+  }
+}

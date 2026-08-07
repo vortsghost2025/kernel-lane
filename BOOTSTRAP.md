@@ -10,6 +10,7 @@
 
 **No-guesswork message contract (schema + signing + send/log):**
 `S:/Archivist-Agent/docs/ops/LANE_MESSAGE_INDEX.md`
+
 **Protocol extensions (v1.4 — uncertainty + review + prior attempts):**
 - `UNCERTAINTY_PACKET_V1`: `schemas/uncertainty-packet-v1.json` — surfaces stalled/uncertain work
 - `REVIEW_ROUND_PROTOCOL_V1`: `schemas/review-round-protocol-v1.json` — iterative review loop
@@ -908,8 +909,10 @@ RULE: All cross-lane communication MUST use the lanes/ structure.
 
 PATHS (DETERMINISTIC - NO GUESSING):
 - Archivist inbox: lanes/archivist/inbox/
+- Kernel inbox:    lanes/kernel/inbox/
 - Library inbox:   lanes/library/inbox/
 - SwarmMind inbox: lanes/swarmmind/inbox/
+- Authority inbox: lanes/authority/inbox/
 
 EACH REPO HAS ALL THREE DIRECTORIES - THIS IS NOT ONE REPO.
 
