@@ -697,17 +697,21 @@ for (const relativePath of allRelativePaths) {
     c8Scan(broadcastDir);
   }
 
+  // T31 fix: --dry-run reports sync drift only; skip the per-lane test suites
+  // (which can take minutes and were causing the dry-run to exceed its timeout).
   const testResults = [];
-  for (const lane of LANE_ORDER) {
-    const laneRoot = laneRoots[lane];
-    const laneWorkerTest = runNodeTest(laneRoot, 'scripts/test-lane-worker-we4free.js');
-    const executorTest = runNodeTest(laneRoot, 'scripts/test-executor-v3.js');
-    testResults.push({
-      lane,
-      lane_worker_test: laneWorkerTest,
-      executor_test: executorTest,
-      all_pass: laneWorkerTest.ok && executorTest.ok,
-    });
+  if (!DRY_RUN) {
+    for (const lane of LANE_ORDER) {
+      const laneRoot = laneRoots[lane];
+      const laneWorkerTest = runNodeTest(laneRoot, 'scripts/test-lane-worker-we4free.js');
+      const executorTest = runNodeTest(laneRoot, 'scripts/test-executor-v3.js');
+      testResults.push({
+        lane,
+        lane_worker_test: laneWorkerTest,
+        executor_test: executorTest,
+        all_pass: laneWorkerTest.ok && executorTest.ok,
+      });
+    }
   }
 
   const laneHealth = LANE_ORDER.map((lane) => collectLaneHealth(lane, laneRoots[lane]));

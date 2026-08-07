@@ -1370,6 +1370,7 @@ module.exports = {
   buildRecommendationPackets, buildRollup, buildEnhancedRollup,
   emitCognitionHandoff, buildDedupeKey, updateRecommendationLedger,
   recordDisposition, loadRecommendationLedger, getRecLedgerPath,
+  writeRecommendationLedger,
   getWorkUnitAccounting,
   SERVICED_LANES, VIRTUAL_LANES, REQUIRED_EXECUTOR_FILES,
   RECOMMENDATION_TYPES, REC_LIFECYCLE_STATES, REC_DISPOSITIONS,

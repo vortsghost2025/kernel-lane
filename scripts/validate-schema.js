@@ -251,8 +251,8 @@ function validateAll() {
   log(`Valid: ${results.summary.valid}`, 'success');
   log(`Invalid: ${results.summary.invalid}`, results.summary.invalid > 0 ? 'error' : 'info');
   
-  // Write results
-  const resultsPath = path.join(LANES['archivist-agent'], 'SCHEMA_VALIDATION_RESULTS.json');
+  // Write results to repo root (works on CI runners where lane root may not exist)
+  const resultsPath = path.join(REPO_ROOT, 'SCHEMA_VALIDATION_RESULTS.json');
   fs.writeFileSync(resultsPath, JSON.stringify(results, null, 2));
   log(`\nResults written to: ${resultsPath}`, 'success');
   

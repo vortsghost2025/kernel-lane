@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "artifact": "last-recovery",
-  "timestamp": "2026-08-05T13:44:43.284Z",
+  "timestamp": "2026-08-07T20:16:21.434Z",
   "suite": "recovery-verification-v1",
   "verdict": "PROVEN",
   "summary": {
@@ -17,26 +17,26 @@
   "lane_heartbeats": {
     "archivist": {
       "status": "alive",
-      "timestamp": "2026-08-05T13:44:23.326Z",
+      "timestamp": "2026-08-07T20:16:01.922Z",
       "age_seconds": 19,
       "source": "windows-local"
     },
     "library": {
       "status": "alive",
-      "timestamp": "2026-08-05T13:44:24.636Z",
-      "age_seconds": 18,
+      "timestamp": "2026-08-07T20:15:37.498Z",
+      "age_seconds": 43,
       "source": "windows-local"
     },
     "swarmmind": {
       "status": "alive",
-      "timestamp": "2026-08-05T13:44:23.766Z",
-      "age_seconds": 19,
+      "timestamp": "2026-08-07T20:15:37.542Z",
+      "age_seconds": 43,
       "source": "windows-local"
     },
     "kernel": {
       "status": "alive",
-      "timestamp": "2026-08-05T13:44:24.818Z",
-      "age_seconds": 18,
+      "timestamp": "2026-08-07T20:15:37.762Z",
+      "age_seconds": 43,
       "source": "windows-local"
     }
   },
@@ -45,5 +45,5 @@
     "expected": 4
   },
   "run_by": "scripts/recovery-test-suite.js",
-  "archivist_repo_git_sha": "029b0af241a385294ae37534ec702560e9a9dcd7"
+  "archivist_repo_git_sha": "985dc658bbada7df77d8685d94477f5dbc005b9b"
 }

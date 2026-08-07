@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.4",
+  "type": "info",
+  "from": "archivist",
+  "to": "broadcast",
+  "priority": "P2",
+  "subject": "Vision endpoint available for desktop assistant (RTX 5060 via Tailscale)",
+  "body": "The Ubuntu host now reads its desktop via the operator's Windows desktop ollama over Tailscale. Any agent or the operator's desktop-assistant can reuse the same endpoint: ollama at http://100.95.92.117:11434, vision models qwen3.5:2b (fast) / qwen3.5:4b (better) / qwen3.5:0.8b, plus Bonsai-27B-gguf:Q1_0. Vision requests: POST /api/generate with model, prompt, images[] (base64 PNG), stream=false, think=false. Capture on the Ubuntu side: gnome-screenshot -f <file> (full Wayland). Local Ubuntu ollama runs only nomic-embed-text embeddings (operator directive: no large local models).",
+  "timestamp": "2026-08-07T16:39:00Z",
+  "requires_action": false,
+  "idempotency_key": "vision-endpoint-broadcast-20260807-1"
+}

@@ -10,7 +10,8 @@ const {
   testBroadcastDelivery, checkExecutorDependencies,
   buildRecommendationPackets, buildRollup, buildEnhancedRollup,
   emitCognitionHandoff, buildDedupeKey, updateRecommendationLedger,
-  recordDisposition, loadRecommendationLedger, getWorkUnitAccounting,
+  recordDisposition, loadRecommendationLedger, writeRecommendationLedger,
+  getWorkUnitAccounting,
   SERVICED_LANES, VIRTUAL_LANES, REQUIRED_EXECUTOR_FILES,
   RECOMMENDATION_TYPES, REC_LIFECYCLE_STATES, REC_DISPOSITIONS,
   DEDUPE_SUPPRESS_CYCLES, AUDIT_VERSION
@@ -453,6 +454,88 @@ test('verifyTaskOutput passes when required_output file has valid provenance', (
   assert.strictEqual(result.checked, true);
   assert.strictEqual(typeof result.size_bytes, 'number');
   fs.unlinkSync(goodFile);
+});
+
+// === A1c: ledger self-healing dedupe ===
+console.log('A1c. Ledger self-healing dedupe');
+test('writeRecommendationLedger collapses duplicate dedupe_keys, preferring adjudicated record', () => {
+  const testLedger = '/tmp/test-rec-ledger-dedupe.jsonl';
+  if (fs.existsSync(testLedger)) fs.unlinkSync(testLedger);
+  process.env.REC_LEDGER = testLedger;
+
+  const base = {
+    recommendation_id: 'rec-dup-a',
+    dedupe_key: 'TOPOLOGY_ANOMALY:kernel',
+    recommendation_type: 'TOPOLOGY_ANOMALY',
+    first_seen_at: '2026-08-06T01:00:00Z',
+    last_seen_at: '2026-08-06T02:00:00Z',
+    occurrence_count: 2,
+    current_state: 'ONGOING_MONITORED',
+    severity: 'P1',
+    affected_lanes: ['kernel'],
+    reason: 'test dup',
+    cycles_since_first: 2,
+    cycles_since_last_escalation: 0,
+    disposition: null,
+    disposition_at: null,
+    resolution_evidence_refs: [],
+    false_positive: null,
+    cognition_handoff_emitted: false
+  };
+  const unadjudicated = { ...base };
+  const adjudicated = {
+    ...base,
+    recommendation_id: 'rec-dup-b',
+    last_seen_at: '2026-08-06T01:30:00Z',
+    occurrence_count: 1,
+    disposition: 'ACCEPT',
+    disposition_at: '2026-08-06T01:30:00Z',
+    false_positive: true,
+    cognition_handoff_emitted: false
+  };
+  // Adjudicated record has an EARLIER last_seen_at but must still win via rank.
+  writeRecommendationLedger([unadjudicated, adjudicated]);
+  const entries = loadRecommendationLedger();
+  assert.strictEqual(entries.length, 1, 'duplicate dedupe_key must collapse to one record');
+  assert.strictEqual(entries[0].recommendation_id, 'rec-dup-b', 'adjudicated record must win');
+  assert.strictEqual(entries[0].false_positive, true);
+  assert.strictEqual(entries[0].disposition, 'ACCEPT');
+  delete process.env.REC_LEDGER;
+  if (fs.existsSync(testLedger)) fs.unlinkSync(testLedger);
+});
+
+test('writeRecommendationLedger keeps the latest record when ranks are equal', () => {
+  const testLedger = '/tmp/test-rec-ledger-dedupe-latest.jsonl';
+  if (fs.existsSync(testLedger)) fs.unlinkSync(testLedger);
+  process.env.REC_LEDGER = testLedger;
+
+  const older = {
+    recommendation_id: 'rec-latest-a',
+    dedupe_key: 'CRASH_LOOP_DETECTED:archivist',
+    recommendation_type: 'CRASH_LOOP_DETECTED',
+    first_seen_at: '2026-08-06T01:00:00Z',
+    last_seen_at: '2026-08-06T01:00:00Z',
+    occurrence_count: 1,
+    current_state: 'NEW',
+    severity: 'P0',
+    affected_lanes: ['archivist'],
+    reason: 'test latest',
+    cycles_since_first: 0,
+    cycles_since_last_escalation: 0,
+    disposition: null,
+    disposition_at: null,
+    resolution_evidence_refs: [],
+    false_positive: null,
+    cognition_handoff_emitted: true
+  };
+  const newer = { ...older, recommendation_id: 'rec-latest-b', last_seen_at: '2026-08-06T03:00:00Z', occurrence_count: 3 };
+  writeRecommendationLedger([older, newer]);
+  const entries = loadRecommendationLedger();
+  assert.strictEqual(entries.length, 1);
+  assert.strictEqual(entries[0].recommendation_id, 'rec-latest-b', 'latest by last_seen_at must win on equal rank');
+  assert.strictEqual(entries[0].occurrence_count, 3);
+  delete process.env.REC_LEDGER;
+  if (fs.existsSync(testLedger)) fs.unlinkSync(testLedger);
 });
 
 // === Summary ===

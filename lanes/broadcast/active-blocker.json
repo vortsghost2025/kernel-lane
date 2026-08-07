@@ -1,15 +1,16 @@
 {
   "OUTPUT_PROVENANCE": {
-    "agent": "opencode",
-    "lane": "library",
+    "agent": "kilo",
+    "lane": "archivist",
     "target": "active-blocker",
-    "generated_at": "2026-04-28T00:00:00Z",
-    "session_id": "sess-20260516-library-opencode"
+    "generated_at": "2026-08-07T03:15:00Z",
+    "session_id": "sess-20260807-archivist-kilo"
   },
   "active": false,
   "owner": null,
   "priority": null,
   "task_id": null,
   "reason": null,
-  "updated_at": "2026-04-28T02:30:00Z"
+  "updated_at": "2026-08-07T03:15:00Z",
+  "note": "Routine refresh of stale blocker record (previously updated 2026-04-28). No active system-wide blocker; only owner lane works on a blocker when one is raised per One-Blocker Rule."
 }

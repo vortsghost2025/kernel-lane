@@ -71,13 +71,12 @@ try {
     BROADCAST_DIR = discovery.getBroadcastPath();
   }
 } catch (e) {
-  var repoRoot = path.resolve(__dirname, '..');
   LANE_ROOTS = {
-    library: path.join(repoRoot, 'lanes', 'library'),
-    archivist: path.join(repoRoot, 'lanes', 'archivist'),
-    swarmmind: path.join(repoRoot, 'lanes', 'swarmmind'),
-    kernel: path.join(repoRoot, 'lanes', 'kernel'),
-    opencode: path.join(repoRoot, 'lanes', 'opencode'),
+    library: path.join(repoRoot(), 'lanes', 'library'),
+    archivist: path.join(repoRoot(), 'lanes', 'archivist'),
+    swarmmind: path.join(repoRoot(), 'lanes', 'swarmmind'),
+    kernel: path.join(repoRoot(), 'lanes', 'kernel'),
+    opencode: path.join(repoRoot(), 'lanes', 'opencode'),
   };
 }
 
