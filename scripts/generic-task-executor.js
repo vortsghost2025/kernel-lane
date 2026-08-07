@@ -943,6 +943,19 @@ function createResponse(originalMsg, executionResult, lane) {
     : null;
   const normalizedConfidence = normalizeConfidence(routingConfidence);
   const confidence = normalizedConfidence !== null ? normalizedConfidence : 7;
+  const confidenceDerivation = normalizedConfidence !== null
+    ? {
+        measured: 'routing confidence',
+        how_measured: 'NLP route matching via executeTask',
+        what_produced: 'generic-task-executor routing',
+        how_mapped: 'normalizedConfidence from _routing.confidence',
+      }
+    : {
+        measured: 'automated acknowledgement',
+        how_measured: 'fallback when no routing confidence available',
+        what_produced: 'generic-task-executor createResponse',
+        how_mapped: 'default fallback confidence 7 with derivation object per CONFIDENCE_DERIVATION_CONTRACT',
+      };
   const investigation = confidence < 7
     ? 'Automated acknowledgement fallback; confidence below investigation threshold per CONFIDENCE_REQUIRED'
     : undefined;
@@ -961,6 +974,7 @@ function createResponse(originalMsg, executionResult, lane) {
     timestamp: nowIso(),
     requires_action: false,
     confidence: confidence,
+    confidence_derivation: confidenceDerivation,
     investigation: investigation,
     payload: { mode: 'inline', compression: 'none' },
     execution: { mode: 'auto', engine: 'pipeline', actor: 'task-executor' },
