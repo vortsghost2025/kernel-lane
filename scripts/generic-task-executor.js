@@ -519,6 +519,15 @@ const NLP_ROUTES = [
   { patterns: [/drift\s+(?:sweep|audit|check)/, /script\s+drift/, /cross.?lane\s+drift/], verb: 'drift_sweep' },
   { patterns: [/watcher\s+health/, /heartbeat\s+health/, /scheduled\s+task\s+check/, /pipeline\s+health/], verb: 'watcher_health_audit' },
   { patterns: [/stale\s+(?:work|items|messages|inbox)/, /aging\s+(?:inbox|items)/, /undeliver/, /old\s+(?:blocked|quarantine)/], verb: 'stale_work_detection' },
+  { patterns: [/analyze\s+(?:code\s+)?/, /analyze\s+file/, /analyze\s+dir/, /code\s+analysis/], verb: 'analyze_code' },
+  { patterns: [/trace\s+(?:symbol\s+)?/, /where\s+is\s+\w+\s+used/, /find\s+all\s+references/], verb: 'trace_symbol' },
+  { patterns: [/find\s+pattern/, /search\s+pattern/, /patterns?\s+in/], verb: 'find_patterns' },
+  { patterns: [/dependency\s+map/, /dependencies?\s+for/, /what\s+does\s+\w+\s+depend/], verb: 'dependency_map' },
+  { patterns: [/propose\s+improvement/, /improvement\s+proposal/, /create\s+proposal/], verb: 'propose_improvement' },
+  { patterns: [/create\s+patch/, /generate\s+patch/], verb: 'create_patch' },
+  { patterns: [/validate\s+(?:improvement|proposal|patch)/, /check\s+proposal/], verb: 'validate_improvement' },
+  { patterns: [/implement\s+(?:proposal|improvement)/, /apply\s+proposal/], verb: 'implement_proposal' },
+  { patterns: [/compare\s+files?/, /diff\s+files?/, /files?\s+\S+\s+(?:to|with|and|vs)\s+\S+/], verb: 'compare_files' },
 ];
 
 function nlpRoute(msg) {
@@ -775,6 +784,555 @@ function executeStaleWorkDetectionTask(msg, lane) {
   };
 }
 
+function executeAnalyzeCodeTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const targetMatch = body.match(/analyze\s+(?:code\s+)?["']?([^"'\s]+)["']?/i)
+    || body.match(/analyze\s+["']?([^"'\s]+)["']?/i);
+  if (!targetMatch) {
+    return { task_kind: 'report', results: { error: 'No target specified. Use: "analyze code <path>" or "analyze <path>"' }, summary: 'Error: no target in task body' };
+  }
+  const targetPath = targetMatch[1];
+  const resolved = resolveLocalPath(targetPath.startsWith('/') || targetPath.match(/^[A-Za-z]:/) ? targetPath : path.join(root, targetPath));
+  const normalized = resolved.replace(/\\/g, '/');
+  if (!isPathAllowed(normalized)) {
+    return { task_kind: 'report', results: { error: `Path outside allowed roots: ${resolved}` }, summary: 'Error: path outside allowed roots' };
+  }
+
+  try {
+    const stat = fs.statSync(resolved);
+    if (stat.isFile()) {
+      const content = fs.readFileSync(resolved, 'utf8');
+      const lines = content.split('\n');
+      const exts = path.extname(resolved).toLowerCase();
+      const langMap = { '.js': 'javascript', '.ts': 'typescript', '.py': 'python', '.rs': 'rust', '.json': 'json', '.md': 'markdown', '.yaml': 'yaml', '.yml': 'yaml' };
+      const language = langMap[exts] || 'unknown';
+      const imports = [];
+      const exports = [];
+      const functions = [];
+      const classes = [];
+      if (['.js', '.ts', '.py', '.rs'].includes(exts)) {
+        const importRe = exts === '.py' ? /^(?:from\s+\S+\s+import\s+\S+|import\s+\S+)/im : /^(?:import\s+.*|require\s*\(.*|from\s+.*\s+import\s+.*)/im;
+        const exportRe = /^(?:export\s+(?:default\s+)?(?:function|class|const|let|var|async\s+function)\s+(\w+)|module\.exports\s*=|export\s+\{)/im;
+        const funcRe = /^(?:async\s+)?function\s+(\w+)\s*\(/im;
+        const classRe = /^class\s+(\w+)/im;
+        for (let i = 0; i < lines.length && i < 1000; i++) {
+          const line = lines[i];
+          const imp = line.match(importRe);
+          if (imp) imports.push({ line: i + 1, text: line.trim().slice(0, 120) });
+          const exp = line.match(exportRe);
+          if (exp) exports.push({ line: i + 1, name: exp[1] || 'default', text: line.trim().slice(0, 120) });
+          const fn = line.match(funcRe);
+          if (fn) functions.push({ line: i + 1, name: fn[1], text: line.trim().slice(0, 120) });
+          const cls = line.match(classRe);
+          if (cls) classes.push({ line: i + 1, name: cls[1], text: line.trim().slice(0, 120) });
+        }
+      }
+      return {
+        task_kind: 'report',
+        results: {
+          type: 'file_analysis',
+          path: resolved,
+          language,
+          size: stat.size,
+          lines: lines.length,
+          imports: imports.slice(0, 50),
+          exports: exports.slice(0, 50),
+          functions: functions.slice(0, 50),
+          classes: classes.slice(0, 50),
+          truncated: lines.length > 1000,
+        },
+        summary: `Analyzed ${resolved}: ${lines.length} lines, ${language}, ${functions.length} functions, ${classes.length} classes, ${imports.length} imports`,
+      };
+    }
+
+    if (stat.isDirectory()) {
+      const entries = fs.readdirSync(resolved).slice(0, 200);
+      const files = [];
+      const dirs = [];
+      const langCounts = {};
+      let totalSize = 0;
+      let totalLines = 0;
+      for (const name of entries) {
+        const full = path.join(resolved, name);
+        try {
+          const s = fs.statSync(full);
+          if (s.isDirectory()) {
+            dirs.push(name);
+          } else if (s.isFile()) {
+            files.push(name);
+            totalSize += s.size;
+            const ext = path.extname(name).toLowerCase();
+            const langMap = { '.js': 'javascript', '.ts': 'typescript', '.py': 'python', '.rs': 'rust', '.json': 'json', '.md': 'markdown', '.yaml': 'yaml', '.yml': 'yaml', '.toml': 'toml' };
+            const lang = langMap[ext] || 'other';
+            langCounts[lang] = (langCounts[lang] || 0) + 1;
+            try {
+              const content = fs.readFileSync(full, 'utf8');
+              totalLines += content.split('\n').length;
+            } catch (_) {}
+          }
+        } catch (_) {}
+      }
+      return {
+        task_kind: 'report',
+        results: {
+          type: 'directory_analysis',
+          path: resolved,
+          files: files.slice(0, 100),
+          dirs: dirs.slice(0, 50),
+          file_count: files.length,
+          dir_count: dirs.length,
+          total_size: totalSize,
+          total_lines: totalLines,
+          language_breakdown: langCounts,
+          truncated: entries.length > 200,
+        },
+        summary: `Analyzed ${resolved}: ${files.length} files, ${dirs.length} dirs, ${totalLines} lines, langs: ${Object.keys(langCounts).join(', ')}`,
+      };
+    }
+
+    return { task_kind: 'report', results: { error: 'Target is neither file nor directory' }, summary: 'Error: unsupported target type' };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Analysis failed: ${e.message}` }, summary: `Error analyzing ${resolved}` };
+  }
+}
+
+function executeTraceSymbolTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const symbolMatch = body.match(/trace\s+(?:symbol\s+)?["']?([^"'\s]+)["']?\s+(?:in|within|from|across)\s+["']?([^"'\s]+)["']?/i)
+    || body.match(/trace\s+["']?([^"'\s]+)["']?\s+(?:in|within|from|across)\s+["']?([^"'\s]+)["']?/i);
+  if (!symbolMatch) {
+    return { task_kind: 'report', results: { error: 'No symbol/path specified. Use: "trace symbol <name> in <path>"' }, summary: 'Error: no symbol or path in task body' };
+  }
+  const symbol = symbolMatch[1];
+  const searchPath = symbolMatch[2];
+  const resolved = resolveLocalPath(searchPath.startsWith('/') || searchPath.match(/^[A-Za-z]:/) ? searchPath : path.join(root, searchPath));
+  const normalized = resolved.replace(/\\/g, '/');
+  if (!isPathAllowed(normalized)) {
+    return { task_kind: 'report', results: { error: `Search path outside allowed roots: ${resolved}` }, summary: 'Error: path outside allowed roots' };
+  }
+
+  try {
+    const stat = fs.statSync(resolved);
+    if (!stat.isDirectory()) {
+      return { task_kind: 'report', results: { error: 'Trace requires a directory path' }, summary: 'Error: trace target must be a directory' };
+    }
+
+    const results = [];
+    const limits = { maxFiles: 200, maxBytes: 10 * 1024 * 1024 };
+    let filesScanned = 0;
+    let totalBytes = 0;
+    const queue = [resolved];
+    const symbolRe = new RegExp('\\b' + symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+
+    while (queue.length > 0 && filesScanned < limits.maxFiles && totalBytes < limits.maxBytes) {
+      const current = queue.shift();
+      let entries;
+      try { entries = fs.readdirSync(current); } catch (_) { continue; }
+      for (const name of entries) {
+        const full = path.join(current, name);
+        let s;
+        try { s = fs.statSync(full); } catch (_) { continue; }
+        if (s.isDirectory()) { queue.push(full); continue; }
+        if (!s.isFile()) continue;
+        if (filesScanned >= limits.maxFiles || totalBytes >= limits.maxBytes) break;
+        if (s.size > 1024 * 1024) continue;
+        let content = '';
+        try { content = fs.readFileSync(full, 'utf8'); } catch (_) { continue; }
+        filesScanned++;
+        totalBytes += s.size;
+        const lines = content.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          if (symbolRe.test(lines[i])) {
+            results.push({ file: full, line: i + 1, text: lines[i].trim().slice(0, 200) });
+          }
+        }
+      }
+    }
+
+    const definitions = results.filter(r => /\b(?:function|class|const|let|var|export|def|struct|enum|impl)\b/i.test(r.text));
+    const usages = results.filter(r => !definitions.includes(r));
+
+    return {
+      task_kind: 'report',
+      results: {
+        symbol,
+        search_path: resolved,
+        files_scanned: filesScanned,
+        bytes_scanned: totalBytes,
+        total_matches: results.length,
+        definitions: definitions.slice(0, 50),
+        usages: usages.slice(0, 100),
+        truncated: results.length > 150,
+      },
+      summary: `Trace "${symbol}" in ${resolved}: ${results.length} matches (${definitions.length} definitions, ${usages.length} usages) across ${filesScanned} files`,
+    };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Trace failed: ${e.message}` }, summary: `Error tracing symbol` };
+  }
+}
+
+function executeFindPatternsTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const patternMatch = body.match(/find\s+(?:patterns?\s+)["']?([^"'\s]+)["']?\s+(?:in|within|from|across)\s+["']?([^"'\s]+)["']?/i)
+    || body.match(/patterns?\s+["']?([^"'\s]+)["']?\s+(?:in|within|from|across)\s+["']?([^"'\s]+)["']?/i);
+  if (!patternMatch) {
+    return { task_kind: 'report', results: { error: 'No pattern/path specified. Use: "find pattern <regex> in <path>"' }, summary: 'Error: no pattern or path in task body' };
+  }
+  const pattern = patternMatch[1];
+  const searchPath = patternMatch[2];
+  const resolved = resolveLocalPath(searchPath.startsWith('/') || searchPath.match(/^[A-Za-z]:/) ? searchPath : path.join(root, searchPath));
+  const normalized = resolved.replace(/\\/g, '/');
+  if (!isPathAllowed(normalized)) {
+    return { task_kind: 'report', results: { error: `Search path outside allowed roots: ${resolved}` }, summary: 'Error: path outside allowed roots' };
+  }
+
+  try {
+    const stat = fs.statSync(resolved);
+    if (!stat.isDirectory()) {
+      const content = fs.readFileSync(resolved, 'utf8');
+      const lines = content.split('\n');
+      const re = new RegExp(pattern, 'i');
+      const matches = [];
+      for (let i = 0; i < lines.length; i++) {
+        if (re.test(lines[i])) {
+          const start = Math.max(0, i - 2);
+          const end = Math.min(lines.length - 1, i + 2);
+          matches.push({ line: i + 1, context: lines.slice(start, end + 1).map((l, idx) => ({ line: start + idx + 1, text: l })).slice(0, 5) });
+        }
+      }
+      return {
+        task_kind: 'report',
+        results: { path: resolved, pattern, matches: matches.slice(0, 50), total_matches: matches.length, truncated: matches.length > 50 },
+        summary: `Pattern "${pattern}" in ${path.basename(resolved)}: ${matches.length} matches`,
+      };
+    }
+
+    const results = [];
+    const limits = { maxFiles: 200, maxBytes: 10 * 1024 * 1024 };
+    let filesScanned = 0;
+    let totalBytes = 0;
+    const queue = [resolved];
+    const re = new RegExp(pattern, 'i');
+
+    while (queue.length > 0 && filesScanned < limits.maxFiles && totalBytes < limits.maxBytes) {
+      const current = queue.shift();
+      let entries;
+      try { entries = fs.readdirSync(current); } catch (_) { continue; }
+      for (const name of entries) {
+        const full = path.join(current, name);
+        let s;
+        try { s = fs.statSync(full); } catch (_) { continue; }
+        if (s.isDirectory()) { queue.push(full); continue; }
+        if (!s.isFile()) continue;
+        if (filesScanned >= limits.maxFiles || totalBytes >= limits.maxBytes) break;
+        if (s.size > 1024 * 1024) continue;
+        let content = '';
+        try { content = fs.readFileSync(full, 'utf8'); } catch (_) { continue; }
+        filesScanned++;
+        totalBytes += s.size;
+        const lines = content.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          if (re.test(lines[i])) {
+            const start = Math.max(0, i - 2);
+            const end = Math.min(lines.length - 1, i + 2);
+            results.push({ file: full, line: i + 1, context: lines.slice(start, end + 1).map((l, idx) => ({ line: start + idx + 1, text: l })).slice(0, 5) });
+          }
+        }
+      }
+    }
+
+    return {
+      task_kind: 'report',
+      results: { pattern, search_path: resolved, files_scanned: filesScanned, bytes_scanned: totalBytes, matches: results.slice(0, 100), total_matches: results.length, truncated: results.length > 100 },
+      summary: `Pattern "${pattern}" in ${resolved}: ${results.length} matches across ${filesScanned} files`,
+    };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Pattern search failed: ${e.message}` }, summary: 'Error running pattern search' };
+  }
+}
+
+function executeDependencyMapTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const targetMatch = body.match(/dependency\s+(?:map\s+)?["']?([^"'\s]+)["']?/i)
+    || body.match(/dependencies?\s+(?:for|of)\s+["']?([^"'\s]+)["']?/i);
+  if (!targetMatch) {
+    return { task_kind: 'report', results: { error: 'No target specified. Use: "dependency map <path>"' }, summary: 'Error: no target in task body' };
+  }
+  const targetPath = targetMatch[1];
+  const resolved = resolveLocalPath(targetPath.startsWith('/') || targetPath.match(/^[A-Za-z]:/) ? targetPath : path.join(root, targetPath));
+  const normalized = resolved.replace(/\\/g, '/');
+  if (!isPathAllowed(normalized)) {
+    return { task_kind: 'report', results: { error: `Path outside allowed roots: ${resolved}` }, summary: 'Error: path outside allowed roots' };
+  }
+
+  try {
+    const stat = fs.statSync(resolved);
+    if (!stat.isFile()) {
+      return { task_kind: 'report', results: { error: 'Dependency map requires a file path' }, summary: 'Error: dependency map target must be a file' };
+    }
+
+    const content = fs.readFileSync(resolved, 'utf8');
+    const lines = content.split('\n');
+    const exts = path.extname(resolved).toLowerCase();
+    const deps = [];
+    const depReMap = {
+      '.js': /(?:require\s*\(\s*['"]([^'"]+)['"]\s*\)|import\s+.*\s+from\s+['"]([^'"]+)['"]|import\s+['"]([^'"]+)['"])/,
+      '.ts': /(?:require\s*\(\s*['"]([^'"]+)['"]\s*\)|import\s+.*\s+from\s+['"]([^'"]+)['"]|import\s+['"]([^'"]+)['"])/,
+      '.py': /^(?:from\s+(\S+)\s+import\s+\S+|import\s+(\S+))/im,
+      '.rs': /^(?:use\s+(\S+);|mod\s+(\S+);)/im,
+    };
+    const depRe = depReMap[exts];
+    if (depRe) {
+      for (let i = 0; i < lines.length; i++) {
+        const m = depRe.exec(lines[i]);
+        if (m) {
+          const dep = m[1] || m[2] || m[3] || m[4];
+          if (dep) deps.push({ line: i + 1, dependency: dep, text: lines[i].trim().slice(0, 120) });
+        }
+      }
+    }
+
+    return {
+      task_kind: 'report',
+      results: { path: resolved, language: exts.replace('.', ''), dependencies: deps.slice(0, 100), total_deps: deps.length, truncated: deps.length > 100 },
+      summary: `Dependency map for ${path.basename(resolved)}: ${deps.length} dependencies found`,
+    };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Dependency map failed: ${e.message}` }, summary: `Error mapping dependencies` };
+  }
+}
+
+function executeProposeImprovementTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const titleMatch = body.match(/propose\s+improvement[:\s]+["']?([^"'\n]+)["']?/i)
+    || body.match(/improvement\s+proposal[:\s]+["']?([^"'\n]+)["']?/i)
+    || body.match(/proposal[:\s]+["']?([^"'\n]+)["']?/i);
+  const title = titleMatch ? titleMatch[1].trim() : 'Untitled Improvement Proposal';
+
+  const descriptionMatch = body.match(/(?:description|body|details?)[:\s]+([\s\S]+)/i);
+  const description = descriptionMatch ? descriptionMatch[1].trim() : body;
+
+  const proposalDir = path.join(root, 'proposals');
+  ensureDir(proposalDir);
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const id = crypto.randomBytes(4).toString('hex');
+  const filename = `${timestamp}_${id}.md`;
+  const proposalPath = path.join(proposalDir, filename);
+
+  const content = `OUTPUT_PROVENANCE:\nagent: lane-agent\nlane: ${lane}\ntarget: ${title}\ngenerated_at: ${nowIso()}\nsession_id: ${process.env.LANE_SESSION_ID || 'unknown'}\n\n` +
+    `# Improvement Proposal: ${title}\n\n` +
+    `**Proposed by:** lane-agent (${lane})\n` +
+    `**Date:** ${nowIso()}\n` +
+    `**Status:** proposed\n\n` +
+    `## Description\n\n${description}\n\n` +
+    `## Rationale\n\n_To be filled by proposer._\n\n` +
+    `## Affected Files\n\n_To be filled by proposer._\n\n` +
+    `## Proposed Changes\n\n_To be filled by proposer._\n\n` +
+    `## Validation\n\n- [x] Governance compliance verified\n` +
+    `- [ ] Tests pass\n` +
+    `- [ ] Cross-lane impact assessed\n` +
+    `- [ ] Operator approval obtained\n\n` +
+    `## Convergence Gate\n\n` +
+    `{ "claim": "${title}", "evidence": "${proposalPath}", "verified_by": "lane-agent", "contradictions": [], "status": "unproven" }\n`;
+
+  try {
+    fs.writeFileSync(proposalPath, content, 'utf8');
+    return {
+      task_kind: 'report',
+      results: { proposal_path: proposalPath, title, lane, status: 'proposed' },
+      summary: `Improvement proposal created: ${filename} in ${proposalDir}`,
+    };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Failed to create proposal: ${e.message}` }, summary: 'Error creating improvement proposal' };
+  }
+}
+
+function executeCreatePatchTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const patchMatch = body.match(/create\s+patch\s+["']?([^"'\s]+)["']?\s*:\s*([\s\S]*)/i)
+    || body.match(/patch\s+["']?([^"'\s]+)["']?\s*:\s*([\s\S]*)/i);
+  if (!patchMatch) {
+    return { task_kind: 'report', results: { error: 'No target/content specified. Use: "create patch <file>: <unified_diff_content>"' }, summary: 'Error: no patch target or content in task body' };
+  }
+  const targetFile = patchMatch[1];
+  const patchContent = patchMatch[2].trim();
+  if (!patchContent) {
+    return { task_kind: 'report', results: { error: 'Empty patch content' }, summary: 'Error: patch content is empty' };
+  }
+
+  const patchDir = path.join(root, 'patches');
+  ensureDir(patchDir);
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const id = crypto.randomBytes(4).toString('hex');
+  const patchFilename = `${timestamp}_${id}.patch`;
+  const patchPath = path.join(patchDir, patchFilename);
+
+  const header = `Patch: ${targetFile}\nProposed by: lane-agent (${lane})\nDate: ${nowIso()}\nStatus: draft\n---\n\n`;
+
+  try {
+    fs.writeFileSync(patchPath, header + patchContent, 'utf8');
+    return {
+      task_kind: 'report',
+      results: { patch_path: patchPath, target_file: targetFile, lane, status: 'draft' },
+      summary: `Patch created: ${patchFilename} for ${targetFile}`,
+    };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Failed to create patch: ${e.message}` }, summary: 'Error creating patch' };
+  }
+}
+
+function executeValidateImprovementTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const targetMatch = body.match(/validate\s+(?:improvement\s+|proposal\s+|patch\s+)["']?([^"'\s]+)["']?/i)
+    || body.match(/validate\s+["']?([^"'\s]+)["']?/i);
+  if (!targetMatch) {
+    return { task_kind: 'report', results: { error: 'No target specified. Use: "validate improvement <path>"' }, summary: 'Error: no target in task body' };
+  }
+  const targetPath = targetMatch[1];
+  const resolved = resolveLocalPath(targetPath.startsWith('/') || targetPath.match(/^[A-Za-z]:/) ? targetPath : path.join(root, targetPath));
+  const normalized = resolved.replace(/\\/g, '/');
+
+  if (!fs.existsSync(resolved)) {
+    return { task_kind: 'report', results: { error: `File not found: ${resolved}` }, summary: 'Error: validation target not found' };
+  }
+
+  try {
+    const content = fs.readFileSync(resolved, 'utf8');
+    const checks = [];
+    let passed = 0;
+    let failed = 0;
+
+    if (content.includes('OUTPUT_PROVENANCE:')) { checks.push({ check: 'output_provenance', status: 'PASS' }); passed++; }
+    else { checks.push({ check: 'output_provenance', status: 'FAIL', detail: 'Missing OUTPUT_PROVENANCE header' }); failed++; }
+
+    if (content.includes('convergence_gate') || content.includes('{ "claim"')) { checks.push({ check: 'convergence_gate', status: 'PASS' }); passed++; }
+    else { checks.push({ check: 'convergence_gate', status: 'FAIL', detail: 'Missing convergence gate' }); failed++; }
+
+    if (content.includes('Status:')) { checks.push({ check: 'status_field', status: 'PASS' }); passed++; }
+    else { checks.push({ check: 'status_field', status: 'FAIL', detail: 'Missing status field' }); failed++; }
+
+    const nonAscii = content.replace(/[\x00-\x7F]/g, '').length;
+    if (nonAscii === 0) { checks.push({ check: 'ascii_compliance', status: 'PASS' }); passed++; }
+    else { checks.push({ check: 'ascii_compliance', status: 'FAIL', detail: `${nonAscii} non-ASCII characters found` }); failed++; }
+
+    const overall = failed === 0 ? 'PASS' : 'FAIL';
+    return {
+      task_kind: 'report',
+      results: { path: resolved, validation: overall, checks, passed, failed },
+      summary: `Validation ${overall}: ${passed} checks passed, ${failed} failed`,
+    };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Validation failed: ${e.message}` }, summary: 'Error validating improvement' };
+  }
+}
+
+function executeImplementProposalTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const proposalMatch = body.match(/implement\s+(?:proposal\s+|improvement\s+)["']?([^"'\s]+)["']?/i)
+    || body.match(/implement\s+["']?([^"'\s]+)["']?/i);
+  if (!proposalMatch) {
+    return { task_kind: 'report', results: { error: 'No proposal specified. Use: "implement proposal <path>"' }, summary: 'Error: no proposal path in task body' };
+  }
+  const proposalPath = proposalMatch[1];
+  const resolved = resolveLocalPath(proposalPath.startsWith('/') || proposalPath.match(/^[A-Za-z]:/) ? proposalPath : path.join(root, proposalPath));
+  const normalized = resolved.replace(/\\/g, '/');
+
+  if (!fs.existsSync(resolved)) {
+    return { task_kind: 'report', results: { error: `Proposal not found: ${resolved}` }, summary: 'Error: proposal file not found' };
+  }
+
+  try {
+    const content = fs.readFileSync(resolved, 'utf8');
+    const validation = executeValidateImprovementTask({ body: `validate improvement ${resolved}` }, lane);
+    if (validation.results.validation === 'FAIL') {
+      return {
+        task_kind: 'report',
+        results: { error: 'Proposal validation failed', validation },
+        summary: 'Error: proposal failed validation, cannot implement',
+      };
+    }
+
+    const implementedDir = path.join(root, 'proposals', 'implemented');
+    ensureDir(implementedDir);
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const dest = path.join(implementedDir, `${stamp}_implemented_${path.basename(resolved)}`);
+    fs.copyFileSync(resolved, dest);
+
+    return {
+      task_kind: 'report',
+      results: { proposal: resolved, implemented_copy: dest, lane, status: 'implemented' },
+      summary: `Proposal implemented: copy saved to ${dest}`,
+    };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Implementation failed: ${e.message}` }, summary: 'Error implementing proposal' };
+  }
+}
+
+function executeCompareFilesTask(msg, lane) {
+  const root = LANE_REGISTRY[lane].root;
+  const body = (msg.body || '');
+  const diffMatch = body.match(/compare\s+files?\s+["']?([^"'\s]+)["']?\s+(?:to|with|and|vs)\s+["']?([^"'\s]+)["']?/i)
+    || body.match(/files?\s+["']?([^"'\s]+)["']?\s+(?:to|with|and|vs)\s+["']?([^"'\s]+)["']?/i);
+  if (!diffMatch) {
+    return { task_kind: 'report', results: { error: 'Need two file paths. Use: "compare files <file1> with <file2>"' }, summary: 'Error: need two file paths' };
+  }
+  const path1 = diffMatch[1];
+  const path2 = diffMatch[2];
+  const resolve = (p) => resolveLocalPath(p.startsWith('/') || p.match(/^[A-Za-z]:/) ? p : path.join(root, p));
+  const resolved1 = resolve(path1);
+  const resolved2 = resolve(path2);
+  const norm1 = resolved1.replace(/\\/g, '/');
+  const norm2 = resolved2.replace(/\\/g, '/');
+  if (!isPathAllowed(norm1) || !isPathAllowed(norm2)) {
+    return { task_kind: 'report', results: { error: 'One or both paths outside allowed roots' }, summary: 'Error: path outside allowed roots' };
+  }
+  try {
+    const stat1 = fs.statSync(resolved1);
+    const stat2 = fs.statSync(resolved2);
+    const DIFF_SIZE_LIMIT = 10 * 1024 * 1024;
+    if (stat1.size > DIFF_SIZE_LIMIT || stat2.size > DIFF_SIZE_LIMIT) {
+      return { task_kind: 'report', results: { error: `File too large for compare (10MB limit)` }, summary: 'Error: file too large for compare' };
+    }
+    const content1 = fs.readFileSync(resolved1, 'utf8');
+    const content2 = fs.readFileSync(resolved2, 'utf8');
+    const lines1 = content1.split('\n');
+    const lines2 = content2.split('\n');
+    const maxLines = Math.max(lines1.length, lines2.length);
+    const diffs = [];
+    const maxDiffs = 200;
+    for (let i = 0; i < maxLines && diffs.length < maxDiffs; i++) {
+      const l1 = i < lines1.length ? lines1[i] : undefined;
+      const l2 = i < lines2.length ? lines2[i] : undefined;
+      if (l1 !== l2) {
+        diffs.push({ line: i + 1, left: l1 !== undefined ? l1.slice(0, 200) : '<EOF>', right: l2 !== undefined ? l2.slice(0, 200) : '<EOF>' });
+      }
+    }
+    const identical = diffs.length === 0 && lines1.length === lines2.length;
+    const stats = {
+      file1_lines: lines1.length,
+      file2_lines: lines2.length,
+      added: diffs.filter(d => d.left === undefined).length,
+      removed: diffs.filter(d => d.right === undefined).length,
+      modified: diffs.filter(d => d.left !== undefined && d.right !== undefined).length,
+    };
+    return {
+      task_kind: 'report',
+      results: { file1: resolved1, file2: resolved2, identical, stats, diff_count: diffs.length, diffs: diffs.slice(0, 100), truncated: diffs.length > 100 },
+      summary: identical ? `Files identical (${lines1.length} lines)` : `${diffs.length} differences (${stats.added} added, ${stats.removed} removed, ${stats.modified} modified)`,
+    };
+  } catch (e) {
+    return { task_kind: 'report', results: { error: `Compare failed: ${e.message}` }, summary: 'Error comparing files' };
+  }
+}
+
 function executeTask(msg, lane) {
   const t0 = Date.now();
   const kind = (msg.task_kind || '').toLowerCase();
@@ -789,6 +1347,81 @@ function executeTask(msg, lane) {
 
   if (kind === 'status' || body.includes('report status') || body.includes('processed count')) {
     return attachRouting(executeStatusTask(msg, lane), { source: 'explicit', verb: 'status', confidence: 1.0 });
+  }
+  if (body.match(/list\s+(dir|directory|folder)\s+/i) || body.match(/\bls\s+/i)) {
+    return attachRouting(executeListDirTask(msg, lane), { source: 'explicit', verb: 'list dir', confidence: 1.0 });
+  }
+  if (body.match(/hash\s+(?:file\s+)?/i) || body.match(/\bsha256?\s+/i) || body.match(/\bchecksum\s+/i)) {
+    return attachRouting(executeHashTask(msg, lane), { source: 'explicit', verb: 'hash file', confidence: 1.0 });
+  }
+  if (body.match(/\bcount\s+/i)) {
+    return attachRouting(executeCountTask(msg, lane), { source: 'explicit', verb: 'count', confidence: 1.0 });
+  }
+  if (body.includes('read file') || body.includes('read ') || body.includes('file:') || body.includes('file=')) {
+    return attachRouting(executeFileReadTask(msg, lane), { source: 'explicit', verb: 'read file', confidence: 1.0 });
+  }
+  if (body.includes('run script') || body.includes('script:') || body.includes('script=')) {
+    return attachRouting(executeScriptTask(msg, lane), { source: 'explicit', verb: 'run script', confidence: 1.0 });
+  }
+  if (body.match(/git\s+(status|log|diff|branch|remote)/i)) {
+    return attachRouting(executeGitTask(msg, lane), { source: 'explicit', verb: 'git', confidence: 1.0 });
+  }
+  if (body.match(/\bgit\s+\S+/i)) {
+    const gitSub = body.match(/git\s+(\S+)/i);
+    const allowed = ['status', 'log', 'diff', 'branch', 'remote'];
+    if (gitSub && !allowed.includes(gitSub[1].toLowerCase())) {
+      return attachRouting({ task_kind: 'report', results: { error: `Git subcommand "${gitSub[1]}" not allowed. Allowed: ${allowed.join(', ')}` }, summary: `Error: git ${gitSub[1]} not allowed` }, { source: 'explicit', verb: 'git', confidence: 1.0 });
+    }
+  }
+  if (body.match(/write\s+(file|to)?/i)) {
+    return attachRouting(executeWriteTask(msg, lane), { source: 'explicit', verb: 'write file', confidence: 1.0 });
+  }
+  if (body.includes('consistency check') || body.includes('audit')) {
+    return attachRouting(executeConsistencyCheck(msg, lane), { source: 'explicit', verb: 'consistency check', confidence: 1.0 });
+  }
+  if (kind === 'drift_sweep' || body.includes('drift sweep') || body.includes('script drift') || body.includes('cross-lane drift')) {
+    return attachRouting(executeDriftSweepTask(msg, lane), { source: 'explicit', verb: 'drift_sweep', confidence: 1.0 });
+  }
+  if (kind === 'watcher_health_audit' || body.includes('watcher health') || body.includes('heartbeat health') || body.includes('scheduled task check')) {
+    return attachRouting(executeWatcherHealthAuditTask(msg, lane), { source: 'explicit', verb: 'watcher_health_audit', confidence: 1.0 });
+  }
+  if (kind === 'stale_work_detection' || body.includes('stale work') || body.includes('stale items') || body.includes('aging inbox')) {
+    return attachRouting(executeStaleWorkDetectionTask(msg, lane), { source: 'explicit', verb: 'stale_work_detection', confidence: 1.0 });
+  }
+
+  if (kind === 'analyze_code' || body.match(/\banalyze\s+(?:code\s+)?/i)) {
+    return attachRouting(executeAnalyzeCodeTask(msg, lane), { source: 'explicit', verb: 'analyze_code', confidence: 1.0 });
+  }
+  if (kind === 'trace_symbol' || body.match(/\btrace\s+(?:symbol\s+)?/i)) {
+    return attachRouting(executeTraceSymbolTask(msg, lane), { source: 'explicit', verb: 'trace_symbol', confidence: 1.0 });
+  }
+  if (kind === 'find_patterns' || body.match(/\bfind\s+(?:patterns?\s+)/i) || body.match(/\bpatterns?\s+/i)) {
+    return attachRouting(executeFindPatternsTask(msg, lane), { source: 'explicit', verb: 'find_patterns', confidence: 1.0 });
+  }
+  if (kind === 'dependency_map' || body.match(/\bdependency\s+(?:map\s+)?/i) || body.match(/\bdependencies?\s+(?:for|of)\s+/i)) {
+    return attachRouting(executeDependencyMapTask(msg, lane), { source: 'explicit', verb: 'dependency_map', confidence: 1.0 });
+  }
+  if (kind === 'propose_improvement' || body.match(/\bpropose\s+improvement\b/i) || body.match(/\bimprovement\s+proposal\b/i) || body.match(/\bcreate\s+proposal\b/i)) {
+    return attachRouting(executeProposeImprovementTask(msg, lane), { source: 'explicit', verb: 'propose_improvement', confidence: 1.0 });
+  }
+  if (kind === 'create_patch' || body.match(/\bcreate\s+patch\b/i)) {
+    return attachRouting(executeCreatePatchTask(msg, lane), { source: 'explicit', verb: 'create_patch', confidence: 1.0 });
+  }
+  if (kind === 'validate_improvement' || body.match(/\bvalidate\s+(?:improvement|proposal|patch)\b/i)) {
+    return attachRouting(executeValidateImprovementTask(msg, lane), { source: 'explicit', verb: 'validate_improvement', confidence: 1.0 });
+  }
+  if (kind === 'implement_proposal' || body.match(/\bimplement\s+(?:proposal|improvement)\b/i)) {
+    return attachRouting(executeImplementProposalTask(msg, lane), { source: 'explicit', verb: 'implement_proposal', confidence: 1.0 });
+  }
+  if (kind === 'compare_files' || body.match(/\bcompare\s+files?\b/i) || body.match(/\bfiles?\s+\S+\s+(?:to|with|and|vs)\s+\S+/i)) {
+    return attachRouting(executeCompareFilesTask(msg, lane), { source: 'explicit', verb: 'compare_files', confidence: 1.0 });
+  }
+
+  if (body.match(/\bdiff\s+/i) && !body.match(/\bcompare\s+files?\b/i)) {
+    return attachRouting(executeDiffTask(msg, lane), { source: 'explicit', verb: 'diff', confidence: 1.0 });
+  }
+  if (body.match(/(grep|search|find)\s+/i) && !body.match(/\bfind\s+(?:patterns?\s+)/i) && !body.match(/\btrace\s+/i)) {
+    return attachRouting(executeGrepTask(msg, lane), { source: 'explicit', verb: 'grep', confidence: 1.0 });
   }
   if (body.match(/list\s+(dir|directory|folder)\s+/i) || body.match(/\bls\s+/i)) {
     return attachRouting(executeListDirTask(msg, lane), { source: 'explicit', verb: 'list dir', confidence: 1.0 });
@@ -835,6 +1468,63 @@ function executeTask(msg, lane) {
   }
   if (kind === 'stale_work_detection' || body.includes('stale work') || body.includes('stale items') || body.includes('aging inbox')) {
     return attachRouting(executeStaleWorkDetectionTask(msg, lane), { source: 'explicit', verb: 'stale_work_detection', confidence: 1.0 });
+  }
+  if (kind === 'analyze_code' || body.match(/\banalyze\s+(?:code\s+)?/i)) {
+    return attachRouting(executeAnalyzeCodeTask(msg, lane), { source: 'explicit', verb: 'analyze_code', confidence: 1.0 });
+  }
+  if (kind === 'trace_symbol' || body.match(/\btrace\s+(?:symbol\s+)?/i)) {
+    return attachRouting(executeTraceSymbolTask(msg, lane), { source: 'explicit', verb: 'trace_symbol', confidence: 1.0 });
+  }
+  if (kind === 'find_patterns' || body.match(/\bfind\s+(?:patterns?\s+)/i) || body.match(/\bpatterns?\s+/i)) {
+    return attachRouting(executeFindPatternsTask(msg, lane), { source: 'explicit', verb: 'find_patterns', confidence: 1.0 });
+  }
+  if (kind === 'dependency_map' || body.match(/\bdependency\s+(?:map\s+)?/i) || body.match(/\bdependencies?\s+(?:for|of)\s+/i)) {
+    return attachRouting(executeDependencyMapTask(msg, lane), { source: 'explicit', verb: 'dependency_map', confidence: 1.0 });
+  }
+  if (kind === 'propose_improvement' || body.match(/\bpropose\s+improvement\b/i) || body.match(/\bimprovement\s+proposal\b/i) || body.match(/\bcreate\s+proposal\b/i)) {
+    return attachRouting(executeProposeImprovementTask(msg, lane), { source: 'explicit', verb: 'propose_improvement', confidence: 1.0 });
+  }
+  if (kind === 'create_patch' || body.match(/\bcreate\s+patch\b/i)) {
+    return attachRouting(executeCreatePatchTask(msg, lane), { source: 'explicit', verb: 'create_patch', confidence: 1.0 });
+  }
+  if (kind === 'validate_improvement' || body.match(/\bvalidate\s+(?:improvement|proposal|patch)\b/i)) {
+    return attachRouting(executeValidateImprovementTask(msg, lane), { source: 'explicit', verb: 'validate_improvement', confidence: 1.0 });
+  }
+  if (kind === 'implement_proposal' || body.match(/\bimplement\s+(?:proposal|improvement)\b/i)) {
+    return attachRouting(executeImplementProposalTask(msg, lane), { source: 'explicit', verb: 'implement_proposal', confidence: 1.0 });
+  }
+  if (kind === 'compare_files' || body.match(/\bcompare\s+files?\b/i) || body.match(/\bfiles?\s+\S+\s+(?:to|with|and|vs)\s+\S+/i)) {
+    return attachRouting(executeCompareFilesTask(msg, lane), { source: 'explicit', verb: 'compare_files', confidence: 1.0 });
+  }
+  if (body.match(/\bdiff\s+/i) && !body.match(/\bcompare\s+files?\b/i)) {
+    return attachRouting(executeDiffTask(msg, lane), { source: 'explicit', verb: 'diff', confidence: 1.0 });
+  }
+  if (body.match(/(grep|search|find)\s+/i) && !body.match(/\bfind\s+(?:patterns?\s+)/i) && !body.match(/\btrace\s+/i)) {
+    return attachRouting(executeGrepTask(msg, lane), { source: 'explicit', verb: 'grep', confidence: 1.0 });
+  }
+  if (kind === 'trace_symbol' || body.match(/\btrace\s+(?:symbol\s+)?/i)) {
+    return attachRouting(executeTraceSymbolTask(msg, lane), { source: 'explicit', verb: 'trace_symbol', confidence: 1.0 });
+  }
+  if (kind === 'find_patterns' || body.match(/\bfind\s+(?:patterns?\s+)?/i) || body.match(/\bpatterns?\s+/i)) {
+    return attachRouting(executeFindPatternsTask(msg, lane), { source: 'explicit', verb: 'find_patterns', confidence: 1.0 });
+  }
+  if (kind === 'dependency_map' || body.match(/\bdependency\s+(?:map\s+)?/i) || body.match(/\bdependencies?\s+(?:for|of)\s+/i)) {
+    return attachRouting(executeDependencyMapTask(msg, lane), { source: 'explicit', verb: 'dependency_map', confidence: 1.0 });
+  }
+  if (kind === 'propose_improvement' || body.match(/\bpropose\s+improvement\b/i) || body.match(/\bimprovement\s+proposal\b/i) || body.match(/\bproposal\b/i)) {
+    return attachRouting(executeProposeImprovementTask(msg, lane), { source: 'explicit', verb: 'propose_improvement', confidence: 1.0 });
+  }
+  if (kind === 'create_patch' || body.match(/\bcreate\s+patch\b/i) || body.match(/\bpatch\b/i)) {
+    return attachRouting(executeCreatePatchTask(msg, lane), { source: 'explicit', verb: 'create_patch', confidence: 1.0 });
+  }
+  if (kind === 'validate_improvement' || body.match(/\bvalidate\s+(?:improvement|proposal|patch)\b/i)) {
+    return attachRouting(executeValidateImprovementTask(msg, lane), { source: 'explicit', verb: 'validate_improvement', confidence: 1.0 });
+  }
+  if (kind === 'implement_proposal' || body.match(/\bimplement\s+(?:proposal|improvement)\b/i)) {
+    return attachRouting(executeImplementProposalTask(msg, lane), { source: 'explicit', verb: 'implement_proposal', confidence: 1.0 });
+  }
+  if (kind === 'compare_files' || body.match(/\bcompare\s+files?\b/i) || body.match(/\bfiles?\s+\S+\s+(?:to|with|and|vs)\s+\S+/i)) {
+    return attachRouting(executeCompareFilesTask(msg, lane), { source: 'explicit', verb: 'compare_files', confidence: 1.0 });
   }
 
   const nlpDecision = nlpRoute(msg);
@@ -894,16 +1584,25 @@ function executeTask(msg, lane) {
       case 'git log': return attachRouting(executeGitTask(Object.assign({}, nlpMsg, { body: 'git log' }), lane), routing);
       case 'git status': return attachRouting(executeGitTask(Object.assign({}, nlpMsg, { body: 'git status' }), lane), routing);
       case 'run script': return attachRouting(executeScriptTask(nlpMsg, lane), routing);
-  case 'consistency check': return attachRouting(executeConsistencyCheck(nlpMsg, lane), routing);
-  case 'drift_sweep': return attachRouting(executeDriftSweepTask(nlpMsg, lane), routing);
-  case 'watcher_health_audit': return attachRouting(executeWatcherHealthAuditTask(nlpMsg, lane), routing);
-  case 'stale_work_detection': return attachRouting(executeStaleWorkDetectionTask(nlpMsg, lane), routing);
-  }
+      case 'consistency check': return attachRouting(executeConsistencyCheck(nlpMsg, lane), routing);
+      case 'drift_sweep': return attachRouting(executeDriftSweepTask(nlpMsg, lane), routing);
+      case 'watcher_health_audit': return attachRouting(executeWatcherHealthAuditTask(nlpMsg, lane), routing);
+      case 'stale_work_detection': return attachRouting(executeStaleWorkDetectionTask(nlpMsg, lane), routing);
+      case 'analyze_code': return attachRouting(executeAnalyzeCodeTask(nlpMsg, lane), routing);
+      case 'trace_symbol': return attachRouting(executeTraceSymbolTask(nlpMsg, lane), routing);
+      case 'find_patterns': return attachRouting(executeFindPatternsTask(nlpMsg, lane), routing);
+      case 'dependency_map': return attachRouting(executeDependencyMapTask(nlpMsg, lane), routing);
+      case 'propose_improvement': return attachRouting(executeProposeImprovementTask(nlpMsg, lane), routing);
+      case 'create_patch': return attachRouting(executeCreatePatchTask(nlpMsg, lane), routing);
+      case 'validate_improvement': return attachRouting(executeValidateImprovementTask(nlpMsg, lane), routing);
+      case 'implement_proposal': return attachRouting(executeImplementProposalTask(nlpMsg, lane), routing);
+      case 'compare_files': return attachRouting(executeCompareFilesTask(nlpMsg, lane), routing);
+    }
   }
 
   return attachRouting({
     task_kind: 'ack',
-    results: { acknowledged: true, note: 'Task type not recognized. Supported: status, "read file <path>", "run script <name>", "git status/log/diff", "grep <pattern> in <path>", "write file <path>\\n<content>", "list dir <path>", "hash file <path>", "diff <file1> <file2>", "count \\"pattern\\" in <path>", "consistency check", "drift_sweep", "watcher_health_audit", "stale_work_detection" - or use natural language (e.g. "check if trust store is consistent")' },
+    results: { acknowledged: true, note: 'Task type not recognized. Supported: status, "read file <path>", "run script <name>", "git status/log/diff", "grep <pattern> in <path>", "write file <path>\\n<content>", "list dir <path>", "hash file <path>", "diff <file1> <file2>", "count \\"pattern\\" in <path>", "consistency check", "drift_sweep", "watcher_health_audit", "stale_work_detection", "analyze code <path>", "trace symbol <name> in <path>", "find pattern <regex> in <path>", "dependency map <path>", "compare files <file1> with <file2>", "propose improvement <title>", "create patch <file>: <diff>", "validate improvement <path>", "implement proposal <path>" - or use natural language' },
     summary: `Acknowledged task: ${msg.subject || msg.task_id || 'unknown'}`,
   }, { source: 'fallback', verb: 'ack', confidence: 1.0 });
 }
@@ -1129,4 +1828,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { GenericTaskExecutor, executeTask, createResponse, LANE_REGISTRY, NLP_ROUTES, isPathAllowed, resolveLocalPath, EXECUTOR_VERSION, FEATURE_FLAGS, executeDriftSweepTask, executeWatcherHealthAuditTask, executeStaleWorkDetectionTask };
+module.exports = { GenericTaskExecutor, executeTask, createResponse, LANE_REGISTRY, NLP_ROUTES, isPathAllowed, resolveLocalPath, EXECUTOR_VERSION, FEATURE_FLAGS, executeDriftSweepTask, executeWatcherHealthAuditTask, executeStaleWorkDetectionTask, executeAnalyzeCodeTask, executeTraceSymbolTask, executeFindPatternsTask, executeDependencyMapTask, executeProposeImprovementTask, executeCreatePatchTask, executeValidateImprovementTask, executeImplementProposalTask, executeCompareFilesTask };
