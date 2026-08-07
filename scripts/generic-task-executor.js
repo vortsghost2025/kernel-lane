@@ -965,7 +965,11 @@ function createResponse(originalMsg, executionResult, lane) {
     task_id: `response-${originalMsg.task_id || Date.now()}`,
     idempotency_key: `resp-${Date.now()}-${(originalMsg.task_id || 'unknown').slice(0, 16)}`,
     from: lane,
-    to: originalMsg.from || 'archivist',
+    // T28 fix: only echo originalMsg.from into `to` when it is a valid,
+    // governance-recognized lane. Otherwise route the ack to the governing
+    // archivist lane. Echoing an unrecognized `from` (e.g. "solana-launch")
+    // produced invalid outbox responses that the sovereignty gate quarantined.
+    to: (originalMsg.from && LANE_REGISTRY[originalMsg.from]) ? originalMsg.from : 'archivist',
     type: 'response',
     task_kind: executionResult.task_kind || 'ack',
     priority: originalMsg.priority || 'P2',
