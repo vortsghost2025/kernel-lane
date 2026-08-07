@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-08-07T17:09:33.521Z",
+  "timestamp": "2026-08-07T17:40:55.820Z",
   "lastRun": {
     "lane": "kernel",
     "repo_root": "/home/we4free/agent/repos/kernel-lane",
     "dry_run": false,
-    "scanned": 1,
+    "scanned": 2,
     "routed": {
       "action_required": 0,
       "in_progress": 0,
       "processed": 0,
       "blocked": 0,
-      "quarantine": 1
+      "quarantine": 2
     },
     "execution_verified_count": 0,
     "execution_failed_count": 0,
@@ -18,7 +18,7 @@
       "tasks_completed_last_5min": 0,
       "alert": true,
       "alert_reason": "ZERO_COMPLETIONS_WHILE_SYSTEM_ACTIVE",
-      "checked_at": "2026-08-07T17:09:33.521Z"
+      "checked_at": "2026-08-07T17:40:55.820Z"
     },
     "manual_cadence": false,
     "enforce_ownership": false,
@@ -32,8 +32,16 @@
         "reason": "PROCESSING_EXCEPTION",
         "detail": "repoRoot is not defined",
         "dry_run": false
+      },
+      {
+        "source": "/home/we4free/agent/repos/kernel-lane/lanes/kernel/inbox/response-alert-1786123975203-pgwe08.json",
+        "filename": "response-alert-1786123975203-pgwe08.json",
+        "target_queue": "quarantine",
+        "reason": "PROCESSING_EXCEPTION",
+        "detail": "repoRoot is not defined",
+        "dry_run": false
       }
     ],
-    "timestamp": "2026-08-07T17:09:33.521Z"
+    "timestamp": "2026-08-07T17:40:55.820Z"
   }
 }
