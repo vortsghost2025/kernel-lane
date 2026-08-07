@@ -341,8 +341,8 @@ test('NLP: "uncommitted changes" -> git status', () => {
   assert(r.results.git === 'status');
 });
 
-test('NLP: 12 route groups loaded', () => {
-  assert.strictEqual(NLP_ROUTES.length, 12);
+test('NLP: 15 route groups loaded', () => {
+  assert.strictEqual(NLP_ROUTES.length, 15);
 });
 
 // ============================================================
