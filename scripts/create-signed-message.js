@@ -17,7 +17,7 @@ function _resolve(winPath) {
   return m ? path.join(UBUNTU_ROOT, m[1]) : winPath;
 }
 
-const KERNEL_ROOT = _resolve('S:/kernel-lane');
+const KERNEL_ROOT = process.env.KERNEL_ROOT ? path.resolve(process.env.KERNEL_ROOT) : _resolve('S:/kernel-lane');
 const { atomicWriteWithLease } = require(path.join(KERNEL_ROOT, 'scripts', 'atomic-write-util'));
 const { guardWrite } = require(path.join(__dirname, 'outbox-write-guard'));
 

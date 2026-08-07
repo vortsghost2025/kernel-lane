@@ -708,7 +708,7 @@ if (msg.confidence !== undefined && msg.confidence >= 7) {
             task_id: msg.task_id || 'unknown',
             confidence: msg.confidence,
         };
-        const cpsPath = path.join(repoRoot, 'context-buffer', 'cps_log.jsonl');
+        const cpsPath = path.join(this.repoRoot, 'context-buffer', 'cps_log.jsonl');
         try {
             fs.appendFileSync(cpsPath, JSON.stringify(cpsEntry) + '\n');
         } catch (e) {

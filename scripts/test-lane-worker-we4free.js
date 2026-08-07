@@ -367,7 +367,7 @@ test('valid terminal informational routes to processed', (tmpRoot) => {
     timestamp: new Date().toISOString(),
     requires_action: false,
   subject: 'Acknowledgment',
-  body: 'Terminal informational message',
+  body: 'OUTPUT_PROVENANCE:\nagent: library\nlane: library\ntarget: archivist\n\nTerminal informational message',
   confidence: 8,
 };
   writeMsg(config.queues.inbox, '2026-01-01_terminalack.json', msg);
@@ -441,7 +441,7 @@ test('signed message missing known default fields -> remediated + processed', (t
     priority: 'P2',
   requires_action: false,
   subject: 'Remediation path',
-  body: 'Missing known defaults only',
+  body: 'OUTPUT_PROVENANCE:\nagent: library\nlane: library\ntarget: archivist\n\nMissing known defaults only',
   confidence: 8,
 };
 writeMsg(config.queues.inbox, '2026-01-01_signed_remediate_known.json', msg);
@@ -541,7 +541,7 @@ test('remediated message includes schema_remediation audit metadata', (tmpRoot) 
     priority: 'P2',
     requires_action: false,
   subject: 'Audit metadata',
-  body: 'Expect schema_remediation in metadata',
+  body: 'OUTPUT_PROVENANCE:\nagent: library\nlane: library\ntarget: archivist\n\nExpect schema_remediation in metadata',
   confidence: 8,
 };
   writeMsg(config.queues.inbox, '2026-01-01_signed_remediation_audit.json', msg);
