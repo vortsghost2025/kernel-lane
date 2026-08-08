@@ -654,7 +654,7 @@ class LaneWorker {
     }
     // Law 5: Confidence Ratings Mandatory check
     // Exempt system message types (notification, heartbeat, status) from confidence requirement
-    const exemptTypes = new Set(['notification', 'heartbeat', 'status', 'response']);
+    const exemptTypes = new Set(['notification', 'heartbeat', 'status']);
     const msgType = (msg && typeof msg === 'object' ? String(msg.type || '') : '').toLowerCase();
     
     if (!exemptTypes.has(msgType)) {
@@ -708,7 +708,7 @@ if (msg.confidence !== undefined && msg.confidence >= 7) {
             task_id: msg.task_id || 'unknown',
             confidence: msg.confidence,
         };
-        const cpsPath = path.join(this.repoRoot, 'context-buffer', 'cps_log.jsonl');
+        const cpsPath = path.join(repoRoot, 'context-buffer', 'cps_log.jsonl');
         try {
             fs.appendFileSync(cpsPath, JSON.stringify(cpsEntry) + '\n');
         } catch (e) {
@@ -720,7 +720,7 @@ if (msg.confidence !== undefined && msg.confidence >= 7) {
       return { queue: 'quarantine', reason: 'FORMAT_VIOLATION_NON_ASCII', detail: 'Message contains non-ASCII content. Re-request in English per governance constraint.' };
     }
 
-  const OUTPUT_PROV_EXEMPT_TYPES = new Set(['task', 'escalation', 'request', 'notification', 'heartbeat', 'status', 'response']);
+  const OUTPUT_PROV_EXEMPT_TYPES = new Set(['task', 'escalation', 'request', 'notification', 'heartbeat', 'status']);
   if (typeof msg.body === 'string' && !OUTPUT_PROV_EXEMPT_TYPES.has(String(msg.type || '').toLowerCase()) && !isActionable(msg)) {
     var prov = verifyOutputProvenance(msg.body);
     if (!prov.ok) {

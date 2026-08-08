@@ -202,7 +202,6 @@ function watchLoop(discovery, lanes) {
           }
         }
       }
-      }
     }
     if (totalExecuted > 0 || totalErrors > 0) {
       console.log(nowIso() + ' [executor-watcher] total: executed=' + totalExecuted + ' errors=' + totalErrors);
