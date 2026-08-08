@@ -134,3 +134,8 @@ lanes/*/metrics/resource_usage.jsonl
 **/context-buffer/cps_log.jsonl
 lanes/broadcast/journal/SNAPSHOT.json
 lanes/broadcast/last-recovery.json
+
+# Lane-worker runtime state (regenerated continuously, never commit)
+logs/contradiction-adjudicator.json
+lanes/*/state/active-owner.json
+lanes/*/state/alerts.log
