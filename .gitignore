@@ -125,3 +125,12 @@ lanes/*/state/work-claim.json
 **/quarantine-archive-*/
 
 logs/*.log.pre-truncate
+
+# Runtime metrics/snapshots (regenerated continuously, never commit)
+lanes/*/metrics/resource_usage.jsonl
+**/metrics/resource_usage.jsonl
+**/state/snapshots/latest.json
+**/cps_log.jsonl
+**/context-buffer/cps_log.jsonl
+lanes/broadcast/journal/SNAPSHOT.json
+lanes/broadcast/last-recovery.json
