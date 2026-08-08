@@ -381,6 +381,12 @@ test('adversarial: path traversal in hash', () => {
   assert(r.results.error);
 });
 
+  test('git: disallowed push returns error', () => {
+    const r = executeTask(makeMsg('git push'), LANE);
+    assert.strictEqual(r.task_kind, 'report');
+    assert(r.results.error);
+  });
+
 test('adversarial: git push rejected', () => {
   const r = executeTask(makeMsg('git push origin main'), LANE);
   assert.strictEqual(r.task_kind, 'report');
