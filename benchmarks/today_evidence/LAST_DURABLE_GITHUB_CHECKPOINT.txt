@@ -1,0 +1,39 @@
+LAST DURABLE GITHUB CHECKPOINT
+==============================
+commit SHA:     c774d5d5901e996d7aee6979f4409f45c60045a6
+previous SHA:   4899b251bc9eea527cf604d122ea904c5133fb88
+timestamp:      2026-08-13
+branch:         main
+files committed:
+  - kernels/src/register_tiled_gemm.cu
+  - build_kernel.bat
+  - bench_kernel.bat
+  - benchmarks/today_evidence/register_tiled_gemm_ACCEPTED_4x4_vectorized_template.cu
+  - benchmarks/today_evidence/register_tiled_gemm_ACCEPTED_4x4.sha256.txt
+  - benchmarks/today_evidence/register_tiled_gemm_As_transpose_summary.log
+  - benchmarks/today_evidence/register_tiled_gemm_As_transpose_correctness.log
+  - benchmarks/today_evidence/register_tiled_gemm_As_transpose_bench.log
+  - benchmarks/today_evidence/register_tiled_gemm_As_transpose_ncu.log
+  - benchmarks/today_evidence/register_tiled_gemm_ncu_after_summary.log
+  - benchmarks/today_evidence/register_tiled_gemm_30sample_bench.log
+  - benchmarks/today_evidence/register_tiled_gemm_awkward_dims.log
+  - benchmarks/today_evidence/register_tiled_gemm_bench_recheck.log
+  - benchmarks/today_evidence/register_tiled_gemm_tile8_30sample_bench.log
+  - benchmarks/today_evidence/pre_tile8_noise_probe.log
+  - benchmarks/today_evidence/register_tiled_gemm_ncu_after.log
+  - benchmarks/today_evidence/register_tiled_gemm_ncu_after_bankconf.log
+  - benchmarks/today_evidence/register_tiled_gemm_ncu_after_conflicts.log
+  - benchmarks/today_evidence/register_tiled_gemm_sass.log
+  - benchmarks/today_evidence/register_tiled_gemm_sourcecounters_after.log
+
+correctness signature:
+  PASS  max_rel=0.000657 max_abs=0.000001 rel=65519 abs=17 outliers=0/65536
+
+accepted median:  0.286096 ms
+frozen original:  0.355232 ms
+improvement:      ~19.46%
+
+GitHub push: SUCCESS
+  remote: Bypassed rule violations for refs/heads/main
+  origin/main: 4899b251..c774d5d5  main -> main
+  local HEAD == origin/main == c774d5d5901e996d7aee6979f4409f45c60045a6
