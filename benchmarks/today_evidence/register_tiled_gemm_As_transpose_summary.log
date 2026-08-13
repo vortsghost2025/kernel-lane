@@ -1,0 +1,46 @@
+EXPERIMENT: A-transpose (As[64][16] -> AsT[16][64]) -- AsT[k][row]
+DATE: 2026-08-13
+VERDICT: KEEP
+
+1) BASELINE SNAPSHOT
+   snapshot file: benchmarks\today_evidence\register_tiled_gemm_ACCEPTED_4x4_vectorized_template.cu
+   sha256 (src, at freeze):  e0c2d5a0c05764044ebdffafc2d0e81533d30b18f0138d75688d111c7e4de247
+   sha256 (src, now):        3f730a09eaf7b8ca12f9b8218a00f7364a0ef1c04b490970fdd169411729ed5c
+   identical after experiment: False   [src now CHANGED by design -> KEEP new baseline; snapshot intentionally preserved as pre-experiment reference]
+
+2) A-TRANSPOSE
+   correctness:   PASS  max_rel=0.000657 max_abs=0.000001 outliers=0/65536 (identical signature)
+   shapes:        PASS 9/9 shapes incl. all 4 template paths (0 outliers each)
+   A shared-load SASS before -> after: 4xLDS.64 + 2xLDS.128 per double-k (6 inst/32 FMA) -> 2xLDS.128 + 2xLDS.128 (4 inst/32 FMA)
+     smsp__inst_executed_op_shared_ld.sum: 6,291,456 -> 4,194,304 (-33.3%)
+   registers before -> after: 48 -> 40
+   occupancy before -> after: 68.70% -> 80.43%
+   bank conflicts shared_ld before -> after: 4,383,380 -> 177,598 (-96%)
+   bank conflicts shared_st before -> after: 60,109 -> 1,629,750 (transpose-store one-time cost, amortized)
+   shared_st sum: 262,144 -> 655,360
+   l1tex throughput: 84.90% -> 81.52%
+   sm throughput: ~60% (flat)
+   grid/block unchanged; THREAD_TILE_M=4, THREAD_TILE_N=4, BK=16, BLOCK_SIZE=16
+   NOTE: A shared STORE becomes scalar STS (stride 0x100) -- one-time per tile, not the hot loop
+
+3) BENCHMARK (1024x1024x1024, 2 batches x 15, combined median)
+   batch1 median: 0.264064 ms
+   batch2 median: 0.273152 ms
+   combined 30-sample median: 0.266240 ms
+   delta vs accepted 0.286096 ms: -6.94% (faster)
+   delta vs historical 0.355232 ms: -25.06% (faster)
+   quiet cluster min: 0.261056 ms (below accepted quiet ~0.286)
+
+4) RESTORE
+   required: NO (KEEP)
+   accepted pre-experiment snapshot retained: benchmarks\today_evidence\register_tiled_gemm_ACCEPTED_4x4_vectorized_template.cu
+   new working-tree source is the KEEP result (uncommitted by design)
+
+EVIDENCE:
+   correctness:  benchmarks\today_evidence\register_tiled_gemm_As_transpose_correctness.log
+   bench:        benchmarks\today_evidence\register_tiled_gemm_As_transpose_bench.log
+   ncu:          benchmarks\today_evidence\register_tiled_gemm_As_transpose_ncu.log
+   sass:         benchmarks\today_evidence\register_tiled_gemm_As_transpose_sass.log
+   summary:      benchmarks\today_evidence\register_tiled_gemm_As_transpose_summary.log
+   snapshot:     benchmarks\today_evidence\register_tiled_gemm_ACCEPTED_4x4_vectorized_template.cu
+                 benchmarks\today_evidence\register_tiled_gemm_ACCEPTED_4x4.sha256.txt

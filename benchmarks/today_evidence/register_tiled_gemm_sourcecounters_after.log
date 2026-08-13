@@ -1,0 +1,24 @@
+==PROF== Connected to process 24660 (S:\kernel-lane\kernels\register_tiled_gemm.exe)
+==PROF== Profiling "register_tiled_gemm": 0%....50%....100% - 5 passes
+[CORRECTNESS] register_tiled_gemm  max_rel=0.000657 max_abs=0.000001 rel=65519 abs=17 outliers=0/65536 => PASS
+Register Tiled GEMM (1024x1024x1024): 1004.38 ms, 0.00213813 TFLOPS
+==PROF== Disconnected from process 24660
+[24660] register_tiled_gemm.exe@127.0.0.1
+  void register_tiled_gemm<1, 1>(const float *, const float *, float *, int, int, int) (16, 16, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+    Section: Source Counters
+    ------------------------- ----------- ------------
+    Metric Name               Metric Unit Metric Value
+    ------------------------- ----------- ------------
+    Branch Instructions Ratio           %         0.04
+    Branch Instructions              inst    1,972,224
+    Branch Efficiency                   %          100
+    Avg. Divergent Branches      branches            0
+    ------------------------- ----------- ------------
+
+    OPT   Est. Speedup: 7.349%                                                                                          
+          This workload has uncoalesced global accesses resulting in a total of 393216 excessive sectors (8% of the     
+          total 4718592 sectors). Check the L2 Theoretical Sectors Global Excessive table for the primary source        
+          locations. The CUDA Programming Guide                                                                         
+          (https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses) has additional      
+          information on reducing uncoalesced device memory accesses.                                                   
+

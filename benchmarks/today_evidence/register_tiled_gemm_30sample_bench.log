@@ -1,0 +1,50 @@
+# 2x15 benchmark: production kernel (template-specialized vectorized global->shared loads)
+# Compiled: -arch=sm_120 -lineinfo -std=c++17 -O3 --use_fast_math
+# Host: Windows 10/11 native, NVIDIA RTX 5060 (sm_120)
+# Frozen baseline median: 0.355232 ms  (frozen, evidence in prior records)
+# These are the authoritative clean runs taken immediately after the template
+# specialization build. Kernel binary unchanged by later host-only --test-shape
+# addition; a subsequent noise-polluted recheck is in
+# register_tiled_gemm_bench_recheck.log (system under load, 0.46-0.78 ms outliers).
+
+## run 1 (median 0.287008 ms)
+Register Tiled GEMM (1024x1024x1024): 0.285792 ms
+Register Tiled GEMM (1024x1024x1024): 0.294464 ms
+Register Tiled GEMM (1024x1024x1024): 0.291808 ms
+Register Tiled GEMM (1024x1024x1024): 0.287392 ms
+Register Tiled GEMM (1024x1024x1024): 0.285696 ms
+Register Tiled GEMM (1024x1024x1024): 0.284224 ms
+Register Tiled GEMM (1024x1024x1024): 0.290368 ms
+Register Tiled GEMM (1024x1024x1024): 0.284640 ms
+Register Tiled GEMM (1024x1024x1024): 0.287008 ms
+Register Tiled GEMM (1024x1024x1024): 0.286176 ms
+Register Tiled GEMM (1024x1024x1024): 0.288480 ms
+Register Tiled GEMM (1024x1024x1024): 0.285120 ms
+Register Tiled GEMM (1024x1024x1024): 0.286784 ms
+Register Tiled GEMM (1024x1024x1024): 0.290400 ms
+Register Tiled GEMM (1024x1024x1024): 0.310464 ms
+
+## run 2 (median 0.285856 ms)
+Register Tiled GEMM (1024x1024x1024): 0.292224 ms
+Register Tiled GEMM (1024x1024x1024): 0.307232 ms
+Register Tiled GEMM (1024x1024x1024): 0.284960 ms
+Register Tiled GEMM (1024x1024x1024): 0.284544 ms
+Register Tiled GEMM (1024x1024x1024): 0.307296 ms
+Register Tiled GEMM (1024x1024x1024): 0.286016 ms
+Register Tiled GEMM (1024x1024x1024): 0.344864 ms
+Register Tiled GEMM (1024x1024x1024): 0.286720 ms
+Register Tiled GEMM (1024x1024x1024): 0.285920 ms
+Register Tiled GEMM (1024x1024x1024): 0.285216 ms
+Register Tiled GEMM (1024x1024x1024): 0.284512 ms
+Register Tiled GEMM (1024x1024x1024): 0.285856 ms
+Register Tiled GEMM (1024x1024x1024): 0.281952 ms
+Register Tiled GEMM (1024x1024x1024): 0.284288 ms
+Register Tiled GEMM (1024x1024x1024): 0.285152 ms
+
+## Summary
+run1 median: 0.287008 ms
+run2 median: 0.285856 ms
+combined 30-sample median: 0.286096 ms
+frozen baseline median: 0.355232 ms
+delta vs frozen: -19.46% (0.286096 vs 0.355232)
+best single: 0.281952 ms (7.616 TFLOPS)

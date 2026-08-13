@@ -23,9 +23,9 @@ __global__ void register_tiled_gemm(const float* __restrict__ A, const float* __
     int col_start = bx * BLOCK_SIZE * THREAD_TILE_N;
 
     // Allocate shared memory for tiles of A and B
-    // AsT: [BK][BLOCK_SIZE * THREAD_TILE_M]  (transposed: AsT[k][row])
+    // As: [BLOCK_SIZE * THREAD_TILE_M][BK]
     // Bs: [BK][BLOCK_SIZE * THREAD_TILE_N]
-    __shared__ float AsT[BK][BLOCK_SIZE * THREAD_TILE_M];
+    __shared__ float As[BLOCK_SIZE * THREAD_TILE_M][BK];
     __shared__ float Bs[BK][BLOCK_SIZE * THREAD_TILE_N];
 
     // Allocate registers for the thread's tile of C
@@ -37,12 +37,12 @@ __global__ void register_tiled_gemm(const float* __restrict__ A, const float* __
         if (k_end > K) k_end = K;
         int k_valid = k_end - k_base;
 
-        // Load tile of A into shared memory AsT using float4 vectorized loads
-        // AsT: [16 k rows][64 tile rows]. 256 threads: 4 threads per row, each loads float4 (4 k values)
+        // Load tile of A into shared memory As using float4 vectorized loads
+        // As tile: [64 rows][16 cols]. 256 threads: 4 threads per row, each loads float4 (4 elements)
         int tid = ty * BLOCK_SIZE + tx;  // linear thread index in the block [0, 255]
         int row_in_tile_A = tid / 4;           // row in A tile [0, 63]
         int lane_in_row_A = tid % 4;           // which float4 chunk in this row [0, 3]
-        int k_base_in_tile_A = lane_in_row_A * 4; // k offset [0, 4, 8, 12]
+        int k_base_in_tile_A = lane_in_row_A * 4; // column offset [0, 4, 8, 12]
         int global_row_A = row_start + row_in_tile_A;
         int global_col_A = k_base + k_base_in_tile_A;
         if (global_row_A < M && global_col_A + 3 < K) {
@@ -50,27 +50,27 @@ __global__ void register_tiled_gemm(const float* __restrict__ A, const float* __
             if (K_aligned) {
                 // 16-byte aligned guaranteed: fast float4 path
                 float4 a_vec = *reinterpret_cast<const float4*>(a_src);
-                AsT[k_base_in_tile_A + 0][row_in_tile_A] = a_vec.x;
-                AsT[k_base_in_tile_A + 1][row_in_tile_A] = a_vec.y;
-                AsT[k_base_in_tile_A + 2][row_in_tile_A] = a_vec.z;
-                AsT[k_base_in_tile_A + 3][row_in_tile_A] = a_vec.w;
+                As[row_in_tile_A][k_base_in_tile_A + 0] = a_vec.x;
+                As[row_in_tile_A][k_base_in_tile_A + 1] = a_vec.y;
+                As[row_in_tile_A][k_base_in_tile_A + 2] = a_vec.z;
+                As[row_in_tile_A][k_base_in_tile_A + 3] = a_vec.w;
             } else {
                 // Potential unaligned: scalar fallback
                 for (int k = 0; k < 4; ++k) {
-                    AsT[k_base_in_tile_A + k][row_in_tile_A] = a_src[k];
+                    As[row_in_tile_A][k_base_in_tile_A + k] = a_src[k];
                 }
             }
         } else if (global_row_A < M) {
             // Handle boundary: scalar fallback for last tile
             for (int k = 0; k < 4; ++k) {
                 int gc = global_col_A + k;
-                AsT[k_base_in_tile_A + k][row_in_tile_A] = (gc < K) ? A[global_row_A * K + gc] : 0.0f;
+                As[row_in_tile_A][k_base_in_tile_A + k] = (gc < K) ? A[global_row_A * K + gc] : 0.0f;
             }
         } else {
-            AsT[k_base_in_tile_A + 0][row_in_tile_A] = 0.0f;
-            AsT[k_base_in_tile_A + 1][row_in_tile_A] = 0.0f;
-            AsT[k_base_in_tile_A + 2][row_in_tile_A] = 0.0f;
-            AsT[k_base_in_tile_A + 3][row_in_tile_A] = 0.0f;
+            As[row_in_tile_A][k_base_in_tile_A + 0] = 0.0f;
+            As[row_in_tile_A][k_base_in_tile_A + 1] = 0.0f;
+            As[row_in_tile_A][k_base_in_tile_A + 2] = 0.0f;
+            As[row_in_tile_A][k_base_in_tile_A + 3] = 0.0f;
         }
 
         // Load tile of B into shared memory Bs using float4 vectorized loads
@@ -114,9 +114,11 @@ __global__ void register_tiled_gemm(const float* __restrict__ A, const float* __
         //   rows: [row_start + ty * THREAD_TILE_M, row_start + (ty+1) * THREAD_TILE_M)
         //   cols: [col_start + tx * THREAD_TILE_N, col_start + (tx+1) * THREAD_TILE_N)
         for (int k = 0; k < k_valid; ++k) {
-            // AsT[k][ty*THREAD_TILE_M + 0..3] are contiguous -> 128-bit A shared load opportunity
+            // Load a row segment of As and a column segment of Bs for this thread's tile
+            // We can load the entire row segment of As and column segment of Bs into registers? 
+            // Instead, we'll loop over the thread's tile and accumulate.
             for (int i = 0; i < THREAD_TILE_M; ++i) {
-                float a_val = AsT[k][ty * THREAD_TILE_M + i];
+                float a_val = As[ty * THREAD_TILE_M + i][k];
                 for (int j = 0; j < THREAD_TILE_N; ++j) {
                     float b_val = Bs[k][tx * THREAD_TILE_N + j];
                     C_local[i][j] += a_val * b_val;

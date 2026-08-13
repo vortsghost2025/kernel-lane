@@ -1,0 +1,108 @@
+================================================================================
+Nsight Compute Comparison - register_tiled_gemm
+Template-specialized float4 vectorized global loads (AFTER)
+Generated: 2026-08-13 (win32, RTX 5060 sm_120, CUDA 13.3)
+================================================================================
+
+Run conditions:
+  ncu.exe (Nsight Compute 2026.2.0)
+  kernel: register_tiled_gemm<1,1> (16,16,1)x(16,16,1), grid 16x16 (M=N=K=1024)
+  launch order in binary: correctness(256) -> warmup(1024) -> timed(1024)
+  ncu flags: --launch-skip 2 --launch-count 1 --kernel-name regex:register_tiled_gemm
+  Metric source files:
+    register_tiled_gemm_ncu_after.log            (12 passes)
+    register_tiled_gemm_ncu_after_conflicts.log  (3 passes)
+    register_tiled_gemm_ncu_after_bankconf.log   (3 passes)
+
+--------------------------------------------------------------------------------
+Metric                                OLD (scalar LDG baseline)   NEW (float4 LDG)
+--------------------------------------------------------------------------------
+launch__registers_per_thread                 48                       48
+sm__throughput.avg.pct_of_peak %            62.68                    60.02
+sm__warps_active.avg.pct_of_peak %          68.79                    68.70
+smsp__warp_issue_stalled_long_             16.64                    18.58
+  scoreboard_per_warp_active.pct %
+smsp__warp_issue_stalled_short_             8.04                    11.00
+  scoreboard_per_warp_active.pct %
+l1tex__throughput.avg.pct %                  n/a                     84.90
+lts__throughput.avg.pct %                    n/a                     26.06
+gpu__dram_throughput.avg.pct %              7.19                     9.66
+smsp__average_warp_latency_per_inst         n/a                     14.00
+  issued.ratio (cycles)
+sm__sass_inst_executed.sum                   n/a                 52,701,184
+sm__sass_inst_executed_op_global_ld.sum      n/a                    262,144
+smsp__inst_executed_op_shared_ld.sum         n/a                  6,291,456
+smsp__inst_executed_op_shared_st.sum         n/a                    262,144
+l1tex__data_bank_conflicts_shared_ld.sum  ~4,200,000 (prior sess)  4,383,380
+l1tex__data_bank_conflicts_shared_st.sum     n/a                     60,109
+sm__inst_executed_pipe_fma.pct_of_peak %     n/a                     38.00
+dram__bytes.sum (Mbyte)                      n/a                     12.98
+--------------------------------------------------------------------------------
+
+Interpretation (evidence-based):
+  - Register footprint UNCHANGED (48), occupancy essentially unchanged.
+  - Shared-memory pipe (L1/TEX 84.9%) is the dominant bottleneck; FMA pipe
+    only 38%, so this kernel is shared-memory-latency/bandwidth bound, not
+    compute bound.
+  - Shared-load instruction count (6,291,456) is 24x the shared-store count
+    and 24x the global-load count: the compute inner loop re-issues Bs loads
+    for every (i,j) accumulator step.
+  - Shared-load bank conflicts (4,383,380) persist at ~70% of shared-load
+    instructions -> padding is NOT the fix; the load pattern itself is.
+  - Wall-clock win (-19.46%) comes from fewer/vectorized GLOBAL loads
+    (262,144 global-ld insts) and reduced instruction count, not from
+    conflict reduction.
+
+NEXT EXPERIMENT (from this profile):
+  Hoist the thread's B column segment out of the i-loop into a small
+  register array (b_reg[THREAD_TILE_N]) loaded once per k step.
+  Expected: shared-load instructions drop 20 -> 8 per (thread,k) step
+  (~60% fewer), proportionally fewer bank conflicts, lower L1/TEX pressure.
+  NOT in scope: float4 C writeback (rejected), BK+1 padding (rejected).
+================================================================================
+
+EXPERIMENT RESULT (2026-08-13): B-column register hoist (manual source change)
+  Attempted: hoist Bs[k][tx*4+j] into b_reg[4] loaded once per k step.
+  Result:     NO-OP. ncu metrics byte-identical before/after the edit:
+              48 regs, 52,701,184 SASS insts, 6,291,456 shared-ld, 262,144 shared-st,
+              SM 59.70-60.02%, warps 68.53-68.70%.
+  Conclusion: nvcc -O3 ALREADY hoists the B-column loads into registers.
+              Manual source hoist changes nothing. Source REVERTED to accepted
+              baseline; rebuild verified (max_rel=0.000657, PASS).
+  Next:       Shared-load traffic is compiler-optimal for this tile shape.
+              The 6.29M shared loads = 4 (A row) + 4 (B col) per (thread,k) step
+              is the theoretical floor for THREAD_TILE=4x4 scalar loads.
+              Larger register tile (THREAD_TILE_M/N) or wider LDS (float4 shared
+              loads) would be the next lever, but changes the whole kernel shape.
+
+=== EXPERIMENT: THREAD_TILE_M 4->8 (register-tile enlargement) ===
+Date: 2026-08-13
+Status: REVERTED (regression)
+
+Motivation: SASS cuobjdump analysis showed compiler already emits LDS.128 (B) + LDS.64 (A)
+fully unrolled; shared loads already max-vectorized at 4x4 tile. Only remaining lever to cut
+shared-load-per-FMA is larger register tile.
+
+Change: THREAD_TILE_M 4->8 (THREAD_TILE_N stayed 4), generalized A-tile loader loop.
+B load unchanged (tile cols still 64). C_local 16 -> 32 accumulators.
+
+First build FAILED correctness: 32758/65536 outliers (max_rel=1.0). Root cause: A-tile loader
+only covered 64/128 rows (256 threads x one float4 = 1024 floats vs 2048 needed). Fixed with
+a_units_per_thread=2 loop. Correctness then PASS all paths + 9 shapes (max_rel=0.000657).
+
+Bench (30-sample, noisy machine):
+  TILE8: median=0.318432 ms  min=0.309728  max=0.37152
+  BASE : median=0.286096 ms
+  => -11.3% SLOWER. Uniform regression (quiet min 0.3097 > baseline median).
+
+ncu (timed launch, register_tiled_gemm<1,1>):
+  grid (16,8,1) = 128 blocks (was 16x16=256)
+  registers/thread: 72 (was 48)
+  max warps/active cycle: 50% (was 68.7%)
+  L1TEX throughput: 73.37% (was 84.90%) -- shared-load bottleneck REDUCED as predicted
+  SM throughput: 52.21%
+  warp latency/inst issued: 10.03 cycles
+
+Verdict: Bigger tile cut shared-load pressure (L1TEX 84.9->73.4) BUT register pressure
+(48->72) dropped occupancy (68.7->50%), netting -11%. Occupancy-limited on SM120.
+KEEP/REVERT protocol => REVERTED. Working tree restored to byte-identical accepted baseline.

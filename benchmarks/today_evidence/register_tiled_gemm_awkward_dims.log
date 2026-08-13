@@ -1,0 +1,12 @@
+# Awkward-dimension correctness: production kernel via --test-shape
+# Template paths exercised: <true,true>, <true,false>, <false,true>, <false,false>
+#
+[CORRECTNESS] M255_N255_K255       max_rel=0.000844 max_abs=0.000001 rel=65009 abs=16 outliers=0/65025 => PASS
+[CORRECTNESS] M257_N257_K257       max_rel=0.000681 max_abs=0.000002 rel=66041 abs=8 outliers=0/66049 => PASS
+[CORRECTNESS] M259_N259_K259       max_rel=0.000999 max_abs=0.000001 rel=67074 abs=7 outliers=0/67081 => PASS
+[CORRECTNESS] M511_N511_K511       max_rel=0.001437 max_abs=0.000002 rel=261091 abs=30 outliers=0/261121 => PASS
+[CORRECTNESS] M513_N513_K513       max_rel=0.002302 max_abs=0.000003 rel=263138 abs=31 outliers=0/263169 => PASS
+[CORRECTNESS] M257_N260_K259       max_rel=0.000658 max_abs=0.000001 rel=66812 abs=8 outliers=0/66820 => PASS
+[CORRECTNESS] M259_N257_K260       max_rel=0.001151 max_abs=0.000002 rel=66553 abs=10 outliers=0/66563 => PASS
+[CORRECTNESS] M260_N259_K257       max_rel=0.000766 max_abs=0.000001 rel=67329 abs=11 outliers=0/67340 => PASS
+[CORRECTNESS] M257_N258_K259       max_rel=0.001372 max_abs=0.000002 rel=66292 abs=14 outliers=0/66306 => PASS

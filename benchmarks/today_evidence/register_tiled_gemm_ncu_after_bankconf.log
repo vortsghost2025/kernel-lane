@@ -1,0 +1,19 @@
+==PROF== Connected to process 9556 (S:\kernel-lane\kernels\register_tiled_gemm.exe)
+==PROF== Profiling "register_tiled_gemm": 0%....50%....100% - 3 passes
+[CORRECTNESS] register_tiled_gemm  max_rel=0.000657 max_abs=0.000001 rel=65519 abs=17 outliers=0/65536 => PASS
+Register Tiled GEMM (1024x1024x1024): 364.024 ms, 0.00589929 TFLOPS
+==PROF== Disconnected from process 9556
+[9556] register_tiled_gemm.exe@127.0.0.1
+  void register_tiled_gemm<1, 1>(const float *, const float *, float *, int, int, int) (16, 16, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+    Section: Command line profiler metrics
+    -------------------------------------------------------- ----------- ------------
+    Metric Name                                              Metric Unit Metric Value
+    -------------------------------------------------------- ----------- ------------
+    dram__bytes.sum                                                Mbyte        12.98
+    l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum                4,383,380
+    l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum                   60,109
+    sm__sass_inst_executed_op_global_ld.sum                         inst      262,144
+    smsp__inst_executed_op_shared_ld.sum                            inst    6,291,456
+    smsp__inst_executed_op_shared_st.sum                            inst      262,144
+    -------------------------------------------------------- ----------- ------------
+

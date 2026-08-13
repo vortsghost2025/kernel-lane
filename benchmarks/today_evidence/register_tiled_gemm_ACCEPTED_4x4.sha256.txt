@@ -1,0 +1,6 @@
+# register_tiled_gemm.cu (working tree)  and  ACCEPTED snapshot hash
+src=e0c2d5a0c05764044ebdffafc2d0e81533d30b18f0138d75688d111c7e4de247
+snapshot=e0c2d5a0c05764044ebdffafc2d0e81533d30b18f0138d75688d111c7e4de247
+identical=True
+generated_at=2026-08-13
+note=accepted 4x4 vectorized template baseline is UNCOMMITTED working-tree state; restore only from snapshot, never git HEAD
