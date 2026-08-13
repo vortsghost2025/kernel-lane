@@ -29,9 +29,11 @@ files committed:
 correctness signature:
   PASS  max_rel=0.000657 max_abs=0.000001 rel=65519 abs=17 outliers=0/65536
 
-accepted median:  0.286096 ms
-frozen original:  0.355232 ms
-improvement:      ~19.46%
+A-transpose accepted median:  0.266240 ms
+previous accepted:            0.286096 ms
+historical original:          0.355232 ms
+improvement vs previous:      6.94%
+improvement vs historical:    ~25.05%
 
 GitHub push: SUCCESS
   remote: Bypassed rule violations for refs/heads/main
