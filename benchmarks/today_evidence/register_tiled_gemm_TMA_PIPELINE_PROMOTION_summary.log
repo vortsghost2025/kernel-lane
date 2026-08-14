@@ -90,3 +90,7 @@ EVIDENCE (all in benchmarks/today_evidence/):
   pipeline_promotion_pairs.csv  (60 paired rows)
   register_tiled_gemm_ACCEPTED_PRE_TMA_PIPELINE.cu + .sha256.txt  (old frozen snapshot)
   kernels/src/register_tiled_gemm_bitwise.cu  (bitwise harness, reproducible)
+
+PROMOTION COMMIT (FINALIZED): 30e772e465cc6f2adb6713deee5b7b320b136e7e
+HEAD == origin/main: YES  (verified post-push)
+This line finalizes the two placeholders above with the literal promotion commit SHA.
