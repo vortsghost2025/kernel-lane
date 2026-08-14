@@ -1,0 +1,29 @@
+**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.0
+** Copyright (c) 2026 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_Z19register_tiled_gemmILb0ELb0EEvPKfS1_PfiiiPK14CUtensorMap_st' for 'sm_120'
+ptxas info    : Function properties for _Z19register_tiled_gemmILb0ELb0EEvPKfS1_PfiiiPK14CUtensorMap_st
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 47 registers, used 1 barriers, 12304 bytes smem
+ptxas info    : Compile time = 0.000 ms
+ptxas info    : Compiling entry function '_Z19register_tiled_gemmILb0ELb1EEvPKfS1_PfiiiPK14CUtensorMap_st' for 'sm_120'
+ptxas info    : Function properties for _Z19register_tiled_gemmILb0ELb1EEvPKfS1_PfiiiPK14CUtensorMap_st
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 47 registers, used 1 barriers, 12304 bytes smem
+ptxas info    : Compile time = 0.000 ms
+ptxas info    : Compiling entry function '_Z19register_tiled_gemmILb1ELb0EEvPKfS1_PfiiiPK14CUtensorMap_st' for 'sm_120'
+ptxas info    : Function properties for _Z19register_tiled_gemmILb1ELb0EEvPKfS1_PfiiiPK14CUtensorMap_st
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 47 registers, used 1 barriers, 12304 bytes smem
+ptxas info    : Compile time = 0.000 ms
+ptxas info    : Compiling entry function '_Z19register_tiled_gemmILb1ELb1EEvPKfS1_PfiiiPK14CUtensorMap_st' for 'sm_120'
+ptxas info    : Function properties for _Z19register_tiled_gemmILb1ELb1EEvPKfS1_PfiiiPK14CUtensorMap_st
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 47 registers, used 1 barriers, 12304 bytes smem
+ptxas info    : Compile time = 0.000 ms
+register_tiled_gemm.cu
+tmpxft_00004c40_00000000-7_register_tiled_gemm.cudafe1.cpp
+BUILD_EXIT=0

@@ -1,0 +1,92 @@
+============================================================
+PIPELINED B-TMA PRODUCTION PROMOTION — SUMMARY
+============================================================
+Date:           2026-08-14
+Platform:       win32, sm_120 (RTX 5060), CUDA 13.3
+Decisions:
+  * Promote the ORIGINAL unconstrained 47-register pipelined B-TMA
+    into S:\kernel-lane\kernels\src\register_tiled_gemm.cu
+  * LB6 (__launch_bounds__) variant is NOT used (already rejected).
+  * Old production frozen as an immutable snapshot before change.
+
+VERDICT: PROMOTED SUCCESSFULLY
+============================================================
+
+STARTING SHA: 90051755a8a5854d7e82ec96b5ef1c3f71b110b2  (HEAD == origin/main verified)
+
+OLD PRODUCTION SNAPSHOT:
+  path: benchmarks/today_evidence/register_tiled_gemm_ACCEPTED_PRE_TMA_PIPELINE.cu
+  SHA : 3F730A09EAF7B8CA12F9B8218A00F7364A0EF1C04B490970FDD169411729ED5C
+        (also recorded in register_tiled_gemm_ACCEPTED_PRE_TMA_PIPELINE.sha256.txt)
+  verified byte-identical to pre-promotion production.  Old source retained.
+
+BITWISE OUTPUT GATE (old production kernel vs pipelined candidate, identical A/B):
+  256x256x256     total=65536    different=0  -> EXACT MATCH
+  1024x1024x1024  total=1048576  different=0  -> EXACT MATCH
+  1000x1000x1002  total=1000000  different=0  -> EXACT MATCH
+  1024x1020x1024  total=1044480  different=0  -> EXACT MATCH
+  all exact: YES  (byte-for-byte identical C; arithmetic order preserved)
+
+PROMOTED CORRECTNESS (after promotion):
+  256: PASS   max_rel=0.000657 max_abs=0.000001 outliers=0/65536
+  9/9: PASS   (all byte-identical max_rel to old production)
+
+PROJECT BUILD:
+  Promoted kernels/register_tiled_gemm.exe built (native CUDA13.3/sm_120) PASS.
+  scripts/build-kernels.ps1: promoted register_tiled_gemm.cu and all kernels
+    build OK. Notes: the script's overall exit is nonzero ONLY due to the
+    PRE-EXISTING, UNRELATED kernels/src/register_tiled_gemm_tf32.cu (a long-rejected
+    TF32 experiment using invalid bfloat16 wmma fragments); it does not use the
+    production source and was not affected by this promotion. No promotion-induced
+    kernel regression.
+
+MECHANISM (promoted production binary):
+  UTMALDG (SASS): present (8)
+  cp.async.bulk.tensor.3d (PTX): present
+  overlap retained: prefetch cp.async.bulk issued before try_wait parity before
+    fma compute (identical to adjudicated byte-identical candidate)
+
+RESOURCES (promoted production):
+  registers:     47/thread
+  static shared: 12,304 B
+  spills:        0
+  block-limit registers: 5   theoretical occupancy 83.33%  achieved 71.10%
+  L1/TEX 83.09%  SM 64.28%  memory 78.17%  L2 29.88%  DRAM 12.16%
+  (Lower occupancy is expected and NOT a rejection: the controlled wall-clock
+   adjudication already showed this candidate wins.)
+
+FINAL ROUND-ROBIN (A=old accepted timing control, P=promoted; 2x30 pairs, alternating):
+  ROUND 1: old 0.268320 | promoted 0.259088 | delta -3.44% | paired_med -3.36% | wins 22/30
+  ROUND 2: old 0.266432 | promoted 0.260704 | delta -2.15% | paired_med -2.86% | wins 20/30
+  COMBINED (60 pairs): old_med=0.266768 | promoted_med=0.259632 | delta=-2.67%
+            paired_med=-2.98% | promoted_wins=42/60 = 70.0%
+  PASS gate: combined >1% (2.67%) YES; paired_med >1% (2.98%) YES; wins >=70% (70.0%) YES
+
+NEW PRODUCTION SHA256: 841BD61A3FB25D112F0E161AB97F16F6ED13697B6E73AE40F500144636A29F25
+  (byte-identical to the adjudicated register_tiled_gemm_TMA_B_pipeline.cu candidate)
+
+PROMOTION COMMIT: (see git)  HEAD == origin/main after push
+
+BASELINE UPDATE:
+  old accepted SHA:       3F730A09... (historical), old controlled median 0.266768 ms,
+                          old historical baseline 0.265424 ms remains historical
+  new accepted SHA:       841BD61A3F... (now production) — controlled median 0.259632 ms
+  promotion vs old:       delta -2.67%, paired -2.98%, win rate 70.0%
+  correctness:            9/9 PASS ; bitwise: exact (0 differing) ; resources 47/12304/0
+  promotion commit SHA:   (reported in output)
+
+VERDICT: PROMOTED SUCCESSFULLY.
+Production source now carries the full-FP32 double-buffered B-TMA pipeline.
+No __launch_bounds__. No further optimization begins after promotion.
+
+EVIDENCE (all in benchmarks/today_evidence/):
+  register_tiled_gemm_TMA_PIPELINE_PROMOTION_bitwise.log
+  register_tiled_gemm_TMA_PIPELINE_PROMOTION_correctness.log
+  register_tiled_gemm_TMA_PIPELINE_PROMOTION_build.log
+  register_tiled_gemm_TMA_PIPELINE_PROMOTION_sass.log
+  register_tiled_gemm_TMA_PIPELINE_PROMOTION_ncu.csv
+  register_tiled_gemm_TMA_PIPELINE_PROMOTION_bench.log
+  register_tiled_gemm_TMA_PIPELINE_PROMOTION_summary.log
+  pipeline_promotion_pairs.csv  (60 paired rows)
+  register_tiled_gemm_ACCEPTED_PRE_TMA_PIPELINE.cu + .sha256.txt  (old frozen snapshot)
+  kernels/src/register_tiled_gemm_bitwise.cu  (bitwise harness, reproducible)
