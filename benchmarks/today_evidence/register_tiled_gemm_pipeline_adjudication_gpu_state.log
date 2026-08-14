@@ -1,0 +1,22 @@
+GPU STATE LOG — TRUE ROUND-ROBIN ADJUDICATION  (2026-08-14)
+Captured by nvidia-smi at the top of each round.
+Format: utilization%, temp C, P-state, GPU clock MHz, memory MiB
+
+  Round 1: 2 %, 52, P1, 2535 MHz, 2978 MiB
+  Round 2: 5 %, 53, P1, 2595 MHz, 3121 MiB
+  Round 3: 5 %, 53, P1, 2565 MHz, 3111 MiB
+  Round 4: 7 %, 54, P1, 2587 MHz, 3061 MiB
+
+Interpretation:
+  Utilization 2-7% = ordinary Windows desktop compositing / DX processes at idle
+  (snapshot taken in the inter-round gap, i.e. no benchmark kernel in flight).
+  Temperature 52-54 C, P-state P1, ~2.5 GHz GPU clock = stable, benign idle.
+  --query-compute-apps listed only ordinary Windows/DX processes with [N/A] CUDA
+  memory (explorer.exe, chrome.exe, msedge, StartMenuExperienceHost,
+  NvContainer, NVIDIA Overlay, ChatGPT (Beta), WindowsTerminal, etc.).
+  NONE is a competing CUDA compute workload consuming significant GPU.
+
+CONTAMINATION VERDICT for all 4 rounds: NONE.
+  (An earlier automated flag marked these True purely because Windows lists many
+   DX/display processes as compute-apps with [N/A]; that is a false positive, not
+   an active competing compute load. Nothing was killed or stopped.)

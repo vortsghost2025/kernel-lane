@@ -1,0 +1,30 @@
+============================================================
+PIPELINE ACCEPTANCE ADJUDICATION — TRUE ROUND-ROBIN BENCHMARK
+A = accepted timing control   (kernel: register_tiled_gemm.cu, resource-identical
+    40 reg / 8192 B / 0 spills, --timing-only host parity with pipeline)
+P = original unconstrained 47-register pipelined B-TMA
+Method: 4 rounds x 30 A/P pairs; pair order ALTERNATES (pair odd A,P; even P,A);
+warm both before each round; identical host pre-test (both --timing-only).
+Run: 2026-08-14.  SM / temps / clocks captured per round.
+
+ROUND 1: acc_med=0.265072 pipe_med=0.265552 med_delta=+0.18%
+         paired_med=-2.35%  [P25 -5.95 P75 +2.75]  pipe_wins=19/30
+         acc min/max 0.261120/0.309184 ; pipe min/max 0.251744/0.447072
+ROUND 2: acc_med=0.265808 pipe_med=0.257664 med_delta=-3.06%
+         paired_med=-2.50%  [P25 -9.23 P75 -1.63]  pipe_wins=24/30
+         acc min/max 0.261344/0.667520 ; pipe min/max 0.252832/0.300992
+ROUND 3: acc_med=0.276816 pipe_med=0.256720 med_delta=-7.26%
+         paired_med=-4.49%  [P25 -9.00 P75 -3.09]  pipe_wins=27/30
+         acc min/max 0.262144/0.360064 ; pipe min/max 0.251328/0.291936
+ROUND 4: acc_med=0.269200 pipe_med=0.255520 med_delta=-5.08%
+         paired_med=-3.25%  [P25 -5.80 P75 -1.02]  pipe_wins=23/30
+         acc min/max 0.260256/0.311200 ; pipe min/max 0.252800/0.322304
+
+COMBINED (120 valid pairs):
+  accepted_med = 0.266816 ms
+  pipeline_med = 0.257504 ms
+  delta        = -3.49 %
+  paired_med   = -3.30 %
+  pipe_wins    = 93/120 (77.5 %)
+
+Note: raw per-pair values in pipeline_adjudication_pairs.csv (120 rows).

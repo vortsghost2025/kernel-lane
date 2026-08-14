@@ -1,0 +1,92 @@
+============================================================
+PIPELINE ACCEPTANCE ADJUDICATION — SUMMARY AND VERDICT
+============================================================
+Date:           2026-08-14
+Platform:       win32, sm_120 (RTX 5060), CUDA 13.3
+Question:       Is the ORIGINAL unconstrained 47-register pipelined B-TMA
+                (register_tiled_gemm_TMA_B_pipeline.cu) truly faster than the
+                accepted production kernel, under a clean round-robin benchmark?
+
+Prior state:    Original pipeline had been classified REJECT/NOISE under a
+                grouped (non-interleaved) benchmark with a host-pre-test mismatch
+                (production ran correctness; pipeline ran --timing-only).
+                Those methodology flaws are fixed here.
+
+============================================================
+METHOD (fixed)
+============================================================
+A = accepted timing control (register_tiled_gemm_accepted_timing_control.cu):
+    byte-identical kernel to production; host harness extended ONLY to add
+    --timing-only. Resource-verified: 40 reg / 8192 B / 0 spills = production.
+P = original pipeline, --timing-only.
+Both invoked with --timing-only => identical host pre-test (warmup + 1 timed
+launch), removing the earlier mismatch.
+TRUE sample-level round-robin: 4 rounds x 30 A/P pairs; pair order alternates
+(odd = A then P, even = P then A) to cancel order/drift bias.
+
+============================================================
+RESULT (120 valid pairs)
+============================================================
+            acc_med    pipe_med   med_delta   paired_med [P25,P75]   wins
+ROUND 1    0.265072   0.265552    +0.18%      -2.35%  [-5.95, 2.75]  19/30
+ROUND 2    0.265808   0.257664    -3.06%      -2.50%  [-9.23,-1.63]  24/30
+ROUND 3    0.276816   0.256720    -7.26%      -4.49%  [-9.00,-3.09]  27/30
+ROUND 4    0.269200   0.255520    -5.08%      -3.25%  [-5.80,-1.02]  23/30
+COMBINED   0.266816   0.257504    -3.49%      -3.30%               93/120 (77.5%)
+
+Contamination: NONE in any round. GPU idle 2-7% util, P1, ~2.5 GHz, 52-54 C
+per round; only benign Windows/DX processes present (see gpu_state log).
+
+============================================================
+ACCEPTANCE GATE
+============================================================
+1. 9/9 correctness remains PASS ........................ YES (established)
+2. TMA overlap remains proven (UTMALDG, prefetch-before-compute) . YES
+3. >=3 of 4 valid round medians show pipeline >1% faster: R2,R3,R4 -> 3/4 YES
+4. Combined median improvement >1% ...................... -3.49%  YES
+5. Median paired improvement >1% ........................ -3.30%  YES
+6. Pipeline wins >=70% of valid pairs ................... 77.5%   YES
+7. No single contaminated/outlier-heavy round carries it .. YES
+   (rounds uncontaminated; the weakest round, R1, shows +0.18% by raw median but
+    -2.35% paired median and 19/30 wins; excluding R1 leaves 74/90 = 82% wins and
+    a clearly negative delta, so no single round drives the verdict)
+
+=> ALL 7 GATES PASS.
+
+============================================================
+VERDICT: ACCEPT ORIGINAL PIPELINED B-TMA AS CANDIDATE
+============================================================
+The earlier REJECT/NOISE classification of the original 47-register pipelined
+B-TMA is SUPERSEDED by this controlled round-robin acceptance evidence. Under a
+clean A/P round-robin the pooled pipeline wins 93/120 pairs with a -3.3% median
+paired delta and -3.49% combined-median delta vs the accepted kernel.
+
+Caveats (stated per policy):
+* Mechanism: WHY the 47-register pipeline is faster (compiler scheduling /
+  instruction selection / ILP) is a HYPOTHESIS only; not isolated.
+* identical max_rel values shown so far are TOLERANCE-level equivalence, NOT a
+  proven bitwise (byte-identical) comparison; a bitwise check was not performed.
+* One weak round (R1) had a positive raw-median delta (+0.18%) though its paired
+  median and win count favored the pipeline; the aggregate over 120 pairs is
+  decisive.
+* Accepted control used --timing-only exactly like the pipeline, so host pre-test
+  behavior was identical (the prior group-order + host-mismatch bias is removed).
+
+Action: This is an ACCEPTED CANDIDATE, not a production promotion. Production
+source is NOT modified. STOP for review before any promotion.
+
+============================================================
+ACCEPTED PRODUCTION SHA
+============================================================
+3F730A09EAF7B8CA12F9B8218A00F7364A0EF1C04B490970FDD169411729ED5C  unchanged: yes
+
+============================================================
+FILES (adjudication evidence)
+============================================================
+kernels/src/register_tiled_gemm_accepted_timing_control.cu (durable control, src)
+benchmarks/today_evidence/register_tiled_gemm_pipeline_adjudication_bench.log
+benchmarks/today_evidence/register_tiled_gemm_pipeline_adjudication_gpu_state.log
+benchmarks/today_evidence/register_tiled_gemm_pipeline_adjudication_summary.log
+benchmarks/today_evidence/pipeline_adjudication_pairs.csv   (120 paired rows)
+NOTE: __launch_bounds__ LB6 variant remains REJECTED (slower than original
+pipeline), unchanged from the prior experiment.
