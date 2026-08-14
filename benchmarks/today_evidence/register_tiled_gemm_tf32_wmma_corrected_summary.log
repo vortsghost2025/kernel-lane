@@ -1,0 +1,106 @@
+========================================
+TRUE TF32 WMMA GEMM Experiment — CORRECTED SUMMARY
+========================================
+Date: 2026-08-13
+Source: register_tiled_gemm_tf32_wmma.cu (harness fixed)
+Accepted Baseline: 0.265424 ms (FP32 CUDA-core)
+
+VERDICT: REJECTED — Precision gate FAILED (confirmed after harness fix)
+
+========================================
+HARNESS BUG FIXED
+========================================
+Previous commit d097337f contained a critical use-after-free bug in
+run_correctness_shape():
+
+    cudaMemcpy(hC_gpu, dC, ...);
+    delete[] hA; delete[] hB; delete[] hC_ref; delete[] hC_gpu;  // FREED HERE
+    cudaFree(...);
+    for (...) {
+        float ref = hC_ref[i];   // USE AFTER FREE
+        float cmp = hC_gpu[i];   // USE AFTER FREE
+    }
+
+This undefined behavior produced wildly varying max_rel values
+(1.66 in one run, ~1e12 in another) and invalidated the original
+precision verdict.
+
+FIX APPLIED: Move evaluation BEFORE any free/delete. The corrected
+order is now:
+
+1. cudaMemcpy dC -> hC_gpu
+2. Evaluate ALL correctness metrics using live hC_ref and hC_gpu
+3. Print/store result
+4. Only THEN: delete[] hA, hB, hC_ref, hC_gpu; cudaFree dA/dB/dC
+
+Also fixed harmless printf warning: %zu now receives (size_t)M*N.
+
+========================================
+CORRECTED 256×256×256 — THREE DETERMINISTIC RUNS
+========================================
+Run 1: max_rel=1.659536  max_abs=0.003605  rel=65519 abs=17  outliers=1072/65536 => FAIL
+Run 2: max_rel=1.659536  max_abs=0.003605  rel=65519 abs=17  outliers=1072/65536 => FAIL
+Run 3: max_rel=1.659536  max_abs=0.003605  rel=65519 abs=17  outliers=1072/65536 => FAIL
+
+DETERMINISTIC: YES (bit-identical across 3 runs)
+
+CORRECTED 256 VERDICT: FAIL
+
+Previous d097337f numerical verdict: SUPERSEDED by this corrected run.
+
+========================================
+ROOT CAUSE (CONFIRMED)
+========================================
+TF32 = 10-bit mantissa (vs FP32 23-bit). Per-operation precision ~0.1%.
+With 32 K-tiles accumulating (K=256, MMA_K=8), error compounds beyond
+the project's 1% relative tolerance.
+
+Outliers (1.64%) occur where FP32 reference is small, causing large
+relative error from TF32 rounding. max_rel = 1.66 exceeds 1% gate.
+
+DO NOT loosen tolerance per instructions.
+
+========================================
+TF32 TENSOR CORE EXECUTION: STILL VERIFIED
+========================================
+HMMA.1684.F32.TF32 instructions present in SASS (from previous NCU/SASS runs).
+This evidence from commit d097337f remains valid.
+
+========================================
+NCU PROFILE (from previous run, unchanged)
+========================================
+Tensor Core execution: VERIFIED (HMMA.1684.F32.TF32 in SASS)
+Block: 32 threads (1 warp)
+Grid: 4,096 blocks (64×64)
+Registers: 40/thread
+Occupancy: 45.9% achieved (theoretical 50%)
+SM Throughput: 22.5% (low — 1 warp/block limits occupancy)
+L1/TEX: 26.6%
+Duration (NCU): 1.7 ms
+
+========================================
+VERDICT
+========================================
+REJECT TF32 on precision grounds.
+
+TF32 Tensor Core GEMM cannot meet the project's established numerical
+correctness policy (rel_tol=0.01, abs_tol=1e-3). The 10-bit mantissa
+precision is fundamentally incompatible with the 1% relative error gate.
+
+========================================
+NEXT STEP
+========================================
+Full-FP32 async/TMA/cluster launch on Blackwell (sm_120).
+The accepted FP32 CUDA-core kernel (0.265 ms) remains production baseline.
+
+========================================
+EVIDENCE
+========================================
+S:\kernel-lane\benchmarks\today_evidence\register_tiled_gemm_tf32_wmma_ncu.csv
+S:\kernel-lane\benchmarks\today_evidence\register_tiled_gemm_tf32_wmma_sass.log
+S:\kernel-lane\benchmarks\today_evidence\register_tiled_gemm_tf32_wmma_summary.log
+S:\kernel-lane\kernels\src\register_tiled_gemm_tf32_wmma.cu (harness fixed)
+
+ACCEPTED FP32 SOURCE HASH:
+3F730A09EAF7B8CA12F9B8218A00F7364A0EF1C04B490970FDD169411729ED5C
+unchanged: yes
