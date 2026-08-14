@@ -1,0 +1,74 @@
+EXPERIMENT: Persistent tile scheduling (180 physical blocks, 256 logical tiles, atomicAdd counter)
+DATE: 2026-08-13
+VERDICT: REJECT
+
+1) CORRECTNESS
+   PASS all 9 shapes (max_rel=0.000657..0.005578, max_abs=0.000001..0.000006, outliers=0)
+   Identical numerical signature to accepted A-transpose baseline.
+
+2) RESOURCES (NCU)
+   registers/thread:         40 (same as accepted)
+   static shared/block:      8,196 B (same as accepted)
+   blocks/SM limit (regs):   6 (same)
+   blocks/SM limit (warps):  6 (same)
+   achieved occupancy:       78.19% (vs 80.78% accepted)
+   theoretical occupancy:    100%
+   grid size:                180 blocks (vs 256 accepted)
+   waves per SM:             1.0 (vs 1.42 accepted)  -- launch tail eliminated
+   SM throughput:            85.89% (vs 59.83% accepted)  -- higher utilization during execution
+   L1/TEX throughput:        90.68% (vs 86.14% accepted)
+   duration:                 572,384 ns (0.572 ms) single NCU run
+
+   Note: Register pressure unchanged. Occupancy slightly lower due to 180 blocks
+   (6 blocks/SM * 30 SM = 180 exactly) filling exactly one theoretical wave,
+   but achieved occupancy 78% suggests workload imbalance from dynamic scheduling.
+
+3) BENCHMARK (30 samples, 2x15, 1024x1024x1024, same machine state)
+
+   Accepted baseline (register_tiled_gemm, includes correctness run each sample):
+     batch1 median: 0.265408 ms
+     batch2 median: 0.266048 ms
+     combined median: 0.265424 ms
+     min: 0.260896 ms
+     max: 0.332032 ms
+
+   Persistent KERNEL-ONLY (counter init before timed event):
+     batch1 median: 0.588352 ms
+     batch2 median: 0.698784 ms
+     combined median: 0.627792 ms
+     min: 0.569408 ms
+     max: 1.641920 ms
+
+   Persistent END-TO-END (full launch including counter init):
+     batch1 median: 0.542272 ms
+     batch2 median: 0.578080 ms
+     combined median: 0.570080 ms
+     min: 0.517024 ms
+     max: 1.305664 ms
+
+   Delta vs accepted baseline (combined medians):
+     kernel-only:   +136% slower (0.6278 / 0.2654)
+     end-to-end:    +115% slower (0.5701 / 0.2654)
+
+4) LAUNCH PROFILE
+   Accepted: 256 blocks, 1.42 waves/SM, partial wave = 76 blocks (Nsight warning)
+   Persistent: 180 blocks, 1.00 waves/SM, zero partial wave (tail eliminated)
+
+   The tail was eliminated but the per-tile scheduling overhead
+   (atomicAdd + while loop + __syncthreads) dominates.
+
+5) REASON FOR REJECTION
+   - 2.1-2.4x slower across all metrics
+   - No resource win (same registers, same shared memory)
+   - Dynamic scheduling adds ~300-400k cycles/block of pure overhead
+   - Workload imbalance visible in achieved occupancy (78% vs 81%)
+
+6) EVIDENCE PATHS
+   correctness:  S:\kernel-lane\benchmarks\today_evidence\register_tiled_gemm_persistent_correctness.log
+   bench:        S:\kernel-lane\benchmarks\today_evidence\register_tiled_gemm_persistent_bench.log
+   ncu:          S:\kernel-lane\benchmarks\today_evidence\register_tiled_gemm_persistent_ncu.csv
+   summary:      S:\kernel-lane\benchmarks\today_evidence\register_tiled_gemm_persistent_summary.log
+
+7) ACCEPTED SOURCE INTACT
+   register_tiled_gemm.cu sha256: 3F730A09EAF7B8CA12F9B8218A00F7364A0EF1C04B490970FDD169411729ED5C
+   (unchanged from A-transpose acceptance checkpoint)

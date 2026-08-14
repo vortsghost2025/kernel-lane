@@ -1,0 +1,74 @@
+========================================
+AsT68 Experiment Summary
+========================================
+Date: 2026-08-13
+Source: register_tiled_gemm_AsT68.cu (copy of accepted source with AsT stride 64→68)
+Accepted Baseline: 0.265424 ms (30 samples, same machine)
+
+VERDICT: REJECTED
+
+========================================
+NCU Comparison (Accepted vs AsT68)
+========================================
+Metric                     Accepted    AsT68       Delta
+Registers Per Thread       40          44          +10.0%
+Block Limit Registers      6           5           -16.7%
+Achieved Occupancy         80.43%      68.10%      -15.3%
+Theoretical Occupancy      ~100%       83.33%      (5 blocks/SM cap)
+Static Shared Mem/Block    8,192 B     8,448 B     +3.1%
+Waves Per SM               1.42        1.71        Tail effect worse
+SM Throughput              59.36%      82.76%      (misleading: fewer warps = higher per-warp util)
+L1/TEX Cache Throughput    81.52%      87.55%      (same misleading effect)
+Duration (NCU)             ~0.266 ms   0.379 ms    +42%
+
+========================================
+Raw Timing (non-NCU, 15 samples)
+========================================
+AsT68 median: 0.337280 ms
+Accepted baseline: 0.265424 ms
+Regression: +27.1% slower (1.271×)
+
+========================================
+Root Cause Analysis
+========================================
+Padding AsT row stride from 64 to 68 caused:
+1. Compiler emitted 4 additional registers per thread (40→44)
+   - Likely due to non-power-of-2 stride multiplication (k * 68) requiring general multiply
+     instead of shift-based addressing for k * 64
+2. 44 regs/thread tipped Block Limit Registers from 6→5 blocks/SM
+3. Occupancy collapsed: 80.43%→68.10% achieved (5/6 theoretical cap)
+4. SMs unable to hide latency with fewer concurrent warps
+5. Performance ~27% worse despite intended bank conflict reduction
+
+Bank conflict data: NOT COLLECTED (occupancy collapse makes it irrelevant)
+SASS check: NOT PERFORMED (occupancy collapse makes it irrelevant)
+
+========================================
+Correctness
+========================================
+All 9 shapes PASS (256, 5×1024/1000 variants, 768, 512, K1002, N1020)
+max_rel=0.005578 max_abs=0.000006 outliers=0 across all shapes
+
+========================================
+Conclusion
+========================================
+REJECTED: Stride padding from 64→68 causes register pressure increase
+(40→44) that collapses occupancy from 80.4%→68.1%, making kernel 27% slower.
+The register pressure cost dramatically outweighs any potential bank conflict
+reduction. This approach is counterproductive for this kernel architecture.
+
+Key learning: Non-power-of-2 shared memory strides on sm_120 can increase
+register pressure beyond the occupancy threshold, causing cascading
+occupancy and performance collapse. Avoid padding that breaks power-of-2
+strides unless register count is verified to stay within the same bracket.
+
+========================================
+Next Experiment Proposal: XOR Swizzle (stride stays 64)
+========================================
+To reduce the 1.63M shared-store bank conflicts without register pressure:
+- Use AsT[k][row ^ (k & 0xF)] and Bs[k][col ^ (k & 0xF)] with stride 64
+- XOR swizzle breaks power-of-2 bank alignment without changing stride
+- Stride remains 64 → no register pressure increase expected
+- Both AsT and Bs stores expected to reduce 4-way → 0/1-way conflicts
+- Row/col indices stay within [0,63] since (6-bit) ^ (4-bit) ≤ 63
+- Test: register_tiled_gemm_Swizzle.cu
