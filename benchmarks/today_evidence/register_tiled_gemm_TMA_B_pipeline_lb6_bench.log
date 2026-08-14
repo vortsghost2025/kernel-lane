@@ -1,0 +1,20 @@
+============================================
+TMA-B PIPELINE LB6 (__launch_bounds__(256,6)) — benchmark
+3-way interleaved: accepted / original pipeline / lb6 pipeline
+2 x 15 samples each run; two complete interleaved runs.
+Run 1:
+  accepted  combined = 0.267488 ms  (min 0.2627 max 0.3420)
+  orig-pipe combined = 0.258272 ms  (vs acc -3.45 %)
+  lb6-pipe  combined = 0.259344 ms  (vs acc -3.04 %, vs orig +0.42 %)
+Run 2 (accepted batch polluted by 0.564 outlier):
+  accepted  combined = 0.280192 ms  (min 0.2651 max 0.5642)
+  orig-pipe combined = 0.261200 ms  (vs acc -6.78 %)
+  lb6-pipe  combined = 0.268272 ms  (vs acc -4.25 %, vs orig +2.71 %)
+
+Consolidated:
+  lb6 vs accepted : -3.04 % (run1), -4.25 % (run2)  => consistently faster (>~1% gate)
+  lb6 vs original : +0.42 % (run1), +2.71 % (run2)  => consistently SLOWER than the
+                      47-register original pipeline
+  => launch_bounds restored occupancy (80.3%, 6 blocks) but did NOT improve
+     wall-clock; the unconstrained 47-reg original encodes more ILP per iteration
+     and wins wall-clock despite lower occupancy.

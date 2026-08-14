@@ -1,0 +1,19 @@
+========================================
+TMA-B PIPELINE LB6 (__launch_bounds__(256,6)) — Nsight Compute (sm_120, 1024x1024x1024)
+source: register_tiled_gemm_TMA_B_pipeline_lb6.cu
+========================================
+METRICS:
+Memory Throughput = 79.19
+DRAM Throughput = 7.89
+Duration = 281,152
+L1/TEX Cache Throughput = 83.47
+L2 Cache Throughput = 29.61
+Compute (SM) Throughput = 68.13
+Registers Per Thread = 40
+Static Shared Memory Per Block = 12,304
+Waves Per SM = 1.42
+Block Limit SM = 24
+Block Limit Registers = 6
+Block Limit Shared Mem = 7
+Theoretical Occupancy = 100
+Achieved Occupancy = 80.33

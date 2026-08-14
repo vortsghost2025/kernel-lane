@@ -1,0 +1,128 @@
+============================================================
+PIPELINE LB6 EXPERIMENT (register-pressure recovery via launch_bounds)
+============================================================
+Date:           2026-08-13
+Platform:       win32, sm_120 (RTX 5060), CUDA 13.3
+Variant source: kernels/src/register_tiled_gemm_TMA_B_pipeline_lb6.cu
+                (byte-for-byte copy of the working pipelined source; the ONLY
+                 change is adding __launch_bounds__(256, 6) to the kernel)
+Accepted source: kernels/src/register_tiled_gemm.cu (UNCHANGED)
+
+VERDICT: REJECT
+  __launch_bounds__(256,6) successfully restored the 6-block / ~80% occupancy
+  resource bracket with zero spills, BUT it did NOT improve wall-clock: the lb6
+  candidate is consistently SLOWER than the unconstrained 47-register pipeline
+  (+0.4% run1, +2.7% run2). Occupancy was not the binding cost; the extra
+  registers in the original encode more ILP per iteration and win wall-clock.
+
+============================================================
+CHECKPOINT
+============================================================
+new durable SHA: 1c402caa93033ce5a4bde3a76b13f56714c2f4ef
+HEAD == origin/main: yes
+(committed: rejected 47-register pipelined B-TMA experiment + evidence)
+
+============================================================
+BUILD
+============================================================
+                  original pipeline    lb6 candidate
+registers/thread       47                  40 (kernel <1,1>)
+                                       39 for <0,0>/<0,1>
+spill stores            0                  0
+spill loads             0                  0
+stack frame           128 B               0 B
+static shared         12,304 B           12,304 B
+
+============================================================
+CORRECTNESS
+============================================================
+256: PASS   (max_rel=0.000657, max_abs=0.000001, outliers=0/65536)
+9/9: PASS   (all byte-identical max_rel to accepted)
+Note: harness label retained as "TMA_pipe" because the file is a byte-copy;
+  numerical behavior is what is compared.
+
+============================================================
+OVERLAP (SASS/PTX)
+============================================================
+UTMALDG (SASS): present (8)
+cp.async.bulk.tensor.3d (PTX): present
+prefetch-before-compute preserved: YES
+  in-loop order: cp.async.bulk (prefetch B[t+1], coords k+16) line 372
+                 -> mbarrier.try_wait.parity (wait B[t])   line 390
+                 -> fma.rn.ftz.f32 (compute tile t)         line 527
+The register reallocation did not break the double-buffered TMA overlap.
+
+============================================================
+RESOURCES (accepted -> original pipeline -> lb6)
+============================================================
+                    accepted   orig-pipe   lb6-pipe
+registers/thread      40          47         40
+static smem/blk       8192       12,304     12,304
+block limit regs        6           5          6     <- restored 5->6
+theoretical occ       100%       83.33%     100%
+achieved occupancy   80.43%      71.12%     80.33%   <- restored toward ~80%
+block limit shared     --          7          7     (12,304 not binding)
+waves/SM              1.42      1.71       1.42
+SM throughput        59.36%      64.56%     68.13%
+L1/TEX               81.52%      83.21%     83.47%
+memory throughput       --       78.52%     79.19%
+L2                      --       30.11%     29.61%
+DRAM                    --       11.04%      7.89%
+Duration (NCU)          --      276,288    281,152 ns  (profiled, not wall-clock)
+spills                  0          0          0
+=> PRIMARY structural goal (block limit 5 -> 6) MET.
+   SECONDARY goal (occupancy back toward ~80%) MET (80.33%).
+   But wall-clock did NOT follow; perf favors the 47-reg original.
+
+============================================================
+PERFORMANCE (3-way, 2x15 interleaved; two complete runs)
+============================================================
+Run 1:
+  accepted          0.267488 ms
+  original pipeline 0.258272 ms   (-3.45 % vs accepted)
+  lb6 pipeline      0.259344 ms   (-3.04 % vs accepted, +0.42 % vs original)
+Run 2 (accepted polluted by 0.564 outlier):
+  accepted          0.280192 ms
+  original pipeline 0.261200 ms   (-6.78 % vs accepted)
+  lb6 pipeline      0.268272 ms   (-4.25 % vs accepted, +2.71 % vs original)
+
+Consolidated:
+  lb6 vs accepted : -3.04 %, -4.25 %  (consistently faster, meets >1% gate)
+  lb6 vs original : +0.42 %, +2.71 %  (consistently SLOWER than 47-reg original)
+
+============================================================
+VERDICT: REJECT
+============================================================
+launch_bounds is a working lever for the RESOURCE axis (40 regs, 6 blocks, 80%
+occupancy, zero spills) but it is NOT the bottleneck: the recovered occupancy does
+not translate to wall-clock. The unconstrained 47-register pipeline encodes more
+ILP per iteration and remains ~0.4-2.7% faster than the lb6 form across all runs.
+So the register-pressure-recovery-via-launch_bounds tuning route is rejected as an
+improvement. (Separately noted: BOTH pipelined forms are ~3-7% faster than accepted
+against fresh same-state accepted, but that pipeline-vs-accepted question belongs to
+the prior experiment's verdict, not this tuning experiment.)
+
+============================================================
+ACCEPTED SOURCE SHA
+============================================================
+3F730A09EAF7B8CA12F9B8218A00F7364A0EF1C04B490970FDD169411729ED5C
+unchanged: yes
+
+============================================================
+FILES CHANGED (lb6 candidate only; NOT committed/pushed, per instructions)
+============================================================
+kernels/src/register_tiled_gemm_TMA_B_pipeline_lb6.cu
+build_TMA_B_pipeline_lb6.bat
+dump_sass_TMA_B_pipeline_lb6.bat
+run_ncu_TMA_B_pipeline_lb6.bat
+
+============================================================
+EVIDENCE
+============================================================
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_pipeline_lb6_correctness.log
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_pipeline_lb6_sass.log
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_pipeline_lb6_ncu.csv
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_pipeline_lb6_ncu.log
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_pipeline_lb6_bench.log
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_pipeline_lb6_summary.log
+benchmarks/today_evidence/_lb6_ptx.txt  (PTX overlap-order proof)
