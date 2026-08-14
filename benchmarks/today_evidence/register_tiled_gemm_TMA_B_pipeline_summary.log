@@ -1,0 +1,127 @@
+============================================================
+PIPELINED (DOUBLE-BUFFERED) B-TMA EXPERIMENT — SUMMARY
+============================================================
+Date:           2026-08-13
+Platform:       win32, sm_120 (RTX 5060), CUDA 13.3
+Variant source: kernels/src/register_tiled_gemm_TMA_B_pipeline.cu
+Based on:       working kernels/src/register_tiled_gemm_TMA_B.cu (NOT an earlier failed attempt)
+Accepted source: kernels/src/register_tiled_gemm.cu (UNCHANGED)
+
+VERDICT: REJECT / NOISE — the pipelined B-TMA does not give a repeatable,
+        meaningfully-above-blocking wall-clock improvement over accepted
+        production, and it enters the experiment at a real resource cost
+        (occupancy 80.5% -> 71.1%).
+
+============================================================
+CORRECTNESS 256: PASS
+============================================================
+max_rel = 0.000657
+max_abs = 0.000001
+outliers = 0 / 65536
+(byte-identical to accepted signature)
+
+============================================================
+GENERAL: 9/9 PASS  YES
+============================================================
+All 9 shapes PASS with max_rel matching accepted exactly (e.g.
+M1024_N1024_K1000=0.003434, M1024_N1000_K1024=0.005578). Boundary blocks keep
+the proven conservative synchronous-B fallback; interior blocks use the pipeline.
+
+============================================================
+DOUBLE BUFFER
+============================================================
+shared B buffers: Bs[2][BK][64]  (two 16x64 FP32 buffers, +4096 B)
+static shared:    12,304 B  (AsT 4096 + Bs 8192 + mb[2] 16)
+barrier scheme:   2 async barriers mb[0], mb[1], each arrival count = 1.
+                  Producer (tid==0) does mbarrier_arrive_expect_tx(mb[b], bytes)
+                  then cp_async_bulk_tensor into Bs[b]; consumers only WAIT via
+                  mbarrier_try_wait_parity(mb[curr], (t>>1)&1). Explicit parity
+                  per buffer per the CUDA async-barrier model. Reuse safety via
+                  trailing block __syncthreads() after each compute tile.
+
+============================================================
+OVERLAP PROOF: B[t+1] issue before compute(t): YES
+============================================================
+PTX (register_tiled_gemm_TMA_B_pipeline_sass.log / _pipe_ptx.txt), loop body order:
+  line 327 : cp.async.bulk.tensor.3d ... {%r4,col, %r160=k+16, ...}  -> PREFETCH B[t+1]
+  line 344 : mbarrier.try_wait.parity [mb[curr]]                    -> WAIT for B[t] (late)
+  line 452+: fma.rn.ftz.f32                                         -> COMPUTE tile t
+SASS: UTMALDG.3D present (8 instances = preload + per-tile prefetch).
+wait placement: the B[t] parity wait is issued AFTER the B[t+1] prefetch and
+  immediately before compute, so the TMA transfer overlaps the register-tile math.
+instruction evidence: cp.async.bulk.tensor.3d + UTMALDG.3D + FFMA interleave.
+
+============================================================
+RESOURCES (accepted -> blocking -> pipeline)
+============================================================
+                  accepted   blocking-TMA   pipeline-TMA
+registers/thread    40          39            47
+static smem/blk     8192        8,200         12,304
+block limit regs      6           6             5      <- 47 regs crosses 6->5
+theoretical occ     100%        100%          83.33%
+achieved occupancy  80.43%      80.53%        71.12%   <- material collapse
+SM throughput       59.36%      67.88%        64.56%
+L1/TEX              81.52%      80.91%        83.21%
+memory throughput    --         76.34%        78.52%
+L2                   --         29.07%        30.11%
+DRAM                 --          6.69%        11.04%
+Duration (NCU)       --        284,576 ns    276,288 ns  (profiled, not wall-clock)
+spills                0           0             0
+=> The pipeline raised registers 39->47, dropping block limit registers 6->5 and
+   achieved occupancy ~80%->71%. This is exactly the "crosses a harmful block/SM
+   threshold / occupancy collapses materially" resource-gate trigger.
+
+============================================================
+PERFORMANCE (3-way, 2x15 interleaved each run; two complete runs)
+============================================================
+Run 1 (accepted batch2 polluted by a 0.548 ms outlier):
+  accepted  combined = 0.280672 ms
+  blocking  combined = 0.267552 ms   (-4.67 % vs accepted)
+  pipeline  combined = 0.260704 ms   (-7.11 % vs accepted)
+  clean batch1 only:  accepted 0.265536 | pipeline 0.255424 (-3.79 %)
+Run 2 (cleaner):
+  accepted  combined = 0.268624 ms
+  blocking  combined = 0.264192 ms   (-1.65 % vs accepted)
+  pipeline  combined = 0.264464 ms   (-1.55 % vs accepted)
+
+Interpretation:
+  pipeline vs accepted: faster on every clean read (-1.5% .. -3.8%), but the
+    margin is right at the ~1% gate and the machine state swings dominate.
+  pipeline vs blocking: FLIPS +2.5% (run1) to -0.1% (run2) => pipelining does not
+    reliably beat the simpler, non-pipelined, higher-occupancy blocking TMA-B.
+  With achieved occupancy down ~9 points and no sign-stable, >1%-and-a-head margin
+    over blocking, the overlap is not paying for itself.
+
+============================================================
+VERDICT: REJECT / NOISE
+============================================================
+Pipelined B-TMA is a genuine, correct, working double-buffered TMA pipeline
+(overlap proven, correctness byte-identical), but it does not meet the KEEP gate:
+  * not a repeatable, meaningfully-above-blocking wall-clock improvement over accepted,
+  * enters with a material occupancy regression (80.5% -> 71.1%, block limit 6->5).
+The extra B buffer + pipeline register pressure eats most of the overlap gain.
+
+============================================================
+ACCEPTED SOURCE SHA
+============================================================
+3F730A09EAF7B8CA12F9B8218A00F7364A0EF1C04B490970FDD169411729ED5C
+unchanged: yes
+
+============================================================
+FILES CHANGED (candidate only; NOT committed/pushed, per instructions)
+============================================================
+kernels/src/register_tiled_gemm_TMA_B_pipeline.cu
+build_TMA_B_pipeline.bat
+dump_sass_TMA_B_pipeline.bat
+run_ncu_TMA_B_pipeline.bat
+
+============================================================
+EVIDENCE
+============================================================
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_pipeline_correctness.log
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_pipeline_sass.log
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_pipeline_ncu.csv
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_pipeline_ncu.log
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_pipeline_bench.log
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_pipeline_summary.log
+benchmarks/today_evidence/_pipe_ptx.txt  (PTX used for overlap-order proof)

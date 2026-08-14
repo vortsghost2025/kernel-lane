@@ -1,0 +1,17 @@
+============================================
+TMA-B PIPELINED GEMM — benchmark (2x15 interleaved, same machine state)
+implementations: accepted / blocking TMA-B / pipelined TMA-B
+Run 1:
+  accepted  combined median = 0.280672 ms  (min 0.2641 max 0.5485)  [batch2 noisy, 0.548 outlier]
+  blocking  combined median = 0.267552 ms  (delta vs acc -4.67 %)
+  pipelined combined median = 0.260704 ms  (delta vs acc -7.11 %)
+  clean batch1 only:  accepted 0.265536 | pipeline 0.255424  (delta -3.79 %)
+Run 2 (repeat, cleaner):
+  accepted  combined median = 0.268624 ms  (min 0.2624 max 0.3986)
+  blocking  combined median = 0.264192 ms  (delta vs acc -1.65 %)
+  pipelined combined median = 0.264464 ms  (delta vs acc -1.55 %)
+Summary:
+  pipeline vs accepted: consistently faster (-1.5% .. -3.8% on clean reads),
+    but pipeline vs blocking FLIPS sign run-to-run (+2.5% run1, -0.1% run2)
+  => no repeatable, meaningfully ABOVE-blocking improvement; margin right at the
+     ~1% gate with high run-to-run variance.
