@@ -1,0 +1,9 @@
+[CORRECTNESS] AsT_swizzle_256           max_rel=0.000657 max_abs=0.000001 rel=65519 abs=17 outliers=0/65536 => PASS
+[CORRECTNESS] AsT_swizzle_M1024_N1024_K1000 max_rel=0.003434 max_abs=0.000005 rel=1048508 abs=68 outliers=0/1048576 => PASS
+[CORRECTNESS] AsT_swizzle_M1000_N1024_K1024 max_rel=0.003426 max_abs=0.000005 rel=1023913 abs=87 outliers=0/1024000 => PASS
+[CORRECTNESS] AsT_swizzle_M1024_N1000_K1024 max_rel=0.005578 max_abs=0.000004 rel=1023930 abs=70 outliers=0/1024000 => PASS
+[CORRECTNESS] AsT_swizzle_M1000_N1000_K1000 max_rel=0.002897 max_abs=0.000006 rel=999943 abs=57 outliers=0/1000000 => PASS
+[CORRECTNESS] AsT_swizzle_M768_N768_K768 max_rel=0.003095 max_abs=0.000004 rel=589770 abs=54 outliers=0/589824 => PASS
+[CORRECTNESS] AsT_swizzle_M512_N512_K512 max_rel=0.001705 max_abs=0.000003 rel=262115 abs=29 outliers=0/262144 => PASS
+[CORRECTNESS] AsT_swizzle_M1000_N1000_K1002 max_rel=0.005211 max_abs=0.000004 rel=999924 abs=76 outliers=0/1000000 => PASS
+[CORRECTNESS] AsT_swizzle_M1024_N1020_K1024 max_rel=0.004646 max_abs=0.000003 rel=1044408 abs=72 outliers=0/1044480 => PASS

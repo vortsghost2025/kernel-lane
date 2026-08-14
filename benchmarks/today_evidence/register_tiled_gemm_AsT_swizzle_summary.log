@@ -1,0 +1,86 @@
+========================================
+AsT-only Swizzle Experiment Summary
+========================================
+Date: 2026-08-13
+Source: register_tiled_gemm_AsT_swizzle.cu
+Accepted Baseline: 0.265424 ms (30 samples, same machine)
+
+VERDICT: REJECTED
+
+========================================
+NCU Comparison (Accepted vs AsT_swizzle)
+========================================
+Metric                     Accepted    AsT_swizzle  Delta
+Registers Per Thread       40          42           +5.0%
+Block Limit Registers      6           5            -16.7%
+Achieved Occupancy         80.43%      71.01%       -9.4%
+Theoretical Occupancy      ~100%       83.33%       (5 blocks/SM cap)
+Static Shared Mem/Block    8,192 B     8,192 B      unchanged
+Waves Per SM               1.42        1.71         Tail effect worse
+SM Throughput              59.36%      78.06%       (misleading: fewer warps)
+L1/TEX Cache Throughput    81.52%      85.29%       (same effect)
+Duration (NCU)             ~0.266 ms   0.473 ms     +78%
+
+========================================
+Raw Timing (non-NCU, 15 samples)
+========================================
+AsT_swizzle median: 0.416064 ms
+Accepted baseline: 0.265424 ms
+Regression: +56.7% slower (1.567×)
+
+========================================
+Root Cause Analysis
+========================================
+The swizzle function:
+  swizzle_a_row(logical_row, k) = logical_row ^ (((k >> 2) & 3) << 3)
+
+caused two regressions:
+
+1. Register pressure increase: 40 -> 42 registers/thread
+   - The XOR/swizzle arithmetic added ~2 registers
+   - Crossed the 6-block/SM register threshold (Block Limit Registers: 6->5)
+   - Occupancy collapsed: 80.43% -> 71.01% achieved
+
+2. LDS.128 vectorization broken on A compute loads
+   - Accepted SASS: LDS.128 for all 4 contiguous A values
+   - Swizzle SASS: Mixed LDS.64 / LDS.32 pattern
+   - The non-linear row access defeated the compiler's vectorization
+   - shared_ld instruction count likely increased (not fully measured)
+
+The swizzle addressed store bank conflicts but at the cost of:
+- Breaking the LDS.128 compute load path
+- Increasing register pressure past the occupancy threshold
+- Net ~57% slowdown despite unchanged shared memory footprint
+
+Bank conflict data: Not collected in this NCU run (occupancy + LDS regressions are decisive)
+
+========================================
+Correctness
+========================================
+All 9 shapes PASS (256, 5×1024/1000 variants, 768, 512, K1002, N1020)
+max_rel=0.000657 max_abs=0.000001 outliers=0/65536 at 256
+Signature matches accepted exactly.
+
+========================================
+Conclusion
+========================================
+REJECTED: The specific AsT-only XOR swizzle with
+physical_row = logical_row ^ (((k >> 2) & 3) << 3)
+causes:
+- Register pressure 40->42, crossing 6->5 blocks/SM threshold
+- LDS.128 vectorization broken on A compute loads
+- Occupancy 80.4%->71.0%
+- Performance 57% worse
+
+This mapping is not viable. The swizzle arithmetic cost exceeds
+the bank conflict benefit for this kernel's register budget.
+
+========================================
+Next Step
+========================================
+Do NOT test Bs swizzle. Do NOT iterate on swizzle mappings.
+The register budget is exhausted. Any swizzle arithmetic that
+requires additional registers or breaks LDS.128 will fail.
+
+Accepted source remains byte-identical:
+SHA256: 3F730A09EAF7B8CA12F9B8218A00F7364A0EF1C04B490970FDD169411729ED5C
