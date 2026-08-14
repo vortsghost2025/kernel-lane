@@ -1,0 +1,77 @@
+========================================
+FP16 Tensor Core GEMM Experiment Summary
+========================================
+Date: 2026-08-13
+Source: register_tiled_gemm_fp16_tensorcore.cu
+Accepted Baseline: 0.265424 ms (FP32 CUDA-core)
+
+VERDICT: REJECTED — Correctness gate FAILED
+
+========================================
+NCU Summary (1024x1024x1024, NCU-instrumented)
+========================================
+Block Size:         (32, 8, 1) = 256 threads
+Grid Size:          (16, 32, 1) = 512 blocks
+Registers/Thread:   56
+Theoretical Occupancy:  66.67%
+Achieved Occupancy: 61.26%
+SM Throughput:      54.16%
+Static Shared Mem:  8,192 B/block
+Tensor Core Usage:  Not visibly active in SOL section
+
+========================================
+Correctness Test (256x256x256)
+========================================
+max_rel = 6603.08 (660,308% error)
+max_abs = 10.60
+outliers = 65,296 / 65,536 (99.6%)
+FAIL — Output completely wrong
+
+========================================
+Root Cause
+========================================
+Kernel logic error in grid/block mapping or WMMA fragment usage.
+The tensor core MMA operations either:
+- Execute on wrong data (indexing bug)
+- Accumulate incorrectly across K-tiles
+- Store to wrong output locations
+- Fragment layout mismatch (row/col major confusion)
+
+Multiple grid/block rewrites attempted; none passed correctness.
+WMMA fragment API for m16n16k16 FP16 is functional (compiles) but
+the surrounding kernel structure has unverified bugs.
+
+========================================
+Attempts Made
+========================================
+1. Initial: block=(128,4), warp_id=ty (wrong: 128 threads = 4 warps per ty)
+2. Rewrite: block=(32,8), warp_row/col mapping, 8 warps/block
+3. Grid calculations revised multiple times
+
+All variants compiled and ran but failed correctness with massive errors.
+No variant produced numerically valid output.
+
+========================================
+Conclusion
+========================================
+FP16 Tensor Core baseline NOT ESTABLISHED.
+Correctness gate is a hard requirement — this experiment fails it.
+
+The WMMA API for FP16 m16n16k16 is available in CUDA 13.3 but
+writing a correct, complete GEMM kernel around it requires more
+iterations than this cycle allows.
+
+Next step options:
+A. Debug kernel with SASS/PTX inspection (time-consuming)
+B. Switch to CUTLASS reference implementation (external dependency)
+C. Return to FP32 CUDA-core and explore async/TMA path
+
+RECOMMENDATION: Option C — the accepted FP32 kernel (0.265 ms) is
+stable and verified. The async/TMA path on Blackwell is the
+architectural successor for this codebase.
+
+========================================
+Evidence
+========================================
+S:\kernel-lane\benchmarks\today_evidence\register_tiled_gemm_fp16_tc_ncu.csv
+S:\kernel-lane\kernels\src\register_tiled_gemm_fp16_tensorcore.cu (final variant)
