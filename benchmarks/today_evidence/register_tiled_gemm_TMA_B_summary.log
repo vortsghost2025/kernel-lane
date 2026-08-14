@@ -1,0 +1,141 @@
+============================================================
+TMA B-TILE EXPERIMENT — SUMMARY
+============================================================
+Date:           2026-08-13
+Platform:       win32, sm_120 (RTX 5060), CUDA 13.3, nvcc 13.3 / VS2026
+Variant source: kernels/src/register_tiled_gemm_TMA_B.cu
+Accepted source: kernels/src/register_tiled_gemm.cu (UNCHANGED)
+
+VERDICT: REJECT / NOISE — B-only TMA does NOT, under the established
+        gate, improve the accepted kernel (+/- 1% inconsistent band).
+
+============================================================
+TMA TOOLCHAIN PROOF: PASS
+============================================================
+API used:
+  - Host tensormap encode: cuda::__driver::__tensorMapEncodeTiled
+    (resolves cuTensorMapEncodeTiled proc at runtime; no dlpack dep).
+    Rank 3, FLOAT32:
+      globalDim    = { N(cols,fastest), K(rows), 1 }
+      globalStrides= { N*4 bytes row stride, N*4*K bytes outer } (bytes)
+      boxDim       = { 64, 16, 1 }
+      elementStrides = {1,1,1}
+    IMPORTANT: cuTensorMap is COLUMN-major (dim[0] = fastest/contiguous),
+    and tensorRank MUST be 3/4/5 (2 is INVALID). Strides are in BYTES.
+  - Device copy:    cuda::ptx::cp_async_bulk_tensor (space_shared,space_global,
+                    &Bs[0][0], tm_dev_ptr, coords{col_start,k_base,0}, &mbar)
+  - Sync:           cuda::ptx::mbarrier_init / mbarrier_arrive / 
+                    mbarrier_arrive_expect_tx / mbarrier_try_wait_parity,
+                    arrival count = 256, expected tx bytes = 4096/tile.
+  - Tensormap MUST live in DEVICE GLOBAL memory (kernel must receive a
+    CUtensorMap* pointer). Passing the by-value 128-byte CUtensorMap kernel
+    parameter to TMA caused illegal-access (param/const-space map not usable).
+
+Instruction evidence (final SASS, register_tiled_gemm_TMA_B_sass.log):
+  UTMALDG.3D [URdst], [URmap];      (Blackwell Unified TMA load-to-shared, .3D)
+  mbarrier.arrive.expect_tx.release.cta.shared::cta.b64
+  mbarrier.try_wait.parity.shared::cta.b64
+  PTX: cp.async.bulk.tensor.3d.shared::cta.global.tile.mbarrier::complete_tx::bytes
+Small proof (tma_proof.cu): a single 16x64 tile copied via TMA to shared and
+  read back: 0 mismatches, maxerr 0.000000  => PASS.
+
+============================================================
+CORRECTNESS 256: PASS
+============================================================
+[CORRECTNESS] TMA_B_256x256x256      max_rel=0.000657 max_abs=0.000001
+             rel=65519 abs=17 outliers=0/65536 => PASS
+Matches accepted signature exactly (same as production kernel).
+
+============================================================
+GENERAL SHAPES (9): PASS
+============================================================
+TMA_B_256                      0.000657  PASS
+TMA_B_M1024_N1024_K1000        0.003434  PASS   (K%16!=0 -> full sync fallback)
+TMA_B_M1000_N1024_K1024        0.003426  PASS   (full TMA)
+TMA_B_M1024_N1000_K1024        0.005578  PASS   (mixed TMA + right-boundary sync)
+TMA_B_M1000_N1000_K1000        0.002897  PASS   (K%16!=0 -> full sync fallback)
+TMA_B_M768_N768_K768           0.003095  PASS
+TMA_B_M512_N512_K512           0.001705  PASS
+TMA_B_M1000_N1000_K1002        0.005211  PASS   (K%16!=0 -> full sync fallback)
+TMA_B_M1024_N1020_K1024        0.004646  PASS   (mixed TMA + right-boundary sync)
+[ALL_SHAPES] 0 shape(s) failed
+Every max_rel is byte-identical to the accepted kernel's historical values,
+so the TMA B copy produces exactly the same Bs contents as synchronous staging.
+
+============================================================
+RESOURCES (NCU, kernel <1,1>, 1024x1024x1024)
+============================================================
+                    accepted       candidate
+registers/thread       40             39
+static smem/blk       8192          8,200   (+8 mbarrier)
+block limit regs         6              6
+block limit smem        (smem not binding)  10
+theoretical occupancy 100%          100%
+achieved occupancy   80.43%         80.53%
+SM throughput         59.36%        67.88%
+L1/TEX throughput     81.52%        80.91%
+DRAM throughput         ~             6.69%
+memory throughput       ~            76.34%
+Duration (NCU)          ~            284,576 ns (profiled, not wall clock)
+=> Candidate stays in the good 40-register / ~80% occupancy bracket; no resource regression.
+
+============================================================
+MECHANISM
+============================================================
+accepted B staging: per-thread synchronous vectorized global loads (LDG float4)
+                     + STS into Bs, guarded by __syncthreads each K-tile.
+candidate B staging: single-thread-issued UTMALDG.3D (TMA) bulk copy into Bs,
+                     completed via mbarrier (256 arrivals + 4096 tx bytes).
+TMA instruction verified: YES (UTMALDG.3D in SASS).
+
+============================================================
+PERFORMANCE (2 batches x 15 samples, interleaved, same machine state)
+============================================================
+Run A (clean):
+  accepted combined median = 0.270672 ms   (min 0.2600, max 0.3553)
+  tma-b    combined median = 0.268864 ms   (min 0.2603, max 0.3742)
+  delta                          = -0.67 %   (tma faster)
+  batch1: acc 0.268544 vs tma 0.266176 ; batch2: acc 0.270688 vs tma 0.270048
+Run B (noisy, outliers to ~2.3 ms):
+  accepted combined = 0.277424 ms ; tma-b combined = 0.278032 ms ; delta +0.22 %
+=> Direction flips sign run-to-run; both within the ~1% noise band.
+   Per gate: <=~1% or inconsistent => REJECT / NOISE.
+
+============================================================
+VERDICT: REJECT / NOISE
+============================================================
+B-only TMA did NOT measurably improve the accepted kernel. The B staging is a
+small fraction of runtime; without software pipelining the block simply waits on
+the mbarrier each tile (no overlap), so TMA is not expected to beat the
+synchronous path. This does NOT conclude all TMA is useless — it only
+establishes that swapping B's transport alone is not a repeatable win.
+Numerical behavior is bit-identical (correctness fully preserved).
+
+============================================================
+ACCEPTED SOURCE
+============================================================
+SHA256 = 3F730A09EAF7B8CA12F9B8218A00F7364A0EF1C04B490970FDD169411729ED5C
+unchanged: yes
+
+============================================================
+FILES CHANGED
+============================================================
+kernels/src/register_tiled_gemm_TMA_B.cu   (candidate variant)
+kernels/src/tma_proof.cu                    (throwaway TMA proof — not production)
+build_TMA_B.bat / build_proof.bat
+dump_sass_TMA_B.bat / dump_proof.bat
+run_ncu_TMA_B.bat
+
+============================================================
+EVIDENCE
+============================================================
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_correctness.log
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_sass.log
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_ncu.csv
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_ncu.log
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_bench.log
+benchmarks/today_evidence/register_tiled_gemm_TMA_B_summary.log
+benchmarks/today_evidence/_tma_ptx.txt (PTX of final exe)
+benchmarks/today_evidence/_proof_ptx.txt / _proof_sass.txt (proof artifacts)
+
+NOTE: No git commit / push performed, per experiment instructions.

@@ -1,0 +1,12 @@
+===== ACCEPTED (production) =====
+batch1 median:  0.268928 ms  (min=0.263776 max=0.334816 n=15)
+batch2 median:  0.290752 ms  (min=0.263680 max=1.082590 n=15)
+combined median:0.277424 ms  (min=0.263680 max=1.082590 n=30)
+===== TMA-B (candidate) =====
+batch1 median:  0.282880 ms  (min=0.259104 max=0.351264 n=15)
+batch2 median:  0.277120 ms  (min=0.267936 max=2.363360 n=15)
+combined median:0.278032 ms  (min=0.259104 max=2.363360 n=30)
+
+accepted combined median = 0.277424 ms
+tma-b    combined median = 0.278032 ms
+delta (tma - acc)/acc     = 0.22 %
