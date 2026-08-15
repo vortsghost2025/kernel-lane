@@ -1366,10 +1366,12 @@ function executeWebResearchTask(msg, lane) {
   }
 
   try {
-    const { execSync } = require('child_process');
+    const { spawnSync } = require('child_process');
     const tmpFile = path.join(os.tmpdir(), `lane-research-${Date.now()}.html`);
-    const curlCmd = `curl -sS -L --max-time ${Math.ceil(TIMEOUT_MS / 1000)} --max-filesize ${MAX_BYTES * 100} -o "${tmpFile}" "${url}"`;
-    execSync(curlCmd, { timeout: TIMEOUT_MS + 2000, encoding: 'utf8', maxBuffer: MAX_BYTES + 1024 });
+    const result = spawnSync('curl', ['-sS','-L','--max-time',String(Math.ceil(TIMEOUT_MS/1000)),'--max-filesize',String(MAX_BYTES*100),'-o',tmpFile,url], { timeout: TIMEOUT_MS+2000, encoding:'utf8', maxBuffer: MAX_BYTES+1024 });
+    if (result.error || result.status !== 0) {
+      throw new Error(result.stderr?.trim() || result.error?.message || `curl exited with code ${result.status}`);
+    }
     let data = '';
     try { data = fs.readFileSync(tmpFile, 'utf8'); } catch (_) {}
     try { fs.unlinkSync(tmpFile); } catch (_) {}
